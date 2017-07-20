@@ -1,5 +1,5 @@
 <?php
-session_start("wbengine");
+session_start();
 require __DIR__."/functions.php";
 wbInit();
 $_ENV["ITEM"]=array();
