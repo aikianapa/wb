@@ -1,0 +1,77 @@
+/* Form Select Switches */
+label.switch {
+    margin: 1px 0;
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+label.switch input {
+    position: absolute;
+    opacity: 0;
+}
+
+label.switch span {
+    position: relative;
+    display: inline-block;
+    width: 54px;
+    height: 28px;
+    border-radius: 14px;
+    background: rgba(0, 0, 0, .2);
+    -webkit-transition: background-color .75s;
+    transition: background-color .75s;
+}
+
+label.switch span:after {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    bottom: 2px;
+    width: 24px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    -webkit-transition: all .15s ease-in-out;
+    transition: all .15s ease-in-out;
+}
+
+label.switch input:checked + span:after {
+    left: 27px;
+    width: 24px;
+    top: 2px;
+    bottom: 2px;
+}
+
+label.switch input:checked + span {
+    background-color: #eeeeee;
+}
+
+label.switch-default input:checked + span {
+    background-color: #dae0e8;
+}
+
+label.switch-warning input:checked + span {
+    background-color: #deb25c;
+}
+
+label.switch-danger input:checked + span {
+    background-color: #de815c;
+}
+
+label.switch-info input:checked + span {
+    background-color: #5cafde;
+}
+
+label.switch-success input:checked + span {
+    background-color: #afde5c;
+}
+
+label.switch-primary input:checked + span {
+    background-color: #5ccdde;
+}
+
+// fix datepicker
+.datetimepicker thead tr:first-child th {
+    display: table-cell!important;
+}

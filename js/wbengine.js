@@ -1,7 +1,7 @@
 wb_include("/engine/js/underscore-min.js");
 wb_include("/engine/js/backbone-min.js");
 wb_include("/engine/js/php.js");
-	
+
 $(document).ready(function(){
 	wb_delegates();
 });
@@ -10,6 +10,7 @@ function wb_delegates() {
 	wb_ajax();
 	wb_pagination();
 	wb_formsave();
+	wb_plugins();
 }
 
 function wb_include(url){
@@ -18,6 +19,17 @@ function wb_include(url){
 	}
 }
 
+function wb_plugins(){
+	$(document).ready(function(){
+		if ($("[data-wb-src=datepicker]").length) {
+			$("[type=datetimepicker]").datetimepicker({
+				format: "dd.mm.yyyy hh:ii",
+				autoclose: true,
+				todayBtn: true
+			});
+		}
+	});
+}
 
 function wb_formsave() {
 // <button data-formsave="#formId" data-src="/path/ajax.php"></button>
@@ -98,13 +110,13 @@ function wb_formsave_obj(formObj) {
 			var form=formObj.serialize();
 		}
 		form+=ui_switch+bs_switch+ic_date;
-		
+
 				console.log(form);
 		var name=formObj.attr("data-wb-form");
 		var item=formObj.attr("data-wb-item");
 		var oldi=formObj.attr("data-wb-item-old");
 
-		
+
 		if ($(this).attr("data-wb-form")!==undefined) {name=$(this).attr("data-wb-form");}
 		if ($(this).attr("data-wb-src")!==undefined) {
 			var src=$(this).attr("data-wb-src");
@@ -112,7 +124,7 @@ function wb_formsave_obj(formObj) {
 			var src="/ajax/save/"+name+"/"+item;
 		}
 		if (oldi!==undefined) {src+="&copy="+oldi;}
-		
+
 		if (ptpl==undefined) {
 			var ptpl=$(document).find("[data-wb-add=true][data-wb-tpl]").attr("data-wb-tpl");
 		}
@@ -133,7 +145,7 @@ function wb_formsave_obj(formObj) {
 						width: "auto",
 						delay: 4000,
 						allow_dismiss: true,
-						stackup_spacing: 10 
+						stackup_spacing: 10
 					});
 				}
 
@@ -143,7 +155,7 @@ function wb_formsave_obj(formObj) {
 					var post={
 						tpl: tpl
 					};
-					
+
 					var ret=false;
 					if (list.attr("data-add")+""!=="false") {
 					$.post("/ajax/setdata/"+name+"/"+item_id,post,function(ret){
@@ -175,7 +187,7 @@ function wb_formsave_obj(formObj) {
 						width: "auto",
 						delay: 4000,
 						allow_dismiss: true,
-						stackup_spacing: 10 
+						stackup_spacing: 10
 					});
 				}
 				return {error:1};
@@ -191,7 +203,7 @@ function wb_formsave_obj(formObj) {
 					width: "auto",
 					delay: 4000,
 					allow_dismiss: true,
-					stackup_spacing: 10 
+					stackup_spacing: 10
 				});
 	}
 }
@@ -204,16 +216,26 @@ function wb_check_email(email) {
 function wb_check_required(form) {
 	var res=true;
 	var idx=0;
-	$(form).find("input,select,textarea").each(function(i){
-	if ($(this).is("[required]:not([disabled],[type=checkbox]):visible")) {
+	$(form).find("input[required],select[required],textarea[required],[type=password]").each(function(i){
+	if ($(this).is(":not([disabled],[type=checkbox]):visible")) {
 			if ($(this).val()=="") {res=false; idx++; $(this).data("idx",idx); $(document).trigger("wb_required_false",[this]);}
 			else {
 				if ($(this).attr("type")=="email" && !wb_check_email($(this).val())) {
-					res=false; idx++; 
-					$(this).data("idx",idx); 
+					res=false; idx++;
+					$(this).data("idx",idx);
 					$(this).data("error","Введите корректный email");
 					$(document).trigger("wb_required_false",[this]);
 				} else {$(document).trigger("wb_required_true",[this]);}
+			}
+		}
+		if ($(this).is("[type=password]")) {
+			var pcheck=$(this).attr("name")+"_check";
+			if ($("input[type=password][name="+pcheck+"]").length) {
+					if ($(this).val()!==$("input[type=password][name="+pcheck+"]").val()) {
+						res=false;
+						$(this).data("error","Пароли должны совпадать");
+						$(document).trigger("wb_required_false",[this]);
+					}
 			}
 		}
 	});
@@ -248,11 +270,12 @@ function wb_ajax() {
 			if ($(link).attr("data-wb-replace")!==undefined) {$($(link).attr("data-wb-replace")).replaceWith(data);}
 			if ($(link).attr("data-wb-append")!==undefined) {$($(link).attr("data-wb-append")).append(data);}
 			if ($(link).attr("data-wb-prepend")!==undefined) {$($(link).attr("data-wb-prepend")).prepend(data);}
+			wb_plugins();
 			wb_delegates();
 			$("<div>"+data+"</div>").find(".modal[id]").each(function(i){
 				if (i==0) {$("#"+$(this).attr("id")).modal();}
 			});
-			
+
 		});
 	});
 	$("[data-wb-ajax][data-wb-autoload=true]").each(function(){$(this).trigger("click");$(this).removeAttr("data-wb-autoload")});
@@ -280,9 +303,30 @@ $(document).on("wb_required_false",function(event,that,text) {
 		allow_dismiss: true,
 		stackup_spacing: 10
 	});
-	
+
 });
 
+function wb_setdata(selector,data,ret) {
+	var tpl_id=$(selector).attr("data-wb-tpl");
+	var form="";
+	if (tpl_id!==undefined) {var html= urldecode($("#"+tpl_id).html());}
+	if (data==undefined) {var data={};}
+	if (selector==undefined) {var selector="body";}
+		var param={html:html,data:data};
+		var url="/ajax/setdata/"+data.form+"/"+data.id;
+		var diff=$.ajax({
+			async: 		false,
+			type:		'POST',
+			data:		param,
+			url: 		url,
+			success: 	function(data){
+				if (ret==undefined) {
+					$(selector).after(data).remove();
+				} else {return data;}
+			}
+		});
+		return diff;
+}
 
 function wb_pagination(pid) {
 	if (pid==undefined) {var slr=".pagination";} else {var slr=".pagination[id="+pid+"]";}
@@ -298,7 +342,7 @@ function wb_pagination(pid) {
 			if (desc==undefined || desc=="" || desc=="false") {$(this).attr("data-desc","false");} else {$(this).attr("data-desc","true");}
 			$(this).data("desc",$(this).attr("data-desc"));
 		});
-*/		
+*/
 		$("[data-page^="+id+"]").hide().removeClass("hidden");
 		$("[data-page="+id+"-1]").show();
 		$(document).undelegate(".pagination[id="+id+"] li a, thead[data="+id+"] th[data-sort]","click");
@@ -324,7 +368,7 @@ function wb_pagination(pid) {
 					$(that).attr("data-sort",implode(":",s));
 				});
 				var sort=$(this).attr("data-sort");
-				
+
 				$(this).parents("thead").find("th[data-sort]").each(function(){
 					$(this).find(".aiki-sort").remove();
 					$(this).data("desc","");
@@ -341,7 +385,7 @@ function wb_pagination(pid) {
 */
 				var $source=$(this).parents(".pagination");
 				var page=$(this).attr("data");
-				var sort=null;	
+				var sort=null;
 				var desc=null;
 //			}
 			if (substr(page,0,4)=="page") {
@@ -364,7 +408,7 @@ function wb_pagination(pid) {
 				var param={tpl:tpl,tplid:arr[1],idx:idx,page:arr[2],size:size,cache:cache,foreach:foreach};
 				var url="/ajax/pagination/";
 				if ($("#"+id).data("find")!==undefined) {var find=$("#"+id).data("find");} else {
-					var find=$source.attr("data-find");		
+					var find=$source.attr("data-find");
 				}
 				if (find>"") {find=urldecode(find);}
 				param.find=find;
@@ -404,7 +448,7 @@ function wb_pagination(pid) {
 										var funcCall = loader + "(false);";
 										eval ( funcCall );
 									}
-									
+
 								},
 					error:		function(data){
 						$("body").removeClass("cursor-wait");
@@ -413,7 +457,7 @@ function wb_pagination(pid) {
 							eval ( funcCall );
 						}
 						(document).trigger("after-pagination-error",[id,page,arr[2]]);
-						
+
 					}
 				});
 			}
@@ -423,11 +467,35 @@ function wb_pagination(pid) {
 				var scrollTop=$("[data-wb-tpl="+arr[1]+"]").offset().top-offset;
 				if (scrollTop<0) {scrollTop=0;}
 				$('body,html').animate({scrollTop: scrollTop}, 1000);
-				
+
 				//$(document).trigger("after_pagination_click",[id,page,arr[2]]);
 		}
 		event.preventDefault();
 		return false;
 		});
 	});
+}
+
+
+function setcookie ( name, value, exp_y, exp_m, exp_d, path, domain, secure ) {
+  var cookie_string = name + "=" + escape ( value );
+  if ( exp_y )  {
+    var expires = new Date ( exp_y, exp_m, exp_d );
+    cookie_string += "; expires=" + expires.toGMTString();
+  }
+  if ( path ) cookie_string += "; path=" + escape ( path );
+  if ( domain ) cookie_string += "; domain=" + escape ( domain );
+  if ( secure ) cookie_string += "; secure";
+   document.cookie = cookie_string;
+}
+
+function delete_cookie ( cookie_name ) {
+  var cookie_date = new Date ( );  // current date & time
+  cookie_date.setTime ( cookie_date.getTime() - 1 );
+  document.cookie = cookie_name += "=; expires=" + cookie_date.toGMTString();
+}
+
+function getcookie ( cookie_name ) {
+  var results = document.cookie.match ( '(^|;) ?' + cookie_name + '=([^;]*)(;|$)' );
+  if ( results ) {  return ( unescape ( results[2] ) ); }  else { return null; }
 }

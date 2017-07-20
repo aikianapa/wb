@@ -1,16 +1,17 @@
 <?php
-function todo__ajax() {
+function ajax__todo() {
 	$res=false;
-	if (isset($_GET["action"])) {
-		$call = __FUNCTION__ ."_".$_GET["action"];
+	if (isset($_ENV["route"]["params"][0])) {
+		$call = __FUNCTION__ ."_".$_ENV["route"]["params"][0];
 		if (is_callable($call)) $res=$call();
+		wbTableFlush(wbTable("todo"));
 	}
 	return json_encode($res);
 }
 
-function todo__ajax_add() {
+function ajax__todo_add() {
 	$Item=array(
-		"id"		=> newIdRnd(),
+		"id"		=> wbNewId(),
 		"form"		=> "todo",
 		"user"		=> $_SESSION["user_id"],
 		"task"		=> $_POST["task"],
@@ -19,61 +20,53 @@ function todo__ajax_add() {
 		"time"		=> "",
 		"created"	=> date("Y-m-d H:i:s")
 	);
-	$res=aikiSaveItem("todo",$Item);
+	$todo=wbTable("todo");
+	$res=wbItemSave($todo,$Item);
 	if ($res) {$res=array("id"=>$Item["id"]);}
 	return $res;
 }
 
-function todo__ajax_addcategory() {
-	$Item=aikiReadItem("users",$_SESSION["user_id"]);
-	if (!isset($Item["todo_categories"])) {$Item["todo_categories"]=array();}
-	$id=newIdRnd();
-	$add=array("id"=>$id,"category"=>$_POST["category"]);
-//$Item["todo_categories"]=array(); // to delete //////////////////////////
-	array_unshift($Item["todo_categories"],$add);
-	$res=aikiSaveItem("users",$Item);
-	if ($res) {$res=array("id"=>$id);}
-	return $res;
-}
 
-function todo__ajax_upd() {
+function ajax__todo_upd() {
 	$res=false;
-	$Item=aikiReadItem("todo",$_POST["id"]);
+	$todo=wbTable("todo");
+	$Item=wbItemRead($todo,$_POST["id"]);
 	if ($Item["user"]==$_SESSION["user_id"]) {
 		foreach($_POST as $key => $val) {	$Item[$key]=$_POST[$key];	}
-		$res=aikiSaveItem("todo",$Item);
+		$res=wbItemSave($todo,$Item);
 		if ($res) {$res=true;}
 	}
 	return $res;
 }
 
-function todo__ajax_counter() {
+function ajax__todo_counter() {
 	$where='user = "'.$_SESSION["user_id"].'"';
 	if (isset($_GET["status"])) {$where.=' AND status = "'+$_GET["status"]+'"';}
-	$list=aikiListItems("todo",$where);
+	$list=wbListItems(wbTable("todo"),$where);
 	$res=count($list["result"]);
 	unset($list,$item);
 	return $res;
 }
 
 
-function todo__ajax_getitem() {
+function ajax__todo_getitem() {
 	$res=false;
-	$Item=aikiReadItem("todo",$_POST["id"]);
+	$Item=wbItemRead(wbTable("todo"),$_POST["id"]);
 	if ($Item["user"]==$_SESSION["user_id"]) {$res=$Item;}
 	return $res;
 }
 
-function todo__ajax_getitemhtml() {
+function ajax__todo_getitemhtml() {
 	$res=false;
-	$Item=aikiReadItem("todo",$_POST["id"]);
+	$todo=wbTable("todo");
+	$Item=wbItemRead($todo,$_POST["id"]);
 	if (is_callable("todoBeforeShowItem")) {$Item=todoBeforeShowItem($Item);}
 	if ($Item["user"]==$_SESSION["user_id"]) {
-		$tpl=aikiGetForm("todo","list");
+		$tpl=wbGetForm("todo","list");
 		$tpl=$tpl->find(".todo-list",0)->html();
-		$out=aikiFromString("<div></div>");
+		$out=wbFromString("<div></div>");
 		$out->find("div")->append($tpl);
-		$out->contentSetData($Item);
+		$out->wbSetData($Item);
 		echo $out->find("div")->html();
 		unset($tpl,$out);
 		die;
@@ -81,7 +74,7 @@ function todo__ajax_getitemhtml() {
 	return $res;
 }
 
-function todo__ajax_getlist() {
+function ajax__todo_getlist() {
 	$where='user = "'.$_SESSION["user_id"].'" AND category="'.$_GET["category"].'"';
 	$tpl=aikiGetForm("todo","list");
 	$tpl=$tpl->find(".task-list",0)->clone();
@@ -98,7 +91,7 @@ function todo__ajax_getlist() {
 
 
 
-function todo__ajax_generate() {
+function ajax__todo_generate() {
 	$res=false;
 
 
@@ -123,8 +116,10 @@ function todo__ajax_generate() {
 }
 
 
-function todo__ajax_del() {
-	$res=aikiDeleteItem("todo",$_POST["id"]);
+function ajax__todo_del() {
+	$todo=wbTable("todo");
+	$res=wbItemRemove($todo,$_POST["id"]);
+	wbTableFlush($todo);
 	return $res;
 }
 
@@ -133,7 +128,7 @@ function todoBeforeShowItem($Item) {
 	return $Item;
 }
 
-function todoAfterReadItem($Item) {
+function todoAfterItemRead($Item) {
 	if ($Item["time"]=="") {$time=date("Y-m-d H:i",strtotime($Item["created"]));} else {$time=$Item["time"];}
 	$time=date("Y-m-d H:i:s",strtotime($time));
 	$now=date("Y-m-d H:i:s");
@@ -147,7 +142,6 @@ function todoAfterReadItem($Item) {
 	if ($Item["time"]=="") {$Item["time"]=$time;}
 	$Item["time"]=$time=date("Y-m-d H:i:s",strtotime($time));
 	if (isset($_POST["data"]["status"])) $Item["status"]=$_POST["data"]["status"];
-
 	return $Item;
 }
 

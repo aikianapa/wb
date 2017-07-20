@@ -17,14 +17,10 @@ var CompTodo = function() {
             $('.todo-done input:checkbox').prop('checked', true);
             $('.todo-list .list-item').each(function(){
                 var status=$(this).attr("data-status");
-                //$('.todo-list [data-block='+status+']').append($(this));
+                $('.todo-list [data-block='+status+']').append($(this));
             });
             $('.todo-list .list-item').removeClass("hide");
             $('.todo-list [data-block=muted]').removeClass("hide").slideUp(0);
-
-
-			$(".xdsoft_datetimepicker").remove();
-			console.log("WARNING!!! datetimepicker removed in todo.js");
 
 			countTodo();
 			eventsTodo();
@@ -38,8 +34,8 @@ var CompTodo = function() {
 				var todoNav			= $('#list .navbar-nav');
 
 
-				todoNav.off('click','a[data-status]');
-				todoNav.on('click','a[data-status]',function(){
+			todoNav.off('click','a[data-status]');
+			todoNav.on('click','a[data-status]',function(){
           if ($(this).find(".fa-circle-o").length) {
             $(this).find(".fa-circle-o").removeClass("fa-circle-o").addClass("fa-dot-circle-o");
             $('.todo-list [data-block='+$(this).attr('data-status')+']').slideDown(200);
@@ -123,7 +119,7 @@ var CompTodo = function() {
 
 				/* Add a new todo to the list */
 				$('#add-todo-form').off('submit');
-				$('#add-todo-form').on('submit', function(){
+				$('#add-todo-form').on('submit', function(e){
 					todoInputVal = todoInput.prop('value');
 					if ( todoInputVal ) {
 						var data={};
@@ -133,17 +129,16 @@ var CompTodo = function() {
 						data.status="warn";
 						var id=addTodo(data);
 						if (id!==false) {
-							var data=getTodo(id);
-							var ret=template_set_data(".todo-list",data,true);
-							$('.todo-list [data-block=warn]').append($(ret.responseText).html());
-              $('.todo-list .list-item[data-id='+id+']').slideDown(200).removeClass("hide");
+							var data=getTodo(id,true);
+							$('.todo-list [data-block=warn]').append(data);
+							$('.todo-list .list-item[data-id='+id+']').slideDown(200).removeClass("hide");
 							todoInput.prop('value', '').focus();
-							countTodo();
 							eventsTodo();
-							active_plugins();
+							wb_plugins();
 						}
 
 					}
+					e.preventDefault();
 					return false;
 				});
 			}
@@ -168,6 +163,7 @@ var CompTodo = function() {
                   setTimeout(function(){
                     $('.todo-list [data-block='+status+']').append(that);
                     $('.todo-list [data-id='+id+']').slideDown(200);
+                    wb_plugins();
                   },200);
               } else {
       					$('.todo-list [data-block='+status+']').find(".list-item").each(function(i){
@@ -182,23 +178,24 @@ var CompTodo = function() {
       									setTimeout(function(){
       										item.before($('.todo-list [data-id='+id+']'));
       										$('.todo-list [data-id='+id+']').slideDown(200);
+      										wb_plugins();
       									},200);
       								}
       							}
-                    if (itime<time) {
+							if (itime<time) {
       								if ($(this).is(":last-child") && cur!==i-1) {
       									$('.todo-list [data-id='+id+']').slideUp(200);
       									setTimeout(function(){
       										item.after($('.todo-list [data-id='+id+']'));
       										$('.todo-list [data-id='+id+']').slideDown(200);
+      										wb_plugins();
       									},200);
       								}
       							}
-
       						}
       					});
               }
-    					active_plugins();
+
     					eventsTodo();
 			}
 
@@ -206,7 +203,7 @@ var CompTodo = function() {
 			function addTodo(data) {
 				var res=false;
 				$.ajax({
-					url: "/engine/ajax.php?mode=ajax&form=todo&action=add",
+					url: "/ajax/todo/add",
 					async:false, method: "post", data: data,
 					success: function(data){
 						data=JSON.parse(data);
@@ -221,12 +218,12 @@ var CompTodo = function() {
 				var err=false
 				if (data.category==undefined || data.category=="") {data.category="unsorted";}
 				$.ajax({
-					url: "/engine/ajax.php?mode=ajax&form=todo&action=del",
+					url: "/ajax/todo/del",
 					async: false, method: "post", data: data,
 					success: function(data){
 								data=JSON.parse(data);
 								err=data;
-                countTodo(true);
+								countTodo(true);
 					}
 				});
 				return err;
@@ -235,7 +232,7 @@ var CompTodo = function() {
 			function getTodo(id,html) {
 				if (html==undefined) {var action="getitem";} else {var action="getitemhtml";}
 				var res=false;
-				var ajax= "/engine/ajax.php?mode=ajax&form=todo&action="+action;
+				var ajax= "/ajax/todo/"+action;
 				$.ajax({
 					url:ajax,
 					async: false, method: "post", data: {id:id},
@@ -250,13 +247,13 @@ var CompTodo = function() {
 			function updTodo(data) {
 				var id=data.id;
 				$.ajax({
-					url: "/engine/ajax.php?mode=ajax&form=todo&action=upd",
+					url: "/ajax/todo/upd",
 					async: false, method: "post", data: data,
 					success: function(data){
 								data=JSON.parse(data);
 								err=data;
 								refreshTodo(id);
-                countTodo(true);
+								countTodo(true);
 					}
 				});
 			}
@@ -264,7 +261,7 @@ var CompTodo = function() {
 			function countTodo(fast) {
           if (fast==undefined && fast!==true) {
     				$.ajax({
-    					url: "/engine/ajax.php?mode=ajax&form=todo&action=counter",
+    					url: "/ajax/todo/counter",
     					async: false, method: "post",
     					success: function(data){
     								data=JSON.parse(data);

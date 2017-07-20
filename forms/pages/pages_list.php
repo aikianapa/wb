@@ -4,6 +4,7 @@
                      Список страниц
                     </h6>
                     <div class="element-box">
+                      <button  data-wb-ajax="/form/edit/pages/_new" data-wb-append="body">Новая</button>
                       <div class="table-responsive">
                         <table class="table table-lightborder">
                           <thead>

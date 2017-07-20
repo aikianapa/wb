@@ -43,7 +43,7 @@ print_r(wbRouter::getRoute());
   private static $params = array();
   private static $names = array();
   public static $requestedUrl = '';
-  
+
 
    // Добавить маршрут
   public static function addRoute($route, $destination=null) {
@@ -57,7 +57,7 @@ print_r(wbRouter::getRoute());
   public static function splitUrl($url) {
     return preg_split('/\//', $url, -1, PREG_SPLIT_NO_EMPTY);
   }
-  
+
    // Текущий обработанный URL
   public static function getCurrentUrl() {
     return (self::$requestedUrl?:'/');
@@ -72,7 +72,6 @@ print_r(wbRouter::getRoute());
 			$requestedUrl = urldecode(rtrim($uri, '/'));
 		}
 		self::$requestedUrl = $requestedUrl;
-
       // если URL и маршрут полностью совпадают
       if (isset(self::$routes[$requestedUrl])) {
         self::$params = self::splitUrl(self::$routes[$requestedUrl]);
@@ -103,49 +102,45 @@ print_r(wbRouter::getRoute());
         }
       }
 		return self::returnRoute();
-  } 
+  }
 
 	// Сборка ответа
   public static function returnRoute() {
 	$_GET=array();
+	$_ENV["route"]=array();
+    
     $controller="form"; $action="mode";
+    
     $form = isset(self::$params[0]) ? self::$params[0]: 'default_form';
     $mode = isset(self::$params[1]) ? self::$params[1]: 'default_mode';
-
-	if (strpos($form, ':') !== false) {
-		$tmp=explode(":",$form); $form=$tmp[1]; $controller=$tmp[0];
-	}
-	if (strpos($mode, ':') !== false) {
-		$tmp=explode(":",$mode); $mode=$tmp[1]; $action=$tmp[0];
-	}
-
-    $params = array_slice(self::$params, 2);
-	if (isset($params[null])) {$params[]=$params[null];}
-    $names=self::$names;
-    foreach($params as $i => $param) {
-		if (strpos($param, ':') !== false) {
+	foreach(self::$params as $i => $param) {
+		if (strpos($param, ':')) {
 			$tmp=explode(":",$param);
-			$params[$tmp[0]]=$tmp[1];
-			unset($params[$i]);
+			$_ENV["route"][$tmp[0]]=$tmp[1];
+		} else {
+			if ($i==0) {$_ENV["route"]["controller"]=$param;}
+			if ($i==1) {$_ENV["route"]["mode"]=$param;}
+			if ($i>1) {$_ENV["route"]["params"][]=$param;}
+			if (isset(self::$names[$i])) {
+				$_ENV["route"]["params"][self::$names[$i]]=$param;
+			}
 		}
-		if (isset($names[$i])) {
-			if ($names[$i]!==$i) {$params[$names[$i]]=$param; unset($params[$i]);}
-		}
+		
+		
 	}
-	if (isset($params[null]) AND $params[null]>"") $params[0]=$params[null];
-	unset($params[null]);
 	$tmp=explode("?",$_SERVER["REQUEST_URI"]);
-	if (isset($tmp[1])) {parse_str($tmp[1],$get); $params=(array)$params+(array)$get;}
-	$_GET=array_merge($_GET,$params);
-	$_GET[$controller]=$form; $_GET[$action]=$mode;
+	if (isset($tmp[1])) {parse_str($tmp[1],$get); $_ENV["route"]["params"]=(array)$_ENV["route"]["params"]+(array)$get;}
+	$_GET=array_merge($_GET,$_ENV["route"]);
 	if (isset($_GET["engine"]) && $_GET["engine"]=="true") {$_SERVER["SCRIPT_NAME"]="/engine".$_SERVER["SCRIPT_NAME"];}
 	if (isset($_SERVER["SCHEME"]) && $_SERVER["SCHEME"]>"") {$scheme=$_SERVER["SCHEME"];} else {$scheme="http";}
-    $_ENV["route"]=array("scheme"=>$scheme,"host"=>$_SERVER["HTTP_HOST"],"controller"=>$controller,$controller=>$form, $action=>$mode , "params"=>$params);
-        
+	$_ENV["route"]["scheme"]=$scheme;
+	$_ENV["route"]["host"]=$_SERVER["HTTP_HOST"];
+
     if ($form=='default_form' && $mode='default_mode' && $_SERVER["QUERY_STRING"]>"") {
 		parse_str($_SERVER["QUERY_STRING"],$_GET);
 		$_ENV["route"]=array("scheme"=>$scheme,"host"=>$_SERVER["HTTP_HOST"],"controller"=>$controller,$controller=>$_GET["form"], $action=>$_GET["mode"] , "params"=>$_GET);
 	}
+
     return $_ENV["route"];
   }
 
@@ -1075,12 +1070,12 @@ class tagForeachFilter extends FilterIterator {
         parent::__construct($iterator);
         $this->data = $data;
     }
-    
+
     public function accept() {
         $data = $this->getInnerIterator()->current();
         if ( 0!== 0 ) {
             return false;
-        }        
+        }
         return true;
     }
 }
@@ -1156,7 +1151,7 @@ abstract class kiNode
 
 //======================================================================//
 //======================================================================//
-	
+
 	public function saveCache() {
 		$cachename=wbGetCacheName();
 		$expired=$this->find("meta[name=cache]")->attr("content")+time();
@@ -1194,22 +1189,22 @@ abstract class kiNode
 		wbBaseHref($this);
 		return $this;
 	}
-	
-	
+
+
 	public function wbSetData($Item=array()) {
 			if (!isset($_ENV["ta_save"])) {$_ENV["ta_save"]=array();}
 			$this->wbSetAttributes($Item);
-			$this->contentUserAllow();
+			$this->wbUserAllow();
 			$nodes=new IteratorIterator($this->find("*"));
 			foreach($nodes as $inc) {
 				if (!$inc->parents("script")->length) {
-				$inc->contentUserAllow();
-				$tag=$inc->contentCheckTag();
+				$inc->wbUserAllow();
+				$tag=$inc->wbCheckTag();
 				if (!$tag==FALSE && !$inc->hasClass("wb-done")) {
-					if ($inc->has("[json]")) {$inc->json=wbSetValuesStr($inc->json,$Item);}
+					if ($inc->has("[data-wb-json]")) {$inc->json=wbSetValuesStr($inc->json,$Item);}
 					if ($inc->hasRole("variable")) {$Item=$inc->tagVariable($Item);} else {
 						if ($inc->is("[data-wb-tpl=true]")) {$inc->addTemplate();}
-						$inc->contentProcess($Item,$tag);
+						$inc->wbProcess($Item,$tag);
 				if ($inc->is("[data-wb-hide=true]"))	{
 					$tmp=$inc->innerHtml();
 					$inc->replaceWith($tmp);
@@ -1221,46 +1216,76 @@ abstract class kiNode
 			}; unset($inc);
 			$this->wbSetValues($Item);
 			$this->contentLoop($Item);
-			$this->contentTargeter($Item);
+			$this->wbPlugins($Item);
+			$this->wbTargeter($Item);
 			$this->wbSetValues($Item);
-			gc_collect_cycles();
+      gc_collect_cycles();
 	}
 
 
-	public function contentCheckAllow() {
-		foreach($this->find(contentControls("allow")) as $inc) {$inc->contentUserAllow();}
+	public function wbPlugins(){
+		$script=$this->find("script[data-wb-src]:not(.wb-done)");
+		foreach($script as $sc) {
+			if ($sc->attr("data-wb-src")=="datepicker") {
+				if (!$sc->hasClass("wb-done")) {
+					$sc->before('<link href="/engine/js/datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet">');
+					$sc->after('<script src="/engine/js/datetimepicker/locales/bootstrap-datetimepicker.ru.js" type="text/javascript" charset="UTF-8"></script>');
+					$sc->attr("src","/engine/js/datetimepicker/bootstrap-datetimepicker.min.js");
+					$sc->addClass("wb-done");
+				}
+			}
+      if ($sc->attr("data-wb-src")=="ckeditor") {
+				if (!$sc->hasClass("wb-done")) {
+					$sc->before('<link href="/engine/js/ckeditor/style.css" rel="stylesheet">');
+					$sc->after('<script src="/engine/js/ckeditor/adapters/jquery.js" type="text/javascript"></script>');
+          $sc->after('<script src="/engine/js/ckeditor/bootstrap-ckeditor-fix.js" type="text/javascript"></script>');
+					$sc->attr("src","/engine/js/ckeditor/ckeditor.js");
+					$sc->addClass("wb-done");
+				}
+			}
+      if ($sc->attr("data-wb-src")=="source") {
+				if (!$sc->hasClass("wb-done")) {
+					$sc->after('<script language="javascript" src="/engine/js/ace/ace.js"></script>');
+					$sc->addClass("wb-done");
+				}
+			}
+		}
 	}
 
-	public function contentUserAllow() {
+	public function wbCheckAllow() {
+		foreach($this->find(wbControls("allow")) as $inc) {$inc->wbUserAllow();}
+	}
+
+	public function wbUserAllow() {
 		if (isset($_SESSION["user_role"])) {
 			$role=$_SESSION["user_role"];
 		} else {$role="noname";}
-		$allow=trim($this->attr("data-allow")); if ($allow>"") {
+		$allow=trim($this->attr("data-wb-allow")); if ($allow>"") {
 			$allow=str_replace(" ",",",trim($allow));
 			$allow=explode(",",$allow);
 			$allow = array_map('trim', $allow);
 		}
-		$disallow=trim($this->attr("data-disallow")); if ($disallow>"") {
+		$disallow=trim($this->attr("data-wb-disallow")); if ($disallow>"") {
 			$disallow=str_replace(" ",",",trim($disallow));
 			$disallow=explode(",",$disallow);
 			$disallow = array_map('trim', $disallow);
 		}
-		$disabled=trim($this->attr("data-disabled")); if ($disabled>"") {
+		$disabled=trim($this->attr("data-wb-disabled")); if ($disabled>"") {
 			$disabled=str_replace(" ",",",trim($disabled));
 			$disabled=explode(",",$disabled);
 			$disabled = array_map('trim', $disabled);
 		}
-		$enabled=trim($this->attr("data-enabled")); if ($enabled>"") {
+		$enabled=trim($this->attr("data-wb-enabled")); if ($enabled>"") {
 			$enabled=str_replace(" ",",",trim($enabled));
 			$enabled=explode(",",$enabled);
 			$enabled = array_map('trim', $enabled);
 		}
-		$readonly=trim($this->attr("data-readonly")); if ($readonly>"") {
+		$readonly=trim($this->attr("data-wb-readonly")); if ($readonly>"") {
 			$readonly=str_replace(" ",",",trim($readonly));
 			$readonly=explode(",",$readonly);
 			$readonly = array_map('trim', $readonly);
 		}
-		$writable=trim($this->attr("data-writable")); if ($writable>"") {
+		$writable=trim($this->attr("data-wb-writable")); if ($writable>"") {
 			$writable=str_replace(" ",",",trim($writable));
 			$writable=explode(",",$writable);
 			$writable = array_map('trim', $writable);
@@ -1274,7 +1299,7 @@ abstract class kiNode
 	}
 
 
-	public function contentCheckTag() {
+	public function wbCheckTag() {
 		$res=FALSE;
 		$tags=array(
 			"module","formdata","foreach", "dict", "tree","gallery",
@@ -1286,23 +1311,23 @@ abstract class kiNode
 		}; unset($tag);
 		return $res;
 	}
-	
-	
-	public function contentProcess($Item,$tag) {
+
+
+	public function wbProcess($Item,$tag) {
 				if (!$this->parents("script")->length) {
 						$this->addClass("wb-done");
 						if ($this->hasRole("imageloader")) {$this->addClass("imageloader");}
 						$func="tag".$tag;
 						$this->wbSetAttributes($Item);
-						if ($this->attr("src")>"") {$this->attr("src",normalizePath($this->attr("src")));}
+						if ($this->attr("src")>"") {$this->attr("src",wbNormalizePath($this->attr("src")));}
 						if ($tag>"") {$this->$func($Item);}
 						$this->tagHideAttrs($Item);
 				}
 	}
 
-	function contentTargeter($Item=array()) {
-		$attr=array("prepend","append","before","after","html");
-		$tar=$this->find(contentControls("target"));
+	function wbTargeter($Item=array()) {
+		$attr=array("data-prepend","data-append","data-before","data-after","data-html","data-replace");
+		$tar=$this->find(wbControls("target"));
 		foreach($tar as $inc) {
 			foreach ($attr as $key => $attribute) {
 				$$attribute=$inc->attr($attribute);
@@ -1310,7 +1335,10 @@ abstract class kiNode
 					if ($this->find($$attribute)->length) {
 						//if ($this->find($$attribute)->hasAttribute("data-role") AND !$this->find($$attribute)->hasClass("wb-done")) {} else {
 							$inc->removeAttr($attribute);
-							$this->find($$attribute)->$attribute($inc);
+				      $tmp=explode("-",$attribute);
+              if (count($tmp)==2) {$com=$tmp[1];} else {$com=$attribute;}
+							if ($attribute=="replace") {$attribute="replaceWidth";}
+							$this->find($$attribute)->$com($inc);
 						//}
 					}
 				}
@@ -1332,7 +1360,7 @@ abstract class kiNode
 			$ta->html("");
 		}; unset($ta,$list);
 	}
-	function includeTextarea($Item=array()) { 
+	function includeTextarea($Item=array()) {
 		$list=$this->find("script,textarea[taid],pre[taid],.nowb[taid],[data-role=module][taid]");
 		foreach ($list as $ta) {
 			$id=$ta->attr("taid"); $name=$ta->attr("name");
@@ -1351,8 +1379,8 @@ abstract class kiNode
 	public function contentLoop($Item) {
 		$res=0; $list=new IteratorIterator($this->find("*"));
 		foreach($list as $inc) {
-			$tag=$inc->contentCheckTag();
-			if (!$tag==FALSE && !$inc->hasClass("wb-done")) {$inc->contentProcess($Item,$tag); }
+			$tag=$inc->wbCheckTag();
+			if (!$tag==FALSE && !$inc->hasClass("wb-done")) {$inc->wbProcess($Item,$tag); }
 		}; unset($inc,$list);
 	}
 
@@ -1435,13 +1463,13 @@ abstract class kiNode
 	}
 
 	public function tagVariable($Item) {
-		if (!isset($_SESSION["var"])) {$_SESSION["var"]=array();}
+		if (!isset($_ENV["var"])) {$_ENV["var"]=array();}
 		$this->wbSetAttributes($Item);
 		$var=$this->attr("var");
-		$var=$_SESSION["var"][$var]=wbSetValuesStr($var,$Item);
+		$var=$_ENV["var"][$var]=wbSetValuesStr($var,$Item);
 		$where=$this->attr("where");
 		if (wbWhereItem($Item,$where)) {
-			if ($var>"") $Item[$var]=$_SESSION["var"][$var]=wbSetValuesStr($this->attr("value"),$Item);
+			if ($var>"") $Item[$var]=$_ENV["var"][$var]=wbSetValuesStr($this->attr("value"),$Item);
 		}
 		return $Item;
 	}
@@ -1537,7 +1565,7 @@ abstract class kiNode
 				if ($atval>"" && strpos($atval,"}}")) {
 					$atval=wbSetValuesStr($atval,$Item);
 					$this->attr($atname,$atval);
-				}; 
+				};
 				if ($atval>"" && substr($atval,0,1)=="%") {
 					$ev=substr($atval,1);
 					eval('$tmp = '.$ev.';');
@@ -1550,13 +1578,13 @@ abstract class kiNode
 	}
 
 	public function tagHideAttrs() {
-		$hide=$this->attr("data-hide");
+		$hide=$this->attr("data-wb-hide");
 		$hide=trim(str_replace(","," ",$hide));
 		$list=explode(" ",$hide);
 		foreach($list as $attr) {
 			$this->removeAttr($attr);
 		}
-		$this->removeAttr("data-hide");
+		$this->removeAttr("data-wb-hide");
 		if ($hide=="*") {$this->after($this->innerHtml()); $this->remove();}
 	}
 
@@ -1576,8 +1604,8 @@ abstract class kiNode
 		if ($this->is("ul[data-build-tree=true]")) {
 			$this->tagTreeUl($Item);
 		} else {
-		$name=$this->attr("from"); 
-		$item=$this->attr("item"); 
+		$name=$this->attr("from");
+		$item=$this->attr("item");
 		$nobranch=$this->attr("branch");
 		$parent=$this->attr("parent"); if ($parent=="true" OR $parent=="1" OR $parent=="") {$parent=true;} else {$parent=false;}
 		$tree=wbReadTree($name);
@@ -1592,23 +1620,23 @@ abstract class kiNode
 		}
 		if (!isset($branch) OR $branch!==$Item) {
 			if (!isset($branch)) {$branch=array();}
-			$_SESSION["tree_idx"]=0;
-			$_SESSION["tmp_srcTree"]=$Item;
+			$_ENV["tree_idx"]=0;
+			$_ENV["tmp_srcTree"]=$Item;
 			$idx=0; $Item["_idx"]=$idx;
 			$this->tagTree_step($tree["tree"],$html,$id,$nobranch,$Item,$idx);
-			if ($_SESSION["tmp_tagTree"]==false) {
+			if ($_ENV["tmp_tagTree"]==false) {
 				$tpl=wbFromString($html);
 				$tpl->wbSetData($branch);
 				$this->append($tpl);
 			}
-			unset($_SESSION["tmp_tagTree"],$_SESSION["tmp_srcTree"]);
+			unset($_ENV["tmp_tagTree"],$_ENV["tmp_srcTree"]);
 			if ($this->tag()=="select") {
 				$plhr=$this->attr("placeholder");
 				if ($plhr>"") {$this->prepend("<option value=''>$plhr</option>");}
 				if ($parent==false) {foreach($this->find("option[parent]") as $p) {$p->attr("disabled",true);} }
 			}
 		}
-		unset($_SESSION["tree_idx"],$p,$html);
+		unset($_ENV["tree_idx"],$p,$html);
 		}
 	}
 
@@ -1622,7 +1650,7 @@ abstract class kiNode
 			foreach($Item as $k => $v) {$val["%{$k}"]=wbSetValuesStr($v,$Item);}; unset($v);
 			$tpl=wbFromString($html);
 			if ($this->is("select")) {
-				$space=str_repeat("&hellip;",$_SESSION["tree_idx"]);
+				$space=str_repeat("&hellip;",$_ENV["tree_idx"]);
 				$tpl->wbSetData($val);
 				if (isset($val["children"])) $tpl->find("option")->attr("parent","true");
 				$tpl->find("option")->prepend($space);
@@ -1630,9 +1658,9 @@ abstract class kiNode
 				if (isset($val["children"])) {
 					if ($id=="" OR $id==$val["id"]) {$this->append($tpl);}
 					if ($nobranch!=="false") {
-						$_SESSION["tree_idx"]+=1;
+						$_ENV["tree_idx"]+=1;
 						$this->tagTree_step($val["children"][0],$html,$id,$val,$idx);
-						$_SESSION["tree_idx"]-=1;
+						$_ENV["tree_idx"]-=1;
 					}
 				}
 			} else {
@@ -1645,14 +1673,14 @@ abstract class kiNode
 			}
 			$i++;
 		}; unset($val,$key,$tpl);
-		$_SESSION["tmp_tagTree"]=$res;
+		$_ENV["tmp_tagTree"]=$res;
 	}
-	
+
 	public function tagTreeUl($Item=array()) {
 		$this->wbSetAttributes($Item);
-		$name=$this->attr("from"); 
-		$item=$this->attr("item"); 
-		$nobranch=$this->attr("branch"); 
+		$name=$this->attr("from");
+		$item=$this->attr("item");
+		$nobranch=$this->attr("branch");
 		$parent=$this->attr("parent"); if ($parent=="true" OR $parent=="1" OR $parent=="") {$parent=true;} else {$parent=false;}
 		$that=$this->clone();
 		$that->removeAttr("id");
@@ -1665,19 +1693,19 @@ abstract class kiNode
 			if ($branch!==false) {$tree["tree"]=$branch["children"];} else {$id=$item;}
 		}
 		if (!isset($branch) OR $branch!==$Item) {
-			$_SESSION["tree_idx"]=0;
-			$_SESSION["tmp_srcTree"]=$Item;
+			$_ENV["tree_idx"]=0;
+			$_ENV["tmp_srcTree"]=$Item;
 			$this->tagTreeUl_step($tree["tree"],$html,$id,$nobranch,$Item,$that);
-			if ($_SESSION["tmp_tagTree"]==false && isset($branch)) {
+			if ($_ENV["tmp_tagTree"]==false && isset($branch)) {
 				$tpl=wbFromString($html);
 				$tpl->wbSetData($branch);
 				$this->append($tpl);
 			}
-			unset($_SESSION["tmp_tagTree"],$_SESSION["tmp_srcTree"]);
+			unset($_ENV["tmp_tagTree"],$_ENV["tmp_srcTree"]);
 		}
-		unset($_SESSION["tree_idx"],$p,$html);
+		unset($_ENV["tree_idx"],$p,$html);
 	}
-	
+
 
 	public function tagTreeUl_step($branch=array(),$html="",$id="",$nobranch="",$Item=array(),$that) {
 		$res=false; $i=0;
@@ -1694,12 +1722,12 @@ abstract class kiNode
 					$tpl->find("li")->append($chld);
 					$this->append($tpl);
 				}
-			} 
+			}
 			if ($id=="" OR $id==$val["id"]) {$this->append($tpl); $res=true;}
 			$i++;
 		}; unset($val,$key,$tpl);
-		$_SESSION["tmp_tagTree"]=$res;
-		
+		$_ENV["tmp_tagTree"]=$res;
+
 	}
 
 	public function tagDict($Item=array()) {
@@ -1731,11 +1759,11 @@ abstract class kiNode
 					if ($value>"") {
 						if ($value==$val["id"]) {$inner=$tpl->outerHtml();}
 					} else {$inner.=$tpl->outerHtml();}
-			}; 
+			};
 			$this->html($inner);
 			unset($val,$inner);
 		}
-		
+
 		if ($this->tag()=="select") {
 			if (!is_array($result)) {$this->outerHtml("");}
 			$plhr=$this->attr("placeholder");
@@ -1786,9 +1814,9 @@ abstract class kiNode
 		}; unset($attrs);
 		if (!isset($tpl) OR $tpl!=="false") {
 			$tplid=$this->attr("data-wb-tpl");
-			if ($tplid=="") {$this->addTemplate();} 
-		} else {$tplid=false;} 
-		
+			if ($tplid=="") {$this->addTemplate();}
+		} else {$tplid=false;}
+
 		if (!isset($size) OR $size=="false") {$size=false;}
 		if (!isset($page) OR 1*$page<=0) {
 			if (!isset($_GET["page"]) OR $_GET["page"]=="") {$page=1;} else {$page=$_GET["page"]*1;}
@@ -1827,38 +1855,38 @@ abstract class kiNode
 		if ($add=="true") {$this->find(":first-child",0)->attr("item","{{id}}");}
 		$tpl=$this->innerHtml(); $inner=""; $this->html("");
 		if ($step>0) {$steptpl=$this->clone(); $stepcount=0;}
-		if ($tplid=="") $tplid="tpl".wbNewId(); 
+		if ($tplid=="") $tplid="tpl".wbNewId();
 		$ndx=0; $fdx=0; $n=0;
 		$count=count($Item);
 		$inner="";
 		$srcVal=array(); foreach($srcItem as $k => $v) {$srcVal["%{$k}"]=$v;}; unset($v);
-		
+
 		$ndx=0; $n=0; $f=0;
 		$tmptpl=wbFromString($tpl);
 		$object = new ArrayObject($Item);
 		$iterator = new tagForeachFilter($object->getIterator(),array(
 			"id"=>$id,
 		));
-		
+
 		foreach($object as $key => $val) {
 			$n++;
 			if ($size!==false) $minpos=$size*$page-($size*1)+1; $maxpos=($size*$page);
-			
-	
+
+
 			if ($size==false OR ($n<=$maxpos AND $n>=$minpos)) {
 				$itemform=""; if (isset($val["_table"])) {$itemform=$val["_table"];}
 				$text=$tmptpl->clone();
 				$val=(array)$srcVal + (array)$val; // сливаем массивы
-				
+
 				$text->find(":first")->attr("idx",$key);
 				$val["_key"]=$key;
 				$val["_idx"]=$ndx;
 				$val["_ndx"]=$ndx+1;
 				$text->wbSetData($val);
 
-				
+
 					$ndx++;
-					
+
 						if ($step>0) { // если степ, то работаем с объектом
 							if ($stepcount==0) {
 								$t_step=$steptpl->clone();
@@ -1872,7 +1900,7 @@ abstract class kiNode
 						} else { // иначе строим строку
 							$inner.=wbClearValues($text->outerHtml());
 						}
-				
+
 			}
 			unset($Item[$key]);
 		};
@@ -1898,10 +1926,10 @@ abstract class kiNode
 				$this->tagPagination($size,$page,$pages,$cacheId,$count,$find);
 			}
 		}
-		unset($Item,$tpl,$_ENV["engine"]["foreach"][$id]);
 		gc_collect_cycles();
+
 	}
-	
+
 public function tagModule($Item=array()) {
 	$src=$this->attr("src");
 	$module="/modules/{$src}/{$src}.php";
@@ -1917,13 +1945,13 @@ public function tagModule($Item=array()) {
 		$call=pathinfo($module, PATHINFO_FILENAME)."_ajax";
 		if (is_callable($call)) {$out=@$call();} else {
 			echo "Отсутствует процедура инициализации {$call}"; die;
-		}				
+		}
 	} else {
 		$call=pathinfo($module, PATHINFO_FILENAME)."_init";
 		if (is_callable($call)) {$out=wbFromString(@$call());} else {
 			echo "Отсутствует процедура инициализации {$call}"; die;
 		}
-	
+
 		$js=explode(".",$module); $js[count($js)-1]="js"; $js=implode(".",$js);
 		if (is_file($js)) {
 			$js=str_replace($_SESSION["app_path"],"",$js);
@@ -1936,34 +1964,35 @@ public function tagModule($Item=array()) {
 		}
 		$out->wbSetData($Item);
 		$this->replaceWith($out);
-	} 
+	}
 }
 
 public function tagInclude($Item) {
 		$src=$ssrc=$this->attr("src"); $res=0;
-		$did=$this->attr("data-id");
-		$dad=$this->attr("data-add");
-		$header=$this->attr("data-header"); if ($header>"") {$Item["header"]=$header;}
-		$footer=$this->attr("data-footer"); if ($footer>"") {$Item["footer"]=$footer;}
-		$vars=$this->attr("vars"); 	if ($vars>"") {$Item=attrAddData($vars,$Item);}
-		$json=$this->attr("json"); 	if ($json>"") {$Item=json_decode($json,true);}
-		$dfs=$this->attr("data-formsave");
-		$class=$this->attr("data-class");
-		$name=$this->attr("data-name");
+		$did=$this->attr("data-wb-id");
+		$dad=$this->attr("data-wb-add");
+		$header=$this->attr("data-wb-header"); if ($header>"") {$Item["header"]=$header;}
+		$footer=$this->attr("data-wb-footer"); if ($footer>"") {$Item["footer"]=$footer;}
+		$vars=$this->attr("data-wb-vars"); 	if ($vars>"") {$Item=attrAddData($vars,$Item);}
+		$json=$this->attr("data-wb-json"); 	if ($json>"") {$Item=json_decode($json,true);}
+		$dfs=$this->attr("data-wb-formsave");
+		$class=$this->attr("data-wb-class");
+		$name=$this->attr("data-wb-name");
+
 		if ($src=="comments") 	{$src="/engine/ajax.php?form=comments&mode=widget"; }
 		if ($src=="modal") 		{$src="/engine/forms/form_comModal.php"; }
 		if ($src=="imgviewer") 	{$src="/engine/js/imgviewer.php";}
 		if ($src=="uploader")	{$src="/engine/js/uploader.php";}
-		if ($src=="editor") 	{$src="/engine/js/editor.php";}
-		if ($src=="source") 	{$src="/engine/forms/source/source_edit.php";}
-		$vars=$this->attr("vars");	if ($vars>"") {$Item=attrAddData($vars,$Item);}
+		if ($src=="editor") 	{$this_content=wbGetForm("common",$src);}
+		if ($src=="source") 	{$this_content=wbGetForm("common",$src);}
+		$vars=$this->attr("data-vars");	if ($vars>"") {$Item=attrAddData($vars,$Item);}
+    if (!isset($this_content)) {
 		if ($src=="") {$src=$this->html(); $this_content=ki::fromString($src);} else {
-			$tplpath=explode("/",$src); 
-			$tplpath=array_slice($tplpath,0,-1); 
+			$tplpath=explode("/",$src);
+			$tplpath=array_slice($tplpath,0,-1);
 			$tplpath=implode("/",$tplpath)."/";
-			if (!isset($_SESSION["tplpath"]) OR $_SESSION["tplpath"]=="") $_SESSION["tplpath"]=normalizePath($tplpath);
 			$src=wbSetValuesStr($src,$Item);
-			$file=$_SESSION["prj_path"].$src;
+			$file=$_ENV["path_app"].$src;
 			if (is_file($_SERVER["DOCUMENT_ROOT"].$file)) {
 				$src=$_SERVER["DOCUMENT_ROOT"].$file;
 			} else {
@@ -1971,14 +2000,21 @@ public function tagInclude($Item) {
 			}
 			$this_content=ki::fromFile($src);
 		}
+    }
 		if ($did>"") {$this_content->find(":first")->attr("id",$did);}
-		if ($dad=="false") {$this_content->find("[data-formsave]")->attr("data-add",$dad);}
-		if ($dfs>"") {$this_content->find("[data-formsave]")->attr("data-formsave",$dfs);}
-		if ($dfs=="false") {$this_content->find("[data-formsave]")->remove();}
+		if ($dad=="false") {$this_content->find("[data-wb-formsave]")->attr("data-add",$dad);}
+		if ($dfs>"") {$this_content->find("[data-wb-formsave]")->attr("data-formsave",$dfs);}
+		if ($dfs=="false") {$this_content->find("[data-wb-formsave]")->remove();}
 		if ($class>"") {$this_content->find(":first")->addClass($class);}
 
 		if ($ssrc=="editor" && !$this_content->find("textarea.editor").length) {
-			$this_content->prepend('<textarea class="editor" name="text"></textarea>');
+      if ($did>"") {
+        $this_content->find(":first")->removeAttr("id");
+        $this_content->find("textarea.editor")->attr("id",$did);
+      }
+      foreach($this_content->find("textarea.editor:not(.wb-done)") as $editor) {
+        if ($editor->attr("id")=="") {$editor->attr("id","editor-".wbNewId());}
+      }
 			if ($name>"") {$this_content->find("textarea.editor")->attr("name",$name);}
 		}
 
@@ -2009,27 +2045,28 @@ public function tagInclude($Item) {
 
 	public function tagFormData($Item=array()) {
 		$srcItem=$Item;
-		$call=$this->attr("call");
-		$vars=$this->attr("vars");	if ($vars>"") {$Item=attrAddData($vars,$Item);}
-		$from=$this->attr("from"); 	if ($from>"") {$Item=$Item[$from];}
-		$json=$this->attr("json"); 	if ($json>"") {$Item=json_decode($json,true);}
-		$item=$this->attr("item");
-		$mode=$this->attr("data-mode"); if ($mode=="") {$mode="show";}
-		$form=$this->attr("form"); 	if ($form>"") {
-			formCurrentInclude($form);
-			$datatype="file"; $func=$form."DataType";
-			if (is_callable ($func)) { $datatype =$func() ; }
-			$ReadItem=$datatype."ReadItem";
-			if ($item>"") {$Item=$ReadItem($form,$item);}
+		$attrs=new IteratorIterator($this->attributes());
+		foreach ($attrs as $attr) {
+			$tmp=$attr->name;
+			if (strpos($tmp,"ata-wb-")) {$tmp=str_replace("data-wb-","",$tmp); $$tmp=$attr."";}
+		}; unset($attrs);
+		
+		if (isset($form) AND !isset($table)) {$table=$form;}
+		if (isset($vars) AND $vars>"") {$Item=attrAddData($vars,$Item);}
+		if (isset($from) AND $from>"") {$Item=$Item[$from];}
+		if (isset($json) AND $json>"") {$Item=json_decode($json,true);}
+		if (isset($mode) AND $mode=="") {$mode="show";}
+		if (isset($table) AND $table>"") {
+			if ($item>"") {$Item=wbItemRead(wbTable($table),$item);}
 			if ($vars>"") {$Item=attrAddData($vars,$Item);}
 		}
-		$field=$this->attr("field"); 	if ($field>"") {
+		if (isset($field) AND $field>"") {
 			$tmparr=json_decode($Item[$field],true);
 			if (is_array($tmparr)) {$Item=$tmparr; unset($tmparr);} else {$Item=$Item[$field];}
 		}
-		if (is_callable($call)) {$Item=$call($Item);}
+		if (isset($call) AND is_callable($call)) {$Item=$call($Item);}
 		if (is_array($srcItem)) {foreach($srcItem as $k => $v) {$Item["%{$k}"]=$v;}; unset($v);}
-		$Item=wbCallFormFunc("BeforeShowItem",$Item,$form,$mode);
+		$Item=wbCallFormFunc("BeforeShowItem",$Item,$table,$mode);
 		$this->wbSetData($Item);
 		//$this->html(clearValueTags($this->html()));
 	}
@@ -2047,14 +2084,14 @@ public function tagThumbnail($Item=array()) {
 	$height=$this->attr("height"); if ($height=="") {$height="120px";}
 	$offset=$this->attr("offset");
 	$contain=$this->attr("contain");
-	
+
 	$srcSrc=$src;
 	$srcImg=explode("/",trim($src)); $srcImg=$srcImg[count($srcImg)-1];
 	$srcExt=explode(".",strtolower(trim($srcImg))); $srcExt=$srcExt[count($srcExt)-1];
 	$exts=array("jpg","gif","png","svg","pdf");
 
 	if (!in_array($srcExt,$exts)) {$src="/engine/uploads/__system/filetypes/{$srcExt}.png"; $img="{$srcExt}.png"; $ext="png";}
-	
+
 	if ($form>"" && $item>"") {$Item=fileReadItem($form,$item); }
 	$json=$this->attr('json'); 	if ($json>"") {$images=json_decode($json,true); } else {
 		if (isset($Item["images"])) {
@@ -2095,7 +2132,7 @@ public function tagThumbnail($Item=array()) {
 			}
 		}
 	}
-	
+
 	$img=explode("/",trim($src)); $img=$img[count($img)-1];
 	$ext=explode(".",trim($src)); $ext=$ext[count($ext)-1];
 
@@ -2105,7 +2142,7 @@ public function tagThumbnail($Item=array()) {
 		$img=explode($src,"/"); $img=$img[count($img)-1];
 		$this->attr("src",$src);
 	}
-	
+
 	if ($src==array()) {$src="";}
 	if ($img=="" AND $bkg==true) {$src="/engine/uploads/__system/image.svg"; $img="image.svg"; $ext="svg";}
 	if ($src=="" AND $bkg==true) {$src="/engine/uploads/__system/image.svg"; $img="image.svg"; $ext="svg";} else {
@@ -2114,7 +2151,7 @@ public function tagThumbnail($Item=array()) {
 		$this->attr("img",$img);
 		$ext=substr($img,-3);
 	}
-	
+
 	if ($ext!=="svg") {
 		if ($contain=="true") {$thumb="thumbc";} else {$thumb="thumb";}
 		$src=urldecode($src);
@@ -2124,14 +2161,14 @@ public function tagThumbnail($Item=array()) {
 		if (substr($width,-1)=="%") {
 			$w=ceil($w/100*(substr($width,0,-1)*1));
 		} else {$w=$width;}
-		
+
 		if (substr($height,-1)=="%" ) {
 			$h=ceil($h/100*(substr($height,0,-1)*1));
 		} else {$h=$height;}
-		
+
 		$src="/{$thumb}/{$w}x{$h}/src{$src}";
 	}
-	
+
 	if ($bkg==true) {
 		if (!in_array($srcExt,$exts)) {$bSize="contain";} else {$bSize="cover";}
 		if (is_numeric($width)) {$width.="px";}
@@ -2146,7 +2183,7 @@ public function tagThumbnail($Item=array()) {
 			$this->attr("src",$src);
 		}
 	}
-	
+
 	$this->attr("data-src",$srcSrc);
 	$this->attr("data-ext",$srcExt);
 	$this->attr("class",$class);
@@ -2204,7 +2241,7 @@ public function tagThumbnail($Item=array()) {
 			$tplid=wbNewId();
 			$this->attr("data-wb-tpl",$tplid);
 			$that=$this->clone();
-			$that->removeClass("loaded");
+			$that->removeClass("wb-done");
 			if ($type=="innerHtml") {$tpl=$that->innerHtml();} else {$tpl=$that->outerHtml();}
 			$this->after("<script type='text/template' id='{$tplid}' style='display:none;'>\n{$tpl}\n</script>");
 	}
@@ -2237,7 +2274,7 @@ public function tagThumbnail($Item=array()) {
 	public function contentAppends() {
 		contentAppends($this);
 	}
-	
+
 	public function hasRole($role) {
 		$tl=wbAttrToArray($this->attr("data-wb-role"));
 		if (in_array($role,$tl)) {return true;} else {return false;}
@@ -2562,7 +2599,7 @@ public function tagThumbnail($Item=array()) {
 		$this->attributes->set($name, $value);
 		return $this;
 	}
-	
+
 	public function removeAttr($name) {
 		$this->attributes && $this->attributes->delete($name);
 		return $this;
@@ -2726,7 +2763,7 @@ public function tagThumbnail($Item=array()) {
 		}
 		return $this;
 	}
-	
+
 	public function attrlist()	{
 		parse_str(str_replace(array(" ",'"'),array("&",""),$this->attributes()),$attr);
 		return $attr;
@@ -3007,7 +3044,7 @@ public function tagThumbnail($Item=array()) {
 
 		return $list;
 	}
-	
+
 	protected function getRelativeAll($type, $selector = null, $list = null)	{
 		$list || $list = new kiNodesList($this);
 
@@ -4553,7 +4590,7 @@ class kiNodesList extends kiList
 		}
 		return $value === null ? null : $this;
 	}
-	
+
 	public function removeAttr($name)	{
 		foreach ($this->list as $node) {
 			$node->attributes && $node->attributes->delete($name);
@@ -5084,10 +5121,10 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
     private $memcached;
     private $ttl;
     private $prefix;
- 
+
     public function __construct(
-        \Memcached $memcached, 
-        $expiretime = 86400, 
+        \Memcached $memcached,
+        $expiretime = 86400,
         $prefix = 'sess_')
     {
         $this->memcached = $memcached;
@@ -5095,40 +5132,40 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
         $this->prefix = $prefix;
         $this->useMe();
     }
- 
+
     public function open($savePath, $sessionName)
     {
         return true;
     }
- 
+
     public function close()
     {
         return true;
     }
- 
+
     public function read($sessionId)
     {
         return $this->memcached->get($this->prefix . $sessionId) ? : '';
     }
- 
+
     public function write($sessionId, $data)
     {
         return $this->memcached->set(
-          $this->prefix . $sessionId, 
-          $data, 
+          $this->prefix . $sessionId,
+          $data,
           time() + $this->ttl);
     }
- 
+
     public function destroy($sessionId)
     {
         return $this->memcached->delete($this->prefix . $sessionId);
     }
- 
+
     public function gc($lifetime)
     {
         return true;
     }
- 
+
     private function useMe()
     {
         session_set_save_handler(
@@ -5139,7 +5176,7 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
             array($this, 'destroy'),
             array($this, 'gc')
         );
- 
+
         register_shutdown_function('session_write_close');
     }
 }

@@ -32,7 +32,7 @@ function ajax__controller__common() {
 	$call="ajax__".$_ENV["route"]["mode"];
 	if (is_callable($call)) {return @$call();} else {
 		echo __FUNCTION__ .": отсутствует функция ".$call."()";
-		die;		
+		die;
 	}
 }
 

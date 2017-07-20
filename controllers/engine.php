@@ -13,6 +13,20 @@ function engine__controller() {
 }
 
 function engine__controller_login() {
+	//$user=array("id"=>"admin","password"=>md5("admin"),"role"=>"admin","point"=>"/admin/","active"=>"on");
+	//wbItemSave("users",$user);
+	if (isset($_POST["l"]) AND $_POST["l"]>"") {
+		if ($user=wbItemRead("users",$_POST["l"])) {
+				if ($user["point"]>"") {$point=$user["point"];} else {$point="/";}
+				if ($user["password"]==md5($_POST["p"]) AND $user["active"]=="on") {
+					$_SESSION["user_id"]=$user["id"];
+					$_SESSION["user_role"]=$user["role"];
+					$_SESSION["user"]=$user;
+					header('Location: '.$point);
+					die;
+				}
+		}
+	}
 	$_ENV["DOM"]=wbGetTpl("login.htm");
 	return $_ENV["DOM"];
 }
@@ -23,11 +37,9 @@ function engine__controller_register() {
 }
 
 function engine__controller_admin() {
-	//$role=dict_filter_value("user_role","code",$_SESSION["user-role"]);
-	//$_ENV["DOM"]=getTemplate($role["tpl"]);
 	$_ENV["DOM"]=wbGetTpl("admin.htm");
-	if (isset($_ENV["route"]["params"]["action"])) {
-		$call=__FUNCTION__ ."_".$_ENV["route"]["params"]["action"];
+	if (isset($_ENV["route"]["action"])) {
+		$call=__FUNCTION__ ."_".$_ENV["route"]["action"];
 		if (is_callable($call)) {
 			$res=$call();
 		} else {
@@ -43,7 +55,7 @@ function engine__controller_admin_ui() {
 }
 
 function engine__controller__logout() {
-		$_SESSION["User"]=$_SESSION["user"]=$_SESSION["user-role"]=$_SESSION["user_role"]=$_SESSION["user-id"]=$_SESSION["user_id"]="";
+		$_SESSION["user"]=$_SESSION["user_role"]="";
 		setcookie("user_id","",time()-3600,"/"); unset($_COOKIE["user_id"]);
 		header("Refresh: 0; URL=http://{$_SERVER["HTTP_HOST"]}");
 		echo "Выход из системы, ждите...";
@@ -53,11 +65,6 @@ function engine__controller__logout() {
 function engine__controller_include() {
 	include_once($_ENV["pathRoot"].$_SERVER["SCRIPT_NAME"]);
 	die;
-}
-
-function engine__controller_setup() {
-		include("../setup.php");
-		die;
 }
 
 function engine__controller__ui() {

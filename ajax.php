@@ -21,9 +21,9 @@ function ajax__pagination() {
 }
 
 function ajax__save($form=null) {
-	if ($form==null) {$form=$_ENV["route"]["params"]["form"];}
+	if ($form==null) {$form=$_ENV["route"]["form"];}
 	$eFunc="{$form}__formsave"; $aFunc="{$form}_formsave";
-	if 		(is_callable($aFunc)) {$ret=$aFunc();} 
+	if 		(is_callable($aFunc)) {$ret=$aFunc();}
 	elseif (is_callable($eFunc)) {$ret=$eFunc();}
 	else {
 		if (!isset($_POST["id"])) {$_POST["id"]="";}
@@ -45,17 +45,16 @@ function ajax__save($form=null) {
 }
 
 function ajax__setdata() {
-	$form=$_ENV["route"]["params"]["form"];
-	$item=$_ENV["route"]["params"]["item"];
-	
+	$form=$_ENV["route"]["form"];
+	$item=$_ENV["route"]["item"];
 	$table=wbTable($form);
-	if (!isset($_REQUEST["data-mode"])) {$_REQUEST["mode"]="list";} else {$_REQUEST["mode"]=$_REQUEST["data-mode"];}
+	if (!isset($_REQUEST["data-wb-mode"])) {$_REQUEST["mode"]="list";} else {$_REQUEST["mode"]=$_REQUEST["data-wb-mode"];}
 	$Item=wbItemRead($table,$item);
 	$call="{$form}BeforeShowItem"; if (is_callable($call)) {$Item=$call($Item);} else {
 	$call="_{$form}BeforeShowItem"; if (is_callable($call)) {$Item=$call($Item,"list");}}
 	$tpl=wbFromString($_REQUEST["tpl"]);
 	$tpl->find(":first")->attr("item","{{id}}");
-	foreach($tpl->find("[data-wb-role]") as $dr) {$dr->removeClass("loaded"); }
+	foreach($tpl->find("[data-wb-role]") as $dr) {$dr->removeClass("wb-done"); }
 	$tpl->wbSetData($Item);
 	return $tpl;
 }

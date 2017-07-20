@@ -54,7 +54,7 @@ function wbFlushDatabase() {
 	$atables=wbTableList();
 	foreach($etables as $key) {wbTableFlush($_ENV["dbe"]."/".$key);}
 	foreach($atables as $key) {wbTableFlush($_ENV["dba"]."/".$key);}
-	
+
 	wbTrigger("func",__FUNCTION__,"after",func_get_args());
 }
 
@@ -111,7 +111,7 @@ function wbTableRemove($table=null,$engine=false) {
 function wbTablePath($table="data",$engine=false) {
 	wbTrigger("func",__FUNCTION__,"before",func_get_args());
 	if ($engine==false) {$db=$_ENV["dba"];} else {$_ENV["dbe"];}
-	$table=$db."/".$table;	
+	$table=$db."/".$table;
 	wbTrigger("func",__FUNCTION__,"after",func_get_args(),$table);
 	return $table;
 }
@@ -119,7 +119,7 @@ function wbTablePath($table="data",$engine=false) {
 function wbTableCachePath($table="data",$engine=false) {
 	wbTrigger("func",__FUNCTION__,"before",func_get_args());
 	if ($engine==false) {$db=$_ENV["dbac"];} else {$_ENV["dbec"];}
-	$table=$db."/".$table;	
+	$table=$db."/".$table;
 	wbTrigger("func",__FUNCTION__,"after",func_get_args(),$table);
 	return $table;
 }
@@ -135,6 +135,7 @@ function wbTableList($engine=false) {
 function wbListItems($table="data",$where=null) {return wbItemList($table);}
 function wbItemList($table="data") {
 	wbTrigger("func",__FUNCTION__,"before",func_get_args());
+	if (!is_file($table)) {$table=wbTable($table);}
 	$list=wbTrigger("form",__FUNCTION__,"BeforeItemList",func_get_args(),array());
 	if (!is_file($table)) {
 		wbError("func",__FUNCTION__,1001,func_get_args());
@@ -155,6 +156,7 @@ function wbItemList($table="data") {
 
 function wbItemRead($table,$id) {
 	wbTrigger("func",__FUNCTION__,"before",func_get_args());
+	if (!is_file($table)) {$table=wbTable($table);}
 	$cache=wbCacheName($table,$id);
 	if (is_file($cache)) {
 		$item=json_decode(file_get_contents($cache),true);
@@ -183,11 +185,12 @@ function wbCacheName($table,$id=null) {
 	$tname=str_replace($db."/","",$table);
 	if (!is_dir($dbc."/".$tname)) {mkdir($dbc."/".$tname,0777);}
 	if ($id==null) {$cache=$cache=$dbc."/".$tname;} else {$cache=$dbc."/".$tname."/".$id;}
-	return $cache;	
+	return $cache;
 }
 
 function wbItemRemove($table=null,$id=null) {
 	wbTrigger("func",__FUNCTION__,"before",func_get_args());
+	if (!is_file($table)) {$table=wbTable($table);}
 	if (!is_file($table)) {
 		wbError("func",__FUNCTION__,1001,func_get_args());
 		return null;
@@ -204,8 +207,9 @@ function wbItemRemove($table=null,$id=null) {
 	wbTrigger("func",__FUNCTION__,"after",func_get_args());
 }
 
-function wbItemSave($table,$item=null) {
+function wbItemSave($table,$item=null,$flush=true) {
 	wbTrigger("func",__FUNCTION__,"before",func_get_args());
+	if (!is_file($table)) {$table=wbTable($table);}
 	$res=null;
 	if (!is_file($table)) {
 		wbError("func",__FUNCTION__,1001,func_get_args());
@@ -220,6 +224,7 @@ function wbItemSave($table,$item=null) {
 		if (!is_dir($cache)) {$res=file_put_contents($cache,$item, LOCK_EX);}
 		if (!$res) {wbError("func",__FUNCTION__,1007,func_get_args());}
 	}
+	if ($flush==true) {wbTableFlush($table);}
 	wbTrigger("func",__FUNCTION__,"after",func_get_args());
 	return $res;
 }
@@ -254,14 +259,7 @@ function wbTrigger($type,$name,$trigger,$args=null,$data=null) {
 	switch ($type) {
 		case "form":
 			$call=$_ENV[$args[0]]["name"].$trigger;
-			if (in_array($trigger,array(
-				"BeforeItemRead","AfterItemRead",
-				"BeforeItemList","AfterItemList",
-				"BeforeItemSave","AfterItemSave",
-				"BeforeItemRemove","AfterItemRemove",
-			))) {
-				if (is_callable($call)) {$data=$call($data);} else {$call="_".$call; if (is_callable($call)) {$data=$call($data);}}	
-			}
+			if (is_callable($call)) {$data=$call($data);} else {$call="_".$call; if (is_callable($call)) {$data=$call($data);}}
 			return $data;
 			break;
 		case "func":
@@ -292,9 +290,9 @@ function wbErrorOut($error) {
 function wbGetTpl($tpl=null,$path=false) {
 	$out=null;
 	if ($path==true) {
-		if (!$out AND is_file($_ENV["path_app"]."/{$tpl}")) {$out=wbFromFile($_ENV["path_app"]."/{$tpl}");}			
+		if (!$out AND is_file($_ENV["path_app"]."/{$tpl}")) {$out=wbFromFile($_ENV["path_app"]."/{$tpl}");}
 	} else {
-		if (!$out AND is_file($_ENV["path_app"]."/tpl/{$tpl}")) {$out=wbFromFile($_ENV["path_app"]."/tpl/{$tpl}");}			
+		if (!$out AND is_file($_ENV["path_app"]."/tpl/{$tpl}")) {$out=wbFromFile($_ENV["path_app"]."/tpl/{$tpl}");}
 		if (!$out AND is_file($_ENV["path_engine"]."/tpl/{$tpl}")) {$out=wbFromFile($_ENV["path_engine"]."/tpl/{$tpl}");}
 	}
 	if ($out==null) wbErrorOut(wbError("func",__FUNCTION__,404,func_get_args()));
@@ -306,8 +304,8 @@ function wbGetForm($form=NULL,$mode=NULL,$engine=null) {
 	$_ENV["error"][__FUNCTION__]="";
 	if ($form==NULL) {$form=$_GET["form"];}
 	if ($mode==NULL) {$mode=$_GET["mode"];}
-	$aCall=$form."_".$mode; $eCall=$form."__".$mode;
-	if (is_callable($aCall)) {$out=$aCall();} elseif (is_callable($eCall) AND $engine!==false) {$out=$eCall();}
+	//$aCall=$form."_".$mode; $eCall=$form."__".$mode;
+	//if (is_callable($aCall)) {$out=$aCall();} elseif (is_callable($eCall) AND $engine!==false) {$out=$eCall();}
 	if (!isset($out)) {
 		$current=""; $flag=false;
 		$path=array("/forms/{$form}_{$mode}.php","/forms/{$form}/{$form}_{$mode}.php","/forms/{$form}/{$mode}.php");
@@ -352,8 +350,8 @@ function wbLog($type,$name,$error,$args) {
 		}
 	}
 	fwrite($log, date("d-m-Y H:i:s")." {$type} {$name} [{$error["errno"]}]: {$error["error"]}\n");
-	
-	
+
+
 }
 
 function wbNewId($separator="") {
@@ -368,7 +366,7 @@ function wbListFiles($dir) {
 	wbTrigger("func",__FUNCTION__,"before",func_get_args());
 	$list=array();
 	if ($dircont = scandir($dir)) {
-           $i=0; $idx=0; 
+           $i=0; $idx=0;
            while (isset($dircont[$i])) {
                if ($dircont[$i] !== '.' && $dircont[$i] !== '..') {
                    $current_file = "{$dir}/{$dircont[$i]}";
@@ -376,26 +374,45 @@ function wbListFiles($dir) {
                }
                $i++;
            }
-    }	
+    }
 	wbTrigger("func",__FUNCTION__,"after",func_get_args());
 	return $list;
 }
 
-function wbRrecurseDelete($src) {
+function wbRecurseDelete($src) {
     $dir = opendir($src);
 	if (is_resource($dir)) {
 		while(false !== ( $file = readdir($dir)) ) {
 			if (( $file !== '.' ) && ( $file !== '..' )) {
 				if ( is_dir($src . '/' . $file) ) {
-					recurse_delete($src . '/' . $file);
+					wbRecurseDelete($src . '/' . $file);
 				}
-				else { 
-					unlink($src . '/' . $file); 
+				else {
+					unlink($src . '/' . $file);
 				}
 			}
 		}
 		closedir($dir);
 		if (is_dir($src)) {rmdir($src);}
+	}
+}
+
+function wbRecurseCopy($src,$dst) {
+  $dir = opendir($src);
+	if (is_resource($dir)) {
+		@mkdir($dst);
+		while(false !== ( $file = readdir($dir)) ) {
+			if (( $file != '.' ) && ( $file != '..' )) {
+				if ( is_dir($src . '/' . $file) ) {
+					wbRecurseCopy($src . '/' . $file,$dst . '/' . $file);
+					chmod($dst.'/'.$file,0777);
+				} else {
+					copy($src . '/' . $file,$dst . '/' . $file);
+					chmod($dst.'/'.$file,0766);
+				}
+			}
+		}
+		closedir($dir);
 	}
 }
 
@@ -439,7 +456,52 @@ function wbQuery($sql) {
 	return $table["data"];
 }
 
+function wbWhereItem($item,$where=NULL) {
+	$where=htmlspecialchars_decode($where);
+	$res=true;
+	if (!$where==NULL) {
+		if (substr($where,0,1)=="%") {$phpif=substr($where,1);} else {$phpif=wbWherePhp($where,$item);}
+		@eval('if ( '.$phpif.' ) { $res=1; } else { $res=0; } ;');
+	};
+	return $res;
+}
+
+
+function wbWherePhp($str="",$item=array()) {
+	$str=wbSetValuesStr($str,$item);
+	$str=" ".trim(strtr($str,array(
+					"("=>" ( ",
+					")"=>" ) ",
+					"="=>" == ",
+					">"=>" > ",
+					"<"=>" < ",
+					">="=>" >= ",
+					"<="=>" <= ",
+					"<>"=>" !== ",
+					"!="=>" !== "
+	)))." ";
+	$exclude=array("AND","OR","LIKE");
+	preg_match_all('/\w+(?!\")\b/iu',$str,$arr);
+	foreach($arr[0] as $a => $fld) {
+		if (!in_array(strtoupper($fld),$exclude)) {
+			$str=str_replace(" {$fld} ",' $item["'.$fld.'"] ',$str);
+		}
+	}
+
+	if (strpos(strtolower($str)," like ")) {
+		preg_match_all('/\S*\slike\s\S*/iu',$str,$arr);
+		foreach($arr[0] as $a => $cls) {
+			$tmp=explode(" like ",$cls);
+			if (count($tmp)==2) {
+				$str=str_replace($cls,'aikiWhereLike('.$tmp[0].','.$tmp[1].')',$str);
+			}
+		}
+	}
+	return $str;
+}
+
 function wbt_where($table,$where) {
+		$where=htmlspecialchars_decode($where);
 		foreach($where as $key => $val) {
 			if (mb_substr($val,0,1)=="$") {
 				$tmp=explode(".",$val);
@@ -483,7 +545,7 @@ function wbt_route($sid,$e,$r="TABLE") {
 			break;
 		case "colref":
 			if (in_array($r,array("WHERE","TABLE","SELECT"))) {$t[]="$".$e["no_quotes"];}
-			if (is_array($e["sub_tree"])) {foreach($e["sub_tree"] as $s) {wbt_route($sid,$s,$r);}}		
+			if (is_array($e["sub_tree"])) {foreach($e["sub_tree"] as $s) {wbt_route($sid,$s,$r);}}
 			break;
 		case "operator":
 			$op=strtr(mb_strtoupper($e["base_expr"]),array(
@@ -505,7 +567,7 @@ function wbt_route($sid,$e,$r="TABLE") {
 				$t[]=")";
 			}
 			break;
-		
+
 	}
 }
 
@@ -528,14 +590,14 @@ class wbt_filter extends FilterIterator {
 				break;
 		}
     }
-    
+
     public function accept() {
 		$item=$this->getInnerIterator()->current();
 		switch($this->type) {
 			case "where":
 				eval('$'.$this->table.' = $item;');
 				break;
-		}			
+		}
         eval('if ( '.$this->userFilter.' ) { $res=1; } else { $res=0; } ;');
         if( $res == 0) {return false;}
         return true;
@@ -546,7 +608,6 @@ function wbRouterAdd($route=null, $destination=null) {
 	if ($route==null) { // Роутинг по-умолчанию
 			$route=wbRouterRead();
 	}
-	
 	wbRouter::addRoute($route,$destination);
 }
 
@@ -562,7 +623,7 @@ function wbRouterRead($file=null) {
 				$r=explode("=>",$r);
 				if (count($r)==2) $route[trim($r[0])]=trim($r[1]);
 			}
-		}		
+		}
 	}
 	return $route;
 }
@@ -575,12 +636,12 @@ function wbLoadController() {
 	$path="/controllers/".$_ENV["route"]["controller"].".php";
 	if (is_file($_ENV["path_app"] . $path)) {
 		include_once($_ENV["path_app"] . $path);
-		$call=$_ENV["route"]["controller"]."_controller"; 
+		$call=$_ENV["route"]["controller"]."_controller";
 		return @$call(array($__page,$Item));
 	} else {
 		if (is_file(__DIR__ . $path)) {
 			include_once(__DIR__ . $path);
-			$call=$_ENV["route"]["controller"]."__controller"; 
+			$call=$_ENV["route"]["controller"]."__controller";
 			return @$call();
 		} else {
 			echo "Ошибка загрузки контроллера: {$_ENV["route"]["controller"]}";
@@ -770,7 +831,7 @@ function wbSetQuotes($In) {
 // заменяем &quot на "
 function wbChangeQuot($Tag) {
 	$mask = '`&quot[^;]`u';
-	
+
 	if (is_string($Tag)) {
 		$nQuot = preg_match_all($mask, $Tag, $res, PREG_OFFSET_CAPTURE);				// найти &quot без последеующего ;
 		if ($nQuot !== false) {
@@ -795,20 +856,19 @@ function wbChangeQuot($Tag) {
 function wbRole($role,$userId=null) {
 	$res=false;
 	if ($userId==null) {
-		if (in_array($role,$_ENV["user"]["role"])) {$res=true;}
+		if (in_array($role,$_SESSION["user_role"])) {$res=true;}
 	} else {
-		$users=wbTable("users");
-		$user=wbReadItem($users,$userId);
+		$user=wbReadItem("users",$userId);
 		if (in_array($role,$user["role"])) {$res=true;}
 	}
-	
+
 }
 
-	function contentControls($set="") {
+	function wbControls($set="") {
 		$res="*";
 		$controls="[data-wb-role]";
-		$allow="[data-allow],[data-disallow],[data-disabled],[data-enabled],[data-readonly],[data-writable]";
-		$target="[prepend],[append],[before],[after],[html]";
+		$allow="[data-wb-allow],[data-wb-disallow],[data-wb-disabled],[data-wb-enabled],[data-wb-readonly],[data-wb-writable]";
+		$target="[data-wb-prepend],[data-wb-append],[data-wb-before],[data-wb-after],[data-wb-html],[data-wb-replace]";
 		if ($set!="") {$res=$$set;} else {$res="{$controls},{$allow},{$target}";}
 		unset($controls,$allow,$target);
 		return $res;
@@ -820,7 +880,7 @@ function wbListForms() {
 	$list=array();
 	$eList=wbListFilesRecursive($_ENV["path_engine"] ."/forms");
 	$aList=wbListFilesRecursive($_ENV["path_app"] ."/forms");
-	$arr=$eList; 
+	$arr=$eList;
 	foreach($aList as $a) {$arr[]=$a;}
 	unset($eList,$aList);
 	foreach($arr as $i => $name) {
@@ -842,7 +902,7 @@ function wbListForms() {
 }
 
 function wbListFormsFull() {
-	$list=array(); 
+	$list=array();
 	$types=array("engine","app");
 	foreach($types as $type) {
 		$list[$type]=array();
@@ -851,7 +911,7 @@ function wbListFormsFull() {
 			$inc=strpos($fname,".inc");
 			$ext=explode(".",$fname); $ext=$ext[count($ext)-1];
 			$name=substr($fname,0,-(strlen($ext)+1));
-			$tmp=explode("_",$name); 
+			$tmp=explode("_",$name);
 			$form=$tmp[0]; unset($tmp[0]);
 			$mode=implode("_",$tmp);
 			//$uri_path=str_replace($_SESSION["root_path"],"",$_ENV["path_".$type]);
@@ -871,33 +931,6 @@ function wbListFormsFull() {
 		}
 	}
 	return $list;
-}
-
-function wbListFilesRecursive($dir,$path=false) {
-   $list = array();
-   $stack[] = $dir;
-   while ($stack) {
-       $thisdir = array_pop($stack);
-       if ($dircont = scandir($thisdir)) {
-           $i=0; $idx=0;
-           while (isset($dircont[$i])) {
-               if ($dircont[$i] !== '.' && $dircont[$i] !== '..') {
-                   $current_file = "{$thisdir}/{$dircont[$i]}";
-                   if (is_file($current_file)) {
-					   if ($path==true) {
-							$list[$idx]["file"] = "{$dircont[$i]}"; 
-							$list[$idx]["path"] = "{$thisdir}"; 
-						} else { $list[] = "{$dircont[$i]}"; }
-                       $idx++;
-                   } elseif (is_dir($current_file)) {
-						$stack[] = $current_file;
-                   }
-               }
-               $i++;
-           }
-       }
-   }
-   return $list;
 }
 
 function wbArraySort( $array=array(), $args = array('votes' => 'd') ){
@@ -938,13 +971,108 @@ function wbArrayAttr($attr) {
 	return explode(" ",trim($attr));
 }
 
-
+function wbNormalizePath( $path ) {
+    $patterns = array('~/{2,}~', '~/(\./)+~', '~([^/\.]+/(?R)*\.{2,}/)~', '~\.\./~');
+    $replacements = array('/', '/', '', '');
+    return preg_replace($patterns, $replacements, $path);
+}
 
 function wbClearValues($out) {
 	$out=preg_replace("|\{\{([^\}]+?)\}\}|","",$out);
 	return $out;
 }
 
+function wbListTpl() {
+	$dir=$_ENV["path_app"]."/tpl";
+	$list=array(); $result=array();
+	if (is_dir($dir)) {
+		$list=wbListFilesRecursive($dir);
+		foreach($list as $l => $val) {
+			if (substr($val,-4)==".php") {
+				$list[$l]=str_replace($dir,"",$val);
+				if (substr_count($list[$l],"/")==1) {$list[$l]=substr($list[$l],1);}
+				$result[]=$list[$l];
+			}
+		}
+	}
+	$list=wbArraySort($result);
+	return $list;
+}
 
+function wbListFilesRecursive($dir,$path=false) {
+   $list = array();
+   $stack[] = $dir;
+   while ($stack) {
+       $thisdir = array_pop($stack);
+       if (is_dir($thisdir) AND $dircont = scandir($thisdir)) {
+           $i=0; $idx=0;
+           while (isset($dircont[$i])) {
+               if ($dircont[$i] !== '.' && $dircont[$i] !== '..') {
+                   $current_file = "{$thisdir}/{$dircont[$i]}";
+                   if (is_file($current_file)) {
+					   if ($path==true) {
+							$list[$idx]["file"] = "{$dircont[$i]}";
+							$list[$idx]["path"] = "{$thisdir}";
+						} else { $list[] = "{$dircont[$i]}"; }
+                       $idx++;
+                   } elseif (is_dir($current_file)) {
+						$stack[] = $current_file;
+                   }
+               }
+               $i++;
+           }
+       }
+   }
+   return $list;
+}
+
+function wbArraySortMulti( $array=array(), $args = array('votes' => 'd') ){
+	// если передан атрибут, то предварительно готовим массив параметров
+	if (is_string($args) && $args>"") {
+			$args=wbAttrToArray($args);
+			$param=array();
+			foreach($args as $ds) {
+				$tmp=explode(":",$ds);
+				if (!isset($tmp[1])) {$tmp[1]="a";}
+				$param[$tmp[0]]=$tmp[1];
+			}
+			$args=$param;
+			unset($param,$tmp,$ds);
+	}
+	// сортировка массива по нескольким полям
+	usort( $array, function( $a, $b ) use ( $args ){
+		$res = 0;
+		$a = (object) $a;
+		$b = (object) $b;
+		foreach( $args as $k => $v ){
+			if (isset($a->$k) && isset($b->$k)) {
+				if( $a->$k == $b->$k ) continue;
+
+				$res = ( $a->$k < $b->$k ) ? -1 : 1;
+				if( $v=='d' ) $res= -$res;
+				break;
+			}
+		}
+		return $res;
+	} );
+	return $array;
+}
+
+function wbCallFormFunc($name,$Item,$form=null,$mode=null) {
+	if (!isset($_GET["mode"])) {$_GET["mode"]="";}
+	if (!isset($_GET["form"])) {$_GET["form"]="";}
+	if ($mode==null) {$mode=$_GET["mode"];}
+	if ($mode=="") {$mode="list";}
+	if ($form==null) {
+		if (isset($Item["form"]) && $Item["form"]>"") {$form=$Item["form"];} else {$form=$_GET["form"];}
+	}
+	$sf=$_GET["form"]; $_GET["form"]=$form;
+//	formCurrentInclude($form);
+	$func=$form.$name; $_func="_".$func;
+	if (is_callable($func)) {$Item=$func($Item,$mode);} else {
+		if (is_callable($_func)) {$Item=$_func($Item,$mode);}
+	}
+	$_GET["form"]=$sf;
+	return $Item;
+}
 ?>
-
