@@ -4,7 +4,7 @@
                      Список сзаписей
                     </h6>
                     <div class="element-box">
-                      <button  data-wb-ajax="/form/edit/{{_ENV[route][form]}}/_new" data-wb-append="body">Новая запись</button>
+                      <button  data-wb-ajax="/form/edit/{{_GET[form]}}/_new" data-wb-append="body">Новая запись</button>
                       <div class="table-responsive">
                         <table class="table table-lightborder">
                           <thead>
@@ -23,7 +23,7 @@
                               </th>
                             </tr>
                           </thead>
-                          <tbody data-wb-role="foreach" data-wb-table="{{_ENV[route][form]}}" data-wb-add="true" data-wb-size="20" data-wb-sort="id">
+                          <tbody data-wb-role="foreach" data-wb-table="{{_GET[form]}}" data-wb-add="true" data-wb-size="12" data-wb-sort="id">
                             <tr>
                               <td class="nowrap">
 									{{id}} {{header}}
@@ -42,7 +42,7 @@
                                 <div class="status-pill green" data-title="Complete" data-toggle="tooltip"></div>
                               </td>
                               <td class="text-right">
-                                <i class="fa fa-pencil" data-wb-ajax="/form/edit/{{_ENV[route][form]}}/{{id}}" data-wb-append="body"></i>
+                                <i class="fa fa-pencil" data-wb-ajax="/form/edit/{{_table}}/{{id}}" data-wb-append="body"></i>
                               </td>
                             </tr>
                           </tbody>

@@ -9,7 +9,7 @@
       </div>
       <div class="modal-body">
 
-<form id="pagesEditForm" data-wb-form="pages" data-wb-item="{{id}}"  class="form-horizontal" role="form">
+<form id="pagesEditForm" data-wb-form="pages" data-wb-item="{{_GET[item]}}"  class="form-horizontal" role="form">
 	<div class="form-group row">
 	  <label class="col-sm-2 form-control-label">Имя записи</label>
 	   <div class="col-sm-10"><input type="text" class="form-control" name="id" placeholder="Имя записи" required ></div>
@@ -50,6 +50,12 @@
 	  <label class="col-sm-2 form-control-label">Описание</label>
 	   <div class="col-sm-10"><input type="text" class="form-control" name="meta_description" placeholder="Описание"></div>
 	</div>
+
+  <div class="form-group row">
+    <label class="col-sm-2 form-control-label">Отображать</label>
+    <div class="col-sm-2"><label class="switch switch-success"><input type="checkbox" name="active"><span></span></label></div>
+	</div>
+
 	<div class="form-group row">
 	  <label class="col-sm-2 form-control-label">Ключевые слова</label>
 	   <div class="col-sm-10"><input type="text" class="form-control input-tags" name="meta_keywords" placeholder="Ключевые слова"></div>
@@ -65,12 +71,12 @@
 
 
 
-
+    </div>
 		  <div class="modal-footer">
 			<button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Закрыть</button>
 			<button type="button" class="btn btn-primary" data-wb-formsave="#pagesEditForm"><span class="glyphicon glyphicon-ok"></span> Сохранить изменения</button>
 		  </div>
-		</div>
+
 		</div>
 </div>
 </div>

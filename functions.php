@@ -135,7 +135,7 @@ function wbTableList($engine=false) {
 function wbListItems($table="data",$where=null) {return wbItemList($table);}
 function wbItemList($table="data") {
 	wbTrigger("func",__FUNCTION__,"before",func_get_args());
-	if (!is_file($table)) {$table=wbTable($table);}
+	if (count(explode($_ENV["path_app"],$table))==1) {$table=wbTable($table);}
 	$list=wbTrigger("form",__FUNCTION__,"BeforeItemList",func_get_args(),array());
 	if (!is_file($table)) {
 		wbError("func",__FUNCTION__,1001,func_get_args());
@@ -156,7 +156,7 @@ function wbItemList($table="data") {
 
 function wbItemRead($table,$id) {
 	wbTrigger("func",__FUNCTION__,"before",func_get_args());
-	if (!is_file($table)) {$table=wbTable($table);}
+	if (count(explode($_ENV["path_app"],$table))==1) {$table=wbTable($table);}
 	$cache=wbCacheName($table,$id);
 	if (is_file($cache)) {
 		$item=json_decode(file_get_contents($cache),true);
@@ -188,9 +188,9 @@ function wbCacheName($table,$id=null) {
 	return $cache;
 }
 
-function wbItemRemove($table=null,$id=null) {
+function wbItemRemove($table=null,$id=null,$flush=true) {
 	wbTrigger("func",__FUNCTION__,"before",func_get_args());
-	if (!is_file($table)) {$table=wbTable($table);}
+	if (count(explode($_ENV["path_app"],$table))==1) {$table=wbTable($table);}
 	if (!is_file($table)) {
 		wbError("func",__FUNCTION__,1001,func_get_args());
 		return null;
@@ -198,29 +198,31 @@ function wbItemRemove($table=null,$id=null) {
 		$cache=wbCacheName($table,$id);
 		if ($id!==null) {
 			$item=wbItemRead($table,$id);
-			if (is_array($item)) {$item["__wbFlag__"]="remove";}
+			if (is_array($item) && $table!=="users" && !isset($item["super"]) && $item["super"]!=="on") {$item["__wbFlag__"]="remove";}
 			$item=json_encode($item, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE);
 		}
 		if (!is_dir($cache) AND $item!==null) {$res=file_put_contents($cache,$item, LOCK_EX);}
 		if (!$res) {wbError("func",__FUNCTION__,1007,func_get_args());}
 	}
+	if ($flush==true) {wbTableFlush($table);}
 	wbTrigger("func",__FUNCTION__,"after",func_get_args());
 }
 
 function wbItemSave($table,$item=null,$flush=true) {
 	wbTrigger("func",__FUNCTION__,"before",func_get_args());
-	if (!is_file($table)) {$table=wbTable($table);}
+	if (count(explode($_ENV["path_app"],$table))==1) {$table=wbTable($table);}
 	$res=null;
 	if (!is_file($table)) {
 		wbError("func",__FUNCTION__,1001,func_get_args());
 		return null;
 	} else {
-		if (!isset($item["id"])) {$item["id"]=wbNewId();}
+		if (!isset($item["id"])) {$item["id"]=wbNewId(); $prev=null;} else {$prev=wbItemRead($table,$item["id"]);}
 		$item=wbItemSetTable($table,$item);
 		$cache=wbCacheName($table,$item["id"]);
-		$item=json_encode($item, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE);
+		if ($prev!==null) {$item=array_merge($prev,$item);}
 		$call=$item["_table"]."BeforeSaveItem";
 		if (is_callable($call)) {$item=$call($item);} else {$call="_".$call; if (is_callable($call)) {$item=$call($item);}}
+		$item=json_encode($item, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE);
 		if (!is_dir($cache)) {$res=file_put_contents($cache,$item, LOCK_EX);}
 		if (!$res) {wbError("func",__FUNCTION__,1007,func_get_args());}
 	}
@@ -869,6 +871,10 @@ function wbRole($role,$userId=null) {
 		$controls="[data-wb-role]";
 		$allow="[data-wb-allow],[data-wb-disallow],[data-wb-disabled],[data-wb-enabled],[data-wb-readonly],[data-wb-writable]";
 		$target="[data-wb-prepend],[data-wb-append],[data-wb-before],[data-wb-after],[data-wb-html],[data-wb-replace]";
+		$tags=array("module","formdata","foreach", "dict", "tree","gallery",
+					"include","imageloader","thumbnail",
+					"multiinput","where","cart","variable"
+		);
 		if ($set!="") {$res=$$set;} else {$res="{$controls},{$allow},{$target}";}
 		unset($controls,$allow,$target);
 		return $res;

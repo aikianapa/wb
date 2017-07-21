@@ -108,9 +108,9 @@ print_r(wbRouter::getRoute());
   public static function returnRoute() {
 	$_GET=array();
 	$_ENV["route"]=array();
-    
+
     $controller="form"; $action="mode";
-    
+
     $form = isset(self::$params[0]) ? self::$params[0]: 'default_form';
     $mode = isset(self::$params[1]) ? self::$params[1]: 'default_mode';
 	foreach(self::$params as $i => $param) {
@@ -125,8 +125,8 @@ print_r(wbRouter::getRoute());
 				$_ENV["route"]["params"][self::$names[$i]]=$param;
 			}
 		}
-		
-		
+
+
 	}
 	$tmp=explode("?",$_SERVER["REQUEST_URI"]);
 	if (isset($tmp[1])) {parse_str($tmp[1],$get); $_ENV["route"]["params"]=(array)$_ENV["route"]["params"]+(array)$get;}
@@ -1197,7 +1197,7 @@ abstract class kiNode
 			$this->wbUserAllow();
 			$nodes=new IteratorIterator($this->find("*"));
 			foreach($nodes as $inc) {
-				if (!$inc->parents("script")->length) {
+				if (!$inc->parents("script[type=text/template]")->length) {
 				$inc->wbUserAllow();
 				$tag=$inc->wbCheckTag();
 				if (!$tag==FALSE && !$inc->hasClass("wb-done")) {
@@ -1301,11 +1301,7 @@ abstract class kiNode
 
 	public function wbCheckTag() {
 		$res=FALSE;
-		$tags=array(
-			"module","formdata","foreach", "dict", "tree","gallery",
-			"include","imageloader","thumbnail",
-			"multiinput","where","cart","variable"
-		);
+		$tags=wbControls("tags");
 		foreach($tags as $tag) {
 			if ($this->hasRole($tag)) {$res=$tag; return $res;}
 		}; unset($tag);
@@ -1326,28 +1322,29 @@ abstract class kiNode
 	}
 
 	function wbTargeter($Item=array()) {
-		$attr=array("data-prepend","data-append","data-before","data-after","data-html","data-replace");
 		$tar=$this->find(wbControls("target"));
+		$attr=(explode(",",str_replace(array("[","]"," "),array("","",""),wbControls("target"))));		
 		foreach($tar as $inc) {
-			foreach ($attr as $key => $attribute) {
-				$$attribute=$inc->attr($attribute);
-				if ($$attribute>"" ) {
-					if ($this->find($$attribute)->length) {
-						//if ($this->find($$attribute)->hasAttribute("data-role") AND !$this->find($$attribute)->hasClass("wb-done")) {} else {
-							$inc->removeAttr($attribute);
-				      $tmp=explode("-",$attribute);
-              if (count($tmp)==2) {$com=$tmp[1];} else {$com=$attribute;}
-							if ($attribute=="replace") {$attribute="replaceWidth";}
-							$this->find($$attribute)->$com($inc);
-						//}
+			if (!$inc->hasAttribute("data-wb-ajax")) {
+				foreach ($attr as $key => $attribute) {
+					$$attribute=$inc->attr($attribute);
+					if ($$attribute>"" ) {
+						if ($this->find($$attribute)->length) {
+							//if ($this->find($$attribute)->hasAttribute("data-role") AND !$this->find($$attribute)->hasClass("wb-done")) {} else {
+								$inc->removeAttr($attribute);
+								$com=str_replace("data-wb-","",$attribute);
+								if ($com=="replace") {$attribute="replaceWidth";}
+								$this->find($$attribute)->$com($inc);
+							//}
+						}
 					}
-				}
-			}; unset($attribute);
+				}; unset($attribute);
+			}
 		}; unset($inc);
 	}
 
 	public function excludeTextarea($Item=array()) {
-		$list=$this->find("script,textarea:not([data-not-exclude]),pre,.nowb,[data-role=module]");
+		$list=$this->find("script[type=text/template],textarea:not([data-not-exclude]),pre,.nowb,[data-role=module]");
 		$_ENV["ta_save"]=array();
 		foreach ($list as $ta) {
 			$id=wbNewId();
@@ -1361,7 +1358,7 @@ abstract class kiNode
 		}; unset($ta,$list);
 	}
 	function includeTextarea($Item=array()) {
-		$list=$this->find("script,textarea[taid],pre[taid],.nowb[taid],[data-role=module][taid]");
+		$list=$this->find("script[type=text/template],textarea[taid],pre[taid],.nowb[taid],[data-role=module][taid]");
 		foreach ($list as $ta) {
 			$id=$ta->attr("taid"); $name=$ta->attr("name");
 			if (isset($_ENV["ta_save"][$id])) $ta->html($_ENV["ta_save"][$id]);
@@ -1797,9 +1794,8 @@ abstract class kiNode
 	public function tagWhere($Item=array()) {
 		$res=wbWhereItem($Item,$this->attr("data"));
 		if ($res==0) {$this->remove();} else {
-			$vars=$this->find("[data-role=variable]");
+			$vars=$this->find("[data-wb-role=variable]");
 			foreach($vars as $v => $var) {$Item=$var->tagVariable($Item);}
-			$_SESSION["itemAfterWhere"]=$Item;
 			$this->wbSetData($Item);
 		}
 	}
@@ -2050,7 +2046,7 @@ public function tagInclude($Item) {
 			$tmp=$attr->name;
 			if (strpos($tmp,"ata-wb-")) {$tmp=str_replace("data-wb-","",$tmp); $$tmp=$attr."";}
 		}; unset($attrs);
-		
+
 		if (isset($form) AND !isset($table)) {$table=$form;}
 		if (isset($vars) AND $vars>"") {$Item=attrAddData($vars,$Item);}
 		if (isset($from) AND $from>"") {$Item=$Item[$from];}

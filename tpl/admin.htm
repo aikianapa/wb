@@ -51,8 +51,8 @@
                                 <img alt="" src="img/avatar1.jpg">
                             </div>
                             <div class="logged-user-info-w">
-                                <div class="logged-user-name">Maria Gomez</div>
-                                <div class="logged-user-role">Administrator</div>
+                                <div class="logged-user-name">{{_SESS[user][name]}}</div>
+                                <div class="logged-user-role">{{_SESS[user][role]}}</div>
                             </div>
                         </div>
                         <!--------------------START - Mobile Menu List-------------------->
@@ -361,8 +361,8 @@
                                             <img alt="" src="img/avatar1.jpg">
                                         </div>
                                         <div class="logged-user-info-w">
-                                            <div class="logged-user-name">Maria Gomez</div>
-                                            <div class="logged-user-role">Administrator</div>
+                                          <div class="logged-user-name">{{_SESS[user][name]}}</div>
+                                          <div class="logged-user-role">{{_SESS[user][role]}}</div>
                                         </div>
                                     </div>
                                     <div class="bg-icon">
@@ -382,7 +382,7 @@
                                             <a href="#"><i class="os-icon os-icon-others-43"></i><span>Notifications</span></a>
                                         </li>
                                         <li>
-                                            <a href="#"><i class="os-icon os-icon-signs-11"></i><span>Logout</span></a>
+                                            <a href="/logout/"><i class="os-icon os-icon-signs-11"></i><span>Logout</span></a>
                                         </li>
                                     </ul>
                                 </div>
@@ -871,9 +871,10 @@ START - User avatar and menu in secondary top menu
                                                 <img alt="" src="img/avatar1.jpg">
                                             </div>
                                             <div class="logged-user-info-w">
-                                                <div class="logged-user-name">Maria Gomez</div>
-                                                <div class="logged-user-role">Administrator</div>
+                                              <div class="logged-user-name">{{_SESS[user][name]}}</div>
+                                              <div class="logged-user-role">{{_SESS[user][role]}}</div>
                                             </div>
+
                                         </div>
                                         <div class="bg-icon">
                                             <i class="os-icon os-icon-wallet-loaded"></i>
@@ -892,7 +893,7 @@ START - User avatar and menu in secondary top menu
                                                 <a href="#"><i class="os-icon os-icon-others-43"></i><span>Notifications</span></a>
                                             </li>
                                             <li>
-                                                <a href="#"><i class="os-icon os-icon-signs-11"></i><span>Logout</span></a>
+                                                <a href="/logout/"><i class="os-icon os-icon-signs-11"></i><span>Logout</span></a>
                                             </li>
                                         </ul>
                                     </div>

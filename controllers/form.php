@@ -14,7 +14,7 @@ return $_ENV["DOM"];
 
 function form__controller__show() {
 	$Item=wbItemRead(wbTable("pages"),$_ENV["route"]["item"]);
-	if ($Item==false) {
+	if ($Item==false OR $Item["active"]!=="on") {
 		echo form__controller__error_404();
 		die;
 	} else {
@@ -23,6 +23,19 @@ function form__controller__show() {
 		$_ENV["DOM"]->wbSetData($Item);
 	}
 	return $_ENV["DOM"];
+}
+
+function form__controller__remove() {
+	if (isset($_SESSION["user_id"])) { 
+		$_ENV["DOM"]=wbGetForm("common","remove_confirm");
+		if (isset($_GET["params"]["confirm"])) {
+			$_ENV["DOM"]->find("script[data-wb-tag=success]")->remove();
+		} else {
+			wbItemRemove($_ENV["route"]["form"],$_ENV["route"]["item"]);
+			$_ENV["DOM"]->find(".modal")->remove();
+		}
+		return $_ENV["DOM"];
+	}
 }
 
 function form__controller__error_404($id=null) {
@@ -67,7 +80,7 @@ function form__controller__setup_engine() {
 		wbTableCreate("todo");
 		wbTableCreate("news");
 		wbTableCreate("orders");
-		$user=array("id"=>$_POST["login"],"password"=>md5($_POST["password"]),"role"=>"admin","point"=>"/admin/","active"=>"on");
+		$user=array("id"=>$_POST["login"],"password"=>md5($_POST["password"]),"role"=>"admin","point"=>"/admin/","active"=>"on","super"=>"on");
 		wbItemSave("users",$user);
 
 		header('Location: '.'/');

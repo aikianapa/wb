@@ -12,6 +12,11 @@ function engine__controller() {
 	return $_ENV["DOM"];
 }
 
+function engine__controller_logout() {
+	unset($_SESSION["user_id"],$_SESSION["user_role"],$_SESSION["user"]);
+	header('Location: /login/');
+}
+
 function engine__controller_login() {
 	//$user=array("id"=>"admin","password"=>md5("admin"),"role"=>"admin","point"=>"/admin/","active"=>"on");
 	//wbItemSave("users",$user);
@@ -21,6 +26,7 @@ function engine__controller_login() {
 				if ($user["password"]==md5($_POST["p"]) AND $user["active"]=="on") {
 					$_SESSION["user_id"]=$user["id"];
 					$_SESSION["user_role"]=$user["role"];
+					if (!isset($user["name"])) {$user["name"]=$user["id"];}
 					$_SESSION["user"]=$user;
 					header('Location: '.$point);
 					die;

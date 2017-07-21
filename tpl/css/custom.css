@@ -75,3 +75,5 @@ label.switch-primary input:checked + span {
 .datetimepicker thead tr:first-child th {
     display: table-cell!important;
 }
+
+.hidden {display:none;}

@@ -10,6 +10,7 @@
 	.todo-list .danger {background-color: rgba(244, 67, 54, 0.3)!important;}
 	.todo-list .success {background-color: rgba(76, 175, 80, 0.3)!important;}
 	.todo-list .muted {background-color: rgba(158, 158, 158, 0.4);}
+  .todo-list li {display: flex!important;}
 	#content .nav .dropdown-menu {margin-left: -140px;}
 	#switcher {display:none;}
 </style>
@@ -49,9 +50,9 @@
 <div class="row">
 	<div class="col-12">
 <ul class="list-group todo-list"
-      data-wb-role="foreach" data-wb-table="todo" data-sort="time"
-			data-size="false" where='user = "{{_SESS[user_id]}}"'>
-	<meta data-wb-role="variable" var="class" value="todo-done" where='done<>""' data-hide="*">
+      data-wb-role="foreach" data-wb-table="todo" data-wb-sort="time"
+			data-wb-size="false" data-wb-where='user = "{{_SESS[user_id]}}"'>
+	<meta data-wb-role="variable" var="class" value="todo-done" where='done<>""' data-wb-hide="*">
 	<li class="list-group-item list-item {{class}} {{status}} hide" item="{{id}}" data-id="{{id}}" data-status="{{status}}">
 
 	<div class="col-1">
@@ -70,11 +71,11 @@
 	<a class="col-1 todo-close pull-right" href="javascript:void(0);"><i class="fa  fa-trash-o"></i></a>
 	</li>
 </ul>
-    <div data-append=".todo-list">
-      <div data-block="danger"></div>
-      <div data-block="success"></div>
-      <div data-block="warn"></div>
-      <div data-block="muted" class="hide"></div>
+    <div data-wb-append=".todo-list">
+      <ul data-block="danger"></ul>
+      <ul data-block="success"></ul>
+      <ul data-block="warn"></ul>
+      <ul data-block="muted" class="hide"></ul>
     </div>
 </div>
 </div>
