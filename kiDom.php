@@ -2003,15 +2003,20 @@ public function tagInclude($Item) {
 		if ($dfs=="false") {$this_content->find("[data-wb-formsave]")->remove();}
 		if ($class>"") {$this_content->find(":first")->addClass($class);}
 
-		if ($ssrc=="editor" && !$this_content->find("textarea.editor").length) {
-      if ($did>"") {
-        $this_content->find(":first")->removeAttr("id");
-        $this_content->find("textarea.editor")->attr("id",$did);
-      }
-      foreach($this_content->find("textarea.editor:not(.wb-done)") as $editor) {
-        if ($editor->attr("id")=="") {$editor->attr("id","editor-".wbNewId());}
-      }
-			if ($name>"") {$this_content->find("textarea.editor")->attr("name",$name);}
+		if (($ssrc=="editor" OR $ssrc=="source") && !$this_content->find("textarea.{$ssrc}").length) {
+			if ($did>"") {
+				$this_content->find(":first")->removeAttr("id");
+				$this_content->find("textarea.{$ssrc}")->attr("id",$did);
+			}
+			foreach($this_content->find("textarea.{$ssrc}:not(.wb-done)") as $editor) {
+				if ($editor->attr("id")=="") {
+					$sid=wbNewId();
+					$editor->attr("id","{$ssrc}-{$sid}");
+					$editor->parent("div")->find(".source-toolbar")->attr("id","{$ssrc}-toolbar-{$sid}");;
+				}
+				if ($editor->attr("name")=="") {$editor->attr("name","text");}
+			}
+			if ($name>"") {$this_content->find("textarea.{$ssrc}")->attr("name",$name);}
 		}
 
 

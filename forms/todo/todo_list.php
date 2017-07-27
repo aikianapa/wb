@@ -10,6 +10,7 @@
 	.todo-list .danger {background-color: rgba(244, 67, 54, 0.3)!important;}
 	.todo-list .success {background-color: rgba(76, 175, 80, 0.3)!important;}
 	.todo-list .muted {background-color: rgba(158, 158, 158, 0.4);}
+  .todo-list ul {padding:0;}
   .todo-list li {display: flex!important;}
 	#content .nav .dropdown-menu {margin-left: -140px;}
 	#switcher {display:none;}
@@ -84,7 +85,7 @@
 			<div class="input-group">
 				<input type="text" id="add-todo" name="add-todo" class="form-control" placeholder="Добавить задачу.." >
 				<span class="input-group-addon"><span class="text-sm text-muted bottom_counter"><strong></strong> из <strong></strong></span></span>
-				<span class="input-group-addon">Добавить</span>
+				<button class="input-group-addon ">Добавить</button>
 
 			</div>
 		</form>

@@ -1,5 +1,3 @@
-wb_include("/engine/js/underscore-min.js");
-wb_include("/engine/js/backbone-min.js");
 wb_include("/engine/js/php.js");
 
 $(document).ready(function(){
@@ -475,6 +473,156 @@ function wb_pagination(pid) {
 		});
 	});
 }
+
+function wb_call_source(id	) {
+	var eid="#"+id;
+	if (!$(eid).parents(".formDesignerEditor").length) {
+		$(document).data("sourceFile",null);
+		var form = $(eid).parents("form");
+		var theme=getcookie("sourceEditorTheme");
+		var fsize=getcookie("sourceEditorFsize")*1;
+		var source="&nbsp;";
+		var fldname=$(eid).attr("name");
+		if ($("[name="+fldname+"]").length) {source=$("[name="+fldname+"]").val();}
+
+		if (theme==undefined || theme=="") {var theme="ace/theme/chrome"; 	setcookie("sourceEditorTheme",theme);}
+		if (fsize==undefined || fsize=="") {var fsize=12; 					setcookie("sourceEditorFsize",fsize);}
+		if ($(document).data("sourceClipboard")==undefined) {$(document).data("sourceClipboard","");}
+		$(form).data(eid,ace.edit(id));
+		$(form).data(eid).setTheme("ace/theme/chrome");
+		$(form).data(eid).setOptions({
+				enableBasicAutocompletion: true,
+				enableSnippets: true
+		});
+		$(form).data(eid).getSession().setUseWrapMode(true);
+		$(form).data(eid).getSession().setUseSoftTabs(true);
+		$(form).data(eid).setDisplayIndentGuides(true);
+		$(form).data(eid).setHighlightActiveLine(false);
+		$(form).data(eid).setAutoScrollEditorIntoView(true);
+		$(form).data(eid).commands.addCommand({
+			name: 'save',
+			bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
+			exec: function() {
+				console.log(form);
+				//wb_formsave(form);
+			},
+			readOnly: false
+		});
+		$(form).data(eid).gotoLine(0,0);
+		$(form).data(eid).resize(true);
+		if ($("#cke_text .cke_contents").length) {var ace_height=$("#cke_text .cke_contents").height();} else {var ace_height=400;}
+		$(".ace_editor").css("height",ace_height);
+		$(form).data(eid).setTheme(theme);
+		$(form).data(eid).setFontSize(fsize);
+		$(form).data(eid).setValue(source);
+		$(form).data(eid).gotoLine(0,0);
+		$(form).data(eid).getSession().setMode("ace/mode/php");
+		wb_call_source_events(eid,fldname);
+		return $(form).data(eid);
+	}
+}
+
+
+function wb_call_source_events(eid,fldname) {
+
+	var tmp=explode("-",eid);
+	var toolbar=tmp[0]+"-toolbar-"+tmp[1]+" ";
+	$(toolbar).data("editor",false);
+	$(toolbar).next(".ace_editor").attr("name",fldname).attr("id",substr(eid,1));
+	var form = $(eid).parents("form");
+	$(form).data(eid).getSession().on('change', function(e) {
+		if ($(toolbar).data("editor")==undefined) {$(toolbar).data("editor",false);}
+		if ($(toolbar).data("editor")==false && $(document).data("editor")!==true) {
+			$(toolbar).data("editor",true);
+			setTimeout(function(){
+				$(document).trigger("sourceChange",{
+								"value" : $(form).data(eid).getSession().getValue(),
+								"field"	: fldname,
+								"form"	: $(toolbar).parents("form")
+				});	
+				$(toolbar).data("editor",false);
+			},500);
+		} 
+	});
+
+	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+		if ($(e.target.hash).find(eid).length) {
+			var form = $(eid).parents("form");
+			var val=$(form).data(eid).getSession().getValue();
+			$(form).data(eid).getSession().setValue(val);
+		}
+	});
+
+
+	$(document).on("editorChange",function(e,data){
+		$(document).data("editor",true);
+		var eid="#"+$(".ace_editor[name="+data.field+"]").attr("id");
+		var form = $(eid).parents("form");
+		$(form).data(eid).getSession().setValue(data.value);
+		setTimeout(function(){$(document).data("editor",false);},30);
+	});
+	
+
+
+	
+	$(document).undelegate(toolbar+" button","click");
+	$(document).delegate(toolbar+" button","click",function(e){
+		var theme=getcookie("sourceEditorTheme");
+		var fsize=getcookie("sourceEditorFsize");
+		if (theme==undefined || theme=="") {var theme="ace/theme/chrome";	setcookie("sourceEditorTheme",theme);}
+		if (fsize==undefined || fsize=="") {var fsize=12; 					setcookie("sourceEditorFsize",fsize);}
+
+		//if ($(this).hasClass("btnCopy")) 		{$(document).data("sourceFile",$(form).data(eid).getCopyText());}
+		//if ($(this).hasClass("btnPaste")) 		{$(form).data(eid).insert($(document).data("sourceFile"));}
+		if ($(this).hasClass("btnCopy")) 		{$(document).data("sourceClipboard",$(form).data(eid).getCopyText());}
+		if ($(this).hasClass("btnPaste")) 		{$(form).data(eid).insert($(document).data("sourceClipboard"));}
+		if ($(this).hasClass("btnUndo")) 		{$(form).data(eid).execCommand("undo");}
+		if ($(this).hasClass("btnRedo")) 		{$(form).data(eid).execCommand("redo");}
+		if ($(this).hasClass("btnFind")) 		{$(form).data(eid).execCommand("find");}
+		if ($(this).hasClass("btnReplace")) 	{$(form).data(eid).execCommand("replace");}
+		if ($(this).hasClass("btnLight")) 		{$(form).data(eid).setTheme("ace/theme/chrome"); setcookie("sourceEditorTheme","ace/theme/chrome");}
+		if ($(this).hasClass("btnDark")) 		{$(form).data(eid).setTheme("ace/theme/monokai");  setcookie("sourceEditorTheme","ace/theme/monokai");}
+		if ($(this).hasClass("btnClose")) 	{
+			$(form).data(eid).setValue("");
+			$(document).data("sourceFile",null);
+			$("#sourceEditorToolbar .btnSave").removeClass("btn-danger");
+		}
+		if ($(this).hasClass("btnFontDn")) 	{
+			if (fsize>8) {fsize=fsize*1-1;}
+			$(form).data(eid).setFontSize(fsize); setcookie("sourceEditorFsize",fsize);
+		}
+		if ($(this).hasClass("btnFontUp")) 	{
+			if (fsize<20) {fsize=fsize*1+1;}
+			$(form).data(eid).setFontSize(fsize); setcookie("sourceEditorFsize",fsize);
+		}
+		if ($(this).hasClass("btnFullScr")) 	{
+			var div=$(this).parents(toolbar).parent();
+			var offset=div.offset();
+			if (!div.hasClass("fullscr")) {
+				div.parents(".modal").addClass("fullscr");
+				div.addClass("fullscr");
+				$(this).parents(".modal").css("overflow-y","hidden");
+				div.find("pre.ace_editor").css("height",$(window).height()-$(toolbar).height()-$(toolbar).next(".nav").height()-15);
+			} else {
+				div.removeAttr("style");
+				div.find("pre.ace_editor").css("height","500px");
+				div.removeClass("fullscr");
+				div.parents(".modal").removeClass("fullscr");
+				$(this).parents(".modal").css("overflow-y","auto");
+			}
+			window.dispatchEvent(new Event('resize'));
+		}
+		if ($(this).hasClass("btnSave")) 	{
+			var fo=$(this).parents(".modal").find("[data-wb-formsave]").trigger("click");
+			
+			//wb_formsave(fo);
+		}
+		e.preventDefault();
+		return false;
+	});
+}
+
+
 
 
 function setcookie ( name, value, exp_y, exp_m, exp_d, path, domain, secure ) {
