@@ -26,7 +26,7 @@ function form__controller__show() {
 }
 
 function form__controller__remove() {
-	if (isset($_SESSION["user_id"])) { 
+	if (isset($_SESSION["user_id"])) {
 		$_ENV["DOM"]=wbGetForm("common","remove_confirm");
 		if (isset($_GET["params"]["confirm"])) {
 			$_ENV["DOM"]->find("script[data-wb-tag=success]")->remove();
@@ -57,13 +57,15 @@ function form__controller__edit() {
 	$mode=$_ENV["route"]["mode"];
 	$aCall=$form."_".$mode; $eCall=$form."__".$mode;
 	if (is_callable($aCall)) {$out=$aCall();} elseif (is_callable($eCall) AND $engine!==false) {$out=$eCall();}
-	if (!isset($out)) {$_ENV["DOM"]=wbGetForm($form,$mode);} else {
+	if (!isset($out)) {
+		$_ENV["DOM"]=wbGetForm($form,$mode);
+		$data=wbItemRead(wbTable($form),$item);
+		if (!$data) {$data=array("id"=>wbNewId());}
+		$_ENV["DOM"]->wbSetData($data);
+	} else {
 		if (is_string($out)) {$out=wbFromString($out);}
 		$_ENV["DOM"]=$out;
 	}
-	$data=wbItemRead(wbTable($form),$item);
-	if (!$data) {$data=array("id"=>wbNewId());}
-	$_ENV["DOM"]->wbSetData($data);
 	return $_ENV["DOM"];
 }
 

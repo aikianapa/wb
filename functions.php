@@ -23,6 +23,15 @@ function wbInitEnviroment() {
 	wbTrigger("func",__FUNCTION__,"after",func_get_args());
 }
 
+function wbFormUploadPath() {
+	$path="/uploads";
+	if ($_ENV["route"]["controller"]=="form") {
+		if (isset($_ENV["route"]["form"]) AND $_ENV["route"]["form"]>"") {$path.="/".$_ENV["route"]["form"];} else {$path.="/undefined";}
+		if (isset($_ENV["route"]["item"]) AND $_ENV["route"]["item"]>"") {$path.="/".$_ENV["route"]["item"];} else {$path.="/undefined";}
+	} else {$path.="/undefined";}
+	return $path;
+}
+
 function wbInitFunctions() {
 	wbTrigger("func",__FUNCTION__,"before");
 	if (is_file($_ENV["path_app"]."/functions.php")) {require_once($_ENV["path_app"]."/functions.php");}
@@ -362,6 +371,36 @@ function wbNewId($separator="") {
 	$id=dechex(time()+rand(100,999)).$separator.$md;
 	$_SESSION["newIdLast"]=$id;
 	return $id;
+}
+
+function wbGetItemImg($Item=null,$idx=0,$noimg="",$imgfld="images",$visible=true) {
+	$res=false; $count=0;
+	if ($Item==null) {$Item=$_SESSION["Item"];}
+	if (!is_file("{$_ENV["path_app"]}/{$noimg}")) {
+		if (is_file("{$_ENV["path_engine"]}/uploads/__system/{$noimg}")) {
+			$noimg="/engine/uploads/__system/{$noimg}";
+		} else {
+			$noimg="/engine/uploads/__system/image.jpg";
+		}
+	}
+	$image=$noimg;
+
+	if (isset($Item[$imgfld])) {
+		if (!is_array($Item[$imgfld])) {$Item[$imgfld]=json_decode($Item[$imgfld],true);}
+		if (!is_array($Item[$imgfld])) {$Item[$imgfld]=array();}
+		foreach($Item[$imgfld] as $key => $img) {
+			if (!isset($img["visible"])) {$img["visible"]=1;}
+
+			if ($res==false AND (($visible==true AND $img["visible"]==1) OR $visible==false) AND is_file("{$_ENV["path_app"]}/uploads/{$Item["_table"]}/{$Item["id"]}/{$img["img"]}")) {
+				if ($idx==$count) {
+					$image="{$_ENV["path_app"]}/uploads/{$Item["_table"]}/{$Item["id"]}/{$img["img"]}"; $res=true;
+					echo $image;
+				}
+				$count++;
+			}
+		}; unset($img);
+	}
+	return urldecode($image);
 }
 
 function wbListFiles($dir) {
@@ -872,7 +911,7 @@ function wbRole($role,$userId=null) {
 		$allow="[data-wb-allow],[data-wb-disallow],[data-wb-disabled],[data-wb-enabled],[data-wb-readonly],[data-wb-writable]";
 		$target="[data-wb-prepend],[data-wb-append],[data-wb-before],[data-wb-after],[data-wb-html],[data-wb-replace]";
 		$tags=array("module","formdata","foreach", "dict", "tree","gallery",
-					"include","imageloader","thumbnail",
+					"include","imageloader","thumbnail","uploader",
 					"multiinput","where","cart","variable"
 		);
 		if ($set!="") {$res=$$set;} else {$res="{$controls},{$allow},{$target}";}
@@ -1080,5 +1119,17 @@ function wbCallFormFunc($name,$Item,$form=null,$mode=null) {
 	}
 	$_GET["form"]=$sf;
 	return $Item;
+}
+
+function wbTranslit($textcyr = null, $textlat = null) {
+    $cyr = array(
+    'ё', 'ж',  'ч',  'щ',   'ш',  'ю',  'а', 'б', 'в', 'г', 'д', 'е', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ъ', 'ы', 'ь', 'э', 'я',
+    'Ё', 'Ж',  'Ч',  'Щ',   'Ш',  'Ю',  'А', 'Б', 'В', 'Г', 'Д', 'Е', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ъ', 'Ы', 'Ь', 'Э', 'Я');
+    $lat = array(
+    'e', 'j', 'ch', 'sch', 'sh', 'u', 'a', 'b', 'v', 'g', 'd', 'e', 'z', 'i', 'i', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'f', 'h', 'c', '`', 'y', '', 'e', 'ya',
+    'E', 'j', 'Ch', 'Sch', 'Sh', 'U', 'A', 'B', 'V', 'G', 'D', 'E', 'Z', 'I', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'F', 'H', 'c', '`', 'Y', '', 'E', 'ya');
+    if($textcyr) return str_replace($cyr, $lat, $textcyr);
+    else if($textlat) return str_replace($lat, $cyr, $textlat);
+    else return null;
 }
 ?>

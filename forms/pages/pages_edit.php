@@ -65,10 +65,9 @@
 
 <div id="pageText" class="tab-pane fade" data-wb-role="include" src="editor" role="tabpanel"></div>
 <div id="pageSource" class="tab-pane fade" data-wb-role="include" src="source" role="tabpanel"></div>
-<div id="pageImages" class="tab-pane fade"  src="" data-wb-ext="jpg png gif zip pdf doc" role="tabpanel">333</div>
+<div id="pageImages" class="tab-pane fade" data-wb-role="include" src="uploader" role="tabpanel"></div>
 </div>
 </form>
-
 
 
     </div>

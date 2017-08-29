@@ -1,8 +1,8 @@
 <?php
 function pages__edit() {
 	$out=wbGetForm("pages","edit");
-  $id=$_ENV["route"]["params"]["item"];
-	$Item=wbItemRead(wbTable("pages"),$id);
+	$id=$_ENV["route"]["item"];
+	$Item=wbItemRead("pages",$id);
 	if ($id=="_new") {
 		$Item["id"]=wbNewId();
 		$Item["template"]=$_ENV["settings"]["template"];

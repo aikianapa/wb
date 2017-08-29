@@ -1249,6 +1249,14 @@ abstract class kiNode
 					$sc->addClass("wb-done");
 				}
 			}
+		if ($sc->attr("data-wb-src")=="uploader") {
+				if (!$sc->hasClass("wb-done")) {
+					$sc->after(file_get_contents(__DIR__ ."/js/uploader/uploader.php"));
+					$sc->addClass("wb-done");
+				}
+		}
+
+
 		}
 	}
 
@@ -1312,7 +1320,6 @@ abstract class kiNode
 	public function wbProcess($Item,$tag) {
 				if (!$this->parents("script")->length) {
 						$this->addClass("wb-done");
-						if ($this->hasRole("imageloader")) {$this->addClass("imageloader");}
 						$func="tag".$tag;
 						$this->wbSetAttributes($Item);
 						if ($this->attr("src")>"") {$this->attr("src",wbNormalizePath($this->attr("src")));}
@@ -1323,7 +1330,7 @@ abstract class kiNode
 
 	function wbTargeter($Item=array()) {
 		$tar=$this->find(wbControls("target"));
-		$attr=(explode(",",str_replace(array("[","]"," "),array("","",""),wbControls("target"))));		
+		$attr=(explode(",",str_replace(array("[","]"," "),array("","",""),wbControls("target"))));
 		foreach($tar as $inc) {
 			if (!$inc->hasAttribute("data-wb-ajax")) {
 				foreach ($attr as $key => $attribute) {
@@ -1470,6 +1477,34 @@ abstract class kiNode
 		}
 		return $Item;
 	}
+
+	public function tagUploader($Item) {
+		if ($this->attr("id")==NULL) {$uid=wbNewId();$this->attr("id",$uid);} else {$uid=$this->attr("id");}
+		if ($this->hasAttr("name")) {$fldname=$this->attr("name");} else {$fldname="images";}
+		if (!$this->hasAttr("data-wb-form") AND isset($_ENV["route"]["form"])) {$this->attr("data-wb-form",$_ENV["route"]["form"]);}
+		if (!$this->hasAttr("data-wb-item") AND isset($_ENV["route"]["item"])) {$this->attr("data-wb-item",$_ENV["route"]["item"]);}
+		if ($this->hasAttr("multiple")) {$out=wbGetForm("common","upl_multiple");} else {$out=wbGetForm("common","upl_single");}
+		$out->find(".wb-uploader")->attr("id",$uid);
+		$attrs=new IteratorIterator($this->attributes());
+		foreach ($attrs as $attr) {
+			$tmp=$attr->name;
+			if (strpos($tmp,"ata-wb-")) {
+				$out->find(".wb-uploader")->attr($tmp,$attr."");
+			}
+		}; unset($attrs);
+		if (!$this->hasAttr("data-wb-path")) {
+			$Item["path"]=wbFormUploadPath();
+			$out->find(".wb-uploader")->attr("data-wb-path",$Item["path"]);
+			$out->find(".wb-uploader")->attr("data-wb-form",$_ENV["route"]["form"]);
+			$out->find(".wb-uploader")->attr("data-wb-item",$_ENV["route"]["item"]);
+		} else {
+			$Item["path"]=$this->attr("data-wb-path");
+		}
+		$out->find(".wb-uploader")->children("input[type=hidden]")->attr("name",$fldname);
+		$out->wbSetData($Item);
+		$this->replaceWith($out);
+	}
+
 
 	public function tagMultiInput($Item) {
 		$len=count($this->find("input,select,textarea"));
@@ -1727,46 +1762,6 @@ abstract class kiNode
 
 	}
 
-	public function tagDict($Item=array()) {
-		$name=$this->attr("from");
-		$sort=$this->attr("sort");
-		$dsort=$this->attr("data-sort");
-		$desc=$this->attr("desc");
-		$rand=$this->attr("rand");
-		if ($this->attr("item")>"") {$value=$this->attr("item"); } else {$value=$this->attr("data-id");}
-		$result=wbReadDict($name);
-		if ($value>"") $result=wbWhere($result,'id = "'.$value.'"');
-		$html=$this->html();
-		$this->html(""); $inner="";
-		if (is_array($result)) {
-			if ($sort>"") { // старый формат
-				if ($desc=="true") {$stype=SORT_DESC;} else {$stype=SORT_ASC;}
-				$result=array_sort($result,$sort,$stype);
-			}
-			if ($dsort>"") {$result=array_sort_multi($result,$dsort);}
-			if ($rand=="true") {shuffle($result);}
-			$srcVal=array(); foreach($Item as $k => $v) {$srcVal["%{$k}"]=$v;}; unset($v);
-			$ndx=0;
-			foreach($result as $key => $val) {
-					$val["_idx"]=$_SESSION["dict_idx"]=$key;
-					$val["_ndx"]=$_SESSION["dict_ndx"]=$ndx; $ndx++;
-					$val=(array)$srcVal + (array)$val; // сливаем массивы
-					$tpl=wbFromString($html);
-					$tpl->wbSetData($val);
-					if ($value>"") {
-						if ($value==$val["id"]) {$inner=$tpl->outerHtml();}
-					} else {$inner.=$tpl->outerHtml();}
-			};
-			$this->html($inner);
-			unset($val,$inner);
-		}
-
-		if ($this->tag()=="select") {
-			if (!is_array($result)) {$this->outerHtml("");}
-			$plhr=$this->attr("placeholder");
-			if ($plhr>"") {$this->prepend("<option value=''>$plhr</option>");}
-		}
-	}
 
 	public function tagImageLoader($Item) {
 			if ($this->attr("load")!==1) {
@@ -1817,13 +1812,15 @@ abstract class kiNode
 		if (!isset($page) OR 1*$page<=0) {
 			if (!isset($_GET["page"]) OR $_GET["page"]=="") {$page=1;} else {$page=$_GET["page"]*1;}
 		} else {$page=$page*1;}
-		if ($from>"" && isset($Item[$from])) {
-			if (isset($Item["form"])) {$table=$Item["form"];} else {$table="";}
-			if (isset($Item["id"])) {$item=$Item["id"];} else {$item="";}
-			$Item=$Item[$from];
-			if (!is_array($Item)) {$Item=json_decode($Item,true);}
-			if ($field>"") {$Item=$Item[$field];}
-			if (!is_array($Item)) {$Item=json_decode($Item,true);}
+		if ($from>"") {
+			if (isset($Item[$from])) {
+				if (isset($Item["form"])) {$table=$Item["form"];} else {$table="";}
+				if (isset($Item["id"])) {$item=$Item["id"];} else {$item="";}
+				$Item=$Item[$from];
+				if (!is_array($Item)) {$Item=json_decode($Item,true);}
+				if ($field>"") {$Item=$Item[$field];}
+				if (!is_array($Item)) {$Item=json_decode($Item,true);}
+			} else {$Item=array();}
 		}
 
 		if ($table>"") {
@@ -1978,7 +1975,7 @@ public function tagInclude($Item) {
 		if ($src=="comments") 	{$src="/engine/ajax.php?form=comments&mode=widget"; }
 		if ($src=="modal") 		{$src="/engine/forms/form_comModal.php"; }
 		if ($src=="imgviewer") 	{$src="/engine/js/imgviewer.php";}
-		if ($src=="uploader")	{$src="/engine/js/uploader.php";}
+		if ($src=="uploader")	{$this_content=wbGetForm("common",$src);}
 		if ($src=="editor") 	{$this_content=wbGetForm("common",$src);}
 		if ($src=="source") 	{$this_content=wbGetForm("common",$src);}
 		$vars=$this->attr("data-vars");	if ($vars>"") {$Item=attrAddData($vars,$Item);}
@@ -2039,7 +2036,7 @@ public function tagInclude($Item) {
 			}; unset($inc);
 			$this->find("#___include___")->remove();
 		} else {
-			$this->append($this_content->outerHtml());
+			$this->append($this_content);
 		}
 		$this->wbSetData($Item);
 	}
@@ -2117,7 +2114,7 @@ public function tagThumbnail($Item=array()) {
 				$top="15%"; $left="50%";
 			}
 
-	if (!is_file($_SESSION["app_path"].$src) && !is_file($_SERVER["DOCUMENT_ROOT"].$src)) {
+	if (!is_file($_ENV["path_app"].$src) && !is_file($_SERVER["DOCUMENT_ROOT"].$src)) {
 		if (isset($Item["img"]) && !isset($Item["images"]) && isset($Item["%images"]) && !is_file($src)) {
 			$tmpItem=array();
 			$tmpItem["images"]=$Item["%images"];
@@ -2137,12 +2134,15 @@ public function tagThumbnail($Item=array()) {
 	$img=explode("/",trim($src)); $img=$img[count($img)-1];
 	$ext=explode(".",trim($src)); $ext=$ext[count($ext)-1];
 
-	if (is_array($images)) {
+/*	if (is_array($images)
+	//AND is_numeric($this->attr("src"))
+	) {
 		if (isset($images[$idx])) {$img=$images[$idx]["img"];} else {$img="";}
-		$src=wbGetItemImg($Item,$idx,$noimg);
+		$src=wbGetItemImg($Item,$idx,$noimg,"images",false);
 		$img=explode($src,"/"); $img=$img[count($img)-1];
 		$this->attr("src",$src);
 	}
+	*/
 
 	if ($src==array()) {$src="";}
 	if ($img=="" AND $bkg==true) {$src="/engine/uploads/__system/image.svg"; $img="image.svg"; $ext="svg";}
@@ -2174,7 +2174,7 @@ public function tagThumbnail($Item=array()) {
 		if (!in_array($srcExt,$exts)) {$bSize="contain";} else {$bSize="cover";}
 		if (is_numeric($width)) {$width.="px";}
 		if (is_numeric($height)) {$height.="px";}
-		$style.="width:{$width}; height: {$height}; background: url('{$src}') {$left} {$top} no-repeat; display:inline-block; background-size: {$bSize}; background-clip: content-box;";
+		$style="width:{$width}; height: {$height}; background: url('{$src}') {$left} {$top} no-repeat; display:inline-block; background-size: {$bSize}; background-clip: content-box;".$style;
 		$this->attr("src","/engine/uploads/__system/transparent.png");
 		$this->attr("width",$width);
 		$this->attr("height",$height);
@@ -2279,6 +2279,10 @@ public function tagThumbnail($Item=array()) {
 	public function hasRole($role) {
 		$tl=wbAttrToArray($this->attr("data-wb-role"));
 		if (in_array($role,$tl)) {return true;} else {return false;}
+	}
+
+	public function hasAttr($attr) {
+		if ($this->attr($attr)==NULL) {return FALSE;} else {return TRUE;}
 	}
 
 	public function hasClass($class) {

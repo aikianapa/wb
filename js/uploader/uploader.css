@@ -1,0 +1,18 @@
+
+.wbImagesAll {margin-top:40px;}
+.wbImagesAll .thumbnail {display: inline-block; position:relative; margin-bottom:10px;}
+.wbImagesAll .thumbnail img {box-shadow: 0 2px 5px rgba(0,0,0,.5); }
+.wbImagesAll .thumbnail.selected img {border-color: #666; box-shadow: 0 2px 5px rgba(0,0,0,.9);}
+.wbImagesAll .img-thumbnail {width: 200px; height: 130px; background: url() 50% 25% no-repeat; background-size: cover; border-radius:0px; }
+.wbImagesAll .li {position: relative; float:left; background:#eee;}
+.wbImagesAll .thumbnail a.btn {bottom: 5px; left:20px; position: absolute; display:none; padding: 3px; width: 1.5em; height: 1.5em; line-height: 1em; border-radius: 50%;}
+.wbImagesAll .thumbnail a.btn:last-child {left:50px;}
+.wbImagesAll .thumbnail:hover a.btn {display: inline-block;}
+.wbImagesAll .thumbnail ul.dropdown-menu {margin-top:-1px !important;}
+.wbImagesAll .imagesAttr {  display: none; background-color: beige; border-color: #666; box-shadow: 0 2px 5px rgba(0,0,0,.9);}
+.wbImagesAll .gallery {padding:0;}
+.wbImagesAll .gallery .imagesAttr {display: inline-block; margin-bottom: 15px; padding: 0 10px;}
+.wb-uploader #console {height: 100px; background:#DEDEDE !important; overflow:auto; border: 1px dashed; display:none;}
+.wb-uploader .uploader {padding-top: 10px;  text-align:center;}
+.wb-uploader .uploader .btn {position: absolute; bottom: 80px; display:none;}
+.wb-uploader .moxie-shim {width:100% !important; height: 70px !important; border: 1px #ddd dashed; border-radius: 10px;}

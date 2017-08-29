@@ -58,4 +58,17 @@ function ajax__setdata() {
 	$tpl->wbSetData($Item);
 	return $tpl;
 }
+
+function ajax__listfiles() {
+	$result=array();
+	$_GET["path"]="/".implode("/",$_ENV["route"]["params"]);
+	if ($_GET["path"]=="") {$path=$_ENV["path_app"]."/uploads";} else { $path=$_ENV["path_app"].$_GET["path"];}
+	$files=wbListFiles($path);
+	if (is_array($files)) {
+	foreach($files as $key => $file) {
+		if (is_file($path."/".$file)) {$result[]=$file;}
+	}
+	}
+	return json_encode($result);
+}
 ?>
