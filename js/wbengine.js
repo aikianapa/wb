@@ -309,7 +309,13 @@ function wb_setdata(selector,data,ret) {
 	if (data	==undefined) {var data={};}
 	if ($(selector).length) {
 		var tpl_id=$(selector).attr("data-wb-tpl");
-		if (tpl_id!==undefined) {var html= urldecode($("#"+tpl_id).html());} else {var html=$(selector).outerHTML();}
+		if (tpl_id!==undefined) {var html= urldecode($("#"+tpl_id).html());} else {
+			if ($(selector).is("script")) {
+				var html=$(selector).html();
+			} else {
+				var html=$(selector).outerHTML();
+			}
+		}
 	} else {
 		var html=selector;
 	}

@@ -254,7 +254,7 @@ function wbImagesAddToList(id,name,vis) {
 	var item=$('#'+id).attr("data-wb-item");
 	var path=$('#'+id).attr("data-wb-path");
 	var tplid=$("#"+id+" ul.gallery").attr("data-wb-tpl");
-	var thumbnail=wb_setdata("#"+tplid,{form:form,id:item,path:path,name:name},true);
+	var thumbnail=wb_setdata("#"+tplid,{form:form,id:item,"%path":path,img:name},true);
 	if (!$("#"+id+" ul.gallery li[data-name='"+name+"']").length) {$("#"+id+" ul.gallery").append(thumbnail);}
 	wbImagesEvents(id);
 }

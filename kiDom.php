@@ -2090,7 +2090,7 @@ public function tagThumbnail($Item=array()) {
 
 	if (!in_array($srcExt,$exts)) {$src="/engine/uploads/__system/filetypes/{$srcExt}.png"; $img="{$srcExt}.png"; $ext="png";}
 
-	if ($form>"" && $item>"") {$Item=fileReadItem($form,$item); }
+	if ($form>"" && $item>"") {$Item=wbItemRead($form,$item); }
 	$json=$this->attr('json'); 	if ($json>"") {$images=json_decode($json,true); } else {
 		if (isset($Item["images"])) {
 			if (is_array($Item["images"])) {$images=$Item["images"];} else {$images=json_decode($Item["images"],true);}

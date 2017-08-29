@@ -50,6 +50,7 @@ function ajax__setdata() {
 	$table=wbTable($form);
 	if (!isset($_REQUEST["data-wb-mode"])) {$_REQUEST["mode"]="list";} else {$_REQUEST["mode"]=$_REQUEST["data-wb-mode"];}
 	$Item=wbItemRead($table,$item);
+	$Item=(array)$Item+(array)$_REQUEST["data"];
 	$call="{$form}BeforeShowItem"; if (is_callable($call)) {$Item=$call($Item);} else {
 	$call="_{$form}BeforeShowItem"; if (is_callable($call)) {$Item=$call($Item,"list");}}
 	$tpl=wbFromString($_REQUEST["tpl"]);
