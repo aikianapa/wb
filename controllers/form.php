@@ -19,6 +19,7 @@ function form__controller__show() {
 		die;
 	} else {
 		if (!isset($Item["template"]) OR $Item["template"]=="") {$Item["template"]="default.php";}
+		if (is_callable("wbBeforeShowItem")) {$Item=wbBeforeShowItem($Item);}
 		$_ENV["DOM"]=wbGetTpl($Item["template"]);
 		$_ENV["DOM"]->wbSetData($Item);
 	}

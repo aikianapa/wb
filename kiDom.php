@@ -1470,9 +1470,8 @@ abstract class kiNode
 		if (!isset($_ENV["var"])) {$_ENV["var"]=array();}
 		$this->wbSetAttributes($Item);
 		$var=$this->attr("var");
-		$var=$_ENV["var"][$var]=wbSetValuesStr($var,$Item);
 		$where=$this->attr("where");
-		if (wbWhereItem($Item,$where)) {
+		if (($where>"" AND wbWhereItem($Item,$where)) OR $where=="") {
 			if ($var>"") $Item[$var]=$_ENV["var"][$var]=wbSetValuesStr($this->attr("value"),$Item);
 		}
 		return $Item;
@@ -1807,7 +1806,6 @@ abstract class kiNode
 			$tplid=$this->attr("data-wb-tpl");
 			if ($tplid=="") {$this->addTemplate();}
 		} else {$tplid=false;}
-
 		if (!isset($size) OR $size=="false") {$size=false;}
 		if (!isset($page) OR 1*$page<=0) {
 			if (!isset($_GET["page"]) OR $_GET["page"]=="") {$page=1;} else {$page=$_GET["page"]*1;}
@@ -1835,7 +1833,7 @@ abstract class kiNode
 					}
 				}
 			}  else {
-				$Item=wbListItems($table,$where);
+				$Item=wbItemList($table,$where);
 			}
 		}
 

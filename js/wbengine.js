@@ -9,11 +9,28 @@ function wb_delegates() {
 	wb_pagination();
 	wb_formsave();
 	wb_plugins();
+	wb_base_fix();
 }
 
 function wb_include(url){
 	if (!$(document).find("script[src='"+url+"']").length) {
 		document.write('<script src="'+ url + '" type="text/javascript" ></script>\n');
+	}
+}
+
+function wb_base_fix() {
+	if ($("base").length) {
+		var base=$("base").attr("href");
+		$(document).undelegate("a","click");
+		$(document).delegate("a","click",function(e){
+			var hash=$(this).attr("href");
+			if (hash!==undefined && substr(hash,0,1)=="#") {
+				var loc=explode("#",window.location.href);
+				var loc=str_replace(base,"",loc[0]);
+				document.location=loc+hash;
+				e.preventDefault();
+			}
+		});
 	}
 }
 

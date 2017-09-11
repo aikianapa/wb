@@ -141,8 +141,8 @@ function wbTableList($engine=false) {
 	return $list;
 }
 
-function wbListItems($table="data",$where=null) {return wbItemList($table);}
-function wbItemList($table="data") {
+function wbListItems($table="data",$where=null) {return wbItemList($table,$where);}
+function wbItemList($table="data",$where="") {
 	wbTrigger("func",__FUNCTION__,"before",func_get_args());
 	if (count(explode($_ENV["path_app"],$table))==1) {$table=wbTable($table);}
 	$list=wbTrigger("form",__FUNCTION__,"BeforeItemList",func_get_args(),array());
@@ -154,13 +154,30 @@ function wbItemList($table="data") {
 			$_ENV["cache"][$table]=json_decode(file_get_contents($table),true);
 		}
 		if (isset($_ENV["cache"][$table]["data"])) {$list=$_ENV["cache"][$table]["data"];}
-		array_walk($list,function(&$item,$key,$args){
+			array_walk($list,function(&$item,$key,$args){
 			$item=wbTrigger("form",__FUNCTION__,"AfterItemRead",$args,$item);
 		},func_get_args());
+		$object = new ArrayObject($list);
+		foreach($object as $key => $item) {
+			if (!wbWhereItem($item,$where)) {unset($list[$key]);}
+		}
+
+
 	}
 	$list=wbTrigger("form",__FUNCTION__,"AfterItemList",func_get_args(),$list);
 	wbTrigger("func",__FUNCTION__,"after",func_get_args(),$list);
 	return $list;
+}
+
+function wbWhereLike($ref,$val) {
+	if (is_array($ref)) {
+		$ref=implode("|",$ref);
+	} else {
+		$val=trim($val);
+		$val=str_replace(" ","|",$val);
+	}
+	$res=preg_match("/{$val}/ui",$ref);
+	return $res;
 }
 
 function wbItemRead($table,$id) {
@@ -534,7 +551,7 @@ function wbWherePhp($str="",$item=array()) {
 		foreach($arr[0] as $a => $cls) {
 			$tmp=explode(" like ",$cls);
 			if (count($tmp)==2) {
-				$str=str_replace($cls,'aikiWhereLike('.$tmp[0].','.$tmp[1].')',$str);
+				$str=str_replace($cls,'wbWhereLike('.$tmp[0].','.$tmp[1].')',$str);
 			}
 		}
 	}
