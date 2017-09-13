@@ -1508,79 +1508,48 @@ abstract class kiNode
 	public function tagMultiInput($Item) {
 		$len=count($this->find("input,select,textarea"));
 		if ($len==0) {$len=1;}
-		$md=$this->attr("md"); if ($md=="") {$md=floor(12 / $len);} else {$md=floor($md / $len);}
-		$xs=$this->attr("xs"); if ($xs=="") {$xs=floor(12 / $len);} else {$xs=floor($xs / $len);}
-		$sm=$this->attr("sm"); if ($sm=="") {$sm=floor(12 / $len);} else {$sm=floor($sm / $len);}
-		$name=$this->attr("name");
-		$tpl=wbFromString($this->html());
-		$tags=array("input","select","textarea");
-		if (count($this->find("div,p,ul,ol,li,span,label"))) {
-			$this->html("<div class='row multi-fld-row'></div>");
-			$list=$tpl->find("*");
-			foreach($list as $inp) {
-				if (in_array($inp->tag(),$tags)) {
-					$iname=$inp->attr("name");
-					$inp->attr("data-name",$iname);
-					$iname=$name."[0][".$iname."]";
-					if ($inp->is("select[multiple]")) {$iname.="[]";}
-				}
-			}; unset($inp,$list);
 
-			$this->find(".row")->append($tpl);
-		} else {
-			$this->append("<div class='row form-inline multi-fld-row'></div>");
-			$list=$this->find("*");
-			foreach($list as $inp) {
-				if (in_array($inp->tag(),$tags)) {
-				$imd=$inp->attr("md"); if ($imd=="") {$imd=$md;}
-				$ixs=$inp->attr("xs"); if ($ixs=="") {$ixs=$md;}
-				$ism=$inp->attr("sm"); if ($ism=="") {$ism=$md;}
-				$iname=$inp->attr("name");
-				$inp->attr("data-name",$iname);
-				$iname=$name."[0][".$iname."]";
-				if ($inp->is("select[multiple]")) {$iname.="[]";}
-				$inp->addClass("form-control");
-				$input=$inp->outerHtml();
-				$phold=$inp->attr("placeholder");
-				$this->find(".row")->append("<div class='col-md-{$imd} col-sm-{$ism}'>
-				<div class='form-group'><label>{$phold}</label>{$input}</div></div>");
-				$inp->remove();
-				}
-			}; unset($inp,$list);
-		}
-		$template=wbFromString($this->innerHtml());
-		$template->wbSetData($Item);
-		$template=$template->outerHtml();
+		$attrs=new IteratorIterator($this->attributes());
+		foreach ($attrs as $attr) {
+			$tmp=$attr->name;
+			if (strpos($tmp,"ata-wb-")) {$tmp=str_replace("data-wb-","",$tmp); $$tmp=$attr."";}
+		}; unset($attrs);
+		if ($this->attr("name") && !isset($name)) {$name=$this->attr("name");} else {$this->attr("name");}
+		$tags=array("input","select","textarea");
+		
+		$tpl=wbFromString($this->html());
+		$template=$this->innerHtml();
+		
 		$tplId=wbNewId();
-		$this->prepend("<textarea id='{$tplId}' style='display:none;'>".urlencode($template)."</textarea>");
+		$this->after("<script type='text/template' id='{$tplId}'>".$template."</script>");
 		$this->attr("data-tpl","#".$tplId);
 		if (isset($Item[$name]) && is_array($Item[$name])) {
-			if (count($Item[$name])>0) {$this->html("");}
-			$this->prepend("<textarea id='{$tplId}' style='display:none;'>".urlencode($template)."</textarea>");
-			foreach($Item[$name] as $key => $line) {
-				$this->append($template);
-				foreach($line as $fld => $val) {
-					$this->find(".row:last")->find("[data-name={$fld}]")->attr("value",$val);
-					if (is_object($this->find(".row:last")->find("[data-name={$fld}]",0))) {
-						$this->find(".row:last")->find("[data-name={$fld}]",0)->contentDatePickerPrep();
-					}
-					if ($this->find(".row:last")->find("[data-name={$fld}]")->is("select")) {
-						if (!is_array($val)) {$val=array($val);}
-						foreach($this->find(".row:last")->find("[data-name={$fld}]")->find("option") as $opt) {
-							if (in_array($opt->attr("value"),$val)) {$opt->attr("selected","selected");}
-						}; unset($opt);
-					}
-					if ($this->find(".row:last")->find("[data-name={$fld}]")->is("textarea")) {
-						$this->find(".row:last")->find("[data-name={$fld}]")->html($val);
-					}
-				}; unset($val);
-			}; unset($line);
+			$this->tagMultiInputSetData($Item[$name]);
 		} else {
-			$this->html("");
-			$this->prepend("<textarea id='{$tplId}' style='display:none;'>".urlencode($template)."</textarea>");
-			$this->append($template);
+			$this->tagMultiInputSetData();
+		}
+
+	}
+
+	function tagMultiInputSetData($Data=array(0=>array())) {
+		$tpl=$this->html();
+		$this->html("");
+		$name=$this->attr("name");
+		foreach($Data as $i => $item) {
+			$line=wbFromString($tpl);
+			$line->wbSetData($item);
+			$inp=$line->find("input,select,textarea");
+			foreach($inp as $tag) {
+				$tname=$tag->attr("name");
+				if ($tag->attr("name")>"") {$tag->attr("name",$name."[{$i}][".$tname."]");}
+				$tag->attr("data-wb-field",$tname);
+			}
+			$row=wbGetForm("common","multiinput_row")->outerHtml();
+			$this->append(str_replace("{{template}}",$line->outerHtml(),$row));
+			unset($line);
 		}
 	}
+	
 
 	public function getAttrVars() {
 		return $tag->attr("vars");

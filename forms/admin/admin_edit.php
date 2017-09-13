@@ -7,10 +7,24 @@
           </div>
           <div class="col-sm-6">
             <div class="form-group">
-              <label for="">Электронная почта</label><input class="form-control" placeholder="Электронная почта" type="email" name="email" required>
+              <label for="">Электронная почта</label><input class="form-control" placeholder="Электронная почта" type="text" name="email" required>
             </div>
           </div>
+			<div class="col-sm-12" data-wb-role="multiinput" name="variables">
+				<div class="col-sm-3 col-xs-12">
+					<input class="form-control" placeholder="Переменная" type="text" name="var">
+				</div>
+
+				<div class="col-sm-4 col-xs-12">
+					<input class="form-control" placeholder="Значение" type="text" name="value">
+				</div>
+				<div class="col-sm-5 col-xs-12">
+					<input class="form-control" placeholder="Заголовок" type="text" name="header">
+				</div>
+
+			</div>
         </div>
+        <br>
         <button type="button" class="btn btn-primary" data-wb-formsave="#admin_settings">Сохранить</button>
         <button type="button" class="btn btn-warning pull-right" id="admin_btn_update">Обновить</button>
 </form>

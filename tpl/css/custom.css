@@ -79,3 +79,6 @@ label.switch-primary input:checked + span {
 .hidden {display:none;}
 
 .modal-max {max-width: 100%!important;}
+
+.wb-multiinput, .wb-multiinput * {cursor: context-menu;}
+.wb-multiinput-menu {position:absolute;margin-top:-3px;}

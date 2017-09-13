@@ -10,12 +10,67 @@ function wb_delegates() {
 	wb_formsave();
 	wb_plugins();
 	wb_base_fix();
+	wb_multiinput();
 }
 
 function wb_include(url){
 	if (!$(document).find("script[src='"+url+"']").length) {
 		document.write('<script src="'+ url + '" type="text/javascript" ></script>\n');
 	}
+}
+
+function wb_multiinput() {
+	$.get("/ajax/getform/common/multiinput_menu/",function(data){$(document).data("wb-multiinput-menu",data);});
+	$.get("/ajax/getform/common/multiinput_row/",function(data){$(document).data("wb-multiinput-row",data);});
+	$(document).undelegate(".wb-multiinput","mouseenter");
+	$(document).delegate(".wb-multiinput","mouseenter",function(){
+		$(this).append("<div class='wb-multiinput-menu'>"+$(document).data("wb-multiinput-menu")+"</div>");
+	});
+	$(document).undelegate(".wb-multiinput","mouseleave");
+	$(document).delegate(".wb-multiinput","mouseleave",function(){
+		$(this).find(".wb-multiinput-menu").remove();
+	});
+	$(document).undelegate(".wb-multiinput","contextmenu");
+	$(document).delegate(".wb-multiinput","contextmenu",function(e){
+		var offset = $(this).offset();
+		var relativeX = (e.pageX - offset.left -25);
+		var relativeY = (e.pageY - offset.top);
+		$(this).find(".wb-multiinput-menu").css("margin-left",relativeX+"px").css("margin-top",relativeY+"px");
+		$(this).find(".wb-multiinput-menu [data-toggle=dropdown]").trigger("click");
+		return false;
+	});
+	$(document).undelegate(".wb-multiinput-menu .dropdown-item","click");
+	$(document).delegate(".wb-multiinput-menu .dropdown-item","click",function(e){
+		var multi=$(this).parents("[data-wb-role=multiinput]");
+		var tpl=$($(multi).attr("data-tpl")).html();
+		var row=$(document).data("wb-multiinput-row");
+		var name=$(multi).attr("name");
+		
+		row=str_replace("{{template}}",tpl,row);
+		if ($(this).attr("href")=="#after") {$(this).parents(".wb-multiinput").after(row);}
+		if ($(this).attr("href")=="#before") {$(this).parents(".wb-multiinput").before(row);}
+		if ($(this).attr("href")=="#remove") {$(this).parents(".wb-multiinput").remove();}
+		if (!$(multi).find(".wb-multiinput").length) {
+			$(multi).append(row);
+		};
+		wb_multiinput_sort(multi);
+		e.preventDefault();
+	});
+}
+
+function wb_multiinput_sort(mi) {
+	var name=$(mi).attr("name");
+	$(mi).find(".wb-multiinput").each(function(i){
+		$(this).find("input,select,textarea").each(function(){
+			if ($(this).attr("data-wb-field")>"") {var field=$(this).attr("data-wb-field");} else {
+				var field=$(this).attr("name");
+			}
+			if (field!==undefined && field>"") {
+				$(this).attr("name",name+"["+i+"]["+field+"]");
+				$(this).attr("data-wb-field",field);
+			}
+		});
+	});
 }
 
 function wb_base_fix() {

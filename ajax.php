@@ -39,7 +39,9 @@ function ajax__save($form=null) {
 		}
 		if ($res) {
 			$ret["error"]=0;
-		} else {$ret["error"]=1; $ret["text"]=$res;}
+		} else {$ret["error"]=1; $ret["text"]=$res;
+			header("HTTP/1.0 404 Not Found");	
+		}
 	}
 	return json_encode($ret);
 }
@@ -72,4 +74,16 @@ function ajax__listfiles() {
 	}
 	return json_encode($result);
 }
+
+function ajax__gettpl() {
+	echo wbGetTpl($_ENV["route"]["params"][0]);
+	die;
+}
+
+function ajax__getform() {
+	echo wbGetForm($_ENV["route"]["params"][0],$_ENV["route"]["params"][1]);
+	die;
+}
+
+
 ?>

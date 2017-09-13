@@ -20,6 +20,7 @@ function wbInitEnviroment() {
 	$_ENV["dbec"]=__DIR__."/database/_cache"; 			// Engine data
 	$_ENV["dbac"]=$_ENV["path_app"]."/database/_cache";	// App data
 	$_ENV["error"]=array();
+	$_ENV["env_id"]=wbNewId();
 	wbTrigger("func",__FUNCTION__,"after",func_get_args());
 }
 
@@ -737,7 +738,8 @@ function wbSetValuesStr($tag="",$Item=array(), $limit=2)
 		$exit = false;
 		$err = false;
 		$nIter = 0;
-		$mask = '`(\{\{){1,1}(%*[\w\d]+|_form|_mode|_item|((_SETT|_SETTINGS|_SESS|_SESSION|_SRV|_COOK|_COOKIE|$_ENV|_REQ|_GET|_POST|%*[\w\d]+)?([\[]{1,1}(%*[\w\d]+|"%*[\w\d]+")[\]]{1,1})*))(\}\}){1,1}`u';
+		$_FUNC="";
+		$mask = '`(\{\{){1,1}(%*[\w\d]+|_form|_mode|_item|((_SETT|_SETTINGS|_SESS|_SESSION|_SRV|_COOK|_COOKIE|_FUNC|_ENV|_REQ|_GET|_POST|%*[\w\d]+)?([\[]{1,1}(%*[\w\d]+|"%*[\w\d]+")[\]]{1,1})*))(\}\}){1,1}`u';
 		while(!$exit) {
 			$nUndef = 0;
 			$nSub = preg_match_all($mask, $tag, $res, PREG_OFFSET_CAPTURE);				// найти все вставки, не содержащие в себе других вставок
@@ -780,6 +782,9 @@ function wbSetValuesStr($tag="",$Item=array(), $limit=2)
 								break;
 							case '_ENV':
 								$sub = '$_ENV';
+								break;
+							case '_FUNC':
+								// нужно придумать вызов функций
 								break;
 							case '_SRV':
 								$sub = '$_SERVER';
