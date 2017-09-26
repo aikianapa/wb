@@ -49,6 +49,31 @@ function wbInitFunctions() {
 	wbTrigger("func",__FUNCTION__,"after",func_get_args());
 }
 
+function wbFieldBuild($param) {
+	$tpl=wbGetForm("wbfldset",$param["type"]);
+	$opt=json_decode($param["prop"],true);
+	$options="";
+	if (isset($opt["required"]) AND $opt["required"]==true) {$options.=" required ";}
+	if (isset($opt["readonly"]) AND $opt["readonly"]==true) {$options.=" readonly ";}
+	if (isset($opt["disabled"]) AND $opt["disabled"]==true) {$options.=" disabled ";}
+	$param["options"]=trim($options);
+	switch($param["type"]) {
+		case "number":
+			if (isset($opt["min"])) {$tpl->find("input")->attr("min",$opt["min"]);}
+			if (isset($opt["max"])) {$tpl->find("input")->attr("max",$opt["max"]);}
+			if (isset($opt["step"])) {$tpl->find("input")->attr("step",$opt["step"]);}
+			if (isset($opt["datalist"])) {
+				$param["listid"]=wbNewId();
+				$tpl->find("input")->attr("list",$param["listid"]);
+				$tpl->find("datalist")->attr("data-wb-from",json_encode($opt["datalist"],JSON_UNESCAPED_UNICODE));
+				$tpl->find("datalist")->attr("data-wb-role","foreach");
+			} else {$tpl->find("datalist")->remove();}
+			break;
+	}
+	$tpl->wbSetData($param);
+	return $tpl->outerHtml();
+}
+
 function wbInitDatabase() {
 	wbTrigger("func",__FUNCTION__,"before");
 	if (!is_dir($_ENV["dbe"])) {mkdir($_ENV["dbe"],0777);}

@@ -43,7 +43,7 @@
 </div>
 
 <div id="{{_GET[form]}}Text" class="tab-pane fade" data-wb-role="include" src="editor" role="tabpanel"></div>
-<div id="{{_GET[form]}}Images" class="tab-pane fade"  src="" data-wb-ext="jpg png gif zip pdf doc" role="tabpanel">333</div>
+<div id="{{_GET[form]}}Images" class="tab-pane fade" data-wb-role="include" src="uploader" role="tabpanel"></div>
 </div>
 </form>
 

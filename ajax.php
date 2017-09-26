@@ -75,6 +75,10 @@ function ajax__listfiles() {
 	return json_encode($result);
 }
 
+function ajax__newid() {
+	return json_encode(wbNewId());
+}
+
 function ajax__gettpl() {
 	echo wbGetTpl($_ENV["route"]["params"][0]);
 	die;
@@ -85,5 +89,12 @@ function ajax__getform() {
 	die;
 }
 
-
+function ajax__buildfields() {
+	$res=array();
+	foreach($_POST as $data) {
+		$res=wbFieldBuild($data);
+		echo $res;
+	}
+	die;
+}
 ?>

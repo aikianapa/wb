@@ -23,6 +23,10 @@
 				</div>
 
 			</div>
+			
+			<div class="col-sm-12" data-wb-role="tree" name="tree">
+					
+			</div>
         </div>
         <br>
         <button type="button" class="btn btn-primary" data-wb-formsave="#admin_settings">Сохранить</button>

@@ -1351,7 +1351,7 @@ abstract class kiNode
 	}
 
 	public function excludeTextarea($Item=array()) {
-		$list=$this->find("script[type=text/template],textarea:not([data-not-exclude]),pre,.nowb,[data-role=module]");
+		$list=$this->find("script[type=text/template],pre,.nowb,[data-role=module]");
 		$_ENV["ta_save"]=array();
 		foreach ($list as $ta) {
 			$id=wbNewId();
@@ -1365,7 +1365,7 @@ abstract class kiNode
 		}; unset($ta,$list);
 	}
 	function includeTextarea($Item=array()) {
-		$list=$this->find("script[type=text/template],textarea[taid],pre[taid],.nowb[taid],[data-role=module][taid]");
+		$list=$this->find("script[type=text/template],pre[taid],.nowb[taid],[data-role=module][taid]");
 		foreach ($list as $ta) {
 			$id=$ta->attr("taid"); $name=$ta->attr("name");
 			if (isset($_ENV["ta_save"][$id])) $ta->html($_ENV["ta_save"][$id]);
@@ -1598,7 +1598,38 @@ abstract class kiNode
 		}
 	}
 
+
 	public function tagTree($Item=array()) {
+		$name=$this->attr("name");
+		$this->append("<input type='hidden' name='{$name}'><input type='hidden' name='_{$name}__dict_' data-name='dict'>");
+		$tree=wbGetForm("common","tree_ol");
+		if (isset($Item[$name]) && $Item[$name]!=="[]") {$tree->tagTreeData($Item[$name]);} else {$tree->find("ol")->append(wbGetForm("common","tree_row"));}
+		$this->addClass("wb-tree dd");
+		$this->prepend($tree);
+		$this->wbSetData($Item);
+		//$this->append($inp); // важно, чтобы input был внизу, иначе неправильно считается index в js
+	}
+	
+	public function tagTreeData($data=array()) {
+		$tree=wbGetForm("common","tree_ol");
+		$tree->find("input[name]")->remove();
+		$rowtpl=wbGetForm("common","tree_row");
+		$name=$this->find("input[name]")->attr("name");
+		if (!is_array($data)) {$data=json_decode($data,true);}
+		foreach($data as $item) {
+			$tpl=$rowtpl->clone();
+			$tpl->wbSetData($item);
+			if (isset($item["child"]) AND $item["child"]!==false AND $item["child"]!==array()) {
+				if (isset($item["open"]) AND $item["open"]==false) {$tpl->find(".wb-tree-item")->addClass("dd-collapsed");}
+				$tch=$tree->clone();
+				$tch->tagTreeData($item["child"]);
+				$tpl->find(".dd-item")->append($tch);
+			}
+			$this->children("ol")->append($tpl);
+		}
+	}
+
+	public function tagTree1($Item=array()) {
 		$this->wbSetAttributes($Item);
 		if ($this->is("[data-add=true]")) {$this->addTemplate("outerHtml");}
 		if ($this->is("ul[data-build-tree=true]")) {
@@ -1787,7 +1818,10 @@ abstract class kiNode
 				if (!is_array($Item)) {$Item=json_decode($Item,true);}
 				if ($field>"") {$Item=$Item[$field];}
 				if (!is_array($Item)) {$Item=json_decode($Item,true);}
-			} else {$Item=array();}
+			} else {
+				$Item=array();
+				$json=json_decode($from,true); if (is_array($json)) {$Item=$json;}
+			}
 		}
 
 		if ($table>"") {
