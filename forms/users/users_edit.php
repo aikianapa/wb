@@ -36,9 +36,16 @@
 	   <div class="col-sm-10"><input type="text" class="form-control" name="role" placeholder="Группа"></div>
 	</div>
 
-  <div class="form-group row">
-    <label class="col-sm-2 form-control-label">Активный</label>
-    <div class="col-sm-2"><label class="switch switch-success"><input type="checkbox" name="active"><span></span></label></div>
+	<div class="form-group row">
+		<label class="col-sm-2 form-control-label">Аватар</label>
+		<div class="col-sm-4">
+			<input type="hidden" name="avatar" data-wb-role="uploader" >
+		</div>
+	</div>
+
+	<div class="form-group row">
+		<label class="col-sm-2 form-control-label">Активный</label>
+		<div class="col-sm-2"><label class="switch switch-success"><input type="checkbox" name="active"><span></span></label></div>
 	</div>
 </div>
 

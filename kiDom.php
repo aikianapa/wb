@@ -1485,12 +1485,12 @@ abstract class kiNode
 		if ($this->hasAttr("multiple")) {$out=wbGetForm("common","upl_multiple");} else {$out=wbGetForm("common","upl_single");}
 		$out->find(".wb-uploader")->attr("id",$uid);
 		$attrs=new IteratorIterator($this->attributes());
+
 		foreach ($attrs as $attr) {
 			$tmp=$attr->name;
-			if (strpos($tmp,"ata-wb-")) {
-				$out->find(".wb-uploader")->attr($tmp,$attr."");
-			}
+			if (strpos($tmp,"ata-wb-")) {$tmp=str_replace("data-wb-","",$tmp); $$tmp=$attr."";}
 		}; unset($attrs);
+
 		if (!$this->hasAttr("data-wb-path")) {
 			$Item["path"]=wbFormUploadPath();
 			$out->find(".wb-uploader")->attr("data-wb-path",$Item["path"]);
@@ -1500,6 +1500,7 @@ abstract class kiNode
 			$Item["path"]=$this->attr("data-wb-path");
 		}
 		$out->find(".wb-uploader")->children("input[type=hidden]")->attr("name",$fldname);
+		$out->find(".wb-uploader .gallery[data-wb-from]")->attr("data-wb-from",$fldname);
 		$out->wbSetData($Item);
 		$this->replaceWith($out);
 	}
@@ -1603,7 +1604,7 @@ abstract class kiNode
 		$name=$this->attr("name");
 		$this->append("<input type='hidden' name='{$name}'><input type='hidden' name='_{$name}__dict_' data-name='dict'>");
 		$tree=wbGetForm("common","tree_ol");
-		if (isset($Item[$name]) && $Item[$name]!=="[]") {$tree->tagTreeData($Item[$name]);} else {$tree->find("ol")->append(wbGetForm("common","tree_row"));}
+		if (isset($Item[$name]) && $Item[$name]!=="[]" && $Item[$name]!=="") {$tree->tagTreeData($Item[$name]);} else {$tree->find("ol")->append(wbGetForm("common","tree_row"));}
 		$this->addClass("wb-tree dd");
 		$this->prepend($tree);
 		$this->wbSetData($Item);

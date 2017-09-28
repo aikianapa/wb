@@ -84,6 +84,14 @@ function ajax__gettpl() {
 	die;
 }
 
+function ajax__remove() {
+	if ($_ENV["route"]["params"][0]=="uploads") {
+		$file=$_ENV["path_app"]."/".implode("/",$_ENV["route"]["params"]);
+		return json_encode(wbFileRemove($file));
+	}
+	die;
+}
+
 function ajax__getform() {
 	echo wbGetForm($_ENV["route"]["params"][0],$_ENV["route"]["params"][1]);
 	die;

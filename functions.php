@@ -50,6 +50,7 @@ function wbInitFunctions() {
 }
 
 function wbFieldBuild($param) {
+	$set=wbGetForm("common","tree_fldset");
 	$tpl=wbGetForm("wbfldset",$param["type"]);
 	$opt=json_decode($param["prop"],true);
 	$options="";
@@ -71,7 +72,9 @@ function wbFieldBuild($param) {
 			break;
 	}
 	$tpl->wbSetData($param);
-	return $tpl->outerHtml();
+	$set->find(".form-group > label")->html($param["label"]);
+	$set->find(".form-group > div")->html($tpl);
+	return $set->outerHtml();
 }
 
 function wbInitDatabase() {
@@ -461,6 +464,15 @@ function wbListFiles($dir) {
     }
 	wbTrigger("func",__FUNCTION__,"after",func_get_args());
 	return $list;
+}
+
+function wbFileRemove($file) {
+	$res=false;
+	if (is_file($file)) {
+		unlink($file);
+		if (is_file($file)) {$res=false;} else {$res=true;}
+	}
+	return $res;
 }
 
 function wbRecurseDelete($src) {

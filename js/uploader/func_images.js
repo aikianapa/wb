@@ -97,11 +97,9 @@ function wbImagesEvents(id) {
 			var name=$(this).parents("li.thumbnail").attr("data-name");
 			var path=$('#'+id).attr("data-wb-path");
 			var that=$(this);
-			$.get("/engine/ajax.php?mode=ajax_deletefile&path="+path+"&file="+name,function(data){
-				$(that).parents("li").tooltip("destroy");
-				var data=JSON.parse(data);
-				var error=data.error;
-				if (error==0) {
+			$.get("/ajax/remove/"+path+"/"+name,function(data){
+				$(that).parents("li").tooltip().remove();
+				if (JSON.parse(data)==true) {
 					that.parents("li.thumbnail").remove();
 				} else {
 					if (confirm("Ошибка удаления! Убрать превью?")) {
@@ -242,6 +240,7 @@ function wbImagesToField(id) {
 }
 
 function wbImagesAddToList(id,name,vis) {
+	if ($('#'+ id).hasClass("single")) {var single=true;} else {var single=false;}
 	var store=$('#'+ id + ' > input[type=hidden]');
 	var path="/engine/phpThumb/phpThumb.php?w=250&src="+$("div.imageloader").attr("path");
 	var title=""; var alt=""; var visible=1;
@@ -255,6 +254,7 @@ function wbImagesAddToList(id,name,vis) {
 	var path=$('#'+id).attr("data-wb-path");
 	var tplid=$("#"+id+" ul.gallery").attr("data-wb-tpl");
 	var thumbnail=wb_setdata("#"+tplid,{form:form,id:item,"%path":path,img:name},true);
+	if (single==true) {$("#"+id+" ul.gallery").find("li").remove();}
 	if (!$("#"+id+" ul.gallery li[data-name='"+name+"']").length) {$("#"+id+" ul.gallery").append(thumbnail);}
 	wbImagesEvents(id);
 }
