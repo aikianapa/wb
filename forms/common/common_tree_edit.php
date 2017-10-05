@@ -7,12 +7,12 @@
 
 	<div class="form-group row">
 	  <label class="col-sm-3 form-control-label">Идентификатор</label>
-	   <div class="col-sm-9"><input type="text" class="form-control" name="id" placeholder="Идентификатор" required ></div>
+	   <div class="col-sm-9"><input type="text" class="form-control" name="data-id" placeholder="Идентификатор" required ></div>
 	</div>
 
 	<div class="form-group row">
 	  <label class="col-sm-3 form-control-label">Наименование</label>
-	   <div class="col-sm-9"><input type="text" class="form-control" name="text" placeholder="Наименование" required ></div>
+	   <div class="col-sm-9"><input type="text" class="form-control" name="data-name" placeholder="Наименование" required ></div>
 	</div>
 </form>
 	
@@ -34,7 +34,8 @@
 				<li class="nav-item"><a class="nav-link active" href="#treeData" data-toggle="tab">Данные</a></li>
 				<li class="nav-item"><a class="nav-link" href="#treeDict" data-toggle="tab" >Словарь</a></li>
 			</ul>
-			<button type="button" class="btn btn-primary tree-close" ><span class="fa fa-arrow-circle-left"></span> Назад</button>
+			<button type="button" class="btn btn-decondary" data-dismiss="modal" ><span class="fa fa-close"></span> Отмена</button>
+			<button type="button" class="btn btn-primary tree-close" ><span class="fa fa-arrow-circle-left"></span> Изменить</button>
 		  </div>
 
 		</div>

@@ -39,6 +39,16 @@ function wb_tree() {
 		});
 	},10);
 	
+	$(document).undelegate(".wb-tree .wb-tree-item button[data-action]","click");
+	$(document).delegate(".wb-tree .wb-tree-item button[data-action]","click",function(){
+		var tree=$(this).parents(".wb-tree");
+		var name=$(tree).attr("name");
+		setTimeout(function(){
+			var data=JSON.stringify(wb_tree_serialize(tree));
+			$(tree).children("input[name='"+name+"']").val(data);
+		},200);		
+	});
+	
 
 	$(document).undelegate(".wb-tree .wb-tree-item","contextmenu");
 	$(document).delegate(".wb-tree .wb-tree-item","contextmenu",function(e){
@@ -58,43 +68,30 @@ function wb_tree() {
 
 	$(document).undelegate(".wb-tree-item .dd-content","focusout");
 	$(document).delegate(".wb-tree-item .dd-content","focusout",function(e){
-		var tree=$(this).parents("[data-wb-role=tree]");
+		$(this).parents(".wb-tree-item").attr("data-name",$(this).text());
+		var tree=$(this).parents(".wb-tree");
 		var name=$(tree).attr("name");
-		var data=JSON.stringify(wb_tree_serialize($(tree).children(".dd-list")));
+		var data=JSON.stringify(wb_tree_serialize(tree));
 		$(tree).children("input[name='"+name+"']").val(data);
-	});
-	
-
-	$(document).undelegate('.wb-tree-item .dd-handle','mouseenter');
-	$(document).delegate('.wb-tree-item .dd-handle','mouseenter',function(e) {
-		var tree=$(this).parents("[data-wb-role=tree]");
-		var that=$(this).parents(".wb-tree-item");
-		var path=wb_tree_data_path(that);
-		$(that).attr("moved",path);
-	});
-
-	$(document).undelegate('.wb-tree-item[moved] .dd-handle','mouseleave');
-	$(document).delegate('.wb-tree-item[moved] .dd-handle','mouseleave',function(e) {
-		$(this).removeAttr("moved");
 	});
 
 	$('.wb-tree').on('change', function(e) {
-		var tree=this;
-		var that=$(this).find(".wb-tree-item[moved]");
-		var name=$(tree).attr("name");
+		var that=e.target;
+		var name=$(that).attr("name");
 		setTimeout(function(){
-			var data=JSON.stringify(wb_tree_serialize($(tree).children(".dd-list")));
-			$(that).removeAttr("moved");
-			$(tree).children("input[name="+name+"]").val(data);	
+			var data=wb_tree_serialize(that);
+			data=JSON.stringify(data);
+			$(that).children("input[name="+name+"]").val(data);	
 		},200);
 	});
 
-	$(document).undelegate(".wb-tree-item .dd-content","dblclick");
-	$(document).delegate(".wb-tree-item .dd-content","dblclick",function(e){
+	$(document).undelegate(".wb-tree-item > .dd-content","dblclick");
+	$(document).delegate(".wb-tree-item > .dd-content","dblclick",function(e){
 		var cont=this;
 		var tree=$(this).parents("[data-wb-role=tree]");
-		var that=$(this).parents(".wb-tree-item");
-		var item=$(this).parents(".wb-tree-item").attr("data-wb-item-id");
+		var that=$(e.target).parent(".wb-tree-item");
+		
+		var item=$(this).parents(".wb-tree-item").attr("data-id");
 		var form=$(tree).parents("[data-wb-form]").attr("data-wb-form");
 		var text=$(this).text();
 		var name=$(tree).attr("name");
@@ -117,9 +114,9 @@ function wb_tree() {
 		var tpl=$(wb_setdata(tpl,dataval,true));
 		data["fields"]=dict;
 		data["name"]=name;
-		data["text"]=text;
+		data["data-name"]=text;
 		data["form"]=form;
-		data["id"]=item;
+		data["data-id"]=item;
 		edit=$(wb_setdata(edit,data,true));
 		edit.find(".modal").attr("id","tree_"+form+"_"+name);
 		$(".content-w").append(edit);
@@ -137,24 +134,17 @@ function wb_tree() {
 					wb_plugins();
 				}
 		});
-		$(edid).off('hide.bs.modal');
-		$(edid).on('hide.bs.modal', function (e) {
-			var cdata=JSON.stringify($(edid).find("#treeData > form").serializeArray());
-			wb_tree_data_set(that,path,cdata);
-			
-/*
-			var eid=$(edid).find(".modal-body > form input[name=id]").val();
-			if (eid==undefined || eid=="") {eid=wb_newid();}
-			$(that).attr("data-wb-item-id",eid);
-			$(cont).html($(edid).find(".modal-body > form input[name=text]").val());
-			wb_tree_data_set(that,path,bdata);
-*/
-		})
+
 		$(edid).find('.tree-close').off("click");
 		$(edid).find('.tree-close').on("click", function (e) {
+			var data=$(edid).find(".modal-body > form").serializeArray();
+			$(data).each(function(i,d){
+				$(that).attr(d.name,d.value);
+				if (d.name=="data-name") {$(that).children(".dd-content").html(d.value);}
+			});
 			var cdata=JSON.stringify($(edid).find("#treeData > form").serializeArray());
 			wb_tree_data_set(that,path,cdata);
-			
+			$(tree).find("input[name='"+name+"']").val(JSON.stringify(wb_tree_serialize($(tree).children(".dd-list"))));
 			$(edid).modal("hide");
 		});
 		wb_plugins();
@@ -227,20 +217,20 @@ function wb_tree_data_get(that,path) {
 	var data=$(tree).children("input[name="+name+"]").val();
 	if (data=="" || data==undefined) {data="[]";}
 	data=JSON.parse(data);
-	data["data"]=wb_get_cdata($(that).find(".data").html());
-	if (data["data"]>"[]") {
+	data["data"]=wb_get_cdata($(that).children(".data").html());
+	if (trim(data["data"])>" ") {
 		data["data"]=JSON.parse(data["data"]);
 	} else {data["data"]=[];}
 	if (path==undefined) {var path=wb_tree_data_path(that);}
 	$(path).each(function(i,j){
-		if (i==0) {data=data[j];} else {data=data["child"][j];}
+		if (i==0) {data=data[j];} else {data=data["children"][j];}
 	});
 	if (data==undefined) {data="[]";}
 	return data;
 }
 
 function wb_tree_data_set(that,path,values) {
-	var tree=$(that).parents("[data-wb-role=tree]");
+	var tree=$(that).parents(".wb-tree");
 	var name=$(tree).attr("name");
 	var data=JSON.parse($(tree).children("input[name="+name+"]").val());
 	var dict=JSON.parse($(tree).children("[data-name=dict]").val());
@@ -255,12 +245,12 @@ function wb_tree_data_set(that,path,values) {
 	if (path==undefined) {var path=wb_tree_data_path(that);}
 	var p="";
 	$(path).each(function(i,j){
-		if (i==0) {p="["+j+"]";} else {p+="['child']["+j+"]";}
+		if (i==0) {p="["+j+"]";} else {p+="['children']["+j+"]";}
 	});
 	eval("data"+p+"['data']=values;");
-	$(that).find(".data").html("<![CDATA["+JSON.stringify(values)+"]]>");
+	$(that).children(".data").html("<![CDATA["+JSON.stringify(values)+"]]>");
 	data=JSON.stringify(data);
-	$(that).parents(".wb-tree").children("input[name="+name+"]").val(data);
+	$(tree).children("input[name="+name+"]").val(data);
 	return data;
 }
 
@@ -273,27 +263,32 @@ function wb_tree_data_path(that,path) {
 	return path;
 }
 
-function wb_tree_serialize(that) {
+
+function wb_tree_serialize(that,branch) {
+	var flag=false;
+	if ($(that).is(".wb-tree")) {var tree=that;} else {var tree=$(that).parents(".wb-tree");}
+	if (branch==undefined) {branch=$(tree).children(".dd-list"); flag=true;}
+	
 	var tree_data=[];
-	$(that).children(".wb-tree-item").each(function(){
+	$(branch).children(".wb-tree-item").each(function(){
+		var name=$(this).attr("data-name");
+		var open=$(this).attr("data-open");
+		var id	=$(this).attr("data-id"  );
+		if (id==undefined || id=="") {id=wb_newid();}
+		if ($(this).hasClass("dd-collapsed")) {open=false;} else {open=true;}
+		$(this).attr("data-open",open);
+		var flds=wb_get_cdata($(this).children(".data").html());
+		if (trim(flds)>" ") {flds=JSON.parse(flds);}
 		var path=wb_tree_data_path(this);
-		var data=[]
-		flds=wb_get_cdata($(that).find(".data").html());
-		if (flds>"[]") {
-			flds=JSON.parse(flds);
-		} else {flds=[];}
-		
-		if ($(this).hasClass("dd-collapsed")) {var open=false;} else {var open=true;}
 		if ($(this).children(".dd-list").length) {
-			var child=wb_tree_serialize($(this).children(".dd-list"));
+			var child=wb_tree_serialize(tree,$(this).children(".dd-list"));
 		} else {var child=false; var open=false;}
-		var name=$(this).children(".dd-content").text();
-		var id=$(this).attr("data-wb-item-id");
-		if (id==undefined || id=="") {id=wb_newid();$(this).attr("data-wb-item-id",id);}
-		tree_data.push({id: id, name: name,	open: open,	data: flds,	child: child});
+		tree_data.push({id: id, name: name,	open: open,	data: flds,	children: child});
 	});
 	return tree_data;
 }
+
+
 
 function wb_newid() {
 	var newid="";
@@ -301,12 +296,8 @@ function wb_newid() {
 			async: 		false,
 			type:		'GET',
 			url: 		"/ajax/newid/",
-			success:	function(data){
-				newid=JSON.parse(data);
-			},
-			error:		function(data){
-				newid=$(document).uniqueId();
-			}
+			success:	function(data){ newid=JSON.parse(data);	},
+			error:		function(data){	newid=$(document).uniqueId(); }
 		});
 	return newid;
 }

@@ -1628,10 +1628,10 @@ abstract class kiNode
 		foreach($data as $item) {
 			$tpl=$rowtpl->clone();
 			$tpl->wbSetData($item);
-			if (isset($item["child"]) AND $item["child"]!==false AND $item["child"]!==array()) {
+			if (isset($item["children"]) AND $item["children"]!==false AND $item["children"]!==array()) {
 				if (isset($item["open"]) AND $item["open"]==false) {$tpl->find(".wb-tree-item")->addClass("dd-collapsed");}
 				$tch=$tree->clone();
-				$tch->tagTreeData($item["child"]);
+				$tch->tagTreeData($item["children"]);
 				$tpl->find(".dd-item")->append($tch);
 			}
 			$this->children("ol")->append($tpl);
