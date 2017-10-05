@@ -6,19 +6,20 @@
 <form class="form-horizontal" role="form">
 
 	<div class="form-group row">
-	  <label class="col-sm-2 form-control-label">Идентификатор</label>
-	   <div class="col-sm-10"><input type="text" class="form-control" name="id" placeholder="Идентификатор" required ></div>
+	  <label class="col-sm-3 form-control-label">Идентификатор</label>
+	   <div class="col-sm-9"><input type="text" class="form-control" name="id" placeholder="Идентификатор" required ></div>
 	</div>
 
 	<div class="form-group row">
-	  <label class="col-sm-2 form-control-label">Наименование</label>
-	   <div class="col-sm-10"><input type="text" class="form-control" name="text" placeholder="Наименование" required ></div>
+	  <label class="col-sm-3 form-control-label">Наименование</label>
+	   <div class="col-sm-9"><input type="text" class="form-control" name="text" placeholder="Наименование" required ></div>
 	</div>
 </form>
 	
 <div class="tab-content  p-a m-b-md">
 <div id="treeData" class="tab-pane fade show active" role="tabpanel">
-	<form class="form-horizontal" role="form"></form>
+	<form class="form-horizontal" role="form">
+	</form>
 </div>
 
 <div id="treeDict" class="tab-pane fade" data-wb-role="include" src="/engine/forms/common/common_tree_dict.php" role="tabpanel"></div>

@@ -20,6 +20,11 @@ function wb_include(url){
 	}
 }
 
+function wb_get_cdata(text) {
+	text = text.replace("<![CDATA[", "").replace("]]>", "");
+	return text;
+}
+
 function wb_tree() {
 	$.get("/ajax/getform/common/tree_rowmenu/",function(data){$(document).data("wb-tree-rowmenu",data);});
 	$.get("/ajax/getform/common/tree_row/",function(data){$(document).data("wb-tree-row",data);});
@@ -34,11 +39,7 @@ function wb_tree() {
 		});
 	},10);
 	
-	$('.wb-tree').on('change', function(e) {
-		var data=JSON.stringify(wb_tree_serialize($(this).children(".dd-list")));
-		$(this).children(".dd-list").find("input[name]").val(data);		
-	});
-	
+
 	$(document).undelegate(".wb-tree .wb-tree-item","contextmenu");
 	$(document).delegate(".wb-tree .wb-tree-item","contextmenu",function(e){
 		$(e.target).parent(".wb-tree-item").append("<div class='wb-tree-menu'>"+$(document).data("wb-tree-rowmenu")+"</div>");
@@ -61,8 +62,33 @@ function wb_tree() {
 		var name=$(tree).attr("name");
 		var data=JSON.stringify(wb_tree_serialize($(tree).children(".dd-list")));
 		$(tree).children("input[name='"+name+"']").val(data);
-	});	
+	});
 	
+
+	$(document).undelegate('.wb-tree-item .dd-handle','mouseenter');
+	$(document).delegate('.wb-tree-item .dd-handle','mouseenter',function(e) {
+		var tree=$(this).parents("[data-wb-role=tree]");
+		var that=$(this).parents(".wb-tree-item");
+		var path=wb_tree_data_path(that);
+		$(that).attr("moved",path);
+	});
+
+	$(document).undelegate('.wb-tree-item[moved] .dd-handle','mouseleave');
+	$(document).delegate('.wb-tree-item[moved] .dd-handle','mouseleave',function(e) {
+		$(this).removeAttr("moved");
+	});
+
+	$('.wb-tree').on('change', function(e) {
+		var tree=this;
+		var that=$(this).find(".wb-tree-item[moved]");
+		var name=$(tree).attr("name");
+		setTimeout(function(){
+			var data=JSON.stringify(wb_tree_serialize($(tree).children(".dd-list")));
+			$(that).removeAttr("moved");
+			$(tree).children("input[name="+name+"]").val(data);	
+		},200);
+	});
+
 	$(document).undelegate(".wb-tree-item .dd-content","dblclick");
 	$(document).delegate(".wb-tree-item .dd-content","dblclick",function(e){
 		var cont=this;
@@ -73,7 +99,7 @@ function wb_tree() {
 		var text=$(this).text();
 		var name=$(tree).attr("name");
 		var edid="#tree_"+form+"_"+name;
-		if ($(tree).find(edid).length) {$(tree).find(edid).remove();}
+		if ($(document).find(edid).length) {$(document).find(edid).remove();}
 		var edit=$($(document).data("wb-tree-edit"));
 		var path=wb_tree_data_path(that);
 		var data=wb_tree_data_get(that,path);
@@ -81,46 +107,57 @@ function wb_tree() {
 		
 		var dict=$(tree).children("[data-name=dict]").val();
 		if (dict=="") {var dict=[];} else {var dict=$.parseJSON(dict);}
-		
-		console.log(dict);
-		
-		var tpl=wb_tree_data_fields(dict);
+
 		var dataval={};
-		if (data["data"]==undefined) {data["data"]="[]";}
+
 		$(data["data"]).each(function(i){
 			dataval[data["data"][i]["name"]]=data["data"][i]["value"];
 		});
-		tpl=$(wb_setdata(tpl,dataval,true));
+		var tpl=wb_tree_data_fields(dict);
+		var tpl=$(wb_setdata(tpl,dataval,true));
 		data["fields"]=dict;
 		data["name"]=name;
 		data["text"]=text;
 		data["form"]=form;
 		data["id"]=item;
 		edit=$(wb_setdata(edit,data,true));
-		$(tree).append(edit);
-		$(tree).find(".modal").attr("id","tree_"+form+"_"+name);
-		$(tree).find(".modal #treeData form").html(tpl);
-
+		edit.find(".modal").attr("id","tree_"+form+"_"+name);
+		$(".content-w").append(edit);
+		$(".content-w").find(".modal #treeData form").html(tpl);
+		$(edid).css("z-index",10000);
 		$(edid).data("path",path);
 		$(edid).modal();
-		$(edid).undelegate("#treeDict input, #treeDict select, #treeDict textarea","change");
-		$(edid).delegate("#treeDict input, #treeDict select, #treeDict textarea","change",function(e){
-				var fields=$(edid).find("#treeDict [data-wb-role=multiinput][name=fields]");
-				var tpl=wb_tree_dict_change(fields);
-				$(this).parents("#treeDict").prev("#treeData").children("form").html(tpl);
+		$(edid).undelegate("#treeDict *","change");
+		$(edid).delegate("#treeDict *","change",function(e){
+				if ($(e.currentTarget).is("input,select,textarea")) {
+					var fields=$(edid).find("#treeDict [data-wb-role=multiinput][name=fields]");
+					var tpl=wb_tree_dict_change(fields,tree);
+					tpl=$(wb_setdata(tpl,dataval,true));
+					$(this).parents("#treeDict").prev("#treeData").children("form").html(tpl);
+					wb_plugins();
+				}
 		});
 		$(edid).off('hide.bs.modal');
 		$(edid).on('hide.bs.modal', function (e) {
-			var bdata=$(edid).find("#treeData > form").serializeArray();
+			var cdata=JSON.stringify($(edid).find("#treeData > form").serializeArray());
+			wb_tree_data_set(that,path,cdata);
+			
+/*
 			var eid=$(edid).find(".modal-body > form input[name=id]").val();
 			if (eid==undefined || eid=="") {eid=wb_newid();}
 			$(that).attr("data-wb-item-id",eid);
 			$(cont).html($(edid).find(".modal-body > form input[name=text]").val());
 			wb_tree_data_set(that,path,bdata);
+*/
 		})
+		$(edid).find('.tree-close').off("click");
 		$(edid).find('.tree-close').on("click", function (e) {
+			var cdata=JSON.stringify($(edid).find("#treeData > form").serializeArray());
+			wb_tree_data_set(that,path,cdata);
+			
 			$(edid).modal("hide");
 		});
+		wb_plugins();
 	});	
 	
 	
@@ -142,15 +179,16 @@ function wb_tree() {
 			$(tree).children(".dd-list").append(row);
 		};
 		$(this).parents(".wb-tree-menu").remove();
-		var data=JSON.stringify(wb_tree_serialize($(tree).children(".dd-list")));
-		$(tree).find("input[name='"+name+"']").val(data);
+		setTimeout(function(){
+			var data=JSON.stringify(wb_tree_serialize($(tree).children(".dd-list")));
+			$(tree).find("input[name='"+name+"']").val(data);
+		},200);
 	});
 }
 
-function wb_tree_dict_change(that) {
-	var tree=$(that).parents("[data-wb-role=tree]");
+function wb_tree_dict_change(fields,tree) {
 	var dict=[];
-	$(that).find(".wb-multiinput").each(function(i){
+	$(fields).find(".wb-multiinput").each(function(i){
 		var fld={};
 		$(this).find("input,select,textarea").each(function(){
 			if ($(this).is("input")) {fld[$(this).attr("data-wb-field")]=$(this).val();}
@@ -164,15 +202,15 @@ function wb_tree_dict_change(that) {
 	return res;
 }
 
-function wb_tree_data_fields(dict) {
+function wb_tree_data_fields(data) {
 	var res=false;
-	var data={};
-	$(dict).each(function(i){data[i]=dict[i];});
+	var dict={};
+	$(data).each(function(i){dict[i]=data[i];});
 	$.ajax({
 		async: 		false,
 		type:		'POST',
 		url: 		"/ajax/buildfields/",
-		data:		data,
+		data:		dict,
 		success:	function(data){
 			res=data;
 		},
@@ -189,6 +227,10 @@ function wb_tree_data_get(that,path) {
 	var data=$(tree).children("input[name="+name+"]").val();
 	if (data=="" || data==undefined) {data="[]";}
 	data=JSON.parse(data);
+	data["data"]=wb_get_cdata($(that).find(".data").html());
+	if (data["data"]>"[]") {
+		data["data"]=JSON.parse(data["data"]);
+	} else {data["data"]=[];}
 	if (path==undefined) {var path=wb_tree_data_path(that);}
 	$(path).each(function(i,j){
 		if (i==0) {data=data[j];} else {data=data["child"][j];}
@@ -201,12 +243,22 @@ function wb_tree_data_set(that,path,values) {
 	var tree=$(that).parents("[data-wb-role=tree]");
 	var name=$(tree).attr("name");
 	var data=JSON.parse($(tree).children("input[name="+name+"]").val());
+	var dict=JSON.parse($(tree).children("[data-name=dict]").val());
+	var values=JSON.parse(values);
+	$(values).each(function(j,d) {
+		$(dict).each(function(z,di){
+			if (di["name"]==d["name"]) {d["value"]=wb_iconv(d["value"],di["type"]);}
+		});
+		values[j]=d;
+	});
+
 	if (path==undefined) {var path=wb_tree_data_path(that);}
 	var p="";
 	$(path).each(function(i,j){
 		if (i==0) {p="["+j+"]";} else {p+="['child']["+j+"]";}
 	});
 	eval("data"+p+"['data']=values;");
+	$(that).find(".data").html("<![CDATA["+JSON.stringify(values)+"]]>");
 	data=JSON.stringify(data);
 	$(that).parents(".wb-tree").children("input[name="+name+"]").val(data);
 	return data;
@@ -225,10 +277,12 @@ function wb_tree_serialize(that) {
 	var tree_data=[];
 	$(that).children(".wb-tree-item").each(function(){
 		var path=wb_tree_data_path(this);
-		var data=wb_tree_data_get(this,path);
-		if (data["data"]!==undefined) {
-			var flds=data["data"];
-		} else {var flds=[];}
+		var data=[]
+		flds=wb_get_cdata($(that).find(".data").html());
+		if (flds>"[]") {
+			flds=JSON.parse(flds);
+		} else {flds=[];}
+		
 		if ($(this).hasClass("dd-collapsed")) {var open=false;} else {var open=true;}
 		if ($(this).children(".dd-list").length) {
 			var child=wb_tree_serialize($(this).children(".dd-list"));
@@ -248,9 +302,7 @@ function wb_newid() {
 			type:		'GET',
 			url: 		"/ajax/newid/",
 			success:	function(data){
-				console.log(data);
 				newid=JSON.parse(data);
-				console.log(newid);
 			},
 			error:		function(data){
 				newid=$(document).uniqueId();
@@ -332,10 +384,19 @@ function wb_base_fix() {
 function wb_plugins(){
 	$(document).ready(function(){
 		if ($("[data-wb-src=datepicker]").length) {
-			$("[type=datetimepicker]").datetimepicker({
-				format: "dd.mm.yyyy hh:ii",
-				autoclose: true,
-				todayBtn: true
+			var datepicker="dd.mm.yyyy";
+			var datetimepicker="dd.mm.yyyy hh:ii";
+			
+			$("[type=datepicker]:not(.wb-done)").each(function(){
+				$(this).attr("data-date-format",datepicker).addClass("wb-done");
+				$(this).val(wb_oconv_object(this));
+				$(this).datetimepicker({language: 'ru',	autoclose: true, todayBtn: true, minView: 2	});
+			});
+
+			$("[type=datetimepicker]:not(.wb-done)").each(function(){
+				$(this).attr("data-date-format",datetimepicker).addClass("wb-done");
+				$(this).val(wb_oconv_object(this));
+				$(this).datetimepicker({language: 'ru',	autoclose: true, todayBtn: true});
 			});
 		}
 		if ($("[data-wb-role=tree]").length) {
@@ -344,8 +405,104 @@ function wb_plugins(){
 				$(".dd-item").unbind("contextmenu");
 			});
 		}
+		wb_plugin_editor();
+		wbCommonUploader();
 	});
 }
+
+function wb_plugin_editor() {
+  if ($("textarea.editor:not(.wb-done)").length) {
+		$("textarea.editor:not(.wb-done)").each(function(){
+			$(this).addClass("wb-done");
+			var fldname=$(this).attr("name");
+			if ($(this).attr("id")==undefined || $(this).attr("id")=="") {$(this).attr("id",wb_newid());}
+
+			var editor = $(this).ckeditor();
+			CKEDITOR.config.extraPlugins = 'youtube';
+			CKEDITOR.config.toolbarGroups = [
+				{ name: 'document',    groups: [ 'document', 'doctools' ] },
+			//    { name: 'editing',     groups: [ 'find', 'selection', 'spellchecker' ] },
+				{ name: 'mode' },
+				{ name: 'clipboard',   groups: [ 'clipboard', 'undo' ] },
+				{ name: 'links' },
+				{ name: 'insert' },
+				{ name: 'others' },
+				'/',
+				{ name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+				{ name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align' ] },
+				{ name: 'colors' },
+				{ name: 'tools' }
+			];
+			CKEDITOR.config.skin = 'bootstrapck';
+			CKEDITOR.config.allowedContent = true;
+			CKEDITOR.config.forceEnterMode = true;
+			CKEDITOR.plugins.registered['save']=
+			{
+			   init : function( editor )
+			   {
+				  var command = editor.addCommand( 'save',
+					 {
+						modes : { wysiwyg:1, source:1 },
+						exec : function( editor ) {
+						   var fo=editor.element.$.form;
+						   editor.updateElement();
+						   wb_formsave($(fo));
+						}
+					 }
+				  );
+				  editor.ui.addButton( 'Save',{label : 'Сохранить',command : 'save'});
+			   }
+			}
+		});
+		
+		for (var i in CKEDITOR.instances) {
+			// это работает
+			CKEDITOR.instances[i].on('change', function() { 
+				CKEDITOR.instances[i].updateElement();
+			 });
+		}
+		
+/*
+			CKEDITOR.on('instanceReady', function(){
+			   $.each( CKEDITOR.instances, function(instance) {
+				CKEDITOR.instances[instance].on("change", function(e) {
+							var fldname=$("textarea#"+instance).attr("name");
+							if (fldname>"" && $("textarea#"+instance).parents("form").find("[name="+fldname+"]").length) {
+								$("textarea#"+instance).parents("form").find("[name="+fldname+"]:not(.ace_editor)").html(CKEDITOR.instances[instance].getData());
+							} else {
+								$("textarea#"+instance).html(CKEDITOR.instances[instance].getData());	
+							}
+							$(document).trigger("editorChange",{
+								"value" : CKEDITOR.instances[instance].getData(),
+								"field"	: fldname
+							});
+						$("textarea#"+instance).trigger("change");
+				});
+			   });			   
+			});
+*/
+
+			$(document).on("sourceChange",function(e,data){
+				var form=data.form;
+				var field=data.field;
+				var value=data.value;
+
+					$(this).html(data.value);
+					if (CKEDITOR.instances[$("[name="+field+"]").attr("id")]!==undefined) {
+						CKEDITOR.instances[$("[name="+field+"]").attr("id")].setData(value);
+							
+					}
+				e.preventDefault();
+				return false;
+				
+
+				
+			});
+
+			
+	}	
+}
+
 
 function wb_formsave() {
 // <button data-formsave="#formId" data-src="/path/ajax.php"></button>
@@ -375,8 +532,54 @@ function wb_formsave() {
 	});
 };
 
+function wb_iconv_object(obj) {
+	var type=$(obj).attr("type");
+	var value=$(obj).val();
+	return wb_iconv(value,type);
+}
+
+function wb_iconv(value,type) {
+	if (substr(type,0,4)=="date") {
+		if (type=="datepicker") {mask="Y-m-d";}
+		if (type=="date") { mask="Y-m-d";}
+		if (type=="datetimepicker") { mask="Y-m-d H:i";}
+		if (type=="datetime") { mask="Y-m-d H:i";}		
+		return date(mask,strtotime(value));	
+	}
+	return value;
+}
+
+function wb_oconv_object(obj) {
+	var type=$(obj).attr("type");
+	var value=$(obj).val();
+	return wb_oconv(value,type,obj);
+}
+
+function wb_oconv(value,type,obj) {
+	var mask="";
+	if (substr(type,0,4)=="date") {
+		if ($(obj).attr("data-date-format")!==undefined) {
+			mask=$(obj).attr("data-date-format");
+			return moment(value).format(strtoupper(mask));
+		} else {
+			if (type=="datepicker") {mask="Y-m-d";}
+			if (type=="date") { mask="Y-m-d";}
+			if (type=="datetimepicker") { mask="Y-m-d H:i";}
+			if (type=="datetime") { mask="Y-m-d H:i";}		
+			return moment(value).format(mask);
+		}
+		
+	}
+	return value;
+}
+
 function wb_formsave_obj(formObj) {
 	if (wb_check_required(formObj)) {
+		var name=formObj.attr("data-wb-form");
+		var item=formObj.attr("data-wb-item");
+		var oldi=formObj.attr("data-wb-item-old");
+		$(document).trigger(name+"_before_formsave",[name,item,form,true]);
+		
 		var ptpl=formObj.attr("parent-template");
 		var padd=formObj.attr("data-wb-add");
 		// обработка switch из appUI (и checkbox вообще кроме bs-switch)
@@ -401,13 +604,8 @@ function wb_formsave_obj(formObj) {
 		formObj.find("[name][type^=date]").each(function(){
 			var dtname=$(this).attr("name");
 			var type=$(this).attr("type");
-			var mask="";
-			if ($(this).attr("type")=="datepicker") {mask="Y-m-d";}
-			if ($(this).attr("type")=="date") { mask="Y-m-d";}
-			if ($(this).attr("type")=="datetimepicker") { mask="Y-m-d H:i";}
-			if ($(this).attr("type")=="datetime") { mask="Y-m-d H:i";}
-			if ($(this).attr("date-iconv")>"") {mask=$(this).attr("date-iconv");}
-			ic_date+="&"+dtname+"="+date(mask,strtotime($(this).val()));
+			var val=wb_iconv_object(this);
+			ic_date+="&"+dtname+"="+val;
 		});
 
 
@@ -426,11 +624,6 @@ function wb_formsave_obj(formObj) {
 			var form=formObj.serialize();
 		}
 		form+=ui_switch+bs_switch+ic_date;
-
-		var name=formObj.attr("data-wb-form");
-		var item=formObj.attr("data-wb-item");
-		var oldi=formObj.attr("data-wb-item-old");
-
 
 		if ($(this).attr("data-wb-form")!==undefined) {name=$(this).attr("data-wb-form");}
 		if ($(this).attr("data-wb-src")!==undefined) {

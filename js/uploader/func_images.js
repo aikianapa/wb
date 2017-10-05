@@ -240,12 +240,13 @@ function wbImagesToField(id) {
 }
 
 function wbImagesAddToList(id,name,vis) {
-	if ($('#'+ id).hasClass("single")) {var single=true;} else {var single=false;}
+	var single=false; if ($('#'+ id).hasClass("single")) {var single=true;}
 	var store=$('#'+ id + ' > input[type=hidden]');
 	var path="/engine/phpThumb/phpThumb.php?w=250&src="+$("div.imageloader").attr("path");
 	var title=""; var alt=""; var visible=1;
 	var images=$("#"+id).data("images");
-	if (images=="") {var images=[];} else {var images=JSON.parse(images);}
+
+	if (images=="" || single==true) {var images=[];} else {var images=JSON.parse(images);}
 	$(images).each(function(i,img){
 		if (img["img"]==name) {title=img["title"]; alt=img["alt"]; visible=img["visible"];}
 	});
@@ -256,5 +257,6 @@ function wbImagesAddToList(id,name,vis) {
 	var thumbnail=wb_setdata("#"+tplid,{form:form,id:item,"%path":path,img:name},true);
 	if (single==true) {$("#"+id+" ul.gallery").find("li").remove();}
 	if (!$("#"+id+" ul.gallery li[data-name='"+name+"']").length) {$("#"+id+" ul.gallery").append(thumbnail);}
+	if (single==true) {wbImagesToField(id);}
 	wbImagesEvents(id);
 }

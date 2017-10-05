@@ -38,7 +38,7 @@
 
 	<div class="form-group row">
 		<label class="col-sm-2 form-control-label">Аватар</label>
-		<div class="col-sm-4">
+		<div class="col-sm-3">
 			<input type="hidden" name="avatar" data-wb-role="uploader" >
 		</div>
 	</div>

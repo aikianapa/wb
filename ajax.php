@@ -100,6 +100,7 @@ function ajax__getform() {
 function ajax__buildfields() {
 	$res=array();
 	foreach($_POST as $data) {
+		$data["value"]=htmlspecialchars($data["value"]);
 		$res=wbFieldBuild($data);
 		echo $res;
 	}

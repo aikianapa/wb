@@ -71,9 +71,9 @@ function wbFieldBuild($param) {
 			} else {$tpl->find("datalist")->remove();}
 			break;
 	}
-	$tpl->wbSetData($param);
 	$set->find(".form-group > label")->html($param["label"]);
 	$set->find(".form-group > div")->html($tpl);
+	$set->wbSetData($param);
 	return $set->outerHtml();
 }
 
@@ -729,19 +729,21 @@ function wbRouterGet($requestedUrl = null) {
 }
 
 function wbLoadController() {
-	$path="/controllers/".$_ENV["route"]["controller"].".php";
-	if (is_file($_ENV["path_app"] . $path)) {
-		include_once($_ENV["path_app"] . $path);
-		$call=$_ENV["route"]["controller"]."_controller";
-		return @$call(array($__page,$Item));
-	} else {
-		if (is_file(__DIR__ . $path)) {
-			include_once(__DIR__ . $path);
-			$call=$_ENV["route"]["controller"]."__controller";
-			return @$call();
+	if (isset($_ENV["route"]["controller"])) {
+		$path="/controllers/".$_ENV["route"]["controller"].".php";
+		if (is_file($_ENV["path_app"] . $path)) {
+			include_once($_ENV["path_app"] . $path);
+			$call=$_ENV["route"]["controller"]."_controller";
+			return @$call(array($__page,$Item));
 		} else {
-			echo "Ошибка загрузки контроллера: {$_ENV["route"]["controller"]}";
-			die;
+			if (is_file(__DIR__ . $path)) {
+				include_once(__DIR__ . $path);
+				$call=$_ENV["route"]["controller"]."__controller";
+				return @$call();
+			} else {
+				echo "Ошибка загрузки контроллера: {$_ENV["route"]["controller"]}";
+				die;
+			}
 		}
 	}
 }

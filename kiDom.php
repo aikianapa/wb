@@ -1218,7 +1218,6 @@ abstract class kiNode
 			$this->contentLoop($Item);
 			$this->wbPlugins($Item);
 			$this->wbTargeter($Item);
-			$this->wbSetValues($Item);
       gc_collect_cycles();
 	}
 
@@ -1400,8 +1399,8 @@ abstract class kiNode
 				$name=$inp->attr("name");	$def=$inp->attr("value");
 				if (substr($name,-2)=="[]") {$name=substr($name,0,-2);}
 				if (substr($def,0,3)=="{{_") {$def="";}
-				if (isset($Item[$name]) AND $def=="") {$inp->attr("value",$Item[$name]);}
-				$inp->contentDatePickerPrep();
+				if (isset($Item[$name])) {$inp->attr("value",$Item[$name]);} else {$inp->attr("value",$def);}
+				//$inp->wbDatePickerPrep();
 				if ($inp->attr("type")=="checkbox") {
 					if ($inp->attr("value")=="on" OR $inp->attr("value")=="1") {$inp->checked="checked";}
 				}
@@ -1416,15 +1415,24 @@ abstract class kiNode
 						$inp->find("option[value=".$value."]")->selected="selected";
 					}
 				}
-				$inp->contentSetMultiValue($Item);
-			}; unset($inp,$list);
+				$inp->wbSetMultiValue($Item);
+			};
+			
+			$list=$this->find("textarea");
+			foreach($list as $inp) {
+				$name=$inp->attr("name");	$def=$inp->attr("value");
+				if (isset($Item[$name])) {$inp->html(htmlspecialchars($Item[$name]));} else {$inp->html(htmlspecialchars($def));}
+			}
+			unset($inp,$list);
 			if (!is_array($Item)) {$Item=array($Item);}
 			$this->html(wbSetValuesStr($this->html(),$Item));
 			$this->includeTextarea($Item);
 		if ($obj==FALSE) {return $this->outerHtml();}
 	}
 
-	public function contentDatePickerPrep() {
+	public function wbDatePickerPrep() {
+		// тут что-то криво работает - нужно переделывать
+		// вызывается из wbSetValues
 		$type=$this->attr("type");
 		$oconv="";
 		/*if ($_SESSION["settings"]["appuiplugins"]=="on") {
@@ -1442,7 +1450,7 @@ abstract class kiNode
 	}
 
 
-	public function contentSetMultiValue($Item) {
+	public function wbSetMultiValue($Item) {
 		$name=$this->attr("name");
 		preg_match_all('/(.*)\[.*\]/',$name,$fld);
 		if (isset($fld[1][0])) {
@@ -1455,7 +1463,7 @@ abstract class kiNode
 				} else {
 					$this->attr("value",$value);
 				}
-				$this->contentDatePickerPrep();
+				$this->wbDatePickerPrep();
 			}
 		}
 		preg_match_all('/\[(.*)\]/',$name,$matches);
@@ -1973,7 +1981,8 @@ public function tagInclude($Item) {
 		$dfs=$this->attr("data-wb-formsave");
 		$class=$this->attr("data-wb-class");
 		$name=$this->attr("data-wb-name");
-
+		if ($name=="") $name=$this->attr("name");
+		
 		if ($src=="comments") 	{$src="/engine/ajax.php?form=comments&mode=widget"; }
 		if ($src=="modal") 		{$src="/engine/forms/form_comModal.php"; }
 		if ($src=="imgviewer") 	{$src="/engine/js/imgviewer.php";}

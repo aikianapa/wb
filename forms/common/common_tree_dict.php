@@ -45,7 +45,7 @@
 				<input class="form-control" placeholder="Свойства JSON" type="text" name="prop">
 			</div>
 			<div class="col-sm-5 col-xs-12">
-				<input class="form-control" placeholder="Стиль CSS" type="text" name="css">
+				<input class="form-control" placeholder="Стиль CSS" type="text" name="style">
 			</div>
 		</div>
 	</div>
