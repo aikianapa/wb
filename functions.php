@@ -51,7 +51,7 @@ function wbInitFunctions() {
 
 function wbFieldBuild($param) {
 	$set=wbGetForm("common","tree_fldset");
-	$tpl=wbGetForm("wbfldset",$param["type"]);
+	$tpl=wbGetForm("snippets",$param["type"]);
 	$opt=json_decode($param["prop"],true);
 	$options="";
 	if (isset($opt["required"]) AND $opt["required"]==true) {$options.=" required ";}
@@ -196,6 +196,17 @@ function wbItemList($table="data",$where="") {
 	$list=wbTrigger("form",__FUNCTION__,"AfterItemList",func_get_args(),$list);
 	wbTrigger("func",__FUNCTION__,"after",func_get_args(),$list);
 	return $list;
+}
+
+function wbTreeRead($name) {
+	$tree=wbItemRead("tree",$name);
+	if (!isset($tree["tree"])) {$tree["tree"]=array();}  else {
+		$tree["tree"]=json_decode($tree["tree"],true);
+	}
+	if (!isset($tree["_tree__dict_"])) {$tree["dict"]=array();}  else {
+		$tree["dict"]=json_decode($tree["_tree__dict_"],true);
+	}
+	return $tree;
 }
 
 function wbWhereLike($ref,$val) {

@@ -20,7 +20,6 @@
 					<option value="switch">switch</option>
 					<option value="call">call</option>
 					<option value="enum">enum</option>
-					<option value="dict">dict</option>
 					<option value="tree">tree</option>
 					<option value="snippet">snippet</option>
 					<option value="tags">tags</option>

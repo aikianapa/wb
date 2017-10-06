@@ -68,7 +68,7 @@ function wb_tree() {
 
 	$(document).undelegate(".wb-tree-item .dd-content","focusout");
 	$(document).delegate(".wb-tree-item .dd-content","focusout",function(e){
-		$(this).parents(".wb-tree-item").attr("data-name",$(this).text());
+		$(this).parent(".wb-tree-item").attr("data-name",$(this).text());
 		var tree=$(this).parents(".wb-tree");
 		var name=$(tree).attr("name");
 		var data=JSON.stringify(wb_tree_serialize(tree));
@@ -134,6 +134,16 @@ function wb_tree() {
 					wb_plugins();
 				}
 		});
+		
+		$(edid).on("multiinput",function(e,multi,trigger){
+			if ($(multi).attr("name")=="fields") {
+				var fields=multi;
+				var tpl=wb_tree_dict_change(fields,tree);
+				tpl=$(wb_setdata(tpl,dataval,true));
+				$(edid).find("#treeData").children("form").html(tpl);
+				wb_plugins();
+			}
+		});
 
 		$(edid).find('.tree-close').off("click");
 		$(edid).find('.tree-close').on("click", function (e) {
@@ -159,9 +169,7 @@ function wb_tree() {
 		var row=$(document).data("wb-tree-row");
 		var form=$(this).parents("[data-wb-form]").attr("data-wb-form");
 		row=wb_setdata(row,{"name":"","form":form,"id":wb_newid()},true);
-		
 		var name=$(tree).attr("name");
-		
 		if ($(this).attr("href")=="#after") {$(this).parents(".wb-tree-menu").parent(".wb-tree-item").after(row);}
 		if ($(this).attr("href")=="#before") {$(this).parents(".wb-tree-menu").parent(".wb-tree-item").before(row);}
 		if ($(this).attr("href")=="#remove") {$(this).parents(".wb-tree-menu").parent(".wb-tree-item").remove();}
@@ -337,6 +345,7 @@ function wb_multiinput() {
 			$(multi).append(row);
 		};
 		wb_multiinput_sort(multi);
+		$(multi).trigger("multiinput",multi,this);
 		e.preventDefault();
 	});
 }

@@ -1396,6 +1396,7 @@ abstract class kiNode
 			}
 			$list=$this->find("input,select");
 			foreach($list as $inp) {
+				$from=$inp->attr("data-wb-from");
 				$name=$inp->attr("name");	$def=$inp->attr("value");
 				if (substr($name,-2)=="[]") {$name=substr($name,0,-2);}
 				if (substr($def,0,3)=="{{_") {$def="";}
@@ -1517,12 +1518,7 @@ abstract class kiNode
 	public function tagMultiInput($Item) {
 		$len=count($this->find("input,select,textarea"));
 		if ($len==0) {$len=1;}
-
-		$attrs=new IteratorIterator($this->attributes());
-		foreach ($attrs as $attr) {
-			$tmp=$attr->name;
-			if (strpos($tmp,"ata-wb-")) {$tmp=str_replace("data-wb-","",$tmp); $$tmp=$attr."";}
-		}; unset($attrs);
+		include("wbattributes.php");	
 		if ($this->attr("name") && !isset($name)) {$name=$this->attr("name");} else {$this->attr("name");}
 		$tags=array("input","select","textarea");
 		
@@ -1609,14 +1605,32 @@ abstract class kiNode
 
 
 	public function tagTree($Item=array()) {
-		$name=$this->attr("name");
-		$this->append("<input type='hidden' name='{$name}'><input type='hidden' name='_{$name}__dict_' data-name='dict'>");
-		$tree=wbGetForm("common","tree_ol");
-		if (isset($Item[$name]) && $Item[$name]!=="[]" && $Item[$name]!=="") {$tree->tagTreeData($Item[$name]);} else {$tree->find("ol")->append(wbGetForm("common","tree_row"));}
-		$this->addClass("wb-tree dd");
-		$this->prepend($tree);
-		$this->wbSetData($Item);
-		//$this->append($inp); // важно, чтобы input был внизу, иначе неправильно считается index в js
+		include("wbattributes.php");
+		$this->wbSetAttributes($Item);
+		$name=$this->attr("name"); if (isset($from)) {$name=$from;}		
+		$type=$this->attr("type");
+		if ($this->is("input")) {
+			$type="input";
+			$class=str_replace("wb-done",$this->attr("class"));
+			$snippet=wbGetForm("snippets","tree");
+			$snippet->children("div")->attr("name",$name);
+			$snippet->children("div")->attr("type",$type);
+			$snippet->children("div")->addClass($class);
+			$this->replaceWith($snippet);
+		}
+		if ($type=="input") {
+			$this->append("<input type='hidden' name='{$name}'><input type='hidden' name='_{$name}__dict_' data-name='dict'>");
+			$tree=wbGetForm("common","tree_ol");
+			if (isset($Item[$name]) && $Item[$name]!=="[]" && $Item[$name]!=="") {$tree->tagTreeData($Item[$name]);} else {$tree->find("ol")->append(wbGetForm("common","tree_row"));}
+			$this->addClass("wb-tree dd");
+			$this->prepend($tree);
+			$this->wbSetData($Item);
+		} elseif ($type=="select") {
+				$this->tagTreeUl($Item);
+		} else {
+			if ($item>"") {$tree=wbTreeRead($item); $Item[$name]=$tree["tree"]; $Item["_{$name}__dict_"]=$tree["dict"];}
+				$this->tagTreeUl($Item);
+		}
 	}
 	
 	public function tagTreeData($data=array()) {
@@ -1638,136 +1652,35 @@ abstract class kiNode
 		}
 	}
 
-	public function tagTree1($Item=array()) {
-		$this->wbSetAttributes($Item);
-		if ($this->is("[data-add=true]")) {$this->addTemplate("outerHtml");}
-		if ($this->is("ul[data-build-tree=true]")) {
-			$this->tagTreeUl($Item);
-		} else {
-		$name=$this->attr("from");
-		$item=$this->attr("item");
-		$nobranch=$this->attr("branch");
-		$parent=$this->attr("parent"); if ($parent=="true" OR $parent=="1" OR $parent=="") {$parent=true;} else {$parent=false;}
-		$tree=wbReadTree($name);
-		$html=$this->html();
+	public function tagTreeUl($Item=array(),$name=null,$tag=null) {
+		if ($name==null) {
+			include("wbattributes.php");
+			$name=$this->attr("name"); if (isset($from)) {$name=$from;}
+			if (!is_array($Item[$name])) {$tree=json_decode($Item[$name],true);} else {$tree=$Item[$name];}
+			$tag=$this->tag();
+			if ($tag=="select") {$tag="optgroup";}
+		} else {$tree=$Item;}
+		$tpl=$this->html();
 		$this->html("");
-		$id="";
-		if ($item>"") {
-			$branch=tagTree_find($tree["tree"],$item);
-			if ($branch!==false && $nobranch!=="false" ) {
-				if  (isset($branch["children"])) {$tree["tree"]=$branch["children"];} else {$tree["tree"]="";}
-			} else {$id=$item;}
-		}
-		if (!isset($branch) OR $branch!==$Item) {
-			if (!isset($branch)) {$branch=array();}
-			$_ENV["tree_idx"]=0;
-			$_ENV["tmp_srcTree"]=$Item;
-			$idx=0; $Item["_idx"]=$idx;
-			$this->tagTree_step($tree["tree"],$html,$id,$nobranch,$Item,$idx);
-			if ($_ENV["tmp_tagTree"]==false) {
-				$tpl=wbFromString($html);
-				$tpl->wbSetData($branch);
-				$this->append($tpl);
-			}
-			unset($_ENV["tmp_tagTree"],$_ENV["tmp_srcTree"]);
-			if ($this->tag()=="select") {
-				$plhr=$this->attr("placeholder");
-				if ($plhr>"") {$this->prepend("<option value=''>$plhr</option>");}
-				if ($parent==false) {foreach($this->find("option[parent]") as $p) {$p->attr("disabled",true);} }
-			}
-		}
-		unset($_ENV["tree_idx"],$p,$html);
-		}
-	}
-
-	public function tagTree_step($branch=array(),$html="",$id="",$nobranch="",$Item=array(),$idx=0) {
-		$res=false; $i=0;
-		if (!is_array($branch)) {$branch=array();}
-		foreach($branch as $key => $val) {
-			$idx++;
-			$val["_idx"]=$idx;
-			if (!is_array($Item)) {$Item=array($Item);}
-			foreach($Item as $k => $v) {$val["%{$k}"]=wbSetValuesStr($v,$Item);}; unset($v);
-			$tpl=wbFromString($html);
-			if ($this->is("select")) {
-				$space=str_repeat("&hellip;",$_ENV["tree_idx"]);
-				$tpl->wbSetData($val);
-				if (isset($val["children"])) $tpl->find("option")->attr("parent","true");
-				$tpl->find("option")->prepend($space);
-				if ($id=="" OR $id==$val["id"]) {$this->append($tpl); $res=true;}
-				if (isset($val["children"])) {
-					if ($id=="" OR $id==$val["id"]) {$this->append($tpl);}
-					if ($nobranch!=="false") {
-						$_ENV["tree_idx"]+=1;
-						$this->tagTree_step($val["children"][0],$html,$id,$val,$idx);
-						$_ENV["tree_idx"]-=1;
-					}
-				}
-			} else {
-				if ( ($nobranch=="false" && $val["id"]==$id) OR $nobranch!=="false") {
-					if (isset($val["children"][0])) $val["children"]=$val["children"][0];
-					$tpl->wbSetData($val);
-					$this->append($tpl);
-					$res=true;
+		foreach($tree as $item) {
+			$label="";
+			$data=array();
+			if (is_array($item["data"])) {
+				foreach($item["data"] as $d) {
+					$data=array($d["name"]=>$d["value"]);
 				}
 			}
-			$i++;
-		}; unset($val,$key,$tpl);
-		$_ENV["tmp_tagTree"]=$res;
-	}
-
-	public function tagTreeUl($Item=array()) {
-		$this->wbSetAttributes($Item);
-		$name=$this->attr("from");
-		$item=$this->attr("item");
-		$nobranch=$this->attr("branch");
-		$parent=$this->attr("parent"); if ($parent=="true" OR $parent=="1" OR $parent=="") {$parent=true;} else {$parent=false;}
-		$that=$this->clone();
-		$that->removeAttr("id");
-		$tree=wbReadTree($name);
-		$html=$this->html();
-		$this->html("");
-		$id="";
-		if ($item>"") {
-			$branch=tagTree_find($tree["tree"],$item);
-			if ($branch!==false) {$tree["tree"]=$branch["children"];} else {$id=$item;}
-		}
-		if (!isset($branch) OR $branch!==$Item) {
-			$_ENV["tree_idx"]=0;
-			$_ENV["tmp_srcTree"]=$Item;
-			$this->tagTreeUl_step($tree["tree"],$html,$id,$nobranch,$Item,$that);
-			if ($_ENV["tmp_tagTree"]==false && isset($branch)) {
-				$tpl=wbFromString($html);
-				$tpl->wbSetData($branch);
-				$this->append($tpl);
+			$item["data"]=$data;
+			$line=wbFromString($tpl);
+			$line->wbSetData($item);
+			$this->append($line);
+			if (is_array($item["children"])) {
+				$child=wbFromString("<{$tag}>{$tpl}</{$tag}>");
+				$child->tagTreeUl($item["children"],$name,$tag);
+				$this->append($child);
 			}
-			unset($_ENV["tmp_tagTree"],$_ENV["tmp_srcTree"]);
 		}
-		unset($_ENV["tree_idx"],$p,$html);
-	}
-
-
-	public function tagTreeUl_step($branch=array(),$html="",$id="",$nobranch="",$Item=array(),$that) {
-		$res=false; $i=0;
-		foreach($branch as $key => $val) {
-			foreach($Item as $k => $v) {$val["%{$k}"]=wbSetValuesStr($v,$Item);}; unset($v);
-			$tpl=wbFromString($html);
-			$tpl->wbSetData($val);
-			if (isset($val["children"])) {
-				$tpl->find("li")->addClass("parent");
-				$chld=$that->clone();
-				$chld->attr("item",$val["id"]);
-				if ($nobranch!=="false") {
-					$chld->tagTreeUl($val["children"][0]);
-					$tpl->find("li")->append($chld);
-					$this->append($tpl);
-				}
-			}
-			if ($id=="" OR $id==$val["id"]) {$this->append($tpl); $res=true;}
-			$i++;
-		}; unset($val,$key,$tpl);
-		$_ENV["tmp_tagTree"]=$res;
-
+		return;
 	}
 
 
@@ -1806,11 +1719,7 @@ abstract class kiNode
 
 	public function tagForeach($Item=array()) {
 		$srcItem=$Item;
-		$attrs=new IteratorIterator($this->attributes());
-		foreach ($attrs as $attr) {
-			$tmp=$attr->name;
-			if (strpos($tmp,"ata-wb-")) {$tmp=str_replace("data-wb-","",$tmp); $$tmp=$attr."";}
-		}; unset($attrs);
+		include("wbattributes.php");
 		if (!isset($tpl) OR $tpl!=="false") {
 			$tplid=$this->attr("data-wb-tpl");
 			if ($tplid=="") {$this->addTemplate();}
@@ -2054,12 +1963,7 @@ public function tagInclude($Item) {
 
 	public function tagFormData($Item=array()) {
 		$srcItem=$Item;
-		$attrs=new IteratorIterator($this->attributes());
-		foreach ($attrs as $attr) {
-			$tmp=$attr->name;
-			if (strpos($tmp,"ata-wb-")) {$tmp=str_replace("data-wb-","",$tmp); $$tmp=$attr."";}
-		}; unset($attrs);
-
+		include("wbattributes.php");
 		if (isset($form) AND !isset($table)) {$table=$form;}
 		if (isset($vars) AND $vars>"") {$Item=attrAddData($vars,$Item);}
 		if (isset($from) AND $from>"") {$Item=$Item[$from];}
