@@ -399,9 +399,9 @@ function wb_plugins(){
 				$(this).datetimepicker({language: 'ru',	autoclose: true, todayBtn: true});
 			});
 		}
-		if ($("[data-wb-role=tree]").length) {
-			$("[data-wb-role=tree]").each(function(){
-				$(this).addClass("dd").nestable({maxDepth:100});
+		if ($(".dd[data-wb-role=tree]").length) {
+			$(".dd[data-wb-role=tree]").each(function(){
+				$(this).nestable({maxDepth:100});
 				$(".dd-item").unbind("contextmenu");
 			});
 		}

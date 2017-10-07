@@ -1481,7 +1481,7 @@ abstract class kiNode
 		$var=$this->attr("var");
 		$where=$this->attr("where");
 		if (($where>"" AND wbWhereItem($Item,$where)) OR $where=="") {
-			if ($var>"") $Item[$var]=$_ENV["var"][$var]=wbSetValuesStr($this->attr("value"),$Item);
+			if ($var>"") $Item[$var]=$_ENV["variables"][$var]=wbSetValuesStr($this->attr("value"),$Item);
 		}
 		return $Item;
 	}
@@ -1608,6 +1608,7 @@ abstract class kiNode
 		include("wbattributes.php");
 		$this->wbSetAttributes($Item);
 		$name=$this->attr("name"); if (isset($from)) {$name=$from;}		
+		if ($name=="" AND isset($item)) {$name=$item;}
 		$type=$this->attr("type");
 		if ($this->is("input")) {
 			$type="input";
@@ -1628,7 +1629,7 @@ abstract class kiNode
 		} elseif ($type=="select") {
 				$this->tagTreeUl($Item);
 		} else {
-			if ($item>"") {$tree=wbTreeRead($item); $Item[$name]=$tree["tree"]; $Item["_{$name}__dict_"]=$tree["dict"];}
+			if ($item>"") {$tree=wbTreeRead($item); $Item[$name]=$tree["tree"]; $Item["_{$name}"]=$tree["dict"];}
 				$this->tagTreeUl($Item);
 		}
 	}
@@ -1652,32 +1653,62 @@ abstract class kiNode
 		}
 	}
 
-	public function tagTreeUl($Item=array(),$name=null,$tag=null) {
-		if ($name==null) {
+	public function tagTreeUl($Item=array(),$param=null) {
+		if ($param==null) {
 			include("wbattributes.php");
-			$name=$this->attr("name"); if (isset($from)) {$name=$from;}
+			$level=0;$bid=null;
+			$name=$this->attr("name"); 
+			if (isset($from)) {$name=$from;}
+			if ($name=="" AND isset($item)) {$name=$item;}
 			if (!is_array($Item[$name])) {$tree=json_decode($Item[$name],true);} else {$tree=$Item[$name];}
 			$tag=$this->tag();
-			if ($tag=="select") {$tag="optgroup";}
-		} else {$tree=$Item;}
+			if (!isset($branch)) {$bflag=true;} {$bflag=false;}
+		} else {
+			foreach($param as $k =>$val) {$$k=$val;}
+			$tree=$Item;
+			$branch=$bid;
+		}
+		if (isset($parent) AND ($parent=="false" OR $parent=="0" OR $parent==0)) {$parent=0;} else {$parent=1;}
 		$tpl=$this->html();
 		$this->html("");
 		foreach($tree as $item) {
-			$label="";
-			$data=array();
-			if (is_array($item["data"])) {
-				foreach($item["data"] as $d) {
-					$data=array($d["name"]=>$d["value"]);
+			if ($item["id"]==$branch OR $bflag==true) {
+				$bflag=true;
+				$label="";
+				$data=array();
+				if (is_array($item["data"])) {
+					foreach($item["data"] as $d) {$data["{$d["name"]}"]=$d["value"];}
 				}
+				$item["data"]=$data;
+				if ($parent==1) {
+					$line=wbFromString($tpl);
+					$line->wbSetData($item);
+					$this->append($line);
+				} else {$parent=2;}
 			}
-			$item["data"]=$data;
-			$line=wbFromString($tpl);
-			$line->wbSetData($item);
-			$this->append($line);
 			if (is_array($item["children"])) {
-				$child=wbFromString("<{$tag}>{$tpl}</{$tag}>");
-				$child->tagTreeUl($item["children"],$name,$tag);
+				$level++;
+				if ($tag=="select") {
+					$child=wbFromString($tpl);
+					$child->children("option")->prepend(str_repeat("<span>&nbsp;&nbsp;<span>",$level));
+				} else {
+					if ($parent==1) {
+						$child=wbFromString("<{$tag}>{$tpl}</{$tag}>");
+					} else {
+						$child=wbFromString($tpl);
+					}
+				}
+				$param=array(
+					"name"=>$name,
+					"tag"=>$tag,
+					"level"=>$level,
+					"bid"=>$branch,
+					"bflag"=>$bflag,
+					"parent"=>$parent
+				);
+				$child->tagTreeUl($item["children"],$param);
 				$this->append($child);
+				$level--;
 			}
 		}
 		return;

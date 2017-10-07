@@ -21,6 +21,13 @@ function wbInitEnviroment() {
 	$_ENV["dbac"]=$_ENV["path_app"]."/database/_cache";	// App data
 	$_ENV["error"]=array();
 	$_ENV["env_id"]=wbNewId();
+	$settings=wbItemRead("admin","settings");
+	$variables=array();
+	foreach($settings["variables"] as $v) {
+		$variables[$v["var"]]=$v["value"];
+	}
+	$settings["variables"]=$_ENV["variables"]=$variables;
+	$_ENV["settings"]=$settings;
 	wbTrigger("func",__FUNCTION__,"after",func_get_args());
 }
 
@@ -789,7 +796,7 @@ function wbSetValuesStr($tag="",$Item=array(), $limit=2)
 		$err = false;
 		$nIter = 0;
 		$_FUNC="";
-		$mask = '`(\{\{){1,1}(%*[\w\d]+|_form|_mode|_item|((_SETT|_SETTINGS|_SESS|_SESSION|_SRV|_COOK|_COOKIE|_FUNC|_ENV|_REQ|_GET|_POST|%*[\w\d]+)?([\[]{1,1}(%*[\w\d]+|"%*[\w\d]+")[\]]{1,1})*))(\}\}){1,1}`u';
+		$mask = '`(\{\{){1,1}(%*[\w\d]+|_form|_mode|_item|((_SETT|_SETTINGS|_SESS|_SESSION|_VAR|_SRV|_COOK|_COOKIE|_FUNC|_ENV|_REQ|_GET|_POST|%*[\w\d]+)?([\[]{1,1}(%*[\w\d]+|"%*[\w\d]+")[\]]{1,1})*))(\}\}){1,1}`u';
 		while(!$exit) {
 			$nUndef = 0;
 			$nSub = preg_match_all($mask, $tag, $res, PREG_OFFSET_CAPTURE);				// найти все вставки, не содержащие в себе других вставок
@@ -807,10 +814,13 @@ function wbSetValuesStr($tag="",$Item=array(), $limit=2)
 						switch($res[4][$i][0])					// префикс вставки
 						{
 							case '_SETT':
-								$sub = '$_SESSION["settings"]';
+								$sub = '$_ENV["settings"]';
 								break;
 							case '_SETTINGS':
-								$sub = '$_SESSION["settings"]';
+								$sub = '$_ENV["settings"]';
+								break;
+							case '_VAR':
+								$sub = '$_ENV["variables"]';
 								break;
 							case '_SESS':
 								$sub = '$_SESSION';

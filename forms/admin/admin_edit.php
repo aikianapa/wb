@@ -27,10 +27,7 @@
 			<div class="col-sm-12">
 				<input data-wb-role="tree" name="tree">
 			</div>
-			
-			<select data-wb-role="tree" name="tree1" data-wb-from="tree" _data-wb-item="test">
-				<option>{{name}}</option>
-			</select>
+
 			
         </div>
         <br>

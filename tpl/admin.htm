@@ -388,7 +388,42 @@
                                 </div>
                             </div>
                         </div>
-                        <ul class="main-menu">
+
+
+
+                        <ul class="main-menu" data-wb-role="tree" data-wb-item="_config" data-wb-branch="side_menu" data-wb-parent="false">
+                            <li class="has-sub-menu">
+                                <a  data-wb-autoload="true"
+                                    data-wb-ajax="/admin/ui/list_forms/"
+                                    data-wb-html=".cms-menu"
+                                    data-wb-tpl="#tFormList">
+                                    <div class="icon-w">
+                                        <i class="{{data[icon]}}"></i>
+                                    </div>
+                                </a>
+                                <div class="sub-menu-w">
+                                    <div class="sub-menu-title" id="aFormList">Сайт</div>
+                                    <div class="sub-menu-icon">
+                                        <i class="os-icon os-icon-window-content"></i>
+                                    </div>
+                                    <div class="sub-menu-i cms-menu">
+                                    </div>
+                  									<script type="text/template" id="tFormList">
+                  											<ul class="sub-menu" data-wb-role="foreach" data-wb-from="forms" data-wb-limit="false">
+                  												<li>
+                  												<a data-wb-ajax="/form/list/{{name}}/" data-wb-html=".content-box">
+                                              {{view}}
+                  												</a>
+                  												</li>
+                  											</ul>
+                  									</script>
+                                </div>
+                            </li>
+
+                        </ul>
+
+
+                        <!--ul class="main-menu" >
                             <li class="has-sub-menu">
                                 <a  data-wb-autoload="true"
                                     data-wb-ajax="/admin/ui/list_forms/"
@@ -747,7 +782,7 @@
                                     </div>
                                 </div>
                             </li>
-                        </ul>
+                        </ul-->
                     </div>
                 </div>
                 <!--------------------
