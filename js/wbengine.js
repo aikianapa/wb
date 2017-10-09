@@ -107,9 +107,10 @@ function wb_tree() {
 
 		var dataval={};
 
-		$(data["data"]).each(function(i){
-			dataval[data["data"][i]["name"]]=data["data"][i]["value"];
-		});
+		//$(data["data"]).each(function(i){
+		//	dataval[data["data"][i]["name"]]=data["data"][i]["value"];
+		//});
+		dataval=data["data"];
 		var tpl=wb_tree_data_fields(dict);
 		var tpl=$(wb_setdata(tpl,dataval,true));
 		data["fields"]=dict;
@@ -242,13 +243,19 @@ function wb_tree_data_set(that,path,values) {
 	var name=$(tree).attr("name");
 	var data=JSON.parse($(tree).children("input[name="+name+"]").val());
 	var dict=JSON.parse($(tree).children("[data-name=dict]").val());
-	var values=JSON.parse(values);
-	$(values).each(function(j,d) {
+	var fields=JSON.parse(values);
+	var values={};
+	$(fields).each(function(j,d) {
+		var fldname=d["name"];
+		var fldval=d["value"];
 		$(dict).each(function(z,di){
-			if (di["name"]==d["name"]) {d["value"]=wb_iconv(d["value"],di["type"]);}
+			if (di["name"]==fldname) {
+				fldval=wb_iconv(fldval,di["type"]);
+				values[fldname]=fldval;
+			}
 		});
-		values[j]=d;
 	});
+console.log(values);
 
 	if (path==undefined) {var path=wb_tree_data_path(that);}
 	var p="";
@@ -405,6 +412,8 @@ function wb_plugins(){
 				$(".dd-item").unbind("contextmenu");
 			});
 		}
+		if ($('.select2:not(.wb-done)').length) {	$('.select2').select2(); $('.select2').addClass("wb-done");}
+		
 		wb_plugin_editor();
 		wbCommonUploader();
 	});
@@ -658,7 +667,7 @@ function wb_formsave_obj(formObj) {
 				}
 
 				if (ptpl!==undefined && padd!=="false") {
-					var tpl=$(document).find("script#"+ptpl).html();
+					var tpl=$(document).find("#"+ptpl).html();
 					var list=$(document).find("[data-wb-tpl="+ptpl+"]");
 					var post={
 						tpl: tpl

@@ -1197,7 +1197,7 @@ abstract class kiNode
 			$this->wbUserAllow();
 			$nodes=new IteratorIterator($this->find("*"));
 			foreach($nodes as $inc) {
-				if (!$inc->parents("script[type=text/template]")->length) {
+				if (!$inc->parents("[type=text/template]")->length) {
 				$inc->wbUserAllow();
 				$tag=$inc->wbCheckTag();
 				if (!$tag==FALSE && !$inc->hasClass("wb-done")) {
@@ -1350,7 +1350,7 @@ abstract class kiNode
 	}
 
 	public function excludeTextarea($Item=array()) {
-		$list=$this->find("script[type=text/template],pre,.nowb,[data-role=module]");
+		$list=$this->find("[type=text/template],pre,.nowb,[data-role=module]");
 		$_ENV["ta_save"]=array();
 		foreach ($list as $ta) {
 			$id=wbNewId();
@@ -1364,7 +1364,7 @@ abstract class kiNode
 		}; unset($ta,$list);
 	}
 	function includeTextarea($Item=array()) {
-		$list=$this->find("script[type=text/template],pre[taid],.nowb[taid],[data-role=module][taid]");
+		$list=$this->find("[type=text/template],pre[taid],.nowb[taid],[data-role=module][taid]");
 		foreach ($list as $ta) {
 			$id=$ta->attr("taid"); $name=$ta->attr("name");
 			if (isset($_ENV["ta_save"][$id])) $ta->html($_ENV["ta_save"][$id]);
@@ -1656,13 +1656,14 @@ abstract class kiNode
 	public function tagTreeUl($Item=array(),$param=null) {
 		if ($param==null) {
 			include("wbattributes.php");
-			$level=0;$bid=null;
+			$level=0;$bid=null;$limlevel=0;
 			$name=$this->attr("name"); 
 			if (isset($from)) {$name=$from;}
 			if ($name=="" AND isset($item)) {$name=$item;}
 			if (!is_array($Item[$name])) {$tree=json_decode($Item[$name],true);} else {$tree=$Item[$name];}
 			$tag=$this->tag();
-			if (!isset($branch)) {$bflag=true;} {$bflag=false;}
+			if (!isset($branch)) {$bflag=true;$branch=null;} {$bflag=false;}
+			if (!isset($limit) OR $limit=="false" OR $limit*1<0) {$limit=0;} else {$limit=$limit*1;}
 		} else {
 			foreach($param as $k =>$val) {$$k=$val;}
 			$tree=$Item;
@@ -1672,14 +1673,14 @@ abstract class kiNode
 		$tpl=$this->html();
 		$this->html("");
 		foreach($tree as $item) {
-			if ($item["id"]==$branch OR $bflag==true) {
+			if 	(	($item["id"]==$branch OR $bflag==true) ) {
 				$bflag=true;
 				$label="";
-				$data=array();
-				if (is_array($item["data"])) {
-					foreach($item["data"] as $d) {$data["{$d["name"]}"]=$d["value"];}
-				}
-				$item["data"]=$data;
+//				$data=array();
+//				if (is_array($item["data"])) {
+//					foreach($item["data"] as $d) {$data["{$d["name"]}"]=$d["value"];}
+//				}
+//				$item["data"]=$data;
 				if ($parent==1) {
 					$line=wbFromString($tpl);
 					$line->wbSetData($item);
@@ -1687,7 +1688,8 @@ abstract class kiNode
 				} else {$parent=2;}
 			}
 			if (is_array($item["children"])) {
-				$level++;
+				$level++; if($bflag==true) {$limlevel++;}
+
 				if ($tag=="select") {
 					$child=wbFromString($tpl);
 					$child->children("option")->prepend(str_repeat("<span>&nbsp;&nbsp;<span>",$level));
@@ -1704,11 +1706,16 @@ abstract class kiNode
 					"level"=>$level,
 					"bid"=>$branch,
 					"bflag"=>$bflag,
-					"parent"=>$parent
+					"parent"=>$parent,
+					"limit"=>$limit,
+					"limlevel"=>$limlevel
 				);
 				$child->tagTreeUl($item["children"],$param);
-				$this->append($child);
-				$level--;
+				if ( $limlevel<=$limit)  {
+					$this->append($child);
+				}
+				$level--; if($bflag==true) {$limlevel--;}
+
 			}
 		}
 		return;
@@ -1739,7 +1746,8 @@ abstract class kiNode
 	}
 
 	public function tagWhere($Item=array()) {
-		$res=wbWhereItem($Item,$this->attr("data"));
+		include("wbattributes.php");
+		$res=wbWhereItem($Item,$where);
 		if ($res==0) {$this->remove();} else {
 			$vars=$this->find("[data-wb-role=variable]");
 			foreach($vars as $v => $var) {$Item=$var->tagVariable($Item);}
@@ -1750,6 +1758,7 @@ abstract class kiNode
 
 	public function tagForeach($Item=array()) {
 		$srcItem=$Item;
+		$field=""; $sort=""; $add=""; $step=""; $id="";
 		include("wbattributes.php");
 		if (!isset($tpl) OR $tpl!=="false") {
 			$tplid=$this->attr("data-wb-tpl");
@@ -1829,7 +1838,7 @@ abstract class kiNode
 
 
 					$ndx++;
-
+					if (wbWhereItem($val,$where)) {
 						if ($step>0) { // если степ, то работаем с объектом
 							if ($stepcount==0) {
 								$t_step=$steptpl->clone();
@@ -1843,6 +1852,7 @@ abstract class kiNode
 						} else { // иначе строим строку
 							$inner.=wbClearValues($text->outerHtml());
 						}
+					}
 
 			}
 			unset($Item[$key]);
@@ -1999,10 +2009,10 @@ public function tagInclude($Item) {
 		if (isset($vars) AND $vars>"") {$Item=attrAddData($vars,$Item);}
 		if (isset($from) AND $from>"") {$Item=$Item[$from];}
 		if (isset($json) AND $json>"") {$Item=json_decode($json,true);}
-		if (isset($mode) AND $mode=="") {$mode="show";}
+		if (!isset($mode) OR $mode=="") {$mode="show";}
 		if (isset($table) AND $table>"") {
-			if ($item>"") {$Item=wbItemRead(wbTable($table),$item);}
-			if ($vars>"") {$Item=attrAddData($vars,$Item);}
+			if (isset($item) AND $item>"") {$Item=wbItemRead(wbTable($table),$item);}
+			if (isset($vars) AND $vars>"") {$Item=attrAddData($vars,$Item);}
 		}
 		if (isset($field) AND $field>"") {
 			$tmparr=json_decode($Item[$field],true);
