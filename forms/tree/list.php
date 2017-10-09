@@ -13,7 +13,6 @@
 			<tr>
 			  <th>Имя дерева</th>
 			  <th>Заголовок</th>
-			  <th class="text-center">Статус</th>
 			  <th class="text-right">Действие</th>
 			</tr>
 		  </thead>
@@ -21,10 +20,6 @@
 			<tr>
 			  <td class="nowrap">{{id}}</td>
 			  <td>{{header}}</td>
-			  <td class="text-center">
-				<div class="status-pill green" data-title="Активен" data-wb-role="where" data='active="on"' data-toggle="tooltip"></div>
-				<div class="status-pill red" data-title="Активен" data-wb-role="where" data='active=""' data-toggle="tooltip"></div>
-			  </td>
 			  <td class="text-right" data-wb-role="include" src="/engine/forms/common/item_actions.php">
 			  </td>
 			</tr>

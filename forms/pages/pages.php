@@ -58,13 +58,17 @@ function _pageBeforeShowItem($Item) {
 	if ($_GET["mode"]=="show") {$Item=aikiAddItemGal($Item);}
 	return $Item;
 }
+*/
 
-function _pageAfterReadItem($Item) {
-	if ($_GET["mode"]=="list") {unset($Item["text"]);}
+function _pagesAfterItemRead($Item) {
+	if ($_GET["mode"]=="list") {
+		$Item["images_count"]=count(json_decode($Item["images"],true));
+		unset($Item["text"]);
+	}
 	return $Item;
 }
 
-*/
+
 
 
 ?>

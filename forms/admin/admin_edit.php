@@ -28,13 +28,7 @@
 				<input data-wb-role="tree" name="tree">
 			</div>
 
-<ul class="main-menu" data-wb-role="tree" data-wb-item="_config" data-wb-branch="side_menu" data-wb-parent="false" data-wb-limit="1">
-	<li>{{name}}</li>
-	<ul data-wb-role="foreach" data-wb-from="children" data-wb-where='id>""'>
-		<li>{{name}}</li>
-	</ul>
-	</ul>
-</ul>
+
 
 			
         </div>

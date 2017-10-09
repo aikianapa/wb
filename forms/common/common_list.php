@@ -1,10 +1,12 @@
 
 <div class="element-wrapper">
                     <h6 class="element-header">
-                     Список сзаписей
+                     Список записей
                     </h6>
                     <div class="element-box">
-                      <button  data-wb-ajax="/form/edit/{{_GET[form]}}/_new" data-wb-append="body">Новая запись</button>
+                     <button class="btn btn-sm btn-success pull-right" data-wb-ajax="/form/edit/{{_GET[form]}}/_new" data-wb-append="body">
+                       <i class="os-icon os-icon-ui-22"></i> Добавить запись
+                     </button>
                       <div class="table-responsive">
                         <table class="table table-lightborder">
                           <thead>
@@ -12,11 +14,8 @@
                               <th>
                                 Страница
                               </th>
-                              <th>
-                                Products Ordered
-                              </th>
                               <th class="text-center">
-                                Status
+                                Статус
                               </th>
                               <th class="text-right">
                                 Действие
@@ -28,21 +27,11 @@
                               <td class="nowrap">
 									{{id}} {{header}}
                               </td>
-                              <td>
-                                <div class="cell-image-list">
-                                  <div class="cell-img" style="background-image: url(img/portfolio9.jpg)"></div>
-                                  <div class="cell-img" style="background-image: url(img/portfolio2.jpg)"></div>
-                                  <div class="cell-img" style="background-image: url(img/portfolio12.jpg)"></div>
-                                  <div class="cell-img-more">
-                                    + 5 more
-                                  </div>
-                                </div>
-                              </td>
                               <td class="text-center">
-                                <div class="status-pill green" data-title="Complete" data-toggle="tooltip"></div>
+                                <div class="status-pill green" data-title="Активен" data-wb-role="where" data='active="on"' data-toggle="tooltip"></div>
+                                <div class="status-pill red" data-title="Активен" data-wb-role="where" data='active=""' data-toggle="tooltip"></div>
                               </td>
-                              <td class="text-right">
-                                <i class="fa fa-pencil" data-wb-ajax="/form/edit/{{_table}}/{{id}}" data-wb-append="body"></i>
+                              <td class="text-right" data-wb-role="include" src="/engine/forms/common/item_actions.php">
                               </td>
                             </tr>
                           </tbody>

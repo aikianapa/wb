@@ -129,7 +129,7 @@ print_r(wbRouter::getRoute());
 
 	}
 	$tmp=explode("?",$_SERVER["REQUEST_URI"]);
-	if (isset($tmp[1])) {parse_str($tmp[1],$get); $_ENV["route"]["params"]=(array)$_ENV["route"]["params"]+(array)$get;}
+	if (isset($tmp[1]) AND isset($_ENV["route"]["params"])) {parse_str($tmp[1],$get); $_ENV["route"]["params"]=(array)$_ENV["route"]["params"]+(array)$get;}
 	$_GET=array_merge($_GET,$_ENV["route"]);
 	if (isset($_GET["engine"]) && $_GET["engine"]=="true") {$_SERVER["SCRIPT_NAME"]="/engine".$_SERVER["SCRIPT_NAME"];}
 	if (isset($_SERVER["SCHEME"]) && $_SERVER["SCHEME"]>"") {$scheme=$_SERVER["SCHEME"];} else {$scheme="http";}
@@ -1654,69 +1654,54 @@ abstract class kiNode
 	}
 
 	public function tagTreeUl($Item=array(),$param=null) {
+		$limit=0; $limlevel=0; $level=0; $tree=$Item; $branch=0; $parent=1;
 		if ($param==null) {
 			include("wbattributes.php");
-			$level=0;$bid=null;$limlevel=0;
 			$name=$this->attr("name"); 
 			if (isset($from)) {$name=$from;}
 			if ($name=="" AND isset($item)) {$name=$item;}
 			if (!is_array($Item[$name])) {$tree=json_decode($Item[$name],true);} else {$tree=$Item[$name];}
 			$tag=$this->tag();
-			if (!isset($branch)) {$bflag=true;$branch=null;} {$bflag=false;}
 			if (!isset($limit) OR $limit=="false" OR $limit*1<0) {$limit=0;} else {$limit=$limit*1;}
 		} else {
 			foreach($param as $k =>$val) {$$k=$val;}
 			$tree=$Item;
-			$branch=$bid;
 		}
 		if (isset($parent) AND ($parent=="false" OR $parent=="0" OR $parent==0)) {$parent=0;} else {$parent=1;}
 		$tpl=$this->html();
 		$this->html("");
-		foreach($tree as $item) {
-			if 	(	($item["id"]==$branch OR $bflag==true) ) {
-				$bflag=true;
-				$label="";
-//				$data=array();
-//				if (is_array($item["data"])) {
-//					foreach($item["data"] as $d) {$data["{$d["name"]}"]=$d["value"];}
-//				}
-//				$item["data"]=$data;
+		if ($branch!==0) {$tree=array(wbTreeFindBranchById($tree,$branch));}
+		
+		foreach($tree as $item) {		
 				if ($parent==1) {
-					$line=wbFromString($tpl);
-					$line->wbSetData($item);
-					$this->append($line);
+						$line=wbFromString($tpl);
+						$line->wbSetData($item);
+						$this->append($line);
 				} else {$parent=2;}
-			}
-			if (is_array($item["children"])) {
-				$level++; if($bflag==true) {$limlevel++;}
-
-				if ($tag=="select") {
-					$child=wbFromString($tpl);
-					$child->children("option")->prepend(str_repeat("<span>&nbsp;&nbsp;<span>",$level));
-				} else {
-					if ($parent==1) {
-						$child=wbFromString("<{$tag}>{$tpl}</{$tag}>");
-					} else {
+				if (is_array($item["children"])) {
+					$level++;
+					if ($tag=="select") {
 						$child=wbFromString($tpl);
+						$child->children("option")->prepend(str_repeat("<span>&nbsp;&nbsp;<span>",$level));
+					} else {
+						if ($parent==1) {
+							$child=wbFromString("<{$tag}>{$tpl}</{$tag}>");
+						} else {
+							$child=wbFromString($tpl);
+						}
 					}
+					$param=array(
+						"name"=>$name,
+						"tag"=>$tag,
+						"level"=>$level,
+						"parent"=>$parent,
+						"limit"=>$limit,
+					);
+					$child->tagTreeUl($item["children"],$param);
+					if ($limit==0 OR $level<=$limit) {$this->append($child);}
+					$level--;
 				}
-				$param=array(
-					"name"=>$name,
-					"tag"=>$tag,
-					"level"=>$level,
-					"bid"=>$branch,
-					"bflag"=>$bflag,
-					"parent"=>$parent,
-					"limit"=>$limit,
-					"limlevel"=>$limlevel
-				);
-				$child->tagTreeUl($item["children"],$param);
-				if ( $limlevel<=$limit)  {
-					$this->append($child);
-				}
-				$level--; if($bflag==true) {$limlevel--;}
-
-			}
+			
 		}
 		return;
 	}
@@ -1747,6 +1732,7 @@ abstract class kiNode
 
 	public function tagWhere($Item=array()) {
 		include("wbattributes.php");
+		if ($this->attr("data")>"") {$where=$this->attr("data");}
 		$res=wbWhereItem($Item,$where);
 		if ($res==0) {$this->remove();} else {
 			$vars=$this->find("[data-wb-role=variable]");
@@ -1821,41 +1807,44 @@ abstract class kiNode
 		));
 
 		foreach($object as $key => $val) {
-			$n++;
-			if ($size!==false) $minpos=$size*$page-($size*1)+1; $maxpos=($size*$page);
+			if (is_array($val)) {
+				$n++;
+				if ($size!==false) $minpos=$size*$page-($size*1)+1; $maxpos=($size*$page);
 
 
-			if ($size==false OR ($n<=$maxpos AND $n>=$minpos)) {
-				$itemform=""; if (isset($val["_table"])) {$itemform=$val["_table"];}
-				$text=$tmptpl->clone();
-				$val=(array)$srcVal + (array)$val; // сливаем массивы
+				if ($size==false OR ($n<=$maxpos AND $n>=$minpos)) {
+					$itemform=""; if (isset($val["_table"])) {$itemform=$val["_table"];}
+					$text=$tmptpl->clone();
+					$val=(array)$srcVal + (array)$val; // сливаем массивы
 
-				$text->find(":first")->attr("idx",$key);
-				$val["_key"]=$key;
-				$val["_idx"]=$ndx;
-				$val["_ndx"]=$ndx+1;
-				$text->wbSetData($val);
-
-
-					$ndx++;
-					if (wbWhereItem($val,$where)) {
-						if ($step>0) { // если степ, то работаем с объектом
-							if ($stepcount==0) {
-								$t_step=$steptpl->clone();
-								$t_step->addClass($tplid);
-								$this->append($t_step);
+					$text->find(":first")->attr("idx",$key);
+					$val["_key"]=$key;
+					$val["_idx"]=$ndx;
+					$val["_ndx"]=$ndx+1;
+					$text->wbSetData($val);
+					$flag=true;
+					if ($flag==true AND $where>"") {$flag=wbWhereItem($val,$where);}
+					if ($flag==true AND $limit>"" AND $ndx>=$limit) {$flag=false;}
+						if ($flag==true) {
+							$ndx++;
+							if ($step>0) { // если степ, то работаем с объектом
+								if ($stepcount==0) {
+									$t_step=$steptpl->clone();
+									$t_step->addClass($tplid);
+									$this->append($t_step);
+								}
+								$this->find(".{$tplid}:last")->append(clearValueTags($text->outerHtml()));
+								$stepcount++;
+								//$stepcount=$this->find(".{$tplid}:last")->children()->length;
+								if ($stepcount==$step) {$stepcount=0;}
+							} else { // иначе строим строку
+								$inner.=wbClearValues($text->outerHtml());
 							}
-							$this->find(".{$tplid}:last")->append(clearValueTags($text->outerHtml()));
-							$stepcount++;
-							//$stepcount=$this->find(".{$tplid}:last")->children()->length;
-							if ($stepcount==$step) {$stepcount=0;}
-						} else { // иначе строим строку
-							$inner.=wbClearValues($text->outerHtml());
 						}
-					}
 
+				}
+				unset($Item[$key]);
 			}
-			unset($Item[$key]);
 		};
 
 		$count=$n;

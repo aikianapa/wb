@@ -23,12 +23,10 @@
                               <td class="nowrap">{{id}}</td>
                               <td>{{header}}</td>
                               <td>
-                                <div class="cell-image-list">
-                                  <div class="cell-img" style="background-image: url(img/portfolio9.jpg)"></div>
-                                  <div class="cell-img" style="background-image: url(img/portfolio2.jpg)"></div>
-                                  <div class="cell-img" style="background-image: url(img/portfolio12.jpg)"></div>
+                                <div class="cell-image-list" data-wb-role="foreach" data-wb-from="images" data-wb-limit="3">
+                                  <div class="cell-img" style="background-image: url(/thumb/30x30/src/uploads/{{_GET[form]}}/{{%id}}/{{img}})"></div>
                                   <div class="cell-img-more">
-                                    + 5 more
+                                    всего {{%images_count}}
                                   </div>
                                 </div>
                               </td>

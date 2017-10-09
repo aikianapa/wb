@@ -216,6 +216,20 @@ function wbTreeRead($name) {
 	return $tree;
 }
 
+function wbTreeFindBranchById($Item,$id) {
+	$res=false;
+	foreach($Item as $item) {
+		if ($item["id"]==$id) {
+			return $item;
+		} else {
+			if (is_array($item["children"])) {
+				$res=wbTreeFindBranchById($item["children"],$id);
+			}
+		}
+	}
+	return $res;
+}
+
 function wbWhereLike($ref,$val) {
 	if (is_array($ref)) {
 		$ref=implode("|",$ref);

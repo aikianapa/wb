@@ -22,9 +22,7 @@
 	</div>
 
 	<input data-wb-role="tree" name="tree">
-	<ul data-wb-role="tree" name="tree">
-		<li>{{name}}</li>
-	</ul>
+
 </div>
 </form>
 
