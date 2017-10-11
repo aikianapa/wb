@@ -12,7 +12,10 @@
 <form id="{{_GET[form]}}EditForm" data-wb-form="{{_GET[form]}}" data-wb-item="{{id}}"  class="form-horizontal" role="form">
 	<div class="form-group row">
 	  <label class="col-sm-2 form-control-label">Логин</label>
-	   <div class="col-sm-10"><input type="text" class="form-control" name="id" placeholder="Логин пользователя" required ></div>
+	   <div class="col-sm-4"><input type="text" class="form-control" name="id" placeholder="Логин пользователя" required ></div>
+
+	  <label class="col-sm-2 form-control-label">Группа</label>
+	   <div class="col-sm-4"><input type="text" class="form-control" name="role" placeholder="Группа"></div>
 	</div>
 
 <div class="nav-active-primary">
@@ -27,25 +30,31 @@
 <div id="{{_GET[form]}}Descr" class="tab-pane fade show active" role="tabpanel">
 
 	<div class="form-group row">
-	  <label class="col-sm-2 form-control-label">Имя пользователя</label>
-	   <div class="col-sm-10"><input type="text" class="form-control" name="name" placeholder="Имя пользователя"></div>
+	  <label class="col-sm-2 form-control-label">Никнейм</label>
+	   <div class="col-sm-4"><input type="text" class="form-control" name="name" placeholder="Никнейм"></div>
+		<label class="col-sm-2 form-control-label">Активный</label>
+		<div class="col-sm-2"><label class="switch switch-success"><input type="checkbox" name="active"><span></span></label></div>
 	</div>
 
 	<div class="form-group row">
-	  <label class="col-sm-2 form-control-label">Группа</label>
-	   <div class="col-sm-10"><input type="text" class="form-control" name="role" placeholder="Группа"></div>
+	  <label class="col-sm-2 form-control-label">Имя</label>
+	   <div class="col-sm-4"><input type="text" class="form-control" name="first_name" placeholder="Имя пользователя"></div>
+
+	  <label class="col-sm-2 form-control-label">Фамилия</label>
+	   <div class="col-sm-4"><input type="text" class="form-control" name="last_name" placeholder="Фамилия"></div>
 	</div>
+
+	<div class="form-group row">
+	  <label class="col-sm-2 form-control-label">Эл.почта</label>
+	   <div class="col-sm-6"><input type="email" class="form-control" name="email" placeholder="Электронная почта"></div>
+	</div>
+
 
 	<div class="form-group row">
 		<label class="col-sm-2 form-control-label">Аватар</label>
 		<div class="col-sm-3">
 			<input type="hidden" name="avatar" data-wb-role="uploader" >
 		</div>
-	</div>
-
-	<div class="form-group row">
-		<label class="col-sm-2 form-control-label">Активный</label>
-		<div class="col-sm-2"><label class="switch switch-success"><input type="checkbox" name="active"><span></span></label></div>
 	</div>
 </div>
 

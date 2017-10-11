@@ -103,16 +103,11 @@ function wb_tree() {
 		var orig=data;
 		
 		var dict=$(tree).children("[data-name=dict]").val();
-		if (dict=="") {var dict=[];} else {var dict=$.parseJSON(dict);}
+		if (dict==undefined || dict=="" || trim(dict)==" ") {var dict=[];} else {var dict=$.parseJSON(dict);}
 
-		var dataval={};
-
-		//$(data["data"]).each(function(i){
-		//	dataval[data["data"][i]["name"]]=data["data"][i]["value"];
-		//});
-		dataval=data["data"];
+		var dataval=data["data"];
 		var tpl=wb_tree_data_fields(dict);
-		var tpl=$(wb_setdata(tpl,dataval,true));
+		var tpl=$(wb_setdata(tpl,data["data"],true));
 		data["fields"]=dict;
 		data["name"]=name;
 		data["data-name"]=text;
@@ -413,6 +408,16 @@ function wb_plugins(){
 			});
 		}
 		if ($('.select2:not(.wb-done)').length) {	$('.select2').select2(); $('.select2').addClass("wb-done");}
+
+		if ($('.input-tags').length) {
+			$('.input-tags').each(function(){
+				if ($(this).attr("placeholder")!==undefined) {var ph=$(this).attr("placeholder");} else {var ph='новый';}
+				if ($(this).attr("height")!==undefined) {var h=$(this).attr("height");} else {var h='auto';}
+				if ($(this).attr("width")!==undefined) {var w=$(this).attr("width");} else {var w='auto';}
+				$(this).tagsInput({ width: w, height: h,  'defaultText':ph});	
+			});
+			
+		}
 		
 		wb_plugin_editor();
 		wbCommonUploader();

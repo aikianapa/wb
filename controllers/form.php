@@ -47,8 +47,15 @@ function form__controller__error_404($id=null) {
 function form__controller__list() {
 	$form=$_ENV["route"]["form"];
 	$mode=$_ENV["route"]["mode"];
-	$_ENV["DOM"]=wbGetForm($form,$mode);
-	$_ENV["DOM"]->wbSetData();
+	$aCall=$form."_".$mode; $eCall=$form."__".$mode;
+	if (is_callable($aCall)) {$out=$aCall();} elseif (is_callable($eCall) AND $engine!==false) {$out=$eCall();}
+	if (!isset($out)) {
+		$_ENV["DOM"]=wbGetForm($form,$mode);
+		$_ENV["DOM"]->wbSetData();
+	} else {
+		if (is_string($out)) {$out=wbFromString($out);}
+		$_ENV["DOM"]=$out;
+	}
 	return $_ENV["DOM"];
 }
 

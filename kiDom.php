@@ -505,7 +505,15 @@ class ki extends CLexer
 		if ($file=="") {
 			return ki::fromString("");
 		} else {
-			return ki::fromString(file_get_contents($file));
+			$context = stream_context_create(array(
+				'http' => array(
+					'method' => 'POST',
+					'header' => 'Content-Type: application/x-www-form-urlencoded' . PHP_EOL,
+					'content' => http_build_query($_POST),
+				)
+			));
+			
+			return ki::fromString(file_get_contents($file,false,$context));
 		}
 	}
 
@@ -1347,6 +1355,7 @@ abstract class kiNode
 				}; unset($attribute);
 			}
 		}; unset($inc);
+		$this->find("[data-wb-remove]")->remove();
 	}
 
 	public function excludeTextarea($Item=array()) {
@@ -1617,21 +1626,28 @@ abstract class kiNode
 			$snippet->children("div")->attr("name",$name);
 			$snippet->children("div")->attr("type",$type);
 			$snippet->children("div")->addClass($class);
-			$this->replaceWith($snippet);
-		}
-		if ($type=="input") {
-			$this->append("<input type='hidden' name='{$name}'><input type='hidden' name='_{$name}__dict_' data-name='dict'>");
+
+			if (!isset($Item[$name]) AND isset($dict)) {
+				$dict=wbItemRead("tree",$dict);
+				$Item[$name]=$dict["tree"];
+				$Item["_{$name}__dict_"]=$dict["_tree__dict_"];
+			}
+
+			$snippet->children("div")->append("<input type='hidden' name='{$name}'><input type='hidden' name='_{$name}__dict_' data-name='dict'>");
 			$tree=wbGetForm("common","tree_ol");
 			if (isset($Item[$name]) && $Item[$name]!=="[]" && $Item[$name]!=="") {$tree->tagTreeData($Item[$name]);} else {$tree->find("ol")->append(wbGetForm("common","tree_row"));}
-			$this->addClass("wb-tree dd");
-			$this->prepend($tree);
-			$this->wbSetData($Item);
+			$snippet->children("div")->addClass("wb-tree wb-done dd");
+			$snippet->children("div")->prepend($tree);
+			$snippet->wbSetData($Item);
+			$this->attr("data-wb-remove",true);
+			$this->replaceWith($snippet);
 		} elseif ($type=="select") {
 				$this->tagTreeUl($Item);
 		} else {
 			if ($item>"") {$tree=wbTreeRead($item); $Item[$name]=$tree["tree"]; $Item["_{$name}"]=$tree["dict"];}
-				$this->tagTreeUl($Item);
+			$this->tagTreeUl($Item);
 		}
+		return;
 	}
 	
 	public function tagTreeData($data=array()) {
@@ -1671,7 +1687,9 @@ abstract class kiNode
 		$tpl=$this->html();
 		$this->html("");
 		if ($branch!==0) {$tree=array(wbTreeFindBranchById($tree,$branch));}
-		
+		if ($this->hasAttr("placeholder") AND $this->is("select")) {
+			$this->prepend("<option value='' class='placeholder'>".$this->attr("placeholder")."</option>");
+		}
 		foreach($tree as $item) {		
 				if ($parent==1) {
 						$line=wbFromString($tpl);
@@ -1744,7 +1762,7 @@ abstract class kiNode
 
 	public function tagForeach($Item=array()) {
 		$srcItem=$Item;
-		$field=""; $sort=""; $add=""; $step=""; $id="";
+		$field=""; $sort=""; $add=""; $step=""; $id=""; $limit=""; $table=""; $cacheId=0;
 		include("wbattributes.php");
 		if (!isset($tpl) OR $tpl!=="false") {
 			$tplid=$this->attr("data-wb-tpl");
@@ -1874,39 +1892,10 @@ abstract class kiNode
 
 public function tagModule($Item=array()) {
 	$src=$this->attr("src");
-	$module="/modules/{$src}/{$src}.php";
-	$Item=array();
-	$json=$this->attr("json"); 	if ($json>"") {$Item=json_decode($json,true);}
-	$vars=$this->attr("vars"); 	if ($vars>"") {$Item=attrAddData($vars,$Item);}
-	$flag=false;
-	if ($flag==false && is_file($src)) {$flag=true; $module=$src;}
-	if ($flag==false && is_file($_SESSION["app_path"].$module)) {$flag=true; $module=$_SESSION["app_path"].$module;}
-	if ($flag==false && is_file($_SESSION["engine_path"].$module)) {$flag=true; $module=$_SESSION["engine_path"].$module;}
-	include_once($module);
-	if (isset($_REQUEST["ajax"])) {
-		$call=pathinfo($module, PATHINFO_FILENAME)."_ajax";
-		if (is_callable($call)) {$out=@$call();} else {
-			echo "Отсутствует процедура инициализации {$call}"; die;
-		}
-	} else {
-		$call=pathinfo($module, PATHINFO_FILENAME)."_init";
-		if (is_callable($call)) {$out=wbFromString(@$call());} else {
-			echo "Отсутствует процедура инициализации {$call}"; die;
-		}
-
-		$js=explode(".",$module); $js[count($js)-1]="js"; $js=implode(".",$js);
-		if (is_file($js)) {
-			$js=str_replace($_SESSION["app_path"],"",$js);
-			$out->append("<script language='javascript' src='{$js}'></script>");
-		}
-		$css=explode(".",$module); $css[count($css)-1]="css"; $css=implode(".",$css);
-		if (is_file($css)) {
-			$css=str_replace($_SESSION["app_path"],"",$css);
-			$out->append("<link rel='stylesheet' src='{$css}'></script>");
-		}
-		$out->wbSetData($Item);
-		$this->replaceWith($out);
-	}
+	$module=$_ENV["route"]["scheme"]."://".$_ENV["route"]["host"]."/module/{$src}/";
+	$out=wbFromFile($module);
+	$out->wbSetData($Item);
+	$this->replaceWith($out);
 }
 
 public function tagInclude($Item) {

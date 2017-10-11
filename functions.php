@@ -218,16 +218,46 @@ function wbTreeRead($name) {
 
 function wbTreeFindBranchById($Item,$id) {
 	$res=false;
-	foreach($Item as $item) {
-		if ($item["id"]==$id) {
-			return $item;
-		} else {
-			if (is_array($item["children"])) {
-				$res=wbTreeFindBranchById($item["children"],$id);
+		foreach($Item as $item) {
+			if ($item["id"]==$id) {
+				return $item;
+			} else {
+				if (is_array($item["children"])) {
+					$res=wbTreeFindBranchById($item["children"],$id);
+					if ($res) return $res;
+				}
 			}
 		}
+		return $res;
+}
+
+
+function wbTreeWhere($tree,$id,$field,$inc=true) {
+	if (!is_array($tree)) {$tree=wbTreeRead($tree); $tree_id=$tree["id"]; $tree=$tree["tree"];} else {$tree_id=$tree["id"];}
+	$tree=wbTreeFindBranchById($tree,$id);
+	$cache_id=md5($tree_id.$id.$field.$inc);
+	if (isset($_ENV["cache"][__FUNCTION__][$cache_id])) {
+		return $_ENV["cache"][__FUNCTION__][$cache_id];
+	} else {
+		$list=wbTreeIdList($tree);
+		$where="";
+		foreach($list as $key => $val) {
+			if ($key==0) {$where.='"'.$val.'"';} else {$where.=',"'.$val.'"';}
+		}
+		$where="in_array({$field},array({$where}))";
+		$_ENV["cache"][__FUNCTION__][$cache_id]=$where;
+		return $_ENV["cache"][__FUNCTION__][$cache_id];
 	}
-	return $res;
+}
+
+function wbTreeIdList($tree,$list=array()) {
+		if (isset($tree["id"])) {$list[]=$tree["id"];}
+		if (isset($tree["children"])) {
+			foreach($tree["children"] as $key =>  $child) {
+				$list=wbTreeIdList($child,$list);
+			}
+		}
+	return $list;
 }
 
 function wbWhereLike($ref,$val) {
@@ -414,6 +444,7 @@ function wbGetForm($form=NULL,$mode=NULL,$engine=null) {
 			}
 		} else {$out=wbfromFile($current);}
 	}
+	if (is_string($out)) {$out=wbFromString($out);}
 	return $out;
 }
 
@@ -589,7 +620,7 @@ function wbWhereItem($item,$where=NULL) {
 	$res=true;
 	if (!$where==NULL) {
 		if (substr($where,0,1)=="%") {$phpif=substr($where,1);} else {$phpif=wbWherePhp($where,$item);}
-		@eval('if ( '.$phpif.' ) { $res=1; } else { $res=0; } ;');
+		if ($phpif>"") @eval('if ( '.$phpif.' ) { $res=1; } else { $res=0; } ;');
 	};
 	return $res;
 }
@@ -605,15 +636,19 @@ function wbWherePhp($str="",$item=array()) {
 					"<"=>" < ",
 					">="=>" >= ",
 					"<="=>" <= ",
-					"<>"=>" !== ",
-					"!="=>" !== "
+					"<>"=>" !== "
 	)))." ";
-	$exclude=array("AND","OR","LIKE");
+	$exclude=array("AND","OR","LIKE","IN_ARRAY");
 	preg_match_all('/\w+(?!\")\b/iu',$str,$arr);
 	foreach($arr[0] as $a => $fld) {
 		if (!in_array(strtoupper($fld),$exclude)) {
 			$str=str_replace(" {$fld} ",' $item["'.$fld.'"] ',$str);
 		}
+	}
+
+	preg_match_all('/in_array\s\(\s(.*),array \(/',$str,$arr);
+	foreach($arr[1] as $a => $fld) {
+		$str=str_replace("in_array ( {$fld},array (", 'in_array ($item["'.$fld.'"],array(',$str);
 	}
 
 	if (strpos(strtolower($str)," like ")) {
@@ -627,6 +662,7 @@ function wbWherePhp($str="",$item=array()) {
 	}
 	return $str;
 }
+
 
 function wbt_where($table,$where) {
 		$where=htmlspecialchars_decode($where);
@@ -1228,4 +1264,5 @@ function wbTranslit($textcyr = null, $textlat = null) {
     else if($textlat) return str_replace($lat, $cyr, $textlat);
     else return null;
 }
+
 ?>
