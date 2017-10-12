@@ -1,2 +1,1 @@
-<div data-wb-role="tree" name="{{name}}">
-</div>
+<div data-wb-role="tree" name="{{name}}"></div>

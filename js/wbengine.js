@@ -83,6 +83,11 @@ function wb_tree() {
 		$(tree).children("input[name='"+name+"']").val(data);
 	});
 
+	$(document).undelegate(".wb-tree-item .dd3-btn","click");
+	$(document).delegate(".wb-tree-item .dd3-btn","click",function(e){
+		$(this).parent(".wb-tree-item").children(".dd-content").trigger("dblclick");
+	});
+
 	$('.wb-tree').on('change', function(e) {
 		var that=e.target;
 		var name=$(that).attr("name");
@@ -122,6 +127,7 @@ function wb_tree() {
 		data["data-name"]=text;
 		data["form"]=form;
 		data["data-id"]=item;
+		$(".content-w .tree-edit.modal").remove();
 		edit=$(wb_setdata(edit,data,true));
 		edit.find(".modal").attr("id","tree_"+form+"_"+name);
 		$(".content-w").append(edit);
@@ -161,6 +167,7 @@ function wb_tree() {
 			wb_tree_data_set(that,path,cdata);
 			$(tree).find("input[name='"+name+"']").val(JSON.stringify(wb_tree_serialize($(tree).children(".dd-list"))));
 			$(edid).modal("hide");
+			setTimeout(function(){$(edid).remove();},500)
 		});
 		wb_plugins();
 	});	

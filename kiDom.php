@@ -1356,6 +1356,8 @@ abstract class kiNode
 			}
 		}; unset($inc);
 		$this->find("[data-wb-remove]")->remove();
+		//$this->find("input[data-wb-role=tree].wb-done")->remove();
+		//$this->find("input[role=tree].wb-done")->remove();
 	}
 
 	public function excludeTextarea($Item=array()) {
@@ -1410,11 +1412,15 @@ abstract class kiNode
 				if (substr($name,-2)=="[]") {$name=substr($name,0,-2);}
 				if (substr($def,0,3)=="{{_") {$def="";}
 				if (isset($Item[$name])) {$value=$Item[$name];} else {$value=$def;}
-				$inp->attr("value",str_replace("{{","[\{[\{",$value)); // если в значениях переменные движка, то исключаем из парсера
+				if ($inp->is(":not([value])") OR $inp->attr("value")=="") $inp->attr("value",$value);
 				//$inp->wbDatePickerPrep();
 				if ($inp->attr("type")=="checkbox") {
 					if ($inp->attr("value")=="on" OR $inp->attr("value")=="1") {$inp->checked="checked";}
-				}
+				} 
+
+				
+				
+				
 				if ($inp->is("select") AND $inp->attr("value")>"") {
 					$value=$inp->attr("value");
 					if (is_array($value)) {
@@ -1437,12 +1443,7 @@ abstract class kiNode
 			unset($inp,$list);
 			if (!is_array($Item)) {$Item=array($Item);}
 			$this->html(wbSetValuesStr($this->html(),$Item));
-			$list=$this->find("input,select");
-			foreach($list as $inp) {
-				$value=str_replace("[\{[\{","{{",$inp->attr("value"));
-				$inp->attr("value",$value); // возвращаем переменные движка
-			}
-			
+		
 			$this->includeTextarea($Item);
 		if ($obj==FALSE) {return $this->outerHtml();}
 	}
@@ -1627,27 +1628,19 @@ abstract class kiNode
 		$name=$this->attr("name"); if (isset($from)) {$name=$from;}		
 		if ($name=="" AND isset($item)) {$name=$item;}
 		$type=$this->attr("type");
-		if ($this->is("input")) {
-			$type="input";
-			$class=str_replace("wb-done",$this->attr("class"));
-			$snippet=wbGetForm("snippets","tree");
-			$snippet->children("div")->attr("name",$name);
-			$snippet->children("div")->attr("type",$type);
-			$snippet->children("div")->addClass($class);
-
-			if (!isset($Item[$name]) AND isset($dict)) {
-				$dict=wbItemRead("tree",$dict);
-				$Item[$name]=$dict["tree"];
-				$Item["_{$name}__dict_"]=$dict["_tree__dict_"];
-			}
-			$snippet->children("div")->append("<input type='hidden' name='{$name}'><input type='hidden' name='_{$name}__dict_' data-name='dict'>");
+		if (isset($dict)) {
+			$dictdata=wbItemRead("tree",$dict);
+			$Item["_{$name}__dict_"]=$dictdata["_tree__dict_"];
+			if (!isset($Item[$name])) {$Item[$name]=$dictdata["tree"];}
+			unset($dictdata);
+		}
+		if (!$this->children()->length) {
 			$tree=wbGetForm("common","tree_ol");
+			$this->append("<input type='hidden' name='{$name}'><input type='hidden' name='_{$name}__dict_' data-name='dict'>");
 			if (isset($Item[$name]) && $Item[$name]!=="[]" && $Item[$name]!=="") {$tree->tagTreeData($Item[$name]);} else {$tree->find("ol")->append(wbGetForm("common","tree_row"));}
-			$snippet->children("div")->addClass("wb-tree wb-done dd");
-			$snippet->children("div")->prepend($tree);
-			$snippet->wbSetData($Item);
-			$this->attr("data-wb-remove",true);
-			$this->replaceWith($snippet);
+			$this->prepend($tree);
+			$this->addClass("wb-tree dd");
+			$this->wbSetData($Item);
 		} elseif ($type=="select") {
 				$this->tagTreeUl($Item);
 		} else {
@@ -1697,7 +1690,9 @@ abstract class kiNode
 		if ($this->hasAttr("placeholder") AND $this->is("select")) {
 			$this->prepend("<option value='' class='placeholder'>".$this->attr("placeholder")."</option>");
 		}
+//		$srcVal=array(); foreach($srcItem as $k => $v) {$srcVal["%{$k}"]=$v;}; unset($v);
 		foreach($tree as $item) {
+//				$item=(array)$srcVal + (array)$item; // сливаем массивы
 				if ($parent==1) {
 						$line=wbFromString($tpl);
 						$line->wbSetData($item);

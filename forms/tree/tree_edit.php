@@ -21,7 +21,7 @@
 	   <div class="col-sm-10"><input type="text" class="form-control" name="header" placeholder="Заголовок"></div>
 	</div>
 
-	<input data-wb-role="tree" name="tree">
+	<div data-wb-role="tree" name="tree"></div>
 
 </div>
 </form>

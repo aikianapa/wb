@@ -25,7 +25,7 @@
 			</div>
 			
 			<div class="col-sm-12">
-				<input data-wb-role="tree" name="tree">
+				<div data-wb-role="tree" name="tree"></div>
 			</div>
 
 
