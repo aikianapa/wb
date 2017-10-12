@@ -39,6 +39,14 @@ function wb_tree() {
 		});
 	},10);
 	
+	$(document).off("wb-tree-init");
+	$(document).on("wb-tree-init",function(e,tree){
+			var data=wb_tree_serialize(tree);
+			data=JSON.stringify(data);
+			var name=$(tree).attr("name");
+			$(tree).children("input[name="+name+"]").val(data);	
+	});
+	
 	$(document).undelegate(".wb-tree .wb-tree-item button[data-action]","click");
 	$(document).delegate(".wb-tree .wb-tree-item button[data-action]","click",function(){
 		var tree=$(this).parents(".wb-tree");
@@ -90,11 +98,12 @@ function wb_tree() {
 		var cont=this;
 		var tree=$(this).parents("[data-wb-role=tree]");
 		var that=$(e.target).parent(".wb-tree-item");
-		
+
 		var item=$(this).parents(".wb-tree-item").attr("data-id");
 		var form=$(tree).parents("[data-wb-form]").attr("data-wb-form");
 		var text=$(this).text();
 		var name=$(tree).attr("name");
+
 		var edid="#tree_"+form+"_"+name;
 		if ($(document).find(edid).length) {$(document).find(edid).remove();}
 		var edit=$($(document).data("wb-tree-edit"));
@@ -220,7 +229,7 @@ function wb_tree_data_get(that,path) {
 	var name=$(tree).attr("name");
 	var data=$(tree).children("input[name="+name+"]").val();
 	if (data=="" || data==undefined) {data="[]";}
-	data=JSON.parse(data);
+	data=JSON.safeParse(data);
 	data["data"]=wb_get_cdata($(that).children(".data").html());
 	if (trim(data["data"])>" ") {
 		data["data"]=JSON.parse(data["data"]);
@@ -232,6 +241,20 @@ function wb_tree_data_get(that,path) {
 	if (data==undefined) {data="[]";}
 	return data;
 }
+
+JSON.safeParse = function (input, def) {
+  // Convert null to empty object
+  if (!input) {
+    return def || {};
+  } else if (Object.prototype.toString.call(input) === '[object Object]') {
+    return input;
+  }
+  try {
+    return JSON.parse(input);
+  } catch (e) {
+    return def || {};
+  }
+};
 
 function wb_tree_data_set(that,path,values) {
 	var tree=$(that).parents(".wb-tree");
@@ -250,7 +273,6 @@ function wb_tree_data_set(that,path,values) {
 			}
 		});
 	});
-console.log(values);
 
 	if (path==undefined) {var path=wb_tree_data_path(that);}
 	var p="";
@@ -402,9 +424,10 @@ function wb_plugins(){
 			});
 		}
 		if ($(".dd[data-wb-role=tree]").length) {
-			$(".dd[data-wb-role=tree]").each(function(){
+			$(".dd[data-wb-role=tree]").each(function(e){
 				$(this).nestable({maxDepth:100});
 				$(".dd-item").unbind("contextmenu");
+				$(this).trigger("wb-tree-init",this);
 			});
 		}
 		if ($('.select2:not(.wb-done)').length) {	$('.select2').select2(); $('.select2').addClass("wb-done");}

@@ -26,7 +26,8 @@ function wbInitEnviroment() {
 	foreach($settings["variables"] as $v) {
 		$variables[$v["var"]]=$v["value"];
 	}
-	$settings["variables"]=$_ENV["variables"]=$variables;
+	$_ENV["variables"]=$variables;
+	$settings=array_merge($settings,$variables);
 	$_ENV["settings"]=$settings;
 	wbTrigger("func",__FUNCTION__,"after",func_get_args());
 }
@@ -268,6 +269,19 @@ function wbWhereLike($ref,$val) {
 		$val=str_replace(" ","|",$val);
 	}
 	$res=preg_match("/{$val}/ui",$ref);
+	return $res;
+}
+
+
+function wbWhereNotLike($ref,$val) {
+	if (is_array($ref)) {
+		$ref=implode("|",$ref);
+	} else {
+		$val=trim($val);
+		$val=str_replace(" ","|",$val);
+	}
+	$res=preg_match("/{$val}/ui",$ref);
+	if ($res==1) {$res=0;} else {$res=1;}
 	return $res;
 }
 
@@ -638,7 +652,7 @@ function wbWherePhp($str="",$item=array()) {
 					"<="=>" <= ",
 					"<>"=>" !== "
 	)))." ";
-	$exclude=array("AND","OR","LIKE","IN_ARRAY");
+	$exclude=array("AND","OR","LIKE","NOT_LIKE","IN_ARRAY");
 	preg_match_all('/\w+(?!\")\b/iu',$str,$arr);
 	foreach($arr[0] as $a => $fld) {
 		if (!in_array(strtoupper($fld),$exclude)) {
@@ -657,6 +671,16 @@ function wbWherePhp($str="",$item=array()) {
 			$tmp=explode(" like ",$cls);
 			if (count($tmp)==2) {
 				$str=str_replace($cls,'wbWhereLike('.$tmp[0].','.$tmp[1].')',$str);
+			}
+		}
+	}
+	
+	if (strpos(strtolower($str)," not_like ")) {
+		preg_match_all('/\S*\snot_like\s\S*/iu',$str,$arr);
+		foreach($arr[0] as $a => $cls) {
+			$tmp=explode(" not_like ",$cls);
+			if (count($tmp)==2) {
+				$str=str_replace($cls,'wbWhereNotLike('.$tmp[0].','.$tmp[1].')',$str);
 			}
 		}
 	}
@@ -836,8 +860,7 @@ function wbSetValuesStr($tag="",$Item=array(), $limit=2)
 	if (!is_array($Item)) {$Item=array($Item);}
 	if (is_string($tag)) {
 	//$tag=strtr($tag,array("%7B%7B"=>"{{","%7D%7D"=>"}}"));
-	$tag=str_replace("%7B%7B","{{",$tag);
-	$tag=str_replace("%7D%7D","}}",$tag);
+	$tag=str_replace(array("%7B%7B","%7D%7D"),array("{{","}}"),$tag);
 	if (strpos($tag, '}}') !== false ) {
 		// функция подставляющая значения
 		$tag = wbChangeQuot($tag);			// заменяем &quot на "
@@ -961,7 +984,6 @@ function wbSetValuesStr($tag="",$Item=array(), $limit=2)
 						}
 					}
 					$tag = $text;
-
 				}
 			}
 			$nIter++;

@@ -1359,7 +1359,7 @@ abstract class kiNode
 	}
 
 	public function excludeTextarea($Item=array()) {
-		$list=$this->find("[type=text/template],pre,.nowb,[data-role=module]");
+		$list=$this->find("textarea,[type=text/template],pre,.nowb,[data-role=module]");
 		$_ENV["ta_save"]=array();
 		foreach ($list as $ta) {
 			$id=wbNewId();
@@ -1373,7 +1373,7 @@ abstract class kiNode
 		}; unset($ta,$list);
 	}
 	function includeTextarea($Item=array()) {
-		$list=$this->find("[type=text/template],pre[taid],.nowb[taid],[data-role=module][taid]");
+		$list=$this->find("textarea,[type=text/template],pre[taid],.nowb[taid],[data-role=module][taid]");
 		foreach ($list as $ta) {
 			$id=$ta->attr("taid"); $name=$ta->attr("name");
 			if (isset($_ENV["ta_save"][$id])) $ta->html($_ENV["ta_save"][$id]);
@@ -1409,7 +1409,8 @@ abstract class kiNode
 				$name=$inp->attr("name");	$def=$inp->attr("value");
 				if (substr($name,-2)=="[]") {$name=substr($name,0,-2);}
 				if (substr($def,0,3)=="{{_") {$def="";}
-				if (isset($Item[$name])) {$inp->attr("value",$Item[$name]);} else {$inp->attr("value",$def);}
+				if (isset($Item[$name])) {$value=$Item[$name];} else {$value=$def;}
+				$inp->attr("value",str_replace("{{","[\{[\{",$value)); // если в значениях переменные движка, то исключаем из парсера
 				//$inp->wbDatePickerPrep();
 				if ($inp->attr("type")=="checkbox") {
 					if ($inp->attr("value")=="on" OR $inp->attr("value")=="1") {$inp->checked="checked";}
@@ -1436,6 +1437,12 @@ abstract class kiNode
 			unset($inp,$list);
 			if (!is_array($Item)) {$Item=array($Item);}
 			$this->html(wbSetValuesStr($this->html(),$Item));
+			$list=$this->find("input,select");
+			foreach($list as $inp) {
+				$value=str_replace("[\{[\{","{{",$inp->attr("value"));
+				$inp->attr("value",$value); // возвращаем переменные движка
+			}
+			
 			$this->includeTextarea($Item);
 		if ($obj==FALSE) {return $this->outerHtml();}
 	}
@@ -1485,12 +1492,13 @@ abstract class kiNode
 	}
 
 	public function tagVariable($Item) {
+		include("wbattributes.php");
 		if (!isset($_ENV["var"])) {$_ENV["var"]=array();}
 		$this->wbSetAttributes($Item);
 		$var=$this->attr("var");
-		$where=$this->attr("where");
+		if (!isset($where)) $where=$this->attr("where");
 		if (($where>"" AND wbWhereItem($Item,$where)) OR $where=="") {
-			if ($var>"") $Item[$var]=$_ENV["variables"][$var]=wbSetValuesStr($this->attr("value"),$Item);
+			if ($var>"") $Item["{$var}"]=$_ENV["variables"]["{$var}"]=wbSetValuesStr($this->attr("value"),$Item);
 		}
 		return $Item;
 	}
@@ -1632,7 +1640,6 @@ abstract class kiNode
 				$Item[$name]=$dict["tree"];
 				$Item["_{$name}__dict_"]=$dict["_tree__dict_"];
 			}
-
 			$snippet->children("div")->append("<input type='hidden' name='{$name}'><input type='hidden' name='_{$name}__dict_' data-name='dict'>");
 			$tree=wbGetForm("common","tree_ol");
 			if (isset($Item[$name]) && $Item[$name]!=="[]" && $Item[$name]!=="") {$tree->tagTreeData($Item[$name]);} else {$tree->find("ol")->append(wbGetForm("common","tree_row"));}
@@ -1690,7 +1697,7 @@ abstract class kiNode
 		if ($this->hasAttr("placeholder") AND $this->is("select")) {
 			$this->prepend("<option value='' class='placeholder'>".$this->attr("placeholder")."</option>");
 		}
-		foreach($tree as $item) {		
+		foreach($tree as $item) {
 				if ($parent==1) {
 						$line=wbFromString($tpl);
 						$line->wbSetData($item);
@@ -1789,7 +1796,7 @@ abstract class kiNode
 		if ($table>"") {
 			$table=wbTable($table);
 			if ($item>"") {
-				$Item[0]=wbReadItem($table,$item);
+				$Item[0]=wbItemRead($table,$item);
 				if ($field>"") {
 					$Item=$Item[0][$field];
 					if (is_string($Item)) { $Item=json_decode($Item,true); }
@@ -2211,7 +2218,9 @@ public function tagThumbnail($Item=array()) {
 	}
 
 	public function hasRole($role) {
-		$tl=wbAttrToArray($this->attr("data-wb-role"));
+		$tl=array();
+		if 		($this->hasAttr("data-wb-role")) {$tl=wbAttrToArray($this->attr("data-wb-role"));} 
+		elseif 	($this->hasAttr("role")) 		{$tl=wbAttrToArray($this->attr("role"));} 
 		if (in_array($role,$tl)) {return true;} else {return false;}
 	}
 
