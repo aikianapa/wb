@@ -29,7 +29,7 @@ function form__controller__show() {
 function form__controller__remove() {
 	if (isset($_SESSION["user_id"])) {
 		$_ENV["DOM"]=wbGetForm("common","remove_confirm");
-		if (isset($_GET["params"]["confirm"])) {
+        if (isset($_REQUEST["confirm"]) AND $_REQUEST["confirm"]=="true") {
 			$_ENV["DOM"]->find("script[data-wb-tag=success]")->remove();
 		} else {
 			wbItemRemove($_ENV["route"]["form"],$_ENV["route"]["item"]);

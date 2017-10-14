@@ -1526,7 +1526,7 @@ abstract class kiNode
 		} else {
 			$Item["path"]=$this->attr("data-wb-path");
 		}
-		$out->find(".wb-uploader")->children("input[type=hidden]")->attr("name",$fldname);
+		$out->find(".wb-uploader")->children("input[name]")->attr("name",$fldname);
 		$out->find(".wb-uploader .gallery[data-wb-from]")->attr("data-wb-from",$fldname);
 		$out->wbSetData($Item);
 		$this->replaceWith($out);
@@ -1821,22 +1821,21 @@ abstract class kiNode
 
 		$ndx=0; $n=0; $f=0;
 		$tmptpl=wbFromString($tpl);
-		$object = new ArrayObject($Item);
+        
+        $object = new ArrayObject($Item);
 		$iterator = new tagForeachFilter($object->getIterator(),array(
 			"id"=>$id,
 		));
 
 		foreach($object as $key => $val) {
+            
 			if (is_array($val)) {
 				$n++;
 				if ($size!==false) $minpos=$size*$page-($size*1)+1; $maxpos=($size*$page);
-
-
 				if ($size==false OR ($n<=$maxpos AND $n>=$minpos)) {
 					$itemform=""; if (isset($val["_table"])) {$itemform=$val["_table"];}
 					$text=$tmptpl->clone();
 					$val=(array)$srcVal + (array)$val; // сливаем массивы
-
 					$text->find(":first")->attr("idx",$key);
 					$val["_key"]=$key;
 					$val["_idx"]=$ndx;
@@ -1866,7 +1865,7 @@ abstract class kiNode
 				unset($Item[$key]);
 			}
 		};
-
+        
 		$count=$n;
 
 			if ($step>0) {

@@ -121,8 +121,13 @@ function wb_tree() {
 
 		var dataval=data["data"];
 		var tpl=wb_tree_data_fields(dict);
-		var tpl=$(wb_setdata(tpl,data["data"],true));
-		data["fields"]=dict;
+        data["_form"]=data["data"]["_form"]=form;
+        data["_id"]=data["data"]["_id"]=$(tree).parents("form[data-wb-item]").attr("data-wb-item");
+
+        
+        var tpl=$(wb_setdata(tpl,data["data"],true));
+        tpl.find(".wb-uploader").attr("data-wb-path","/uploads/"+form+"/"+$(tree).parents("form[data-wb-item]").attr("data-wb-item"));
+        data["fields"]=dict;
 		data["name"]=name;
 		data["data-name"]=text;
 		data["form"]=form;
@@ -146,7 +151,8 @@ function wb_tree() {
 				}
 		});
 		
-		$(edid).on("multiinput",function(e,multi,trigger){
+		$(edid).off("multiinput");
+        $(edid).on("multiinput",function(e,multi,trigger){
 			if ($(multi).attr("name")=="fields") {
 				var fields=multi;
 				var tpl=wb_tree_dict_change(fields,tree);
@@ -187,7 +193,7 @@ function wb_tree() {
 		if ($(this).attr("href")=="#remove") {$(this).parents(".wb-tree-menu").parent(".wb-tree-item").remove();}
 		if (!$(tree).find(".wb-tree-item").length) {
 			$(tree).children(".dd-list").append(row);
-		};
+		}
 		$(this).parents(".wb-tree-menu").remove();
 		setTimeout(function(){
 			var data=JSON.stringify(wb_tree_serialize($(tree).children(".dd-list")));
@@ -280,7 +286,6 @@ function wb_tree_data_set(that,path,values) {
 			}
 		});
 	});
-
 	if (path==undefined) {var path=wb_tree_data_path(that);}
 	var p="";
 	$(path).each(function(i,j){
@@ -374,7 +379,7 @@ function wb_multiinput() {
 		if ($(this).attr("href")=="#remove") {$(this).parents(".wb-multiinput").remove();}
 		if (!$(multi).find(".wb-multiinput").length) {
 			$(multi).append(row);
-		};
+		}
 		wb_multiinput_sort(multi);
 		$(multi).trigger("multiinput",multi,this);
 		e.preventDefault();
@@ -571,10 +576,10 @@ function wb_formsave() {
 			return save;
 		} else {
 			return {error:1};
-		};
+		}
 		return false;
 	});
-};
+}
 
 function wb_iconv_object(obj) {
 	var type=$(obj).attr("type");
@@ -897,9 +902,13 @@ function wb_setdata(selector,data,ret) {
 	} else {
 		var html=selector;
 	}
-	var form="";
+        var form="undefined"; var item="undefined";
+        if (data.form !==undefined) {form=data.form;}
+        if (data.id   !==undefined) {item=data.id;}
+        if (data._form!==undefined) {form=data._form;}
+        if (data._id  !==undefined) {item=data._id  ;}
 		var param={tpl:html,data:data};
-		var url="/ajax/setdata/"+data.form+"/"+data.id;
+		var url="/ajax/setdata/"+form+"/"+item;
 		var res=null;
 		$.when($.ajax({
 			type:		'POST',

@@ -53,6 +53,10 @@ function ajax__setdata() {
 	if (!isset($_REQUEST["data-wb-mode"])) {$_REQUEST["mode"]="list";} else {$_REQUEST["mode"]=$_REQUEST["data-wb-mode"];}
 	$Item=wbItemRead($table,$item);
 	$Item=(array)$Item+(array)$_REQUEST["data"];
+    
+    if (isset($Item["_form"])) {$_ENV["route"]["form"]=$_GET["form"]=$Item["_form"]; $_ENV["route"]["controller"]="form";}
+    if (isset($Item["_item"])) {$_ENV["route"]["iten"]=$_GET["item"]=$Item["_item"];}
+    
 	$call="{$form}BeforeShowItem"; if (is_callable($call)) {$Item=$call($Item);} else {
 	$call="_{$form}BeforeShowItem"; if (is_callable($call)) {$Item=$call($Item,"list");}}
 	$tpl=wbFromString($_REQUEST["tpl"]);

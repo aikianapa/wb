@@ -23,7 +23,7 @@ function wbInitEnviroment() {
 	$_ENV["env_id"]=wbNewId();
 	$settings=wbItemRead("admin","settings");
 	$variables=array();
-	foreach($settings["variables"] as $v) {
+	foreach((array)$settings["variables"] as $v) {
 		$variables[$v["var"]]=$v["value"];
 	}
 	$_ENV["variables"]=$variables;
@@ -78,10 +78,11 @@ function wbFieldBuild($param) {
 				$tpl->find("datalist")->attr("data-wb-role","foreach");
 			} else {$tpl->find("datalist")->remove();}
 			break;
+
 	}
 	$set->find(".form-group > label")->html($param["label"]);
 	$set->find(".form-group > div")->html($tpl);
-	$set->wbSetData($param);
+	$set->wbSetValues($param);
 	return $set->outerHtml();
 }
 

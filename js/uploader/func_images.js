@@ -9,7 +9,7 @@ function wbCommonUploader() {
 	$(document).find(".wb-uploader:not(wb-done)").each(function(){
 		var id=$(this).attr("id");
 		var uid="upl-"+$(this).attr("id");
-		var store=$('#'+ id + ' > input[type=hidden]');
+		var store=$('#'+ id + ' > input[name]');
 		var path=$(this).attr("data-wb-path");
 		var max=store.attr("data-wb-max"); if (max==undefined) {max=10;}
 		var ext=store.attr("data-wb-ext");
@@ -49,7 +49,8 @@ function wbCommonUploader() {
 				});
 				$("#"+id).data("images",store.val());
 				$("#"+id+" ul.gallery").sortable({	update: function() { wbImagesToField(id); }	});
-				wbImagesEvents(id);
+				$("#"+id).wbImagesEvents();
+                $("#"+id).wbUploaderResizer();
 			},
 			FilesAdded: function(up, files) {
 				plupload.each(files, function(file) {
@@ -63,6 +64,7 @@ function wbCommonUploader() {
 				var name=res.id.toLowerCase();
 				wbImagesAddToList(id,	name);
 				$(".wbImagesAll ul.gallery li:last").trigger("click");
+                $("#"+id).wbUploaderResizer();
 			},
 			UploadProgress: function(up, file) {
 				document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
@@ -77,7 +79,25 @@ function wbCommonUploader() {
 }
 
 
-function wbImagesEvents(id) {
+jQuery.fn.wbUploaderResizer = function() {
+   if ($(this).hasClass("single")) {
+        var img=$(this).find(".gallery > li:first-child > img");
+        if ($(img).length) {
+            var height=$(img).attr("height");
+            var width=$(img).attr("width");
+            $(img).css("height",height).css("width",width);
+            $(this).find(".moxie-shim").css({"height":height,"width":width,"background":"transparent"});
+            $(this).find(".gallery").css({"height":"auto","width":"auto"});
+        } else {
+            $(this).find(".moxie-shim").css({"height":"120px","width":"160px"});
+            $(this).find(".gallery").css({"height":"120px","width":"160px"});
+       
+        }
+   } 
+}
+
+jQuery.fn.wbImagesEvents = function() {
+        var id=$(this).attr("id");
 		$("#"+id+" .wbImagesAll").off("mouseenter","ul li");
 		$("#"+id+" .wbImagesAll").on ("mouseenter","ul li",function(){
 			$(this).find(".dropdown-menu").remove();
@@ -169,10 +189,10 @@ function wbImagesEvents(id) {
 function wbImagesList(id) {
 	var path=$('#'+id).attr("data-wb-path");
 	$.get("/ajax/listfiles/"+path,function(data){
-		var store=$('#'+ id + ' > input[type=hidden]');
+		var store=$('#'+ id + ' > input[name]');
 		var gallery=[];//JSON.parse(data);
 		var images=store.val();
-		var ext=store.attr("data-ext");
+		var ext=store.attr("data-wb-ext");
 		if (ext!==undefined) {
 			ext=trim(str_replace(","," ",ext));
 			var exts=explode(" ",ext);
@@ -200,7 +220,7 @@ function wbImagesList(id) {
 }
 
 function wbImagesSort(id) {
-	var store=$('#'+ id + ' > input[type=hidden]');
+	var store=$('#'+ id + ' > input[name]');
 	var images=store.val();
 	if (images=="") {var images=[];} else {var images=JSON.parse(images);}
 	$("#"+id+" ul.gallery").after("<ul class='tmp' style='display:none;'></ul>");
@@ -224,7 +244,7 @@ function wbImagesSort(id) {
 
 function wbImagesToField(id) {
 	var images = new Array();
-	var store=$('#'+ id + ' > input[type=hidden]');
+	var store=$('#'+ id + ' > input[name]');
 	$("#"+id+" ul li.thumbnail").each(function(i){
 		if ($(this).hasClass("selected")) {var sel=1;} else {var sel=0;}
 		var img = {
@@ -236,12 +256,12 @@ function wbImagesToField(id) {
 		images.push(img);
 	});
 	store.val(JSON.stringify(images));
-	wbImagesEvents(id);
+	$("#"+id).wbImagesEvents();
 }
 
 function wbImagesAddToList(id,name,vis) {
 	var single=false; if ($('#'+ id).hasClass("single")) {var single=true;}
-	var store=$('#'+ id + ' > input[type=hidden]');
+	var store=$('#'+ id + ' > input[name]');
 	var path="/engine/phpThumb/phpThumb.php?w=250&src="+$("div.imageloader").attr("path");
 	var title=""; var alt=""; var visible=1;
 	var images=$("#"+id).data("images");
@@ -258,5 +278,5 @@ function wbImagesAddToList(id,name,vis) {
 	if (single==true) {$("#"+id+" ul.gallery").find("li").remove();}
 	if (!$("#"+id+" ul.gallery li[data-name='"+name+"']").length) {$("#"+id+" ul.gallery").append(thumbnail);}
 	if (single==true) {wbImagesToField(id);}
-	wbImagesEvents(id);
+	$("#"+id).wbImagesEvents();
 }

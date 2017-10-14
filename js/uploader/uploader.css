@@ -15,4 +15,10 @@
 .wb-uploader #console {height: 100px; background:#DEDEDE !important; overflow:auto; border: 1px dashed; display:none;}
 .wb-uploader .uploader {padding-top: 10px;  text-align:center;}
 .wb-uploader .uploader .btn {position: absolute; bottom: 80px; display:none;}
-.wb-uploader .moxie-shim {width:100% !important; height: 70px !important; border: 1px #ddd dashed; border-radius: 10px;}
+.wb-uploader .moxie-shim {width:auto; height: auto; border: 1px #ddd dashed; border-radius: 10px;background: url(/engine/uploads/__system/image.png) 50% 50% no-repeat; background-size: contain;}
+
+
+.wb-uploader.single {margin-top:0;}
+.wb-uploader.single .uploader {padding-top:0;}
+.wb-uploader.single .gallery {text-align:left;}
+.wb-uploader.single .thumbnail img  {padding: 1px; border-radius: 6px;  background-size: contain;}

@@ -1,1 +1,1 @@
-<input type="hidden" name="avatar" data-wb-role="uploader" >
+<input type="hidden" name="{{name}}" data-wb-role="uploader" >
