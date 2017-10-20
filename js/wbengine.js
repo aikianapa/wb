@@ -1,4 +1,5 @@
 wb_include("/engine/js/php.js");
+if ($("link[rel$=less]").length) wb_include("/engine/js/less.min.js");
 
 $(document).ready(function(){
 	wb_delegates();
@@ -137,7 +138,9 @@ function wb_tree() {
 		edit.find(".modal").attr("id","tree_"+form+"_"+name);
 		$(".content-w").append(edit);
 		$(".content-w").find(".modal #treeData form").html(tpl);
-		$(edid).css("z-index",10000);
+        $(edid).after("<div class='modal-backdrop show fade'></div>");
+        $(edid).css("z-index",10000);
+        $(edid).next(".modal-backdrop").css("z-index",9999);
 		$(edid).data("path",path);
 		$(edid).modal();
 		$(edid).undelegate("#treeDict *","change");
@@ -162,18 +165,23 @@ function wb_tree() {
 			}
 		});
 
-		$(edid).find('.tree-close').off("click");
-		$(edid).find('.tree-close').on("click", function (e) {
-			var data=$(edid).find(".modal-body > form").serializeArray();
-			$(data).each(function(i,d){
-				$(that).attr(d.name,d.value);
-				if (d.name=="data-name") {$(that).children(".dd-content").html(d.value);}
-			});
-			var cdata=JSON.stringify($(edid).find("#treeData > form").serializeArray());
-			wb_tree_data_set(that,path,cdata);
-			$(tree).find("input[name='"+name+"']").val(JSON.stringify(wb_tree_serialize($(tree).children(".dd-list"))));
+		$(edid).find('.modal-footer button').off("click");
+		$(edid).find('.modal-footer button').on("click", function (e) {
+            if ($(this).hasClass("tree-close")) {
+                var data=$(edid).find(".modal-body > form").serializeArray();
+                $(data).each(function(i,d){
+                    $(that).attr(d.name,d.value);
+                    if (d.name=="data-name") {$(that).children(".dd-content").html(d.value);}
+                });
+                var cdata=JSON.stringify($(edid).find("#treeData > form").serializeArray());
+                wb_tree_data_set(that,path,cdata);
+                $(tree).find("input[name='"+name+"']").val(JSON.stringify(wb_tree_serialize($(tree).children(".dd-list"))));
+            }
 			$(edid).modal("hide");
-			setTimeout(function(){$(edid).remove();},500)
+            $(edid).next(".modal-backdrop").remove();
+			setTimeout(function(){
+                $(edid).remove();
+            },500)
 		});
 		wb_plugins();
 	});	
@@ -273,7 +281,10 @@ function wb_tree_data_set(that,path,values) {
 	var tree=$(that).parents(".wb-tree");
 	var name=$(tree).attr("name");
 	var data=JSON.parse($(tree).children("input[name="+name+"]").val());
-	var dict=JSON.parse($(tree).children("[data-name=dict]").val());
+	var dict=$(tree).children("[data-name=dict]").val();
+    if (dict>"") {
+        var dict=JSON.parse($(tree).children("[data-name=dict]").val());    
+    } else {var dict=[];}
 	var fields=JSON.parse(values);
 	var values={};
 	$(fields).each(function(j,d) {
@@ -454,8 +465,8 @@ function wb_plugins(){
 			
 		}
 		
-		wb_plugin_editor();
-		wbCommonUploader();
+		if (is_callable("wb_plugin_editor")) wb_plugin_editor();
+		if (is_callable("wbCommonUploader")) wbCommonUploader();
 	});
 }
 
@@ -730,11 +741,15 @@ function wb_formsave_obj(formObj) {
 
 				}
 				if (setup==true) {document.location.href="/login.htm";}
-				$(document).trigger(name+"_after_formsave",[name,item,form,true]);
+                if (is_callable(name+"_after_formsave")) {
+				    $(document).trigger(name+"_after_formsave",[name,item,form,true]);
+                }
 				return data;
 			},
 			error:		function(data){
-				$(document).trigger(name+"_after_formsave",[name,item,form,false]);
+                if (is_callable(name+"_after_formsave")) {
+				    $(document).trigger(name+"_after_formsave",[name,item,form,false]);
+                }
 				if ($.bootstrapGrowl) {
 					$.bootstrapGrowl("Ошибка сохранения!", {
 						ele: 'body',
@@ -1221,6 +1236,46 @@ function wb_call_source_events(eid,fldname) {
 }
 
 
+
+function is_callable (v, syntax_only, callable_name) {  
+    // Returns true if var is callable.    
+    //   
+    // version: 902.821  
+    // discuss at: http://phpjs.org/functions/is_callable  
+    // +   original by: Brett Zamir  
+    // %        note 1: The variable callable_name cannot work as a string variable passed by reference as in PHP (since JavaScript does not support passing strings by reference), but instead will take the name of a global variable and set that instead  
+    // %        note 2: When used on an object, depends on a constructor property being kept on the object prototype  
+    // *     example 1: is_callable('is_callable');  
+    // *     returns 1: true  
+    // *     example 2: is_callable('bogusFunction', true);  
+    // *     returns 2:true // gives true because does not do strict checking  
+    // *     example 3: function SomeClass () {}  
+    // *     example 3: SomeClass.prototype.someMethod = function(){};  
+    // *     example 3: var testObj = new SomeClass();  
+    // *     example 3: is_callable([testObj, 'someMethod'], true, 'myVar');  
+    // *     example 3: alert(myVar); // 'SomeClass::someMethod'  
+    var name='', obj={}, method='';  
+    if (typeof v === 'string') {  
+        obj = window;  
+        method = v;  
+        name = v;  
+    }  
+    else if (v instanceof Array && v.length === 2 && typeof v[0] === 'object' && typeof v[1] === 'string') {  
+        obj = v[0];  
+        method = v[1];  
+        name = (obj.constructor && obj.constructor.name)+'::'+method;  
+    }  
+    else {  
+        return false;  
+    }  
+    if (syntax_only || typeof obj[method] === 'function') {  
+        if (callable_name) {  
+        window[callable_name] = name;  
+        }  
+        return true;  
+    }  
+    return false;  
+}  
 
 
 function setcookie ( name, value, exp_y, exp_m, exp_d, path, domain, secure ) {

@@ -1412,7 +1412,7 @@ abstract class kiNode
 				if (substr($name,-2)=="[]") {$name=substr($name,0,-2);}
 				if (substr($def,0,3)=="{{_") {$def="";}
 				if (isset($Item[$name])) {$value=$Item[$name];} else {$value=$def;}
-				if ($inp->is(":not([value])") OR $inp->attr("value")=="") $inp->attr("value",$value);
+				if ($value!=="") $inp->attr("value",$value);
 				//$inp->wbDatePickerPrep();
 				if ($inp->attr("type")=="checkbox") {
 					if ($inp->attr("value")=="on" OR $inp->attr("value")=="1") {$inp->checked="checked";}
@@ -1752,7 +1752,7 @@ abstract class kiNode
 
 	public function tagWhere($Item=array()) {
 		include("wbattributes.php");
-		if ($this->attr("data")>"") {$where=$this->attr("data");}
+		if ($this->attr("data") > "") {$where=$this->attr("data");}
 		$res=wbWhereItem($Item,$where);
 		if ($res==0) {$this->remove();} else {
 			$vars=$this->find("[data-wb-role=variable]");
@@ -1774,7 +1774,7 @@ abstract class kiNode
 		if (!isset($page) OR 1*$page<=0) {
 			if (!isset($_GET["page"]) OR $_GET["page"]=="") {$page=1;} else {$page=$_GET["page"]*1;}
 		} else {$page=$page*1;}
-		if ($from>"") {
+		if ( $from > "") {
 			if (isset($Item[$from])) {
 				if (isset($Item["form"])) {$table=$Item["form"];} else {$table="";}
 				if (isset($Item["id"])) {$item=$Item["id"];} else {$item="";}
@@ -1787,8 +1787,8 @@ abstract class kiNode
 				$json=json_decode($from,true); if (is_array($json)) {$Item=$json;}
 			}
 		}
-
-		if ($table>"") {
+if ($count>"") {$Item=array();$count=$count*1;for($i=1;$i<=$count;$i++){$Item[$i]=$i;};}
+		if ($table > "") {
 			$table=wbTable($table);
 			if ($item>"") {
 				$Item[0]=wbItemRead($table,$item);
@@ -1828,8 +1828,7 @@ abstract class kiNode
 		));
 
 		foreach($object as $key => $val) {
-            
-			if (is_array($val)) {
+            if (!is_array($val)) {$val=array($val);}
 				$n++;
 				if ($size!==false) $minpos=$size*$page-($size*1)+1; $maxpos=($size*$page);
 				if ($size==false OR ($n<=$maxpos AND $n>=$minpos)) {
@@ -1863,7 +1862,6 @@ abstract class kiNode
 
 				}
 				unset($Item[$key]);
-			}
 		};
         
 		$count=$n;

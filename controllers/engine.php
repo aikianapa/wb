@@ -22,19 +22,27 @@ function engine__controller_login() {
 	//wbItemSave("users",$user);
 	if (isset($_POST["l"]) AND $_POST["l"]>"") {
 		if ($user=wbItemRead("users",$_POST["l"])) {
-				if ($user["point"]>"") {$point=$user["point"];} else {$point="/";}
 				if ($user["password"]==md5($_POST["p"]) AND $user["active"]=="on") {
-					$_SESSION["user_id"]=$user["id"];
-					$_SESSION["user_role"]=$user["role"];
-					if (!isset($user["name"])) {$user["name"]=$user["id"];}
-					$_SESSION["user"]=$user;
-					header('Location: '.$point);
-					die;
+                    engine__controller_login_success($user);
 				}
 		}
 	}
 	$_ENV["DOM"]=wbGetTpl("login.htm");
 	return $_ENV["DOM"];
+}
+
+function engine__controller_login_success($user) {
+        $_SESSION["user_id"]=$user["id"];
+        $_SESSION["user_role"]=$user["role"];
+    if ($user["point"]>"") {$point=$user["point"];} else {$point="/";}
+    if (!isset($user["name"])) {$user["name"]=$user["id"];}
+        if (isset($user["avatar"])) {
+            if (!is_array($user["avatar"])) {$user["avatar"]=json_decode($user["avatar"],true);$user["avatar"]=$user["avatar"][0];} 
+            $user["avatar"]="/uploads/users/{$user["id"]}/{$user["avatar"]["img"]}";
+        } else {$user["avatar"]="/engine/uploads/__system/person.svg";}
+        $_SESSION["user"]=$user;
+        header('Location: '.$point);
+        die;  
 }
 
 function engine__controller_register() {

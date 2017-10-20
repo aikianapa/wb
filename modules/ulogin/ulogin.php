@@ -12,9 +12,10 @@ function ulogin__init() {
 			$user = json_decode($s, true);
 			$check = ulogin__check($user);
 			if ($check!==false) {
-				$out="<script language='javascript'>document.location.href='/module/ulogin/login/{$check["id"]}/{$_POST['token']}';</script>";
 				$check["token"]=$_POST['token'];
 				wbItemSave("users",$check);
+				$out="<script language='javascript'>document.location.href='/module/ulogin/login/{$check["id"]}/{$_POST['token']}';</script>";
+
 			} else {
 				$out.="<div>Авторизация {$user["network"]} не удалась!</div>";
 			}
@@ -28,11 +29,8 @@ function ulogin__login() {
 	$token=$_ENV["route"]["params"][2];
 	$user=wbItemRead("users",$user_id);
 	if ($user["token"]==$token) {
-		$_SESSION["user_id"]=$user["id"];
-		$_SESSION["user_role"]=$user["role"];
-		if (!isset($user["name"])) {$user["name"]=$user["id"];}
-		$_SESSION["user"]=$user;
-		header('Location: '.$user["point"]);
+        if (!is_callable("engine__controller_login_success")) {include_once($_ENV["path_engine"]."/controllers/engine.php");}
+        engine__controller_login_success($user); 
 	} else {
 		header('Location: /login/');
 	}
@@ -43,7 +41,13 @@ function ulogin__check($user) {
 	$res=false;
 	$check=wbItemList("users",'email="'.$user["email"].'"');
 	foreach($check as $u) {
-		if ($u["active"]=="on") {$res=$u; return $res;}
+		if ($u["active"]=="on") {
+            $user["id"]=$u["id"];
+            $u["avatar"]=ulogin__avatar($user);
+            wbItemSave("users",$u);
+            $res=$u;
+            return $res;
+        }
 	}
 	if ($user["verified_email"]==1) {
 		$newuser=array(
@@ -55,9 +59,27 @@ function ulogin__check($user) {
 			"role"			=> "user",
 			"point"			=> "/"
 		);
+        $user["id"]=$newuser["id"];
+        $newuser["avatar"]=ulogin__avatar($user);
 		wbItemSave("users",$newuser);
 		return $newuser;
 	}
 	return $res;
 }
+
+function ulogin__avatar($user) {
+    $avatar="";
+    if (isset($user["photo_big"]) AND $user["photo_big"]>"") {$avatar=$user["photo_big"];} 
+    elseif  (isset($user["photo"]) AND $user["photo"]>"") {$avatar=$user["photo"];} 
+    else {$avatar="";}
+    if ($avatar>"") {
+        $name=explode("/",$avatar); $name=strtolower($name[count($name)-1]);
+        $path= wbNormalizePath("{$_ENV["path_app"]}/uploads/users/{$user["id"]}/{$name}");
+        if (wbPutContents($path,file_get_contents($avatar))) {
+            $avatar="[".json_encode(array("img"=>$name,"title"=>"","visible"=>0))."]";
+        }
+    }
+    return $avatar;
+}
+
 ?>

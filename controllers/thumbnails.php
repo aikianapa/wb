@@ -1,9 +1,11 @@
 <?php
 function thumbnails__controller() {
-	$params=$_ENV["route"]["params"];
-	$_GET=array();
-	$_GET["w"]=$params["w"]; unset($params["w"]);
-	$_GET["h"]=$params["h"]; unset($params["h"]);
+    $params=$_ENV["route"]["params"];
+	if (!isset($_GET)) {
+        $_GET=array();
+        $_GET["w"]=$params["w"]; unset($params["w"]);
+        $_GET["h"]=$params["h"]; unset($params["h"]);
+    }
 	$_GET["src"]=$params["src"]; unset($params["src"]);
 	$_GET["src"].="/".implode("/",$params);
 	$_GET["zc"]=$_ENV["route"]["zc"];

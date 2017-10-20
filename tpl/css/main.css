@@ -3376,6 +3376,16 @@ button.close {
     transition: transform 0.3s ease-out, -webkit-transform 0.3s ease-out;
     -webkit-transform: translate(0, -25%);
             transform: translate(0, -25%); }
+
+
+.modal.fadeLeft .modal-dialog {
+  -webkit-animation-name: fadeLeft;
+          animation-name: fadeLeft;
+  -webkit-animation-duration: 0.5s;
+          animation-duration: 0.5s; }
+
+
+
   .modal.show .modal-dialog {
     -webkit-transform: translate(0, 0);
             transform: translate(0, 0); }

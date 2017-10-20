@@ -47,7 +47,7 @@
                     <div class="menu-and-user">
                         <div class="logged-user-w">
                             <div class="avatar-w">
-                                <img alt="" src="img/avatar1.jpg">
+                                <img alt="" src="{{_SESS[user][avatar]}}" role="thumbnail" data-wb-from="avatar" data-wb-size="100px;100px;src">
                             </div>
                             <div class="logged-user-info-w">
                                 <div class="logged-user-name">{{_SESS[user][name]}}</div>
@@ -97,12 +97,12 @@
                         <div class="logged-user-w">
                             <div class="logged-user-i">
                                 <div class="avatar-w">
-                                    <img alt="" src="img/avatar1.jpg">
+                                    <img alt="" src="{{_SESS[user][avatar]}}" role="thumbnail" data-wb-from="avatar" data-wb-size="100px;100px;src">
                                 </div>
                                 <div class="logged-user-menu">
                                     <div class="logged-user-avatar-info">
                                         <div class="avatar-w">
-                                            <img alt="" src="img/avatar1.jpg">
+                                            <img alt="" src="{{_SESS[user][avatar]}}" role="thumbnail" data-wb-from="avatar" data-wb-size="100px;100px;src">
                                         </div>
                                         <div class="logged-user-info-w">
                                           <div class="logged-user-name">{{_SESS[user][name]}}</div>
@@ -169,368 +169,6 @@
                             </li>
                         </ul>
 
-
-
-                        <!--ul class="main-menu" >
-                            <li class="has-sub-menu">
-                                <a  data-wb-autoload="true"
-                                    data-wb-ajax="/admin/ui/list_forms/"
-                                    data-wb-html=".cms-menu"
-                                    data-wb-tpl="#tFormList">
-                                    <div class="icon-w">
-                                        <i class="os-icon os-icon-window-content"></i>
-                                    </div>
-                                </a>
-                                <div class="sub-menu-w">
-                                    <div class="sub-menu-title" id="aFormList">Сайт</div>
-                                    <div class="sub-menu-icon">
-                                        <i class="os-icon os-icon-window-content"></i>
-                                    </div>
-                                    <div class="sub-menu-i cms-menu">
-                                    </div>
-                  									<script type="text/template" id="tFormList">
-                  											<ul class="sub-menu" data-wb-role="foreach" data-wb-from="forms" data-wb-limit="false">
-                  												<li>
-                  												<a data-wb-ajax="/form/list/{{name}}/" data-wb-html=".content-box">
-                                              {{view}}
-                  												</a>
-                  												</li>
-                  											</ul>
-                  									</script>
-                                </div>
-                            </li>
-                            <li class="has-sub-menu">
-                                <a data-wb-ajax="/form/list/todo/" data-wb-html=".content-box">
-                                    <div class="icon-w">
-                                        <i class="os-icon os-icon-tasks-checked"></i>
-                                    </div>
-                                </a>
-                                <div class="sub-menu-w">
-                                    <div class="sub-menu-title">Сервисы</div>
-                                    <div class="sub-menu-icon">
-                                        <i class="os-icon os-icon-tasks-checked"></i>
-                                    </div>
-                                    <div class="sub-menu-i">
-                                        <ul class="sub-menu">
-                                            <li>
-                                                <a data-wb-ajax="/form/list/todo/" data-wb-html=".content-box">Задачи</a>
-                                            </li>
-                                            <li>
-                                                <a href="forms_validation.html">Form Validation</a>
-                                            </li>
-                                            <li>
-                                                <a href="forms_wizard.html">Form Wizard</a>
-                                            </li>
-                                            <li>
-                                                <a href="forms_uploads.html">File Uploads</a>
-                                            </li>
-                                            <li>
-                                                <a href="forms_wisiwig.html">Wisiwig Editor</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </li>
-
-                            <li>
-								<a data-wb-ajax="/form/list/tree/" data-wb-html=".content-box">
-                                    <div class="icon-w">
-                                        <i class="os-icon os-icon-hierarchy-structure-2"></i>
-                                    </div>
-                                </a>
-                            </li>
-
-                            <li class="has-sub-menu">
-                                <a href="#">
-                                    <div class="icon-w">
-                                        <i class="os-icon os-icon-hierarchy-structure-2"></i>
-                                    </div>
-                                </a>
-                                <div class="sub-menu-w">
-                                    <div class="sub-menu-title">Menu Styles</div>
-                                    <div class="sub-menu-icon">
-                                        <i class="os-icon os-icon-hierarchy-structure-2"></i>
-                                    </div>
-                                    <div class="sub-menu-i">
-                                        <ul class="sub-menu">
-                                            <li>
-                                                <a href="layouts_menu_side.html">Side Menu Light</a>
-                                            </li>
-                                            <li>
-                                                <a href="layouts_menu_side_dark.html">Side Menu Dark</a>
-                                            </li>
-                                            <li>
-                                                <a href="apps_pipeline.html">Side &amp; Top Dark <strong class="badge badge-danger">New</strong></a>
-                                            </li>
-                                            <li>
-                                                <a href="apps_projects.html">Side &amp; Top <strong class="badge badge-danger">New</strong></a>
-                                            </li>
-                                            <li>
-                                                <a href="layouts_menu_side_compact.html">Compact Side Menu</a>
-                                            </li>
-                                        </ul>
-                                        <ul class="sub-menu">
-                                            <li>
-                                                <a href="layouts_menu_side_compact_dark.html">Compact Menu Dark</a>
-                                            </li>
-                                            <li>
-                                                <a href="layouts_menu_top.html">Top Menu Light</a>
-                                            </li>
-                                            <li>
-                                                <a href="layouts_menu_top_dark.html">Top Menu Dark</a>
-                                            </li>
-                                            <li>
-                                                <a href="layouts_menu_top_image.html">Top Menu Image</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="has-sub-menu">
-                                <a href="#">
-                                    <div class="icon-w">
-                                        <i class="os-icon os-icon-delivery-box-2"></i>
-                                    </div>
-                                </a>
-                                <div class="sub-menu-w">
-                                    <div class="sub-menu-title">Applications</div>
-                                    <div class="sub-menu-icon">
-                                        <i class="os-icon os-icon-delivery-box-2"></i>
-                                    </div>
-                                    <div class="sub-menu-i">
-                                        <ul class="sub-menu">
-                                            <li>
-                                                <a href="apps_email.html">Email Application</a>
-                                            </li>
-                                            <li>
-                                                <a href="apps_projects.html">Projects List</a>
-                                            </li>
-                                            <li>
-                                                <a href="apps_full_chat.html">Chat Application</a>
-                                            </li>
-                                            <li>
-                                                <a href="apps_pipeline.html">CRM Pipeline <strong class="badge badge-danger">New</strong></a>
-                                            </li>
-                                            <li>
-                                                <a href="misc_chat.html">Popup Chat</a>
-                                            </li>
-                                        </ul>
-                                        <ul class="sub-menu">
-                                            <li>
-                                                <a href="misc_calendar.html">Calendar</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="has-sub-menu">
-                                <a href="#">
-                                    <div class="icon-w">
-                                        <i class="os-icon os-icon-newspaper"></i>
-                                    </div>
-                                </a>
-                                <div class="sub-menu-w">
-                                    <div class="sub-menu-title">Pages</div>
-                                    <div class="sub-menu-icon">
-                                        <i class="os-icon os-icon-newspaper"></i>
-                                    </div>
-                                    <div class="sub-menu-i">
-                                        <ul class="sub-menu">
-                                            <li>
-                                                <a href="misc_invoice.html">Invoice</a>
-                                            </li>
-                                            <li>
-                                                <a href="front_home.html">Front Site <strong class="badge badge-danger">New</strong></a>
-                                            </li>
-                                            <li>
-                                                <a href="misc_charts.html">Charts</a>
-                                            </li>
-                                            <li>
-                                                <a href="auth_login.html">Login</a>
-                                            </li>
-                                            <li>
-                                                <a href="auth_register.html">Register</a>
-                                            </li>
-                                        </ul>
-                                        <ul class="sub-menu">
-                                            <li>
-                                                <a href="auth_lock.html">Lock Screen</a>
-                                            </li>
-                                            <li>
-                                                <a href="misc_pricing_plans.html">Pricing Plans</a>
-                                            </li>
-                                            <li>
-                                                <a href="misc_error_404.html">Error 404</a>
-                                            </li>
-                                            <li>
-                                                <a href="misc_error_500.html">Error 500</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="has-sub-menu">
-                                <a href="#">
-                                    <div class="icon-w">
-                                        <i class="os-icon os-icon-pencil-12"></i>
-                                    </div>
-                                </a>
-                                <div class="sub-menu-w">
-                                    <div class="sub-menu-title">UI Kit</div>
-                                    <div class="sub-menu-icon">
-                                        <i class="os-icon os-icon-pencil-12"></i>
-                                    </div>
-                                    <div class="sub-menu-i">
-                                        <ul class="sub-menu">
-                                            <li>
-                                                <a href="uikit_modals.html">Modals</a>
-                                            </li>
-                                            <li>
-                                                <a href="uikit_alerts.html">Alerts</a>
-                                            </li>
-                                            <li>
-                                                <a href="uikit_grid.html">Grid</a>
-                                            </li>
-                                            <li>
-                                                <a href="uikit_progress.html">Progress</a>
-                                            </li>
-                                            <li>
-                                                <a href="uikit_popovers.html">Popover</a>
-                                            </li>
-                                        </ul>
-                                        <ul class="sub-menu">
-                                            <li>
-                                                <a href="uikit_tooltips.html">Tooltips</a>
-                                            </li>
-                                            <li>
-                                                <a href="uikit_buttons.html">Buttons</a>
-                                            </li>
-                                            <li>
-                                                <a href="uikit_dropdowns.html">Dropdowns</a>
-                                            </li>
-                                            <li>
-                                                <a href="uikit_typography.html">Typography</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="has-sub-menu">
-                                <a href="#">
-                                    <div class="icon-w">
-                                        <i class="os-icon os-icon-user-male-circle"></i>
-                                    </div>
-                                </a>
-                                <div class="sub-menu-w">
-                                    <div class="sub-menu-title">Users</div>
-                                    <div class="sub-menu-icon">
-                                        <i class="os-icon os-icon-user-male-circle"></i>
-                                    </div>
-                                    <div class="sub-menu-i">
-                                        <ul class="sub-menu">
-                                            <li>
-                                                <a href="users_profile_big.html">Big Profile</a>
-                                            </li>
-                                            <li>
-                                                <a href="users_profile_small.html">Compact Profile</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="has-sub-menu">
-                                <a href="#">
-                                    <div class="icon-w">
-                                        <i class="os-icon os-icon-grid-squares"></i>
-                                    </div>
-                                </a>
-                                <div class="sub-menu-w">
-                                    <div class="sub-menu-title">Tables</div>
-                                    <div class="sub-menu-icon">
-                                        <i class="os-icon os-icon-grid-squares"></i>
-                                    </div>
-                                    <div class="sub-menu-i">
-                                        <ul class="sub-menu">
-                                            <li>
-                                                <a href="tables_regular.html">Regular Tables</a>
-                                            </li>
-                                            <li>
-                                                <a href="tables_datatables.html">Data Tables</a>
-                                            </li>
-                                            <li>
-                                                <a href="tables_editable.html">Editable Tables</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="has-sub-menu">
-                                <a href="#">
-                                    <div class="icon-w">
-                                        <i class="os-icon os-icon-robot-1"></i>
-                                    </div>
-                                </a>
-                                <div class="sub-menu-w">
-                                    <div class="sub-menu-title">Icons</div>
-                                    <div class="sub-menu-icon">
-                                        <i class="os-icon os-icon-robot-1"></i>
-                                    </div>
-                                    <div class="sub-menu-i">
-                                        <ul class="sub-menu">
-                                            <li>
-                                                <a href="icon_fonts_simple_line_icons.html">Simple Line Icons</a>
-                                            </li>
-                                            <li>
-                                                <a href="icon_fonts_themefy.html">Themefy Icons</a>
-                                            </li>
-                                            <li>
-                                                <a href="icon_fonts_picons_thin.html">Picons Thin</a>
-                                            </li>
-                                            <li>
-                                                <a href="icon_fonts_dripicons.html">Dripicons</a>
-                                            </li>
-                                            <li>
-                                                <a href="icon_fonts_eightyshades.html">Eightyshades</a>
-                                            </li>
-                                        </ul>
-                                        <ul class="sub-menu">
-                                            <li>
-                                                <a href="icon_fonts_entypo.html">Entypo</a>
-                                            </li>
-                                            <li>
-                                                <a href="icon_fonts_font_awesome.html">Font Awesome</a>
-                                            </li>
-                                            <li>
-                                                <a href="icon_fonts_foundation_icon_font.html">Foundation Icon Font</a>
-                                            </li>
-                                            <li>
-                                                <a href="icon_fonts_metrize_icons.html">Metrize Icons</a>
-                                            </li>
-                                            <li>
-                                                <a href="icon_fonts_picons_social.html">Picons Social</a>
-                                            </li>
-                                        </ul>
-                                        <ul class="sub-menu">
-                                            <li>
-                                                <a href="icon_fonts_batch_icons.html">Batch Icons</a>
-                                            </li>
-                                            <li>
-                                                <a href="icon_fonts_dashicons.html">Dashicons</a>
-                                            </li>
-                                            <li>
-                                                <a href="icon_fonts_typicons.html">Typicons</a>
-                                            </li>
-                                            <li>
-                                                <a href="icon_fonts_weather_icons.html">Weather Icons</a>
-                                            </li>
-                                            <li>
-                                                <a href="icon_fonts_light_admin.html">Light Admin</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul-->
                     </div>
                 </div>
                 <!--------------------
@@ -564,7 +202,7 @@ START - Messages Link in secondary top menu
                                         <li>
                                             <a href="#">
                                                 <div class="user-avatar-w">
-                                                    <img alt="" src="img/avatar1.jpg">
+                                                    <img alt="" src="{{_SESS[user][avatar]}}" role="thumbnail" data-wb-from="avatar" data-wb-size="100px;100px;src">
                                                 </div>
                                                 <div class="message-content">
                                                     <h6 class="message-from">John Mayers</h6>
@@ -645,12 +283,12 @@ START - User avatar and menu in secondary top menu
                             <div class="logged-user-w">
                                 <div class="logged-user-i">
                                     <div class="avatar-w">
-                                        <img alt="" src="img/avatar1.jpg">
+                                        <img alt="" src="{{_SESS[user][avatar]}}" role="thumbnail" data-wb-from="avatar" data-wb-size="100px;100px;src">
                                     </div>
                                     <div class="logged-user-menu">
                                         <div class="logged-user-avatar-info">
                                             <div class="avatar-w">
-                                                <img alt="" src="img/avatar1.jpg">
+                                                <img alt="" src="{{_SESS[user][avatar]}}" role="thumbnail" data-wb-from="avatar" data-wb-size="100px;100px;src">
                                             </div>
                                             <div class="logged-user-info-w">
                                               <div class="logged-user-name">{{_SESS[user][name]}}</div>
@@ -714,6 +352,7 @@ END - User avatar and menu in secondary top menu
                                     </div>
                                 </div>
                             </div>
+                            
                             <div class="pipelines-w">
                                 <div class="row">
                                     <div class="col-lg-4 col-xxl-3">
@@ -779,7 +418,7 @@ START - Pipeline
                                                     </div>
                                                     <div class="pi-body">
                                                         <div class="avatar">
-                                                            <img alt="" src="img/avatar1.jpg">
+                                                            <img alt="" src="{{_SESS[user][avatar]}}" role="thumbnail" data-wb-from="avatar" data-wb-size="100px;100px;src">
                                                         </div>
                                                         <div class="pi-info">
                                                             <div class="h6 pi-name">Better Pharmacy</div>
@@ -991,7 +630,7 @@ START - Pipeline
                                                     </div>
                                                     <div class="pi-body">
                                                         <div class="avatar">
-                                                            <img alt="" src="img/avatar1.jpg">
+                                                            <img alt="" src="{{_SESS[user][avatar]}}" role="thumbnail" data-wb-from="avatar" data-wb-size="100px;100px;src">
                                                         </div>
                                                         <div class="pi-info">
                                                             <div class="h6 pi-name">Zillow Farm</div>
@@ -1244,7 +883,7 @@ START - Pipeline
                                                     </div>
                                                     <div class="pi-body">
                                                         <div class="avatar">
-                                                            <img alt="" src="img/avatar1.jpg">
+                                                            <img alt="" src="{{_SESS[user][avatar]}}" role="thumbnail" data-wb-from="avatar" data-wb-size="100px;100px;src">
                                                         </div>
                                                         <div class="pi-info">
                                                             <div class="h6 pi-name">Better Pharmacy</div>
@@ -1452,7 +1091,7 @@ START - Chat Popup Box
                                         <div class="user-w with-status status-green">
                                             <div class="user-avatar-w">
                                                 <div class="user-avatar">
-                                                    <img alt="" src="img/avatar1.jpg">
+                                                    <img alt="" src="{{_SESS[user][avatar]}}" role="thumbnail" data-wb-from="avatar" data-wb-size="100px;100px;src">
                                                 </div>
                                             </div>
                                             <div class="user-name">

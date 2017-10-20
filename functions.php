@@ -21,10 +21,12 @@ function wbInitEnviroment() {
 	$_ENV["dbac"]=$_ENV["path_app"]."/database/_cache";	// App data
 	$_ENV["error"]=array();
 	$_ENV["env_id"]=wbNewId();
-	$settings=wbItemRead("admin","settings");
 	$variables=array();
-	foreach((array)$settings["variables"] as $v) {
-		$variables[$v["var"]]=$v["value"];
+	$settings=wbItemRead("admin","settings"); 
+	if (!$settings) {$settings=array();} else {
+		foreach((array)$settings["variables"] as $v) {
+			$variables[$v["var"]]=$v["value"];
+		}
 	}
 	$_ENV["variables"]=$variables;
 	$settings=array_merge($settings,$variables);
@@ -366,6 +368,7 @@ function wbItemSave($table,$item=null,$flush=true) {
 function wbItemSetTable($table,$item=null) {
 	$tablename=explode("/",$table);
 	$item["_table"]=$tablename[count($tablename)-1];
+    if (!isset($item["_created"]) OR $item["_created"]=="") $item["_created"]=date("Y-m-d H:i:s");
 	return $item;
 }
 
@@ -392,8 +395,10 @@ function wbTrigger($type,$name,$trigger,$args=null,$data=null) {
 	if (!isset($_ENV["error"][$type])) {$_ENV["error"][$type]=array();}
 	switch ($type) {
 		case "form":
-			$call=$_ENV[$args[0]]["name"].$trigger;
-			if (is_callable($call)) {$data=$call($data);} else {$call="_".$call; if (is_callable($call)) {$data=$call($data);}}
+			if (isset($_ENV[$args[0]]["name"])) {
+				$call=$_ENV[$args[0]]["name"].$trigger;
+				if (is_callable($call)) {$data=$call($data);} else {$call="_".$call; if (is_callable($call)) {$data=$call($data);}}
+			}
 			return $data;
 			break;
 		case "func":
@@ -551,6 +556,15 @@ function wbFileRemove($file) {
 		if (is_file($file)) {$res=false;} else {$res=true;}
 	}
 	return $res;
+}
+
+function wbPutContents($dir, $contents){
+    $parts = explode('/', $dir);
+    $file = array_pop($parts);
+    $dir = '';
+    foreach($parts as $part)
+        if(!is_dir($dir .= "/$part")) mkdir($dir);
+    return file_put_contents("$dir/$file", $contents);
 }
 
 function wbRecurseDelete($src) {

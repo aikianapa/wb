@@ -1,4 +1,4 @@
-<div class="modal fade tree-edit" id="tree_{{form}}_{{name}}" data-keyboard="false" data-backdrop="true" role="dialog" aria-hidden="true">
+<div class="modal fadeLeft tree-edit" id="tree_{{form}}_{{name}}" data-keyboard="false" data-backdrop="true" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
 	<div class="modal-content">
       <div class="modal-body">
@@ -24,9 +24,6 @@
 
 <div id="treeDict" class="tab-pane fade" data-wb-role="include" src="/engine/forms/common/common_tree_dict.php" role="tabpanel"></div>
 </div>
-
-
-
 
     </div>
 		  <div class="modal-footer">
