@@ -1787,7 +1787,7 @@ abstract class kiNode
 				$json=json_decode($from,true); if (is_array($json)) {$Item=$json;}
 			}
 		}
-if ($count>"") {$Item=array();$count=$count*1;for($i=1;$i<=$count;$i++){$Item[$i]=$i;};}
+if (isset($count) AND $count>"") {$Item=array();$count=$count*1;for($i=1;$i<=$count;$i++){$Item[$i]=$i;};}
 		if ($table > "") {
 			$table=wbTable($table);
 			if ($item>"") {
