@@ -114,8 +114,11 @@ function wbTable($table="data",$engine=false) {
 	$table=wbTablePath($table,$engine);
 	$_ENV[$table]["name"]=$tname;
 	if (!is_file($table)) {
-		wbError("func",__FUNCTION__,1001,func_get_args());
-		$table=null;
+        $res=file_put_contents($table,"");
+        if (!res) {
+		  wbError("func",__FUNCTION__,1001,func_get_args());
+		  $table=null;
+        }
 	} else {
 		$_ENV["cache"][$table]=json_decode(file_get_contents($table),true);
 	}

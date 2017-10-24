@@ -1787,7 +1787,7 @@ abstract class kiNode
 				$json=json_decode($from,true); if (is_array($json)) {$Item=$json;}
 			}
 		}
-if (isset($count) AND $count>"") {$Item=array();$count=$count*1;for($i=1;$i<=$count;$i++){$Item[$i]=$i;};}
+        if (isset($count) AND $count>"") {$Item=array();$count=$count*1;for($i=1;$i<=$count;$i++){$Item[$i]=$i;};}
 		if ($table > "") {
 			$table=wbTable($table);
 			if ($item>"") {
@@ -1821,7 +1821,6 @@ if (isset($count) AND $count>"") {$Item=array();$count=$count*1;for($i=1;$i<=$co
 
 		$ndx=0; $n=0; $f=0;
 		$tmptpl=wbFromString($tpl);
-        
         $object = new ArrayObject($Item);
 		$iterator = new tagForeachFilter($object->getIterator(),array(
 			"id"=>$id,
@@ -2144,9 +2143,10 @@ public function tagThumbnail($Item=array()) {
 			$flag=floor($page/10); if ($flag<=1) {$flag=0;} else {$flag*=10;}
 			$inner="";
 			$pagination=array("id"=>$class,"size"=>$size,"count"=>$count,"cache"=>$cacheId,"find"=>$find,"pages"=>array());
+            if (!isset($_ENV["route"]["params"]["form"]) OR $_ENV["route"]["params"]["form"]=="") {$form=$tplId;} else {$form=$_ENV["route"]["params"]["form"];}
 			for($i=1; $i<=$pages; $i+=$step) {
-				$href=$_ENV["route"]["controller"]."/".$_ENV["route"]["mode"]."/".$_ENV["route"]["params"]["form"]."/".$i;
-				$pagination["pages"][$i]=array(
+				$href=$_ENV["route"]["controller"]."/".$_ENV["route"]["mode"]."/".$form."/".$i;
+                $pagination["pages"][$i]=array(
 					"page"=>$i,
 					"href"=>$href,
 					"flag"=>$flag,
@@ -2158,7 +2158,6 @@ public function tagThumbnail($Item=array()) {
 				if ($flag>0 && $i>=$flag && $i<=$flag+9) {$step=1;}
 				if ($page>=10 && $page<20 && $i<20) {$step=1;}
 			}
-			//$pag->find("ul")->append($inner);
 			$pag->wbSetData($pagination);
 
 			$pag->find("[data-page={$page}]")->addClass("active");

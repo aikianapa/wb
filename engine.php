@@ -13,6 +13,7 @@ if (!isset($_ENV["route"]["form"]) OR $_ENV["route"]["form"]!=="default_form") {
 		$_ENV["DOM"]=wbFromString(wbErrorOut(404));
 	}
 }
+if (!is_object($_ENV["DOM"])) {$_ENV["DOM"]=wbFromString($_ENV["DOM"]);}
 $_ENV["DOM"]->wbSetData($_ENV["ITEM"]);
 //echo $_ENV["DOM"]->beautyHtml();
 echo $_ENV["DOM"]->outerHtml();

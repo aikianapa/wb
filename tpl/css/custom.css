@@ -18,7 +18,7 @@ label.switch-primary input:checked + span { background-color: #5ccdde;}
 .datetimepicker thead tr:first-child th { display: table-cell!important;}
 
 .hidden {display:none;}
-.modal-max {max-width: 100%!important;}
+.modal-max, .modal-xl {max-width: 100%!important;}
 .wb-multiinput, .wb-multiinput * {cursor: context-menu;}
 .wb-multiinput {padding:2px;}
 .wb-multiinput:hover {background-color:rgba(84, 165, 248, 0.5);border-radius:3px; box-shadow:1px 1px 3px rgba(84, 165, 248, 0.5);}
@@ -50,3 +50,5 @@ label.switch-primary input:checked + span { background-color: #5ccdde;}
 }
 .tree-edit.modal .modal-dialog {margin:0;height: 100vh;}
 .tree-edit.modal .modal-body {height:calc(100vh - 70px);overflow-y:auto;}
+
+select.form-control + .select2-container {width:100%!important;}

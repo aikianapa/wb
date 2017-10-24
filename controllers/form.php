@@ -21,6 +21,7 @@ function form__controller__show() {
 		if (!isset($Item["template"]) OR $Item["template"]=="") {$Item["template"]="default.php";}
 		if (is_callable("wbBeforeShowItem")) {$Item=wbBeforeShowItem($Item);}
 		$_ENV["DOM"]=wbGetTpl($Item["template"]);
+        if (!is_object($_ENV["DOM"])) {$_ENV["DOM"]=wbFromString($_ENV["DOM"]);}
 		$_ENV["DOM"]->wbSetData($Item);
 	}
 	return $_ENV["DOM"];
@@ -79,6 +80,25 @@ function form__controller__edit() {
 
 function form__controller__default_mode() {
 	if (!is_dir($_ENV["path_app"]."/forms")) {form__controller__setup_engine();} else {die("Установка выполнена");}
+}
+
+function form__controller__select2() {
+    $form=""; $where=""; $tpl=""; $val="";
+    $form=$_ENV["route"]["form"];
+    if (isset($_POST["where"]) AND $_POST["where"]>"") {$where=$_POST["where"];}
+    if (isset($_POST["tpl"]) AND $_POST["tpl"]>"") {$tpl=$_POST["tpl"];}
+    if (isset($_POST["value"]) AND $_POST["value"]>"") {$val=$_POST["value"];}
+    $list=wbItemList($form,$where);
+    $iterator=new ArrayIterator($list);
+    foreach($iterator as $key => $r) {
+        $data=wbSetValuesStr(strip_tags($tpl),$r);
+        $res=preg_match("/{$val}/ui",$data);
+        if (!$res) {unset($list[$key]);}
+    }
+    $ret_string="{ results: [ {id:'1', text:'Option 1'}, {id:'2', text:'Option 2'} ],more:false}";
+    header('Content-Type: application/json');
+return json_encode($ret_string);
+    //return json_encode($list);
 }
 
 function form__controller__setup_engine() {
