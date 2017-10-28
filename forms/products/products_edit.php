@@ -33,7 +33,7 @@
 	
 	<div class="form-group row">
 	  <label class="col-sm-3 form-control-label">Артикул</label>
-	   <div class="col-sm-3"><input type="text" class="form-control" name="descr" placeholder="Артикул"></div>
+	   <div class="col-sm-3"><input type="text" class="form-control" name="articul" placeholder="Артикул"></div>
 		<label class="col-sm-3 form-control-label">Отображать</label>
 		<div class="col-sm-3"><label class="switch switch-success"><input type="checkbox" name="active"><span></span></label></div>
 	</div>

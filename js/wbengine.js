@@ -570,65 +570,60 @@ function wb_plugins() {
         }
         if ($('.select2:not(.wb-plugin)').length) {
             $('.select2:not(.wb-plugin').each(function () {
+                var that = this;
                 if ($(this).is("[data-wb-ajax]")) {
-                    var url=$(this).attr("data-wb-ajax");
-                    var tpl=$(this).attr("data-wb-tpl");
-                    var where=$(this).attr("data-wb-where");
+                    var url = $(this).attr("data-wb-ajax");
+                    var tpl = $(this).attr("data-wb-tpl");
+                    var where = $(this).attr("data-wb-where");
+                    var val = $(this).attr("value");
+                    var plh = $(this).attr("placeholder");
+                    if (plh==undefined) {plh="Поиск...";}
                     $(this).select2({
-                        placeholder: "Поиск...",
+                        language: "ru",
+                        placeholder: plh,
                         minimumInputLength: 2,
-                        cache: true,
                         ajax: {
                             url: url,
                             method: "post",
                             dataType: 'json',
-                            quietMillis: 100,
+                            delay: 150,
+                            cache: true,
                             data: function (term, page) {
                                 return {
                                     value: term.term,
-                                    page:page,
+                                    page: page,
                                     where: where,
-                                    tpl: $("#"+tpl).html()
+                                    tpl: $("#" + tpl).html()
                                 };
                             },
-                            processResults: function (data, page) {
-                return {
-                    results: data.items
-                };
+                            processResults: function (data) {
+                                $(that).data("wb-ajax-data", data);
+                                $(that).trigger("wb_ajax_done", [that, url, data]);
+                                return {
+                                    results: data
+                                };
                             },
-                            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
-                            templateResult: formatRepo,
                         },
+                    });
+                    $.ajax({
+                        url: url,
+                        method: "post",
+                        dataType: 'json',
+                        data: {id: val,tpl: $("#" + tpl).html()}
+                    }).then(function (data) {
+                        var option = new Option(data.text, data.id, true, true);
+                        $(that).append(option).trigger('change');
+                        $(that).trigger({
+                            type: 'select2:select',
+                            params: {data: data}
+                        });
                     });
                 } else {
                     $(this).select2();
                 }
 
             });
-function formatRepo (repo) {
-    console.log(repo);
-  if (repo.loading) {
-    return repo.text;
-  }
 
-  var markup = "<div class='select2-result-repository clearfix'>" +
-    "<div class='select2-result-repository__avatar'><img src='" + repo.owner.avatar_url + "' /></div>" +
-    "<div class='select2-result-repository__meta'>" +
-      "<div class='select2-result-repository__title'>" + repo.full_name + "</div>";
-
-  if (repo.description) {
-    markup += "<div class='select2-result-repository__description'>" + repo.description + "</div>";
-  }
-
-  markup += "<div class='select2-result-repository__statistics'>" +
-    "<div class='select2-result-repository__forks'><i class='fa fa-flash'></i> " + repo.forks_count + " Forks</div>" +
-    "<div class='select2-result-repository__stargazers'><i class='fa fa-star'></i> " + repo.stargazers_count + " Stars</div>" +
-    "<div class='select2-result-repository__watchers'><i class='fa fa-eye'></i> " + repo.watchers_count + " Watchers</div>" +
-  "</div>" +
-  "</div></div>";
-
-  return markup;
-}
             $('.select2').addClass("wb-plugin");
         }
 

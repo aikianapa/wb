@@ -19,7 +19,7 @@
 	<div class="form-group row">
 	  <label class="col-sm-3 form-control-label">Плательщик</label>
 	   <div class="col-sm-9">
-           <select class="form-control select2" role="foreach" data-wb-table="partners" name="payer" data-wb-where='active="on"' placeholder="Плательщик">
+           <select class="form-control select2" role="foreach" data-wb-ajax="/form/select2/partners" name="payer" data-wb-where='active="on"' placeholder="Плательщик">
                <option value="{{id}}">
                    {{inn}} {{name}} 
                </option>
@@ -40,8 +40,8 @@
     
     <div class="form-group" data-wb-role="multiinput" name="products">
         <div class="col-5">
-            <select class="form-control select2" role="foreach" data-wb-table="products" name="recipient">
-                <option value="{{id}}">{{name}}</option>
+            <select placeholder="Выберите продукцию" class="form-control select2" role="foreach" data-wb-ajax="/form/select2/products" name="recipient">
+                <option value="{{id}}">{{name}} арт.{{articul}}</option>
             </select>
         </div>
         <div class="col-2">

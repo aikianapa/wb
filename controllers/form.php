@@ -85,20 +85,25 @@ function form__controller__default_mode() {
 function form__controller__select2() {
     $form=""; $where=""; $tpl=""; $val="";
     $form=$_ENV["route"]["form"];
-    if (isset($_POST["where"]) AND $_POST["where"]>"") {$where=$_POST["where"];}
-    if (isset($_POST["tpl"]) AND $_POST["tpl"]>"") {$tpl=$_POST["tpl"];}
-    if (isset($_POST["value"]) AND $_POST["value"]>"") {$val=$_POST["value"];}
-    $list=wbItemList($form,$where);
-    $iterator=new ArrayIterator($list);
-    foreach($iterator as $key => $r) {
-        $data=wbSetValuesStr(strip_tags($tpl),$r);
-        $res=preg_match("/{$val}/ui",$data);
-        if (!$res) {unset($list[$key]);}
+    $custom="form_controller_select2_{$form}"; 
+    if (is_callable($custom)) {return $custom();} else {
+        $result=array();
+        $single=false;
+        if (isset($_POST["where"]) AND $_POST["where"]>"") {$where=$_POST["where"];}
+        if (isset($_POST["tpl"]) AND $_POST["tpl"]>"") {$tpl=$_POST["tpl"];}
+        if (isset($_POST["value"]) AND $_POST["value"]>"") {$val=$_POST["value"];}
+        if (isset($_POST["id"]) AND $_POST["id"]>"") {$where='id="'.$_POST["id"].'"'; $single=true;}
+        $list=wbItemList($form,$where);
+        $iterator=new ArrayIterator($list);
+        foreach($iterator as $key => $r) {
+            $data=wbSetValuesStr(strip_tags($tpl),$r);
+            $res=preg_match("/{$val}/ui",$data);
+            if ($res) {$result[]=array("id"=>$r["id"],"text"=>$data,"item"=>$r);}
+        }
+        if ($single AND count($result)>0) {$result=$result[0];}
+        header('Content-Type: application/json');
+        return json_encode($result);
     }
-    $ret_string="{ results: [ {id:'1', text:'Option 1'}, {id:'2', text:'Option 2'} ],more:false}";
-    header('Content-Type: application/json');
-return json_encode($ret_string);
-    //return json_encode($list);
 }
 
 function form__controller__setup_engine() {

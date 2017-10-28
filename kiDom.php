@@ -1825,7 +1825,6 @@ abstract class kiNode
 		$iterator = new tagForeachFilter($object->getIterator(),array(
 			"id"=>$id,
 		));
-
 		foreach($object as $key => $val) {
             if (!is_array($val)) {$val=array($val);}
 				$n++;
@@ -1874,6 +1873,7 @@ abstract class kiNode
 
 		if ($this->tag()=="select") {
 			if (isset($result) AND !is_array($result)) {$this->outerHtml("");}
+            if (isset($srcItem[$this->attr('name')])) $this->attr('value',$srcItem[$this->attr('name')]);
 			$plhr=$this->attr("placeholder");
 			if ($plhr>"") {$this->prepend("<option value=''>$plhr</option>");}
 		} else {
