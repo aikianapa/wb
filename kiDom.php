@@ -1213,10 +1213,10 @@ abstract class kiNode
 					if ($inc->hasRole("variable")) {$Item=$inc->tagVariable($Item);} else {
 						if ($inc->is("[data-wb-tpl=true]")) {$inc->addTemplate();}
 						$inc->wbProcess($Item,$tag);
-				if ($inc->is("[data-wb-hide=true]"))	{
-					$tmp=$inc->innerHtml();
-					$inc->replaceWith($tmp);
-				}
+                        if ($inc->is("[data-wb-hide=true]"))	{
+                            $tmp=$inc->innerHtml();
+                            $inc->replaceWith($tmp);
+                        }
 						//if (isset($_SESSION["itemAfterWhere"])) {$Item=$_SESSION["itemAfterWhere"]; unset($_SESSION["itemAfterWhere"]);}
 					}
 				}
@@ -1499,7 +1499,7 @@ abstract class kiNode
 		$var=$this->attr("var");
 		if (!isset($where)) $where=$this->attr("where");
 		if (($where>"" AND wbWhereItem($Item,$where)) OR $where=="") {
-			if ($var>"") $Item["{$var}"]=$_ENV["variables"]["{$var}"]=wbSetValuesStr($this->attr("value"),$Item);
+			if ($var>"") $_ENV["variables"]["{$var}"]=wbSetValuesStr($this->attr("value"),$Item);
 		}
 		return $Item;
 	}

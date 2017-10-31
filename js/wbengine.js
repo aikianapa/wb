@@ -520,6 +520,7 @@ function wb_base_fix() {
         var base = $("base").attr("href");
         $(document).undelegate("a", "click");
         $(document).delegate("a", "click", function (e) {
+            if (!$(this).is("[data-toggle]")) {
             var hash = $(this).attr("href");
             var role = $(this).attr("role");
             if (hash !== undefined && role == undefined && substr(hash, 0, 1) == "#") {
@@ -527,6 +528,7 @@ function wb_base_fix() {
                 var loc = str_replace(base, "", loc[0]);
                 document.location = loc + hash;
                 e.preventDefault();
+            }
             }
         });
     }

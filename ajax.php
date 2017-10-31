@@ -52,7 +52,9 @@ function ajax__setdata() {
 	$table=wbTable($form);
 	if (!isset($_REQUEST["data-wb-mode"])) {$_REQUEST["mode"]="list";} else {$_REQUEST["mode"]=$_REQUEST["data-wb-mode"];}
 	$Item=wbItemRead($table,$item);
-	$Item=(array)$Item+(array)$_REQUEST["data"];
+    if (!is_array($Item)) {$Item=array($Item);}
+    if (!is_array($_REQUEST["data"])) {$_REQUEST["data"]=array($_REQUEST["data"]);}
+	$Item=array_merge($Item,$_REQUEST["data"]);
     
     if (isset($Item["_form"])) {$_ENV["route"]["form"]=$_GET["form"]=$Item["_form"]; $_ENV["route"]["controller"]="form";}
     if (isset($Item["_item"])) {$_ENV["route"]["iten"]=$_GET["item"]=$Item["_item"];}

@@ -876,6 +876,23 @@ function wbSetValuesStr($tag="",$Item=array(), $limit=2)
 {
 	if (is_object($tag)) {$tag=$tag->outerHtml();}
 	if (!is_array($Item)) {$Item=array($Item);}
+    // Обработка для доступа к полям с JSON имеющим id в содержании, в частности к tree
+    $arr=new ArrayIterator($Item);
+    $Item=array();
+    $flag=false;
+    foreach($arr as $key => $item) {
+        if (!is_array($item) AND (substr(trim($item),0,1)=="[" OR substr(trim($item),0,1)=="{")) {
+            $item=json_decode($item,true);
+                foreach($item as $k => $a) {
+                    if (isset($a["id"]) AND $a["id"]>"" AND $key!==$a["id"]) {
+                        $flag=true;
+                        $Item[$key][$a["id"]]=$a;
+                    }
+                }
+        } else {$Item[$key]=$item;}
+    }
+    //if ($flag) print_r($Item);
+    // ================ Конец обработки ======================
 	if (is_string($tag)) {
 	//$tag=strtr($tag,array("%7B%7B"=>"{{","%7D%7D"=>"}}"));
 	$tag=str_replace(array("%7B%7B","%7D%7D"),array("{{","}}"),$tag);
