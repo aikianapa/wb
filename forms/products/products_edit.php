@@ -51,7 +51,7 @@
 	  <label class="col-sm-3 form-control-label">Цена</label>
 	   <div class="col-sm-3"><input type="number" class="form-control" name="price" min="1" placeholder="Цена розничная"></div>
 	  <label class="col-sm-3 form-control-label">Цена распродажи</label>
-	   <div class="col-sm-3"><input type="number" class="form-control" name="price" min="1" placeholder="Цена распродажи"></div>
+	   <div class="col-sm-3"><input type="number" class="form-control" name="sale" min="1" placeholder="Цена распродажи"></div>
 
 	</div>
 

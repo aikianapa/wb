@@ -13,15 +13,27 @@ return $_ENV["DOM"];
 }
 
 function form__controller__show() {
-	$Item=wbItemRead(wbTable("pages"),$_ENV["route"]["item"]);
-	if ($Item==false OR $Item["active"]!=="on") {
+	$form=$_ENV["route"]["form"];
+    $item=$_ENV["route"]["item"];
+	$mode="show";
+    $Item=wbItemRead($form,$item);
+	$aCall=$form."_".$mode; $eCall=$form."__".$mode;
+	if (is_callable($aCall)) {$out=$aCall();} elseif (is_callable($eCall) AND $engine!==false) {$out=$eCall($Item);}
+    if ($Item==false OR $Item["active"]!=="on") {
 		echo form__controller__error_404();
 		die;
 	} else {
-		if (!isset($Item["template"]) OR $Item["template"]=="") {$Item["template"]="default.php";}
-		if (is_callable("wbBeforeShowItem")) {$Item=wbBeforeShowItem($Item);}
-		$_ENV["DOM"]=wbGetTpl($Item["template"]);
-        if (!is_object($_ENV["DOM"])) {$_ENV["DOM"]=wbFromString($_ENV["DOM"]);}
+        if (isset($out)) {
+            $_ENV["DOM"]=wbFromString($out);
+        } else {
+            $out=wbGetForm($form,$mode);
+            if ($_ENV["error"]["wbGetForm"]!=="noform") { $_ENV["DOM"]=$out; } else {
+                if (!isset($Item["template"]) OR $Item["template"]=="") {$Item["template"]="default.php";}
+                if (is_callable("wbBeforeShowItem")) {$Item=wbBeforeShowItem($Item);}
+                $_ENV["DOM"]=wbGetTpl($Item["template"]);
+                if (!is_object($_ENV["DOM"])) {$_ENV["DOM"]=wbFromString($_ENV["DOM"]);}
+            }
+        }
 		$_ENV["DOM"]->wbSetData($Item);
 	}
 	return $_ENV["DOM"];
@@ -42,7 +54,7 @@ function form__controller__remove() {
 
 function form__controller__error_404($id=null) {
 	header("HTTP/1.0 404 Not Found");
-	return wbGetTpl("404.htm");
+	return wbGetTpl("404.php");
 }
 
 function form__controller__list() {

@@ -1411,16 +1411,17 @@ abstract class kiNode
 				$name=$inp->attr("name");	$def=$inp->attr("value");
 				if (substr($name,-2)=="[]") {$name=substr($name,0,-2);}
 				if (substr($def,0,3)=="{{_") {$def="";}
-				if (isset($Item[$name])) {$value=$Item[$name];} else {$value=$def;}
-				if ($value!=="") $inp->attr("value",$value);
+                if (isset($Item[$name])) {$value=$Item[$name];} else {$value=$def;}	
+                if ($inp->attr("data-name")=="dict") {
+                    if (!$inp->hasAttr("value") AND isset($Item[$name])) {$inp->attr("value",$Item[$name]);}
+                } else {
+                    if ($value!=="") {$inp->attr("value",$value);}
+                }
 				//$inp->wbDatePickerPrep();
 				if ($inp->attr("type")=="checkbox") {
 					if ($inp->attr("value")=="on" OR $inp->attr("value")=="1") {$inp->checked="checked";}
 				} 
 
-				
-				
-				
 				if ($inp->is("select") AND $inp->attr("value")>"") {
 					$value=$inp->attr("value");
 					if (is_array($value)) {
@@ -1633,22 +1634,21 @@ abstract class kiNode
 			$Item["_{$name}__dict_"]=$dictdata["_tree__dict_"];
 			if (!isset($Item[$name])) {$Item[$name]=$dictdata["tree"];}
 			unset($dictdata);
-		}
+        }
 		if (!$this->children()->length) {
 			$tree=wbGetForm("common","tree_ol");
 			$this->append("<input type='hidden' name='{$name}'><input type='hidden' name='_{$name}__dict_' data-name='dict'>");
 			if (isset($Item[$name]) && $Item[$name]!=="[]" && $Item[$name]!=="") {$tree->tagTreeData($Item[$name]);} else {$tree->find("ol")->append(wbGetForm("common","tree_row"));}
 			$this->prepend($tree);
 			$this->addClass("wb-tree dd");
-			$this->wbSetData($Item);
+            $this->wbSetData($Item);
 		} elseif ($type=="select") {
 				$this->tagTreeUl($Item);
 		} else {
 			if ($item>"") {$tree=wbTreeRead($item); $Item[$name]=$tree["tree"]; $Item["_{$name}"]=$tree["dict"];}
 			$this->tagTreeUl($Item);
 		}
-		return;
-	}
+    }
 	
 	public function tagTreeData($data=array()) {
 		$tree=wbGetForm("common","tree_ol");
