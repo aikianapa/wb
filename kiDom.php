@@ -1235,8 +1235,9 @@ abstract class kiNode
 		foreach($script as $sc) {
 			if ($sc->attr("data-wb-src")=="datepicker") {
 				if (!$sc->hasClass("wb-done")) {
+                    $lang="ru"; if ($sc->attr("data-wb-lang")>"") {$lang=$sc->attr("data-wb-lang");}
 					$sc->before('<link href="/engine/js/datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet">');
-					$sc->after('<script src="/engine/js/datetimepicker/locales/bootstrap-datetimepicker.ru.js" type="text/javascript" charset="UTF-8"></script>');
+					$sc->after('<script src="/engine/js/datetimepicker/locales/bootstrap-datetimepicker.{$lang}.js" type="text/javascript" charset="UTF-8"></script>');
 					$sc->attr("src","/engine/js/datetimepicker/bootstrap-datetimepicker.min.js");
 					$sc->addClass("wb-done");
 				}

@@ -521,14 +521,14 @@ function wb_base_fix() {
         $(document).undelegate("a", "click");
         $(document).delegate("a", "click", function (e) {
             if (!$(this).is("[data-toggle]")) {
-            var hash = $(this).attr("href");
-            var role = $(this).attr("role");
-            if (hash !== undefined && role == undefined && substr(hash, 0, 1) == "#") {
-                var loc = explode("#", window.location.href);
-                var loc = str_replace(base, "", loc[0]);
-                document.location = loc + hash;
-                e.preventDefault();
-            }
+                var hash = $(this).attr("href");
+                var role = $(this).attr("role");
+                if (hash !== undefined && role == undefined && substr(hash, 0, 1) == "#") {
+                    var loc = explode("#", window.location.href);
+                    var loc = str_replace(base, "", loc[0]);
+                    document.location = loc + hash;
+                    e.preventDefault();
+                }
             }
         });
     }
@@ -537,27 +537,48 @@ function wb_base_fix() {
 function wb_plugins() {
     $(document).ready(function () {
         if ($("[data-wb-src=datepicker]").length) {
-            var datepicker = "dd.mm.yyyy";
-            var datetimepicker = "dd.mm.yyyy hh:ii";
-
             $("[type=datepicker]:not(.wb-plugin)").each(function () {
-                $(this).attr("data-date-format", datepicker).addClass("wb-plugin");
-                $(this).val(wb_oconv_object(this));
+                if ($(this).val() > "") {
+                    $(this).attr("data-date-format", "d.m.Y"); // PHP format
+                    $(this).val(wb_oconv_object(this));
+                }
+                if ($(this).attr("data-date-format") == undefined) {
+                    $(this).attr("data-date-format", "dd.mm.yyyy"); // Plugin Format
+                }
+                $(this).addClass("wb-plugin");
+                var lang = "ru";
+                if ($(this).attr("data-wb-lang") !== undefined) {
+                    lang = $(this).attr("data-wb-lang");
+                }
                 $(this).datetimepicker({
-                    language: 'ru',
+                    language: lang,
                     autoclose: true,
                     todayBtn: true,
                     minView: 2
+                }).on('changeDate', function (ev) {
+                    $(this).attr("value",wb_iconv_object(this));
                 });
             });
 
             $("[type=datetimepicker]:not(.wb-plugin)").each(function () {
-                $(this).attr("data-date-format", datetimepicker).addClass("wb-plugin");
-                $(this).val(wb_oconv_object(this));
+                if ($(this).val() > "") {
+                    $(this).attr("data-date-format", "d.m.Y H:i"); // PHP format
+                    $(this).val(wb_oconv_object(this));
+                }
+                if ($(this).attr("data-date-format") == undefined) {
+                    $(this).attr("data-date-format", "dd.mm.yyyy hh:ii"); // Plugin Format
+                }
+                $(this).addClass("wb-plugin");
+                var lang = "ru";
+                if ($(this).attr("data-wb-lang") !== undefined) {
+                    lang = $(this).attr("data-wb-lang");
+                }
                 $(this).datetimepicker({
-                    language: 'ru',
+                    language: lang,
                     autoclose: true,
                     todayBtn: true
+                }).on('changeDate', function (ev) {
+                    $(this).attr("value",wb_iconv_object(this));
                 });
             });
         }
@@ -579,7 +600,9 @@ function wb_plugins() {
                     var where = $(this).attr("data-wb-where");
                     var val = $(this).attr("value");
                     var plh = $(this).attr("placeholder");
-                    if (plh==undefined) {plh="Поиск...";}
+                    if (plh == undefined) {
+                        plh = "Поиск...";
+                    }
                     $(this).select2({
                         language: "ru",
                         placeholder: plh,
@@ -611,13 +634,18 @@ function wb_plugins() {
                         url: url,
                         method: "post",
                         dataType: 'json',
-                        data: {id: val,tpl: $("#" + tpl).html()}
+                        data: {
+                            id: val,
+                            tpl: $("#" + tpl).html()
+                        }
                     }).then(function (data) {
                         var option = new Option(data.text, data.id, true, true);
                         $(that).append(option).trigger('change');
                         $(that).trigger({
                             type: 'select2:select',
-                            params: {data: data}
+                            params: {
+                                data: data
+                            }
                         });
                     });
                 } else {
@@ -848,23 +876,26 @@ function wb_oconv_object(obj) {
 function wb_oconv(value, type, obj) {
     var mask = "";
     if (substr(type, 0, 4) == "date") {
+        if (value == "") {
+            value = date(new Date().toLocaleString());
+        }
         if ($(obj).attr("data-date-format") !== undefined) {
             mask = $(obj).attr("data-date-format");
-            return moment(value).format(strtoupper(mask));
+            return date(mask, strtotime(value));
         } else {
             if (type == "datepicker") {
-                mask = "Y-m-d";
+                mask = "YYYY-MM-DD";
             }
             if (type == "date") {
-                mask = "Y-m-d";
+                mask = "YYYY-MM-DD";
             }
             if (type == "datetimepicker") {
-                mask = "Y-m-d H:i";
+                mask = "YYYY-MM-DD H:m";
             }
             if (type == "datetime") {
-                mask = "Y-m-d H:i";
+                mask = "YYYY-MM-DD H:m";
             }
-            return moment(value).format(mask);
+            return date(mask, strtotime(value));
         }
 
     }
