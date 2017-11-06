@@ -5,11 +5,27 @@ function form__controller() {
 	if (is_callable($call)) {
 		$_ENV["DOM"]=$call();
 	} else {
-		echo __FUNCTION__ .": отсутствует функция ".$call."()";
-		die;
+        if (form__controller__common__controller()==false) {
+		  echo __FUNCTION__ .": отсутствует функция ".$call."()";
+		  die;
+        }
 	}
 	wbTrigger("func",__FUNCTION__,"after");
 return $_ENV["DOM"];
+}
+
+function form__controller__common__controller() {
+	$mode=$_ENV["route"]["mode"];
+    $form=$_ENV["route"]["form"];
+    $item=$_ENV["route"]["item"];
+	$aCall=$form."_".$mode; $eCall=$form."__".$mode;
+    $out=false;
+	if (is_callable($aCall)) {$out=$aCall($item);} elseif (is_callable($eCall) AND $engine!==false) {$out=$eCall($item);}
+    if ($out==false) {return false;} else {
+        if (!is_object($out)) {$out=wbFromString($out);}
+        $_ENV["DOM"]=$out;
+    }
+    return true;
 }
 
 function form__controller__show() {
@@ -114,7 +130,7 @@ function form__controller__select2() {
         }
         if ($single AND count($result)>0) {$result=$result[0];}
         header('Content-Type: application/json');
-        return json_encode($result);
+        return wbJsonEncode($result);
     }
 }
 

@@ -57,8 +57,8 @@
     </div>
     <div class="form-group row">
         <label class="col-sm-3 form-control-label">Гл.бухгалтер</label>
-        <div class="col-sm-4"><input type="text" class="form-control" name="buh" value="Главный бухгалтер" placeholder="Главный бухгалтер"></div>
-        <div class="col-sm-5"><input type="text" class="form-control" name="bossname" placeholder="ФИО гл.бухгалтера"></div>      
+        <div class="col-sm-4"><input type="text" class="form-control" name="buch" value="Главный бухгалтер" placeholder="Главный бухгалтер"></div>
+        <div class="col-sm-5"><input type="text" class="form-control" name="buchname" placeholder="ФИО гл.бухгалтера"></div>      
     </div>
 
 	<div class="form-group row">

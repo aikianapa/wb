@@ -291,6 +291,10 @@ function wbWhereNotLike($ref,$val) {
 	return $res;
 }
 
+function wbJsonEncode($Item=array()) {
+    return json_encode($Item, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+}
+
 function wbItemRead($table,$id) {
 	wbTrigger("func",__FUNCTION__,"before",func_get_args());
 	if (count(explode($_ENV["path_app"],$table))==1) {$table=wbTable($table);}
@@ -301,7 +305,7 @@ function wbItemRead($table,$id) {
 		$list=wbItemList($table);
 		if (isset($list[$id])) {
 			$item=$list[$id];
-			file_put_contents($cache,json_encode($item, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE), LOCK_EX);
+			file_put_contents($cache,wbJsonEncode($item), LOCK_EX);
 		} else {
 			wbError("func",__FUNCTION__,1006,func_get_args());
 			$item=null;

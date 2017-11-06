@@ -17,4 +17,5 @@ if (!is_object($_ENV["DOM"])) {$_ENV["DOM"]=wbFromString($_ENV["DOM"]);}
 $_ENV["DOM"]->wbSetData($_ENV["ITEM"]);
 //echo $_ENV["DOM"]->beautyHtml();
 echo $_ENV["DOM"]->outerHtml();
+wbFlushDatabase();
 ?>

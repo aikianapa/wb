@@ -611,7 +611,7 @@ function wb_plugins() {
                             url: url,
                             method: "post",
                             dataType: 'json',
-                            delay: 150,
+                            delay: 200,
                             cache: true,
                             data: function (term, page) {
                                 return {
@@ -624,6 +624,7 @@ function wb_plugins() {
                             processResults: function (data) {
                                 $(that).data("wb-ajax-data", data);
                                 $(that).trigger("wb_ajax_done", [that, url, data]);
+                                $(that).data("item",data);
                                 return {
                                     results: data
                                 };
@@ -641,12 +642,21 @@ function wb_plugins() {
                     }).then(function (data) {
                         var option = new Option(data.text, data.id, true, true);
                         $(that).append(option).trigger('change');
+                        $(document).data("item",data.item);
                         $(that).trigger({
                             type: 'select2:select',
                             params: {
                                 data: data
                             }
                         });
+                    });
+                    $(that).off("change");
+                    $(that).on("change",function(){
+                        if ($(that).val()>"") {
+                            $($(that).data("item")).each(function(i,item){
+                                if (item.id==$(that).val()) {$(that).data("item",item.item);return;}
+                            });
+                        }
                     });
                 } else {
                     $(this).select2();
