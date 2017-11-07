@@ -117,7 +117,7 @@ function wb_tree() {
 
         var item = $(this).parents(".wb-tree-item").attr("data-id");
         var form = $(tree).parents("[data-wb-form]").attr("data-wb-form");
-        var text = $(this).text();
+        var text = $(this).val();
         var name = $(tree).attr("name");
 
         var edid = "#tree_" + form + "_" + name;
@@ -188,7 +188,11 @@ function wb_tree() {
                 $(data).each(function (i, d) {
                     $(that).attr(d.name, d.value);
                     if (d.name == "data-name") {
-                        $(that).children(".dd-content").html(d.value);
+                        $(that).children(".dd-content").val(d.value);
+                    }
+                    if (d.name == "data-id") {
+                            console.log(i,d);
+                        $(that).children(".dd3-btn").children("span").html(d.value);
                     }
                 });
                 var cdata = JSON.stringify($(edid).find("#treeData > form").serializeArray());

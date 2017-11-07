@@ -107,7 +107,9 @@ label.switch-primary input:checked + span {
 }
 
 .wb-tree .dd-item * {
-    cursor: context-menu;
+    margin-top: 1px;
+    margin-bottom: 1px;
+
 }
 
 .wb-tree-menu {
@@ -117,52 +119,42 @@ label.switch-primary input:checked + span {
 }
 
 .dd-item > button {
-    margin: 5px 0px 5px 30px;
+    margin: 5px 0px 5px 0px;
+    position: absolute;
 }
 
 .dd3-content {
-    display: block;
-    height: 30px;
-    margin: 5px 0;
-    padding: 5px 10px 5px 40px;
-    color: #333;
-    text-decoration: none;
-    font-weight: bold;
-    border: 1px solid #ccc;
-    background: #fafafa;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-}
-
-.dd3-content:hover {
-    color: #2ea8e5;
-    background: #fff;
-}
-
-.dd-dragel > .dd3-item > .dd3-content {
-    margin: 0;
-}
-
-.dd3-item > button {
+    width: calc(100% - 30px);
+    padding-left: 130px;
+    padding-right: 5px;
     margin-left: 30px;
+    height: 30px;
+    border-radius: 3px;
+    border: 1px #eee solid;
+    cursor: context-menu;
+}
+
+.dd-item > button:before {
+    content: "\f196";
+    font-family: FontAwesome;
+    font-size: 17px;
+    color: #327bf8;
+}
+
+.dd-item > button[data-action="collapse"]:before {
+    content: "\f147";
 }
 
 .dd3-handle {
     position: absolute;
     margin: 0;
-    left: 0;
+    left: 30px;
     top: 0;
     cursor: pointer;
     width: 30px;
     text-indent: 100%;
     white-space: nowrap;
     overflow: hidden;
-    border: 1px solid #aaa;
-    background: #ddd;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
 }
 
 .dd3-handle:before {
@@ -179,12 +171,10 @@ label.switch-primary input:checked + span {
     font-weight: normal;
 }
 
-.dd3-handle:hover {
-    background: #ddd;
-}
-
 .dd3-btn {
+    position: absolute;
     margin: 0;
+    left: 55px;
     cursor: pointer!important;
     height: 30px;
     white-space: nowrap;
@@ -195,10 +185,16 @@ label.switch-primary input:checked + span {
     background: #ddd;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
+    width: 100px;
+    min-width: 100px;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    z-index: 10;
 }
 
 .dd3-btn:hover {
     background: #ddd;
+    width: auto;
 }
 
 .tree-edit.modal {
@@ -230,11 +226,20 @@ select.form-control + .select2-container {
     max-width: 200px;
 }
 
-.modal[role=dialog] {overflow-y: auto;}
+.modal[role=dialog] {
+    overflow-y: auto;
+}
 
 @media screen {
-    .wb-print-box {display:none; opacity:0;}
+    .wb-print-box {
+        display: none;
+        opacity: 0;
+    }
 }
+
 @media print {
-    .wb-print-box {display:block; opacity:1;}
+    .wb-print-box {
+        display: block;
+        opacity: 1;
+    }
 }

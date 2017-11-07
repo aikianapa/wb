@@ -7602,7 +7602,8 @@ strong {
 
 .content-box {
   vertical-align: top;
-  padding: 2rem 3rem; }
+  padding: 2rem 3rem; 
+min-height: 90vh;}
 
 .content-panel {
   vertical-align: top;
@@ -8332,7 +8333,7 @@ strong {
   .menu-side-compact-w .logged-user-w {
     position: relative; }
     .menu-side-compact-w .logged-user-w .avatar-w img {
-      width: 40px; }
+      width: 40px; height: 40px;}
     .menu-side-compact-w .logged-user-w .logged-user-i {
       display: inline-block; }
       .menu-side-compact-w .logged-user-w .logged-user-i:hover {
@@ -9008,7 +9009,7 @@ strong {
       padding: 0px;
       border: none; }
       .top-menu-secondary .logged-user-w .avatar-w img {
-        width: 40px; }
+        width: 40px; height:40px;}
     .top-menu-secondary .logged-user-w .logged-user-i {
       display: inline-block; }
       .top-menu-secondary .logged-user-w .logged-user-i:hover {

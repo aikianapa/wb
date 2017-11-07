@@ -1719,7 +1719,8 @@ abstract class kiNode
 						"limit"=>$limit,
 					);
 					$child->tagTreeUl($item["children"],$param);
-					if ($limit==0 OR $level<=$limit) {$this->append($child);}
+					//if ($limit==0 OR $level<=$limit) {$this->append($child);}
+                    if ($level<=$limit) {$this->append($child);}
 					$level--;
 				}
 			
@@ -1953,12 +1954,23 @@ public function tagInclude($Item) {
 			}
 			if ($name>"") {$this_content->find("textarea.{$ssrc}")->attr("name",$name);}
 		}
+        if ($this->find("include")->length) { 
+            $this->includeTag($Item);
+        } else {
+			$this->append($this_content);
+		} 
+		$this->wbSetData($Item);
+	}
 
-
-
-		if (count($this->find("include"))>0) {
+    public function includeTag($Item) {
+		 if ($this->find("include")->length) { 
 			$this->append("<div id='___include___' style='display:none;'>{$this_content}</div>");
 			foreach($this->find("include") as $inc) {
+                $from=$inc->attr("data-wb-from");
+                if ($from>"") {
+                    $Item=wbItemToArray($Item);
+                    $this->find("#___include___")->html(wbGetDataWbFrom($Item,$from));
+                }
 				$attr=array("html","outer","htmlOuter","outerHtml","innerHtml","htmlInner","text","value");
 				foreach ($attr as $key => $attribute) {
 					$find=$inc->attr($attribute);
@@ -1973,30 +1985,29 @@ public function tagInclude($Item) {
 				$inc->remove();
 			}; unset($inc);
 			$this->find("#___include___")->remove();
-		} else {
-			$this->append($this_content);
-		}
-		$this->wbSetData($Item);
-	}
-
+         }
+    }
+    
 	public function tagFormData($Item=array()) {
 		$srcItem=$Item;
 		include("wbattributes.php");
 		if (isset($form) AND !isset($table)) {$table=$form;}
 		if (isset($vars) AND $vars>"") {$Item=attrAddData($vars,$Item);}
-		if (isset($from) AND $from>"") {$Item=$Item[$from];}
+		if (isset($from) AND $from>"") {$Item=wbGetDataWbFrom($Item,$from);}
 		if (isset($json) AND $json>"") {$Item=json_decode($json,true);}
 		if (!isset($mode) OR $mode=="") {$mode="show";}
 		if (isset($table) AND $table>"") {
 			if (isset($item) AND $item>"") {$Item=wbItemRead(wbTable($table),$item);}
-			if (isset($vars) AND $vars>"") {$Item=attrAddData($vars,$Item);}
 		}
 		if (isset($field) AND $field>"") {
-			$tmparr=json_decode($Item[$field],true);
-			if (is_array($tmparr)) {$Item=$tmparr; unset($tmparr);} else {$Item=$Item[$field];}
+            print_r($field);
+            $Item=wbGetDataWbFrom($Item,$field);
+            //print_r($Item); die;
 		}
+        if (isset($vars) AND $vars>"") {$Item=attrAddData($vars,$Item);}
 		if (isset($call) AND is_callable($call)) {$Item=$call($Item);}
 		if (is_array($srcItem)) {foreach($srcItem as $k => $v) {$Item["%{$k}"]=$v;}; unset($v);}
+        $this->includeTag($Item);
 		$Item=wbCallFormFunc("BeforeShowItem",$Item,$table,$mode);
 		$this->wbSetData($Item);
 		//$this->html(clearValueTags($this->html()));

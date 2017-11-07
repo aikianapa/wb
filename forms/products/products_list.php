@@ -14,7 +14,7 @@
 					<span class="fa fa-gear"></span></a>
 					</b>
 					
-				<ul id="{{_GET[form]}}Catalog" data-wb-role="tree" data-wb-item="{{_GET[form]}}_category" data-add="true" class="sidebar-nav">
+				<ul id="{{_GET[form]}}Catalog" data-wb-role="tree" data-wb-item="{{_GET[form]}}_category" data-add="true" class="sidebar-nav list-unstyled">
 					<li>
 						<a data-wb-ajax="/form/list/products/{{id}}/" title="{{name}}" data-wb-html="#{{_GET[form]}}List .list">{{name}}</a>
 					</li>

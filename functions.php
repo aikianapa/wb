@@ -59,6 +59,37 @@ function wbInitFunctions() {
 	wbTrigger("func",__FUNCTION__,"after",func_get_args());
 }
 
+function wbItemToArray($Item=array()) {
+    foreach($Item as $i => $item) {
+        if (!is_array($item) AND substr($item,0,2)=="[{") {
+            $item=wbItemToArray(json_decode($item,true));
+        }
+        $Item[$i]=$item;
+        if (isset($item["id"])) {unset($Item[$i]); $Item[$item["id"]]=$item;}
+
+    }
+    return $Item;
+}
+
+function wbGetDataWbFrom($Item,$str) {
+    $str=trim($str);
+    $str=wbSetValuesStr($str,$Item);
+    $Item=wbItemToArray($Item);
+    $pos=strpos($str,"[");
+    if ($pos) {
+        $fld="[".substr($str,0,$pos)."]";
+        $suf=substr($str,$pos);
+        $fld.=$suf;
+        $fld=str_replace('[','["',$fld);
+        $fld=str_replace(']','"]',$fld);
+        $fld=str_replace('""','"',$fld);
+        eval('$res=$Item'.$fld.';');
+        return $res;
+    } else {
+        return $Item[$str];
+    }
+}
+
 function wbFieldBuild($param) {
 	$set=wbGetForm("common","tree_fldset");
 	$tpl=wbGetForm("snippets",$param["type"]);
