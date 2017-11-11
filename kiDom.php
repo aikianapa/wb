@@ -1605,12 +1605,21 @@ abstract class kiNode
 	public function tagHideAttrs() {
 		$hide=$this->attr("data-wb-hide");
 		$hide=trim(str_replace(","," ",$hide));
-		$list=explode(" ",$hide);
+        if ($hide=="wb") {
+            $list=$this->attributes();
+            foreach($list as $attr) {
+                if (substr($attr->name,0,8)=="data-wb-") {$this->removeAttr($attr->name);}
+            }
+        } elseif ($hide=="*") {
+            $this->after($this->innerHtml()); $this->remove();
+        } 
+        $list=explode(" ",$hide);
 		foreach($list as $attr) {
 			$this->removeAttr($attr);
 		}
-		$this->removeAttr("data-wb-hide");
-		if ($hide=="*") {$this->after($this->innerHtml()); $this->remove();}
+
+		
+        		$this->removeAttr("data-wb-hide");
 	}
 
 	public function tagCart() {
@@ -1671,7 +1680,8 @@ abstract class kiNode
 	}
 
 	public function tagTreeUl($Item=array(),$param=null) {
-		$limit=0; $limlevel=0; $level=0; $tree=$Item; $branch=0; $parent=1;
+     
+		$limit=-1; $level=0; $tree=$Item; $branch=0; $parent=1;
 		if ($param==null) {
 			include("wbattributes.php");
 			$name=$this->attr("name"); 
@@ -1679,56 +1689,46 @@ abstract class kiNode
 			if ($name=="" AND isset($item)) {$name=$item;}
 			if (!is_array($Item[$name])) {$tree=json_decode($Item[$name],true);} else {$tree=$Item[$name];}
 			$tag=$this->tag();
-			if (!isset($limit) OR $limit=="false" OR $limit*1<0) {$limit=0;} else {$limit=$limit*1;}
+			if (!isset($limit) OR $limit=="false" OR $limit*1<0) {$limit=-1;} else {$limit=$limit*1;}
 		} else {
 			foreach($param as $k =>$val) {$$k=$val;}
 			$tree=$Item;
 		}
 		if (isset($parent) AND ($parent=="false" OR $parent=="0" OR $parent==0)) {$parent=0;} else {$parent=1;}
-		$tpl=$this->html();
+        $tpl=$this->html();
 		$this->html("");
 		if ($branch!==0) {$tree=array(wbTreeFindBranchById($tree,$branch));}
 		if ($this->hasAttr("placeholder") AND $this->is("select")) {
 			$this->prepend("<option value='' class='placeholder'>".$this->attr("placeholder")."</option>");
 		}
-//		$srcVal=array(); foreach($srcItem as $k => $v) {$srcVal["%{$k}"]=$v;}; unset($v);
-		foreach($tree as $item) {
-//				$item=(array)$srcVal + (array)$item; // сливаем массивы
-				if ($parent==1) {
-						$line=wbFromString($tpl);
-						$line->wbSetData($item);
-						$this->append($line);
-				} else {$parent=2;}
-				if (is_array($item["children"])) {
-					$level++;
-					if ($tag=="select") {
-						$child=wbFromString($tpl);
-						$child->children("option")->prepend(str_repeat("<span>&nbsp;&nbsp;<span>",$level));
-					} else {
-						if ($parent==1) {
-							$child=wbFromString("<{$tag}>{$tpl}</{$tag}>");
-						} else {
-							$child=wbFromString($tpl);
-						}
-					}
-					$param=array(
-						"name"=>$name,
-						"tag"=>$tag,
-						"level"=>$level,
-						"parent"=>$parent,
-						"limit"=>$limit,
-					);
-					$child->tagTreeUl($item["children"],$param);
-					//if ($limit==0 OR $level<=$limit) {$this->append($child);}
-                    if ($level<=$limit) {$this->append($child);}
-					$level--;
-				}
-			
-		}
-		return;
-	}
-
-
+        foreach($tree as $i => $item) {
+            $item["_idx"]=$i;
+            $line=wbFromString($tpl);
+            $line->wbSetData($item);
+            if (is_array($item["children"]) AND count($item["children"])) {
+                $level++;
+                if ($limit==-1 OR $level<=$limit) {
+				$param=array("name"=>$name,"tag"=>$tag,"level"=>$level,"parent"=>$parent,"limit"=>$limit);
+                $child=wbFromString($tpl);
+                $child->tagTreeUl($item["children"],$param);
+                    
+    	if ($tag=="select") {
+							$child->children("option")->prepend(str_repeat("<span>&nbsp;&nbsp;<span>",$level));
+					} 
+                    
+                    if ($parent!==1) {
+                        $line->html($child);
+                    } else {
+                        $line->children(":first-child")->append("<{$tag}>".$child->outerHtml()."</{$tag}>");        
+                    }
+                
+                }
+                $level--;
+            }
+            $this->append($line);
+        }
+    }
+    
 	public function tagImageLoader($Item) {
 			if ($this->attr("load")!==1) {
 				$form=$_GET["form"];
@@ -1777,7 +1777,7 @@ abstract class kiNode
 			if (!isset($_GET["page"]) OR $_GET["page"]=="") {$page=1;} else {$page=$_GET["page"]*1;}
 		} else {$page=$page*1;}
 		if ( $from > "") {
-			if (isset($Item[$from])) {
+			if (isset($Item[$from]) AND !strpos("[",$from)) {
 				if (isset($Item["form"])) {$table=$Item["form"];} else {$table="";}
 				if (isset($Item["id"])) {$item=$Item["id"];} else {$item="";}
 				$Item=$Item[$from];
@@ -1785,10 +1785,10 @@ abstract class kiNode
 				if ($field>"") {$Item=$Item[$field];}
 				if (!is_array($Item)) {$Item=json_decode($Item,true);}
 			} else {
-				$Item=array();
-				$json=json_decode($from,true); if (is_array($json)) {$Item=$json;}
-			}
+                $Item=wbGetDataWbFrom($Item,$from);
+            }
 		}
+        
         if (isset($count) AND $count>"") {$Item=array();$count=$count*1;for($i=1;$i<=$count;$i++){$Item[$i]=$i;};}
 		if ($table > "") {
 			$table=wbTable($table);
@@ -2000,9 +2000,7 @@ public function tagInclude($Item) {
 			if (isset($item) AND $item>"") {$Item=wbItemRead(wbTable($table),$item);}
 		}
 		if (isset($field) AND $field>"") {
-            print_r($field);
             $Item=wbGetDataWbFrom($Item,$field);
-            //print_r($Item); die;
 		}
         if (isset($vars) AND $vars>"") {$Item=attrAddData($vars,$Item);}
 		if (isset($call) AND is_callable($call)) {$Item=$call($Item);}

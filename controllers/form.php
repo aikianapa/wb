@@ -46,6 +46,7 @@ function form__controller__show() {
             if ($_ENV["error"]["wbGetForm"]!=="noform") { $_ENV["DOM"]=$out; } else {
                 if (!isset($Item["template"]) OR $Item["template"]=="") {$Item["template"]="default.php";}
                 if (is_callable("wbBeforeShowItem")) {$Item=wbBeforeShowItem($Item);}
+                $Item=wbCallFormFunc("BeforeShowItem",$Item,$form,$mode);
                 $_ENV["DOM"]=wbGetTpl($Item["template"]);
                 if (!is_object($_ENV["DOM"])) {$_ENV["DOM"]=wbFromString($_ENV["DOM"]);}
             }
