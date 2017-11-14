@@ -1776,7 +1776,7 @@ abstract class kiNode
 		if (!isset($page) OR 1*$page<=0) {
 			if (!isset($_GET["page"]) OR $_GET["page"]=="") {$page=1;} else {$page=$_GET["page"]*1;}
 		} else {$page=$page*1;}
-		if ( $from > "") {
+		if ( isset($from) AND $from > "") {
 			if (isset($Item[$from]) AND !strpos("[",$from)) {
 				if (isset($Item["form"])) {$table=$Item["form"];} else {$table="";}
 				if (isset($Item["id"])) {$item=$Item["id"];} else {$item="";}
@@ -1788,13 +1788,16 @@ abstract class kiNode
                 $Item=wbGetDataWbFrom($Item,$from);
             }
 		}
+        if (isset($json) AND $json> "") {
+            $Item=json_decode($json,true);
+        }
         
         if (isset($count) AND $count>"") {$Item=array();$count=$count*1;for($i=1;$i<=$count;$i++){$Item[$i]=$i;};}
 		if ($table > "") {
-			$table=wbTable($table);
+            $table=wbTable($table);
 			if ($item>"") {
 				$Item[0]=wbItemRead($table,$item);
-				if ($field>"") {
+                if ($field>"") {
 					$Item=$Item[0][$field];
 					if (is_string($Item)) { $Item=json_decode($Item,true); }
 					if (isset($Item[0]["img"]) && isset($Item[0]["visible"])) {
@@ -1805,7 +1808,6 @@ abstract class kiNode
 				$Item=wbItemList($table,$where);
 			}
 		}
-
 		if (is_string($Item)) $Item=json_decode($Item,true);
 		if (!is_array($Item)) $Item=array($Item);
 		if ($sort>"") {$Item=wbArraySort($Item,$sort);}
@@ -1828,17 +1830,18 @@ abstract class kiNode
 			"id"=>$id,
 		));
 		foreach($object as $key => $val) {
-            if (!is_array($val)) {$val=array($val);}
+            $val=wbItemToArray($val);
 				$n++;
 				if ($size!==false) $minpos=$size*$page-($size*1)+1; $maxpos=($size*$page);
 				if ($size==false OR ($n<=$maxpos AND $n>=$minpos)) {
 					$itemform=""; if (isset($val["_table"])) {$itemform=$val["_table"];}
 					$text=$tmptpl->clone();
 					$val=(array)$srcVal + (array)$val; // сливаем массивы
-					$text->find(":first")->attr("idx",$key);
+                    $text->find(":first")->attr("idx",$key);
 					$val["_key"]=$key;
 					$val["_idx"]=$ndx;
 					$val["_ndx"]=$ndx+1;
+                    $val=wbCallFormFunc("BeforeShowItem",$val,$itemform);
 					$text->wbSetData($val);
 					$flag=true;
 					if ($flag==true AND $where>"") {$flag=wbWhereItem($val,$where);}
@@ -2009,7 +2012,7 @@ public function tagInclude($Item) {
 		$Item=wbCallFormFunc("BeforeShowItem",$Item,$table,$mode);
 		$this->wbSetData($Item);
 		//$this->html(clearValueTags($this->html()));
-	}
+    }
 
 public function tagThumbnail($Item=array()) {
 	$bkg=false; $img="";

@@ -111,10 +111,22 @@ function wbFieldBuild($param) {
 				$tpl->find("datalist")->attr("data-wb-role","foreach");
 			} else {$tpl->find("datalist")->remove();}
 			break;
+        case "enum":
+            if (substr($param["value"],0,2)=="[{") {
+                $arr=json_encode($param["value"],true);
+            } else {
+                $arr=explode(";",$param["value"]);
+                foreach($arr as $i => $line) {
+                    unset($arr[$i]); $arr[$line]=array("id"=>$line,"name"=>$line);
+                }
+            }
+            $param["value"]=$arr;
+            $tpl->wbSetData($param);
+            break;
 
 	}
 	$set->find(".form-group > label")->html($param["label"]);
-	$set->find(".form-group > div")->html($tpl);
+	$set->find(".form-group > div")->html($tpl->outerHtml());
 	$set->wbSetValues($param);
 	return $set->outerHtml();
 }
@@ -905,6 +917,17 @@ function wbAttrToArray($attr) {
 	$attr=str_replace(","," ",$attr);
 	$attr=str_replace(";"," ",$attr);
 	return explode(" ",trim($attr));
+}
+
+function wbGetWords($str,$w) {
+	$res="";
+	$arr=explode(" ",trim($str));
+	for ($i=0; $i<=$w; $i++) {
+		if (isset($arr[$i])) $res=$res." ".$arr[$i];
+	}
+	if (count($arr)>$w) {$res=$res."...";}
+	$res=trim($res);
+	return $res;
 }
 
 function wbSetValuesStr($tag="",$Item=array(), $limit=2)

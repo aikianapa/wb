@@ -542,13 +542,12 @@ function wb_plugins() {
     $(document).ready(function () {
         if ($("[data-wb-src=datepicker]").length) {
             $("[type=datepicker]:not(.wb-plugin)").each(function () {
-                if ($(this).val() > "") {
-                    $(this).attr("data-date-format", "d.m.Y"); // PHP format
-                    $(this).val(wb_oconv_object(this));
-                }
                 if ($(this).attr("data-date-format") == undefined) {
                     $(this).attr("data-date-format", "dd.mm.yyyy"); // Plugin Format
+                } else {
+                    $(this).attr("data-date-format", "dd.mm.yyyy");
                 }
+                if ($(this).val() > "") {$(this).val(wb_oconv_object(this));}
                 $(this).addClass("wb-plugin");
                 var lang = "ru";
                 if ($(this).attr("data-wb-lang") !== undefined) {
@@ -565,13 +564,12 @@ function wb_plugins() {
             });
 
             $("[type=datetimepicker]:not(.wb-plugin)").each(function () {
-                if ($(this).val() > "") {
-                    $(this).attr("data-date-format", "d.m.Y H:i"); // PHP format
-                    $(this).val(wb_oconv_object(this));
-                }
                 if ($(this).attr("data-date-format") == undefined) {
                     $(this).attr("data-date-format", "dd.mm.yyyy hh:ii"); // Plugin Format
+                } else {
+                    $(this).attr("data-date-format", "dd.mm.yyyy hh:ii");
                 }
+                if ($(this).val() > "") {$(this).val(wb_oconv_object(this));}
                 $(this).addClass("wb-plugin");
                 var lang = "ru";
                 if ($(this).attr("data-wb-lang") !== undefined) {
@@ -864,19 +862,9 @@ function wb_iconv_object(obj) {
 
 function wb_iconv(value, type) {
     if (substr(type, 0, 4) == "date") {
-        if (type == "datepicker") {
-            mask = "Y-m-d";
-        }
-        if (type == "date") {
-            mask = "Y-m-d";
-        }
-        if (type == "datetimepicker") {
-            mask = "Y-m-d H:i";
-        }
-        if (type == "datetime") {
-            mask = "Y-m-d H:i";
-        }
-        return date(mask, strtotime(value));
+        if (type == "date" || type == "datepicker") { mask = "Y-m-d";}
+        if (type == "datetime" || type == "datetimepicker") { mask = "Y-m-d H:i"; }
+        value=date(mask, strtotime(value));
     }
     return value;
 }
@@ -895,20 +883,16 @@ function wb_oconv(value, type, obj) {
         }
         if ($(obj).attr("data-date-format") !== undefined) {
             mask = $(obj).attr("data-date-format");
+            mask=str_replace("yyyy","Y",mask);
+            mask=str_replace("hh","H",mask);
+            mask=str_replace("ii","i",mask);
+            mask=str_replace("ss","s",mask);
+            mask=str_replace("mm","m",mask);
+            mask=str_replace("dd","d",mask);
             return date(mask, strtotime(value));
         } else {
-            if (type == "datepicker") {
-                mask = "YYYY-MM-DD";
-            }
-            if (type == "date") {
-                mask = "YYYY-MM-DD";
-            }
-            if (type == "datetimepicker") {
-                mask = "YYYY-MM-DD H:m";
-            }
-            if (type == "datetime") {
-                mask = "YYYY-MM-DD H:m";
-            }
+        if (type == "date" || type == "datepicker") { mask = "Y-m-d";}
+        if (type == "datetime" || type == "datetimepicker") { mask = "Y-m-d H:i"; }
             return date(mask, strtotime(value));
         }
 
