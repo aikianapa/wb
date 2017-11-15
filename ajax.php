@@ -2,7 +2,10 @@
 function ajax__pagination() {
 	$res=array();
 	foreach($_POST as $key =>$val) {$$key=$val;}
-	if (!isset($page)) $page=1;
+    $vars=wbItemToArray(json_decode($vars,true));
+    $_ENV=array_merge($_ENV,$vars);
+
+    if (!isset($page)) $page=1;
 	if (!isset($find)) $find="";
 	$fe=wbFromString("<div>".$foreach."</div>");
 	//$fe->find("[data-wb-tpl={$tplid}]")->attr("data-find",$find);
@@ -18,6 +21,13 @@ function ajax__pagination() {
 	$res["pagr"]=$fe->find("#ajax-{$tplid}")->outerHtml();
 	$res["pages"]=$fe->find("[data-wb-tpl={$tplid}]")->attr("data-wb-pages");
 	return json_encode($res);
+}
+
+function ajax__pagination_vars() {
+    $tplid=$_ENV["route"]["params"][0];
+    $res=$_SESSION["temp"][$tplid];
+    unset($_SESSION["temp"][$tplid]);
+    return wbJsonEncode($res);
 }
 
 function ajax__save($form=null) {

@@ -1325,9 +1325,12 @@ function wb_pagination(pid) {
         var slr = ".pagination[id=" + pid + "]";
     }
     $.each($(document).find(slr), function (idx) {
+        var that=this;
         var id = $(this).attr("id");
-        if ($(this).is(":not([data-idx])")) {
-            $(this).attr("data-idx", idx);
+        var tplid=substr(id,5);
+        if ($(this).is(":not([data-idx])")) {     $(this).attr("data-idx", idx);}
+        if ($("[data-wb-tpl="+tplid+"]").data("variables")==undefined) {
+            $.get("/ajax/pagination_vars/"+id,function(data){$("[data-wb-tpl="+tplid+"]").data("variables",data);});            
         }
         /*
         		$("thead[data='"+id+"']").attr("data-idx",idx);
@@ -1340,6 +1343,16 @@ function wb_pagination(pid) {
         */
         $("[data-page^=" + id + "]").hide().removeClass("hidden");
         $("[data-page=" + id + "-1]").show();
+        $(document).undelegate(".pagination[id=" + id + "] > a", "click");
+        $(document).delegate(".pagination[id=" + id + "] > a",  "click", function (event) {
+            if ($(this).hasClass("next")) {
+                $(this).parents(".pagination").find("li.active").next("li").find("a").trigger("click");
+            }
+            if ($(this).hasClass("prev")) {
+                $(this).parents(".pagination").find("li.active").prev("li").find("a").trigger("click");
+            }
+        });
+
         $(document).undelegate(".pagination[id=" + id + "] li a, thead[data=" + id + "] th[data-sort]", "click");
         $(document).delegate(".pagination[id=" + id + "] li a, thead[data=" + id + "] th[data-sort]", "click", function (event) {
             if (!$(this).is("a") || !$(this).parent().hasClass("active")) { // отсекает дубль вызова ajax, но не работает trigger в поиске
@@ -1410,6 +1423,7 @@ function wb_pagination(pid) {
                         page: arr[2],
                         size: size,
                         cache: cache,
+                        vars: $("[data-wb-tpl="+arr[1]+"]").data("variables"),
                         foreach: foreach
                     };
                     var url = "/ajax/pagination/";

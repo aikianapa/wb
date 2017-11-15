@@ -1825,6 +1825,7 @@ abstract class kiNode
 
 		$ndx=0; $n=0; $f=0;
 		$tmptpl=wbFromString($tpl);
+        if (isset($rand) AND $rand=="true") {shuffle($Item);}
         $object = new ArrayObject($Item);
 		$iterator = new tagForeachFilter($object->getIterator(),array(
 			"id"=>$id,
@@ -2142,6 +2143,13 @@ public function tagThumbnail($Item=array()) {
 		$this->attr("data-wb-pages",$pages);
 		$tplId=$this->attr("data-wb-tpl");
 		$class="ajax-".$tplId;
+        if (!isset($_SESSION["temp"])) {$_SESSION["temp"]=array();}
+        $_SESSION["temp"][$class]=$_ENV;
+        unset($_SESSION["temp"][$class]["DOM"],
+              $_SESSION["temp"][$class]["cache"],
+              $_SESSION["temp"][$class]["error"],
+              $_SESSION["temp"][$class]["errors"]
+             );
 		if (is_object($this->parent("table")) && $this->parent("table")->find("thead th[data-sort]")->length) {
 			$this->parent("table")->find("thead")->attr("data-wb-cache",$cacheId);
 			$this->parent("table")->find("thead")->attr("data-wb-size",$size);

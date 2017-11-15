@@ -34,8 +34,8 @@ function form__controller__show() {
 	$mode="show";
     $Item=wbItemRead($form,$item);
 	$aCall=$form."_".$mode; $eCall=$form."__".$mode;
-	if (is_callable($aCall)) {$out=$aCall();} elseif (is_callable($eCall) AND $engine!==false) {$out=$eCall($Item);}
-    if ($Item==false OR $Item["active"]!=="on") {
+	if (is_callable($aCall)) {$out=$aCall($Item);} elseif (is_callable($eCall) AND $engine!==false) {$out=$eCall($Item);}
+    if ($Item==false OR (isset($Item["active"]) AND $Item["active"]!=="on")) {
 		echo form__controller__error_404();
 		die;
 	} else {
