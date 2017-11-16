@@ -668,7 +668,6 @@ function wb_plugins() {
 
             $('.select2').addClass("wb-plugin");
         }
-
         if ($('.input-tags').length) {
             $('.input-tags').each(function () {
                 if ($(this).attr("placeholder") !== undefined) {
@@ -693,6 +692,16 @@ function wb_plugins() {
                 });
             });
 
+        }
+        if ($('.rating').length) {
+            $('.rating:not(.wb-plugin)').each(function () {
+                $(this).addClass("wb-plugin");
+                $(this).rating({
+                    filled: 'fa fa-bell',
+                    empty: 'fa fa-bell-o'
+                });
+                
+            });
         }
 
         if (is_callable("wb_plugin_editor")) wb_plugin_editor();

@@ -157,11 +157,8 @@ function wbTable($table="data",$engine=false) {
 	$table=wbTablePath($table,$engine);
 	$_ENV[$table]["name"]=$tname;
 	if (!is_file($table)) {
-        $res=file_put_contents($table,"");
-        if (!res) {
-		  wbError("func",__FUNCTION__,1001,func_get_args());
-		  $table=null;
-        }
+        wbError("func",__FUNCTION__,1001,func_get_args()); 
+        $table=null;
 	} else {
 		$_ENV["cache"][$table]=json_decode(file_get_contents($table),true);
 	}
@@ -367,7 +364,9 @@ function wbCacheName($table,$id=null) {
 	$tmp=explode($_ENV["dbe"],$table);
 	if (count($tmp)==2) {$dbc=$_ENV["dbec"];$db=$_ENV["dbe"];} else {$dbc=$_ENV["dbac"];$db=$_ENV["dba"];}
 	$tname=str_replace($db."/","",$table);
-	if (!is_dir($dbc."/".$tname)) {mkdir($dbc."/".$tname,0777);}
+    if (!is_dir($db)) {mkdir($db,0777);}
+    if (!is_dir($dbc)) {mkdir($dbc,0777);}
+    if (!is_dir($dbc."/".$tname)) {mkdir($dbc."/".$tname,0777);}
 	if ($id==null) {$cache=$cache=$dbc."/".$tname;} else {$cache=$dbc."/".$tname."/".$id;}
 	return $cache;
 }

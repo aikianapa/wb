@@ -33,6 +33,24 @@
 @import url('/engine/lib/fonts/font-awesome/css/font-awesome.min.css');
 @import url('/engine/lib/fonts/simple-line-icons/css/simple-line-icons.css');
 
+/* bootstrap-rating - v1.3.2 - (c) 2016 dreyescat 
+https://github.com/dreyescat/bootstrap-rating MIT */
+.symbol {
+  display: inline-block;
+  border-radius: 50%;
+  border: 5px double white;
+  width: 30px;
+  height: 30px;
+}
+
+.symbol-empty {
+  background-color: #ccc;
+}
+
+.symbol-filled {
+  background-color: black;
+}
+
 /*
 =================================================================
 (#03fcs) FullCalendar

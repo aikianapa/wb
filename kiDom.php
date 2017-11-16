@@ -1242,6 +1242,11 @@ abstract class kiNode
 					$sc->addClass("wb-done");
 				}
 			}
+            if ($sc->attr("data-wb-src")=="plugins") {
+                $sc->before('<link href="/engine/js/plugins/plugins.css" rel="stylesheet">');
+                $sc->after('<script src="/engine/js/plugins/plugins.js" type="text/javascript"></script>');
+                $sc->remove();
+            }
       if ($sc->attr("data-wb-src")=="ckeditor") {
 				if (!$sc->hasClass("wb-done")) {
 					$sc->before('<link href="/engine/js/ckeditor/style.css" rel="stylesheet">');
@@ -5073,11 +5078,9 @@ class kiNodesList extends kiList
 }
 
 // Класс для работы $_SESSION через memcache
-class MemcachedSessionHandler implements \SessionHandlerInterface
+/*class MemcachedSessionHandler implements \SessionHandlerInterface
 {
-    /**
-     * @var Memcached
-     */
+    
     private $memcached;
     private $ttl;
     private $prefix;
@@ -5141,5 +5144,5 @@ class MemcachedSessionHandler implements \SessionHandlerInterface
     }
 }
 
-
+*/
 ?>
