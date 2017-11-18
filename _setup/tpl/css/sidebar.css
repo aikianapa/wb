@@ -1,0 +1,50 @@
+@media (min-width: 768px) {
+  .main { padding-right: 10px; padding-left: 10px; }
+  [data-role=multiinput] .multi-fld-row label {display: none;}
+  [data-role=multiinput] .multi-fld-row .col-sm-12 label {display: inline-block;}
+  [data-role=multiinput] .multi-fld-row:first-child label {display: inline-block;}
+}
+
+
+.sidebar {position: fixed; top: 51px; bottom: 0; left: 0; z-index: 1000; display: block; padding: 20px;
+	overflow-x: hidden; overflow-y: auto; background-color: #f5f5f5; border-right: 1px solid #eee;
+}
+
+.sidebar, .main{
+	-webkit-transition: margin 200ms ease-out;
+	-moz-transition: margin 200ms ease-out;
+	-o-transition: margin 200ms ease-out;
+	transition: margin 200ms ease-out;
+}
+
+body {margin-top:50px;}
+
+@media (max-width: 768px) {
+	.main{position: absolute;width: calc(100% - 40px); margin-left: 40px;float: right;}
+	.sidebar:hover + .main{margin-left: 200px;}
+	.sidebar .navbar-brand, .sidebar .navbar-header{text-align: center;width: 100%;margin-left: 0px;}
+	.sidebar a{padding-right: 5px;}
+	.sidebar .nav-sidebar .open .dropdown-menu {
+		position: static;float: none;width: auto;
+		margin-top: 0;background-color: transparent;
+		border: 0;	-webkit-box-shadow: none; box-shadow: none;
+	}
+	.sidebar .navbar-collapse, .sidebar .container-fluid{padding: 0 0px 0 0px;}
+	.sidebar {width: 200px;height: 100%;margin-left: -160px;float: left;z-index:1020;margin-bottom: 0px; }
+	.sidebar li {width: 100%;}
+	.sidebar li.active a .btn {display:none !important;}
+	.sidebar:hover{margin-left: 0px; background-color: #f5f5f5;}
+	.sidebar:hover li.active a span.btn {display:inline-block !important;}
+	.forAnimate{opacity: 0;}
+	.navbar-inverse .nav-sidebar .open .dropdown-menu>li>a {color: #777;}
+}
+
+@media (min-width: 768px) {
+	.sidebar{margin-left: 0px;float: left;}
+	.sidebar .forAnimate{opacity: 1;}
+}
+
+.sidebar .nav-sidebar > li:first-child{border-top: 1px #e5e5e5 solid;}
+.sidebar .nav-sidebar > li{border-bottom: 1px #e5e5e5 solid;}
+.sidebar .nav-sidebar .open .dropdown-menu>li>a:hover, .sidebar .nav-sidebar .open .dropdown-menu>li>a:focus {color: #CCC; background-color: transparent;}
+nav:hover .forAnimate{opacity: 1;}
