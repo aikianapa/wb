@@ -1,26 +1,14 @@
 <!DOCTYPE html>
 <html>
-    <head  data-wb-role="tree" data-wb-item="_config" data-wb-branch="config">
-        <title>{{name}}</title>
+    <head>
+        <title role="tree" data-wb-item="_config" data-wb-branch="config" data-wb-limit="0">{{name}}</title>
         <base href="/engine/tpl/">
         <meta charset="utf-8">
-        <meta content="ie=edge" http-equiv="x-ua-compatible">
         <meta content="width=device-width, initial-scale=1" name="viewport">
         <link href="favicon.png" rel="shortcut icon">
         <link href="apple-touch-icon.png" rel="apple-touch-icon">
-        <link href="//fast.fonts.net/cssapi/175a63a1-3f26-476a-ab32-4e21cbdb8be2.css" rel="stylesheet" type="text/css">
-        <link href="/engine/js/bootstrap/bootstrap.min.css" rel="stylesheet">
-        <link href="/engine/js/plugins/plugins.css" rel="stylesheet">
-        <link href="bower_components/select2/dist/css/select2.min.css" rel="stylesheet">
-        <link href="bower_components/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-        <link href="bower_components/dropzone/dist/dropzone.css" rel="stylesheet">
-        <link href="bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
-        <link href="bower_components/fullcalendar/dist/fullcalendar.min.css" rel="stylesheet">
-        <link href="bower_components/perfect-scrollbar/css/perfect-scrollbar.min.css" rel="stylesheet">
-		<link href="bower_components/dragula.js/dist/dragula.min.css" rel="stylesheet">
-		<link href="icon_fonts_assets/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-		<link href="icon_fonts_assets/simple-line-icons/css/simple-line-icons.css" rel="stylesheet" >
-
+        <script data-wb-src="jquery"></script>
+        <script data-wb-src="bootstrap"></script>
         <link href="css/main.css?version=3.3" rel="stylesheet">
     </head>
     <meta http-equiv="refresh" content="0; url=/login/" data-wb-disallow="admin" />
@@ -133,13 +121,9 @@
                             </div>
                         </div>
 
-
-
                         <ul class="main-menu" data-wb-role="tree" data-wb-item="_config" data-wb-branch="side_menu" data-wb-parent="false" data-wb-limit="1">
                             <li class="has-sub-menu" data-wb-role="where" data-wb-where='children>""'>
-								<meta data-wb-role="variable" var="mm_ajax" value='data-wb-ajax="{{data[ajax]}}"' data-wb-where='data[ajax]>""'>
-								<meta data-wb-role="variable" var="mm_target" value='data-html="{{data[target]}}"' data-wb-where='data[target]>""'>
-                                <a {{mm_ajax}} {{mm_target}}>
+                                <a data-wb-ajax="{{data[ajax]}}" data-html="{{data[target]}}">
                                     <div class="icon-w">
                                         <i class="{{data[icon]}}"></i>
                                     </div>
@@ -176,10 +160,16 @@ END - Menu side compact
 -------------------->
                 <div class="content-w">
                     <div class="top-menu-secondary color-scheme-dark">
-                        <ul class="main-menu" data-wb-role="tree" data-wb-item="_config" data-wb-branch="top_menu" data-wb-parent="false" data-wb-limit="1">
+                        <ul class="main-menu"  data-wb-role="tree" data-wb-item="_config" data-wb-branch="top_menu" data-wb-parent="false" data-wb-limit="1">
                             <li>
-                                <a href="{{data[url]}}">{{name}}</a>
+                                <a data-wb-ajax="{{data[ajax]}}" data-wb-html="{{data[target]}}" href="{{data[url]}}">
+                                    <div class="icon-w">
+                                        <div class="{{data[icon]}}"></div>
+                                    </div>
+                                    <span>{{name}}</span>
+                                </a>
                             </li>
+
                         </ul>
                         <div class="top-menu-controls">
                             <div class="element-search hidden-lg-down">
@@ -1129,28 +1119,13 @@ START - Chat Popup Box
             </div>
             <div class="display-type"></div>
         </div>
-        <script src="bower_components/jquery/dist/jquery.min.js"></script>
-        <script src="bower_components/tether/dist/js/tether.min.js"></script>
-        <script src="/engine/js/bootstrap/bootstrap.min.js"></script>
-        <script src="bower_components/moment/moment.js"></script>
-        <script src="bower_components/chart.js/dist/Chart.min.js"></script>
-        <script src="bower_components/select2/dist/js/select2.full.min.js"></script>
-        <!--script src="bower_components/ckeditor/ckeditor.js"></script-->
-        <script src="bower_components/bootstrap-validator/dist/validator.min.js"></script>
-        <script src="bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
-        <script src="bower_components/dropzone/dist/dropzone.js"></script>
-        <script src="bower_components/editable-table/mindmup-editabletable.js"></script>
-        <script src="bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-        <script src="bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-        <script src="bower_components/fullcalendar/dist/fullcalendar.min.js"></script>
-        <script src="bower_components/perfect-scrollbar/js/perfect-scrollbar.jquery.min.js"></script>
-        <script src="bower_components/dragula.js/dist/dragula.min.js"></script>
+
         <script data-wb-src="datepicker"></script>
         <script data-wb-src="ckeditor"></script>
         <script data-wb-src="source"></script>
         <script data-wb-src="uploader"></script>
-        <script src="/engine/js/plugins/plugins.js"></script>
-        <script src="/engine/js/wbengine.js"></script>
+        <script data-wb-src="plugins"></script>
+        <script data-wb-src="engine"></script>
         <script src="js/main.js?version=3.3"></script>
     </body>
 </html>

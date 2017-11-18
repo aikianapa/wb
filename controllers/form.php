@@ -139,7 +139,18 @@ function form__controller__select2() {
 }
 
 function form__controller__setup_engine() {
-	if (isset($_POST["setup"]) AND $_POST["setup"]=="done" AND !is_dir($_ENV["path_app"]."/form")) {
+	if (is_dir($_ENV["dba"]) AND is_dir($_ENV["path_app"]."/tpl")) {
+        $out=wbGetTpl("setup.htm");
+        $error="<p><h4>ВНИМАНИЕ!</h4> Установка невозможна, так как в дирректории
+        <i>{$_ENV["path_app"]}</i> уже выполнялась установка.
+        Пожалуйста, удалите содержимое дирректории, кроме папки engine и попробуйте снова.</p>";
+        $out->find("#error .alert-warning")->html($error);
+        $out->find(".step-content.active")->removeClass("active");
+        $out->find("#error.step-content")->addClass("active");
+        $out->wbSetData();
+        echo $out;
+         die;
+     } elseif (isset($_POST["setup"]) AND $_POST["setup"]=="done" AND !is_dir($_ENV["path_app"]."/form")) {
 		unset($_ENV["DOM"],$_ENV["errors"]);
 		wbRecurseCopy($_ENV["path_engine"]."/_setup/",$_ENV["path_app"]);
 		wbTableCreate("pages");
@@ -153,9 +164,11 @@ function form__controller__setup_engine() {
 		header('Location: '.'/');
 		die;
 	}
-	//if (is_dir($_ENV["dba"])) {die("Установка уже выполнена");}
-
-		echo wbGetTpl("setup.htm");
+    $out=wbGetTpl("setup.htm");
+    $out->wbSetData();
+    echo $out;
+    die;
+	
 
 
 	die;

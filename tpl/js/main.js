@@ -113,25 +113,6 @@ $(function () {
     $('#formValidate').validator();
   }
 
-  // #4. DATE RANGE PICKER
-
-  $('input.single-daterange').daterangepicker({ "singleDatePicker": true });
-  $('input.multi-daterange').daterangepicker({ "startDate": "03/28/2017", "endDate": "04/06/2017" });
-
-  // #5. DATATABLES
-
-  if ($('#formValidate').length) {
-    $('#formValidate').validator();
-  }
-  if ($('#dataTable1').length) {
-    $('#dataTable1').DataTable({ buttons: ['copy', 'excel', 'pdf'] });
-  }
-  // #6. EDITABLE TABLES
-
-  if ($('#editableTable').length) {
-    $('#editableTable').editableTableWidget();
-  }
-
   // #7. FORM STEPS FUNCTIONALITY
 
   $('.step-trigger-btn').on('click', function () {

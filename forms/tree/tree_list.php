@@ -1,9 +1,9 @@
 
 <div class="element-wrapper">
 	<h6 class="element-header">
-	 Список деревьев
+	 Список каталогов
 	 <button class="btn btn-sm btn-success pull-right" data-wb-ajax="/form/edit/{{_GET[form]}}/_new" data-wb-append="body">
-	   <i class="os-icon os-icon-ui-22"></i> Добавить дерево
+	   <i class="os-icon os-icon-ui-22"></i> Добавить каталог
 	 </button>
 	</h6>
 	<div class="element-box">
@@ -11,7 +11,7 @@
 		<table class="table table-lightborder">
 		  <thead>
 			<tr>
-			  <th>Имя дерева</th>
+			  <th>Идентификатор</th>
 			  <th>Заголовок</th>
 			  <th class="text-right">Действие</th>
 			</tr>

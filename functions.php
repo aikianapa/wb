@@ -21,6 +21,7 @@ function wbInitEnviroment() {
 	$_ENV["dbac"]=$_ENV["path_app"]."/database/_cache";	// App data
 	$_ENV["error"]=array();
 	$_ENV["env_id"]=wbNewId();
+    wbCheckWorkspace();
 	$variables=array();
 	$settings=wbItemRead("admin","settings"); 
 	if (!$settings) {$settings=array();} else {
@@ -32,6 +33,22 @@ function wbInitEnviroment() {
 	$settings=array_merge($settings,$variables);
 	$_ENV["settings"]=$settings;
 	wbTrigger("func",__FUNCTION__,"after",func_get_args());
+}
+
+function wbCheckWorkspace() {
+     if (!is_readable($_ENV["path_app"]) OR !is_writable($_ENV["path_app"])) {
+        $out=wbGetTpl("setup.htm");
+        $error="<p><h4>ВНИМАНИЕ!</h4> Установка невозможна, так как дирректория установки
+        <i>{$_ENV["path_app"]}</i> не имеет необходимых прав доступа.
+        Пожалуйста, установите права чтения/записи/создания файлов для указанной дирректории
+        и попробуйте снова.</p>";
+        $out->find("#error .alert-warning")->html($error);
+        $out->find(".step-content.active")->removeClass("active");
+        $out->find("#error.step-content")->addClass("active");
+        $out->wbSetData();
+        echo $out;
+        die;
+    }
 }
 
 function wbFormUploadPath() {

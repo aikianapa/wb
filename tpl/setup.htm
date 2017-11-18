@@ -4,22 +4,12 @@
     <title>Установка</title>
     <base href="/engine/tpl/">
     <meta charset="utf-8">
-    <meta content="ie=edge" http-equiv="x-ua-compatible">
-    <meta content="template language" name="keywords">
-    <meta content="Tamerlan Soziev" name="author">
-    <meta content="Admin dashboard html template" name="description">
+    <meta content="Setup" name="description">
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <link href="favicon.png" rel="shortcut icon">
     <link href="apple-touch-icon.png" rel="apple-touch-icon">
-    <link href="//fast.fonts.net/cssapi/175a63a1-3f26-476a-ab32-4e21cbdb8be2.css" rel="stylesheet" type="text/css">
-    <link href="/engine/js/plugins/plugins.css" rel="stylesheet">
-    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="bower_components/select2/dist/css/select2.min.css" rel="stylesheet">
-    <link href="bower_components/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-    <link href="bower_components/dropzone/dist/dropzone.css" rel="stylesheet">
-    <link href="bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
-    <link href="bower_components/fullcalendar/dist/fullcalendar.min.css" rel="stylesheet">
-    <link href="bower_components/perfect-scrollbar/css/perfect-scrollbar.min.css" rel="stylesheet">
+    <script data-wb-src="jquery"></script>
+    <script data-wb-src="bootstrap"></script>
     <link href="css/main.css?version=2.6" rel="stylesheet">
   </head>
   <body>
@@ -44,8 +34,14 @@
           <a class="step-trigger active" href="#stepContent1">Шаг первый</a><a class="step-trigger" href="#stepContent2">Шаг второй</a><a class="step-trigger" href="#stepContent3">Шаг третий</a>
         </div>
         <div class="step-contents">
-          <div class="step-content active" id="stepContent1">
-            <div class="row">
+            <div class="step-content" id="error">
+                <div class="row">
+                    <div class="col-12 alert alert-warning">
+                    </div>
+                </div>
+            </div>
+            <div class="step-content active" id="stepContent1">
+            <div class="row success">
               <div class="col-sm-12">
                 <div class="form-group">
                   <label for="">Заголовок сайта</label><input class="form-control" placeholder="Заголовок сайта" type="text" name="header" required>
@@ -123,15 +119,11 @@
       </div>
       <div class="display-type"></div>
     </div>
-    <script src="bower_components/jquery/dist/jquery.min.js"></script>
-    <script src="bower_components/tether/dist/js/tether.min.js"></script>
-    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    
 
-    <script src="bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
-    <script src="bower_components/perfect-scrollbar/js/perfect-scrollbar.jquery.min.js"></script>
 
-    <script src="/engine/js/wbengine.js"></script>
-    <script src="/engine/js/plugins/plugins.js"></script>
+    <script data-wb-src="engine"></script>
+    <script data-wb-src="plugins"></script>
     <script src="js/main.js?version=2.6"></script>
 
     <script>
