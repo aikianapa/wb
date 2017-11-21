@@ -137,18 +137,18 @@ function wb_tree() {
         }
 
         var dataval = data["data"];
-        var tpl = wb_tree_data_fields(dict);
+        var tpl = wb_tree_data_fields(dict,dataval);
         data["_form"] = data["data"]["_form"] = form;
         data["_id"] = data["data"]["_id"] = $(tree).parents("form[data-wb-item]").attr("data-wb-item");
 
-
-        var tpl = $(wb_setdata(tpl, data["data"], true));
-        tpl.find(".wb-uploader").attr("data-wb-path", "/uploads/" + form + "/" + $(tree).parents("form[data-wb-item]").attr("data-wb-item"));
+        //var tpl = $(wb_setdata(tpl, dataval, true));
+        $(tpl).find(".wb-uploader").attr("data-wb-path", "/uploads/" + form + "/" + $(tree).parents("form[data-wb-item]").attr("data-wb-item"));
         data["fields"] = dict;
         data["name"] = name;
         data["data-name"] = text;
         data["form"] = form;
         data["data-id"] = item;
+
         $(".content-w .tree-edit.modal").remove();
         edit = $(wb_setdata(edit, data, true));
         edit.find(".modal").attr("id", "tree_" + form + "_" + name);
@@ -264,17 +264,18 @@ function wb_tree_dict_change(fields, tree) {
     return res;
 }
 
-function wb_tree_data_fields(data) {
+function wb_tree_data_fields(dictdata,datadata) {
     var res = false;
     var dict = {};
-    $(data).each(function (i) {
-        dict[i] = data[i];
+    if (datadata==undefined) {var data=[];} else { var data=datadata;}
+    $(dictdata).each(function (i) {
+        dict[i] = dictdata[i];
     });
     $.ajax({
         async: false,
         type: 'POST',
         url: "/ajax/buildfields/",
-        data: dict,
+        data: {dict:dict,data:data},
         success: function (data) {
             res = data;
         },
@@ -851,7 +852,7 @@ function wb_formsave() {
         }
         $(this).find("span.glyphicon").addClass("loader");
         var save = wb_formsave_obj(formObj);
-        $(this).find("span.glyphicon").removeClass("loader glyphicon-save").addClass("glyphicon-ok");
+        //$(this).find("span.glyphicon").removeClass("loader glyphicon-save").addClass("glyphicon-ok");
         if (save) {
             return save;
         } else {
@@ -914,7 +915,12 @@ function wb_formsave_obj(formObj) {
         var name = formObj.attr("data-wb-form");
         var item = formObj.attr("data-wb-item");
         var oldi = formObj.attr("data-wb-item-old");
-        $(document).trigger(name + "_before_formsave", [name, item, form, true]);
+        $(document).trigger("wb_before_formsave", [name, item, form, true]);
+        console.log("call: wb_before_formsave");
+        if (is_callable(name + "_before_formsave")) {
+            $(document).trigger(name + "_before_formsave", [name, item, form, true]);
+            console.log("call: "+name + "_before_formsave");
+        }
 
         var ptpl = formObj.attr("parent-template");
         var padd = formObj.attr("data-wb-add");
@@ -941,10 +947,11 @@ function wb_formsave_obj(formObj) {
                 }
             }
         });
-        if (formObj.find("input[name=id]").length) {
+        if (formObj.find("input[name=id]").length && formObj.find("input[name=id]").val()>"") {
             var item_id = formObj.find("input[name=id]").val();
         } else {
-            item_id = formObj.attr("data-wb-item");
+            var item_id = formObj.attr("data-wb-item");
+            if (item_id=="_new") {item_id=wb_newid(); formObj.find("input[name=id]").val(item_id)}
         }
         var ic_date = "";
         formObj.find("[name][type^=date]").each(function () {
@@ -1031,7 +1038,7 @@ function wb_formsave_obj(formObj) {
                         };
 
                         var ret = false;
-                        if (list.attr("data-add") + "" !== "false") {
+                        if (list.attr("data-wb-add") + "" !== "false") {
                             $.post("/ajax/setdata/" + name + "/" + item_id, post, function (ret) {
                                 if (list.find("[item=" + item_id + "]").length) {
                                     list.find("[item=" + item_id + "]").after(ret);
@@ -1053,13 +1060,19 @@ function wb_formsave_obj(formObj) {
                     }
                     if (is_callable(name + "_after_formsave")) {
                         $(document).trigger(name + "_after_formsave", [name, item, form, true]);
+                        console.log("call: "+name + "_after_formsave");
                     }
+                    $(document).trigger("wb_after_formsave", [name, item, form, true]);
+                    console.log("call: wb_after_formsave");
                     return data;
                 },
                 error: function (data) {
                     if (is_callable(name + "_after_formsave")) {
                         $(document).trigger(name + "_after_formsave", [name, item, form, false]);
+                        console.log("call: "+name + "_after_formsave");
                     }
+                    $(document).trigger("wb_after_formsave", [name, item, form, false]);
+                    console.log("call: wb_after_formsave");
                     if ($.bootstrapGrowl) {
                         $.bootstrapGrowl("Ошибка сохранения!", {
                             ele: 'body',

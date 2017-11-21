@@ -1445,7 +1445,6 @@ abstract class kiNode
                 } else {
                     if ($value!=="") {$inp->attr("value",$value);}
                 }
-				//$inp->wbDatePickerPrep();
 				if ($inp->attr("type")=="checkbox") {
 					if ($inp->attr("value")=="on" OR $inp->attr("value")=="1") {$inp->checked="checked";}
 				} 
@@ -1672,7 +1671,7 @@ abstract class kiNode
 			if (!isset($Item[$name])) {$Item[$name]=$dictdata["tree"];}
 			unset($dictdata);
         }
-		if ($this->hasAttr("name") OR $this->is("input")) {
+		if (($this->hasAttr("name") OR $this->is("input")) AND !$this->is("select") ) {
 			$tree=wbGetForm("common","tree_ol");
 			$this->append("<input type='hidden' name='{$name}'><input type='hidden' name='_{$name}__dict_' data-name='dict'>");
 			if (isset($Item[$name]) && $Item[$name]!=="[]" && $Item[$name]!=="") {$tree->tagTreeData($Item[$name]);} else {$tree->find("ol")->append(wbGetForm("common","tree_row"));}

@@ -115,9 +115,10 @@ function ajax__getform() {
 
 function ajax__buildfields() {
 	$res=array();
-	foreach($_POST as $data) {
-		$data["value"]=htmlspecialchars($data["value"]);
-		$res=wbFieldBuild($data);
+    if (isset($_POST["data"])) {$data=$_POST["data"];} else {$data=array();}
+	foreach($_POST["dict"] as $dict) {
+		$dict["value"]=htmlspecialchars($dict["value"]);
+		$res=wbFieldBuild($dict,$data);
 		echo $res;
 	}
 	die;

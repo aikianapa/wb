@@ -8,19 +8,19 @@
 	<div class="row">
 		<div class="col-sm-3">
 				<div class="themed-background-dark text-light">
-					<b class="">Категории
-					<a href="#" data-ajax="mode=edit&amp;form=tree&amp;id={{_GET[form]}}_category" class="text-light pull-right"
-					data-toggle="modal" data-target="#treeEdit" data-html="#treeEdit .modal-body">
+                    <div class="catalog-header">
+                    Категории
+					<a href="#" data-wb-ajax="/form/edit/tree/products_category" data-wb-append="body" class="text-light pull-right"
+					data-toggle="modal" data-target="#treeEdit" >
 					<span class="fa fa-gear"></span></a>
-					</b>
-					
-				<ul id="{{_GET[form]}}Catalog" data-wb-role="tree" data-wb-item="{{_GET[form]}}_category" data-add="true" class="sidebar-nav list-unstyled">
+                    </div>	
+				<ul id="{{_GET[form]}}Catalog" data-wb-role="tree" data-wb-item="{{_GET[form]}}_category" data-wb-tpl="true" class="sidebar-nav list-unstyled">
 					<li>
 						<a data-wb-ajax="/form/list/products/{{id}}/" title="{{name}}" data-wb-html="#{{_GET[form]}}List .list">{{name}}</a>
 					</li>
 				</ul>
 				</div>
-				<div data-role="include" src="modal" data-wb-id="treeEdit" data-wb-formsave="#treeEditForm" data-add="false" data-header="Категории"></div>
+
 		</div>
 		<div class="col-sm-9 list">
 	
@@ -33,7 +33,7 @@
 					  <th>Действие</th>
 					</tr>
 				  </thead>
-				  <tbody  data-wb-role="foreach" data-wb-from="result" data-wb-sort="name" data-wb-size="15">
+				  <tbody  data-wb-role="foreach" data-wb-from="result" data-wb-add="true" data-wb-sort="name" data-wb-size="15">
 					<tr item="{{id}}">
 					  <td>{{name}}</td>
 					  <td align="right">{{price}}</td>
@@ -52,7 +52,9 @@
 	#{{_GET[form]}}List #{{_GET[form]}}Catalog a {cursor:pointer;}
 	#{{_GET[form]}}List #{{_GET[form]}}Catalog ul li {font-weight:normal;width: 100%;line-height: auto;}
 	#{{_GET[form]}}List #{{_GET[form]}}Catalog a {display: inline-block; width: 95%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
-	#{{_GET[form]}}List #{{_GET[form]}}Catalog > li > a {width:100%;}
+	#{{_GET[form]}}List #{{_GET[form]}}Catalog > li > a {width:auto;}
+    #{{_GET[form]}}List .catalog-header {font-weight:bold; margin-bottom:10px;}
+    #{{_GET[form]}}List .catalog-header a {width: auto;}
 		
 </style>
 <script>

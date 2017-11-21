@@ -77,13 +77,14 @@ function wbInitFunctions() {
 }
 
 function wbItemToArray($Item=array()) {
-    foreach($Item as $i => $item) {
-        if (!is_array($item) AND substr($item,0,2)=="[{") {
-            $item=wbItemToArray(json_decode($item,true));
-        }
-        $Item[$i]=$item;
-        if (isset($item["id"])) {unset($Item[$i]); $Item[$item["id"]]=$item;}
+    if (is_array($Item)) {
+        foreach($Item as $i => $item) {
+            if (!is_array($item) AND substr($item,0,2)=="[{") {$item=json_decode($item,true);}
+            $item=wbItemToArray($item);
+            $Item[$i]=$item;
+            if (isset($item["id"])) {unset($Item[$i]); $Item[$item["id"]]=$item;}
 
+        }
     }
     return $Item;
 }
@@ -107,7 +108,7 @@ function wbGetDataWbFrom($Item,$str) {
     }
 }
 
-function wbFieldBuild($param) {
+function wbFieldBuild($param,$data=array()) {
 	$set=wbGetForm("common","tree_fldset");
 	$tpl=wbGetForm("snippets",$param["type"]);
 	$opt=json_decode($param["prop"],true);
@@ -137,15 +138,15 @@ function wbFieldBuild($param) {
                     unset($arr[$i]); $arr[$line]=array("id"=>$line,"name"=>$line);
                 }
             }
-            $param["value"]=$arr;
-            $tpl->wbSetData($param);
+            $param["enum"]=$arr; unset($param["value"]);
             break;
 
 	}
 	$set->find(".form-group > label")->html($param["label"]);
 	$set->find(".form-group > div")->html($tpl->outerHtml());
-	$set->wbSetValues($param);
-	return $set->outerHtml();
+	$set->wbSetData($param);
+    $set->wbSetValues($data);
+    return $set->outerHtml();
 }
 
 function wbInitDatabase() {
@@ -950,6 +951,7 @@ function wbSetValuesStr($tag="",$Item=array(), $limit=2)
 {
 	if (is_object($tag)) {$tag=$tag->outerHtml();}
 	if (!is_array($Item)) {$Item=array($Item);}
+    $Item=wbItemToArray($Item);
     // Обработка для доступа к полям с JSON имеющим id в содержании, в частности к tree
     $arr=new ArrayIterator($Item);
     $Item=array();
