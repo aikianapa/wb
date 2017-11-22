@@ -68,9 +68,8 @@ function ajax__setdata() {
     
     if (isset($Item["_form"])) {$_ENV["route"]["form"]=$_GET["form"]=$Item["_form"]; $_ENV["route"]["controller"]="form";}
     if (isset($Item["_item"])) {$_ENV["route"]["iten"]=$_GET["item"]=$Item["_item"];}
-    
-	$call="{$form}BeforeShowItem"; if (is_callable($call)) {$Item=$call($Item);} else {
-	$call="_{$form}BeforeShowItem"; if (is_callable($call)) {$Item=$call($Item,"list");}}
+    $Item=wbCallFormFunc("BeforeShowItem",$Item,$form,$_REQUEST["mode"]);
+    $Item=wbCallFormFunc("BeforeItemShow",$Item,$form,$_REQUEST["mode"]);
 	$tpl=wbFromString($_REQUEST["tpl"]);
 	$tpl->find(":first")->attr("item","{{id}}");
 	foreach($tpl->find("[data-wb-role]") as $dr) {$dr->removeClass("wb-done"); }

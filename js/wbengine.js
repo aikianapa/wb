@@ -698,8 +698,8 @@ function wb_plugins() {
             $('.rating:not(.wb-plugin)').each(function () {
                 $(this).addClass("wb-plugin");
                 $(this).rating({
-                    filled: 'fa fa-bell',
-                    empty: 'fa fa-bell-o'
+                    filled: 'fa fa-star',
+                    empty: 'fa fa-star-o'
                 });
                 
             });

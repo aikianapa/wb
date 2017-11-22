@@ -1869,6 +1869,7 @@ abstract class kiNode
 					$val["_idx"]=$ndx;
 					$val["_ndx"]=$ndx+1;
                     $val=wbCallFormFunc("BeforeShowItem",$val,$itemform);
+                    $val=wbCallFormFunc("BeforeItemShow",$val,$itemform);
 					$text->wbSetData($val);
 					$flag=true;
 					if ($flag==true AND $where>"") {$flag=wbWhereItem($val,$where);}
@@ -2037,6 +2038,7 @@ public function tagInclude($Item) {
 		if (is_array($srcItem)) {foreach($srcItem as $k => $v) {$Item["%{$k}"]=$v;}; unset($v);}
         $this->includeTag($Item);
 		$Item=wbCallFormFunc("BeforeShowItem",$Item,$table,$mode);
+        $Item=wbCallFormFunc("BeforeItemShow",$Item,$table,$mode);
 		$this->wbSetData($Item);
 		//$this->html(clearValueTags($this->html()));
     }
