@@ -455,6 +455,8 @@ function wb_multiinput() {
     $.get("/ajax/getform/common/multiinput_row/", function (data) {
         $(document).data("wb-multiinput-row", data);
     });
+    
+    $("[data-wb-role=multiinput]").sortable();
     $(document).undelegate(".wb-multiinput", "mouseenter");
     $(document).delegate(".wb-multiinput", "mouseenter", function () {
         $(this).append("<div class='wb-multiinput-menu'>" + $(document).data("wb-multiinput-menu") + "</div>");
@@ -917,14 +919,12 @@ function wb_formsave_obj(formObj) {
         var oldi = formObj.attr("data-wb-item-old");
         $(document).trigger("wb_before_formsave", [name, item, form, true]);
         console.log("call: wb_before_formsave");
-        if (is_callable(name + "_before_formsave")) {
-            $(document).trigger(name + "_before_formsave", [name, item, form, true]);
-            console.log("call: "+name + "_before_formsave");
-        }
+        $(document).trigger(name + "_before_formsave", [name, item, form, true]);
+        console.log("call: "+name + "_before_formsave");
 
         var ptpl = formObj.attr("parent-template");
         var padd = formObj.attr("data-wb-add");
-        // обработка switch из appUI (и checkbox вообще кроме bs-switch)
+        // обработка switch и checkbox 
         var ui_switch = "";
         formObj.find("input[type=checkbox]:not(.bs-switch)").each(function () {
             var swname = $(this).attr("name");
@@ -935,18 +935,6 @@ function wb_formsave_obj(formObj) {
             }
         });
 
-        // обработка bootstrap switch
-        var bs_switch = "";
-        formObj.find(".bs-switch").each(function () {
-            var bsname = $(this).attr("name");
-            if (bsname != undefined && bsname > "") {
-                if ($(this).bootstrapSwitch("state") == true) {
-                    bs_switch += "&" + bsname + "=on";
-                } else {
-                    bs_switch += "&" + bsname + "=";
-                }
-            }
-        });
         if (formObj.find("input[name=id]").length && formObj.find("input[name=id]").val()>"") {
             var item_id = formObj.find("input[name=id]").val();
         } else {
@@ -982,7 +970,7 @@ function wb_formsave_obj(formObj) {
         } else {
             var form = formObj.serialize();
         }
-        form += ui_switch + bs_switch + ic_date;
+        form += ui_switch + ic_date;
 
         if ($(this).attr("data-wb-form") !== undefined) {
             name = $(this).attr("data-wb-form");
@@ -1058,10 +1046,8 @@ function wb_formsave_obj(formObj) {
                     if (setup == true) {
                         document.location.href = "/login.htm";
                     }
-                    if (is_callable(name + "_after_formsave")) {
-                        $(document).trigger(name + "_after_formsave", [name, item, form, true]);
-                        console.log("call: "+name + "_after_formsave");
-                    }
+                    $(document).trigger(name + "_after_formsave", [name, item, form, true]);
+                    console.log("call: "+name + "_after_formsave");
                     $(document).trigger("wb_after_formsave", [name, item, form, true]);
                     console.log("call: wb_after_formsave");
                     return data;

@@ -1,9 +1,11 @@
 <?php
 
-
 function comments__widget() {
-	$out=wbGetForm();
+    if (isset($_GET["item"])) {$save=$_GET["item"];}
+    $_GET["item"]="_new";
+    $out=wbGetForm("comments","widget");
 	$out->wbSetData();
+    if (isset($save)) {$_GET["item"]=$save;}
 	return $out->outerHtml();
 }
 
@@ -41,29 +43,37 @@ function comments__getajax() {
 
 function _commentsBeforeItemShow($Item,$mode=NULL) {
     if ($mode==NULL) {$mode=$_ENV["route"]["mode"];}
-	switch($mode) {
+    $time=strtotime($Item["date"]);
+    switch($mode) {
 		case "edit" :
-			if (!isset($Item["date"]) OR $Item["date"]=="") {$Item["date"]=date("Y-m-d H:i:s"); } else {	$Item["date"]=date("Y-m-d H:i:s",strtotime($Item["date"])); }
+			if (!isset($Item["date"]) OR $Item["date"]=="") {$Item["date"]=date("Y-m-d H:i:s"); } else {	$Item["date"]=date("Y-m-d H:i:s",$time); }
 			break;
 		case "list"	:
-			$Item["date"]=date("d.m.Y H:i",strtotime($Item["date"]));
+			$Item["date"]=date("d.m.Y H:i",$time);
 			$Item["text"]=wbGetWords(strip_tags($Item["text"]),50);
 			$Item["smalltext"]=wbGetWords(strip_tags($Item["text"]),10);
 			if ($_SESSION["user_id"]!=="admin" && (!$Item["show"]==1 OR !$Item["show"]=="on") ) {$Item=NULL;}
 			break;
 		default		:
-			$Item["date_short"]=date("d.m.y H:i",strtotime($Item["date"]));
-			$Item["date"]=date("d.m.Y H:i",strtotime($Item["date"]));
-			$Item["header"]="";
+            $Item["date"]=date("d.m.Y H:i",$time);
+            $Item["date_d"]=date("d",$time);
+            $Item["date_m"]=date("m",$time);
+            $Item["date_y"]=date("y",$time);
+            $Item["date_Y"]=date("Y",$time);
+            $Item["date_h"]=date("h",$time);
+            $Item["date_H"]=date("H",$time);
+            $Item["date_i"]=date("i",$time);
+            $Item["date_s"]=date("s",$time);
+            $Item["text"]=strip_tags($Item["text"]);
 			break;
 	}
 	return $Item;
 }
 
 function _commentsBeforeItemSave($Item) {
-    print_r($Item);
 	if (!isset($Item["id"]) OR $Item["id"]=="_new") {$Item["id"]=wbNewId();}
 	if (!isset($Item["date"]) OR $Item["date"]=="") {$Item["date"]=date("Y-m-d H:i:s");}
+    $Item["text"]=htmlentities($Item["text"]);
 	return $Item;
 }
 

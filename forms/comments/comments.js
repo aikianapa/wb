@@ -10,8 +10,7 @@ $(document).ready(function(){
 			$("#commentsWidget .sendbutton").show("fade");
 		});
 		$("#commentsWidget textarea[name=text]").val("");
-		$(document).unbind("check_required_success");
-		$(document).on("check_required_success",function(event){
+		$(document).on("wb_required_true",function(event){
 			//$("#contactForm .sendbutton a.btn").hide("fade");
 			$(document).on("comments_after_formsave",function(event,name,item,form,ret){
 			$("#commentsWidget #commentsEditInc").hide();

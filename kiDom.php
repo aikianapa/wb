@@ -1439,7 +1439,7 @@ abstract class kiNode
 				$name=$inp->attr("name");	$def=$inp->attr("value");
 				if (substr($name,-2)=="[]") {$name=substr($name,0,-2);}
 				if (substr($def,0,3)=="{{_") {$def="";}
-                if (isset($Item[$name])) {$value=$Item[$name];} else {$value=$def;}	
+                if (isset($Item[$name]) AND $inp->attr("value")=="") {$value=$Item[$name];} else {$value=$def;}	
                 if ($inp->attr("data-name")=="dict") {
                     if (!$inp->hasAttr("value") AND isset($Item[$name])) {$inp->attr("value",$Item[$name]);}
                 } else {
@@ -1935,20 +1935,44 @@ public function tagInclude($Item) {
 		$dad=$this->attr("data-wb-add");
 		$header=$this->attr("data-wb-header"); if ($header>"") {$Item["header"]=$header;}
 		$footer=$this->attr("data-wb-footer"); if ($footer>"") {$Item["footer"]=$footer;}
-		$vars=$this->attr("data-wb-vars"); 	if ($vars>"") {$Item=attrAddData($vars,$Item);}
+		$vars=$this->attr("data-wb-vars"); 	if ($vars>"") {$Item=wbAttrAddData($vars,$Item);}
 		$json=$this->attr("data-wb-json"); 	if ($json>"") {$Item=json_decode($json,true);}
 		$dfs=$this->attr("data-wb-formsave");
 		$class=$this->attr("data-wb-class");
 		$name=$this->attr("data-wb-name");
 		if ($name=="") $name=$this->attr("name");
-		
-		if ($src=="comments") 	{$src="/engine/ajax.php?form=comments&mode=widget"; }
-		if ($src=="modal") 		{$src="/engine/forms/form_comModal.php"; }
-		if ($src=="imgviewer") 	{$src="/engine/js/imgviewer.php";}
-		if ($src=="uploader")	{$this_content=wbGetForm("common",$src);}
-		if ($src=="editor") 	{$this_content=wbGetForm("common",$src);}
-		if ($src=="source") 	{$this_content=wbGetForm("common",$src);}
-		$vars=$this->attr("data-vars");	if ($vars>"") {$Item=attrAddData($vars,$Item);}
+        switch($src) {
+            case "modal":
+                $src="/engine/forms/form_comModal.php";
+                break;
+            case "imgviewer":
+                $src="/engine/js/imgviewer.php";
+                break;
+            case "uploader":
+                $this_content=wbGetForm("common",$src);
+                break;
+            case "editor":
+                $this_content=wbGetForm("common",$src);
+                break;
+            case "source":
+                $this_content=wbGetForm("common",$src);
+                break;
+            case "form":
+                $form=""; $mode="";
+                $arr=explode("_",$name);
+                if (isset($arr[0])) {$form=$arr[0];}
+                if (isset($arr[1])) {unset($arr[0]); $mode=implode("_",$arr);}
+                $this_content=wbGetForm($form,$mode);
+                break;
+            case "template":
+                $this_content=wbGetTpl($name);
+                break;
+            case "module":
+                $module=$_ENV["route"]["scheme"]."://".$_ENV["route"]["host"]."/module/{$name}/";
+                $this_content=wbFromFile($module);
+                break;
+        }
+		$vars=$this->attr("data-vars");	if ($vars>"") {$Item=wbAttrAddData($vars,$Item);}
     if (!isset($this_content)) {
 		if ($src=="") {$src=$this->html(); $this_content=ki::fromString($src);} else {
 			$tplpath=explode("/",$src);
@@ -2023,7 +2047,7 @@ public function tagInclude($Item) {
 		$srcItem=$Item;
 		include("wbattributes.php");
 		if (isset($form) AND !isset($table)) {$table=$form;}
-		if (isset($vars) AND $vars>"") {$Item=attrAddData($vars,$Item);}
+		if (isset($vars) AND $vars>"") {$Item=wbAttrAddData($vars,$Item);}
 		if (isset($from) AND $from>"") {$Item=wbGetDataWbFrom($Item,$from);}
 		if (isset($json) AND $json>"") {$Item=json_decode($json,true);}
 		if (!isset($mode) OR $mode=="") {$mode="show";}
@@ -2033,7 +2057,7 @@ public function tagInclude($Item) {
 		if (isset($field) AND $field>"") {
             $Item=wbGetDataWbFrom($Item,$field);
 		}
-        if (isset($vars) AND $vars>"") {$Item=attrAddData($vars,$Item);}
+        if (isset($vars) AND $vars>"") {$Item=wbAttrAddData($vars,$Item);}
 		if (isset($call) AND is_callable($call)) {$Item=$call($Item);}
 		if (is_array($srcItem)) {foreach($srcItem as $k => $v) {$Item["%{$k}"]=$v;}; unset($v);}
         $this->includeTag($Item);
@@ -2118,6 +2142,8 @@ public function tagThumbnail($Item=array()) {
 	}
 	*/
 
+    $this->src=$src;
+    
 	if ($src==array()) {$src="";}
 	if ($img=="" AND $bkg==true) {$src="/engine/uploads/__system/image.svg"; $img="image.svg"; $ext="svg";}
 	if ($src=="" AND $bkg==true) {$src="/engine/uploads/__system/image.svg"; $img="image.svg"; $ext="svg";} else {
@@ -2231,7 +2257,7 @@ public function tagThumbnail($Item=array()) {
 
 	public function tagGallery($Item) {
 		$vars=$this->attr("vars");	$src=$this->attr("src"); 	$id=$this->attr("id");
-		if ($vars>"") {$Item=attrAddData($vars,$Item);}
+		if ($vars>"") {$Item=wbAttrAddData($vars,$Item);}
 		$inner=ki::fromFile($_SESSION['engine_path']."/tpl/gallery.php");
 		if ($src=="") {
 			if (trim($this->html())>"<p>&nbsp;</p>") {

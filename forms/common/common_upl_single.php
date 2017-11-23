@@ -2,7 +2,7 @@
 	<input type="hidden" name="{{name}}">
 	<div id="filelist" class="list-group">Your browser doesn't have Flash, Silverlight or HTML5 support.</div>
 	<div class="uploader">
-		<ul class="gallery list-inline" role="foreach" data-wb-from="{{name}}">
+		<ul class="gallery list-inline" role="foreach" data-wb-from="{{name}}" data-wb-limit="1">
 			<li class="thumbnail" data-name="{{img}}" title="{{title}}" alt="{{alt}}" >
 				<img data-wb-role='thumbnail' size='320px;240px;bkg' style='height:auto;' class='img-fluid' src="{{%path}}/{{img}}"/>
 				<a href="#" class="btn btn-outline-primary delete" data-toggle="dropdown"><span class="fa fa-trash"></span></a>

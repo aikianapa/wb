@@ -523,8 +523,16 @@ function wbGetForm($form=NULL,$mode=NULL,$engine=null) {
 	$_ENV["error"][__FUNCTION__]="";
 	if ($form==NULL) {$form=$_GET["form"];}
 	if ($mode==NULL) {$mode=$_GET["mode"];}
-	//$aCall=$form."_".$mode; $eCall=$form."__".$mode;
-	//if (is_callable($aCall)) {$out=$aCall();} elseif (is_callable($eCall) AND $engine!==false) {$out=$eCall();}
+    $aCall=$form."_".$mode; $eCall=$form."__".$mode;
+    if (!isset($_ENV["wbGetFormStack"])) {$_ENV["wbGetFormStack"]=array();}
+    if (is_callable($aCall) AND !in_array($aCall,$_ENV["wbGetFormStack"])) {
+        $_ENV["wbGetFormStack"][]=$aCall;
+        $out=$aCall();
+    } elseif (is_callable($eCall) AND $engine!==false AND !in_array($eCall,$_ENV["wbGetFormStack"])) {
+        $_ENV["wbGetFormStack"][]=$eCall;
+        $out=$eCall();
+    }
+    
 	if (!isset($out)) {
 		$current=""; $flag=false;
 		$path=array("/forms/{$form}_{$mode}.php","/forms/{$form}/{$form}_{$mode}.php","/forms/{$form}/{$mode}.php");
@@ -944,9 +952,16 @@ function wbFromFile($str="") {
 }
 
 function wbAttrToArray($attr) {
-	$attr=str_replace(","," ",$attr);
-	$attr=str_replace(";"," ",$attr);
-	return explode(" ",trim($attr));
+	return wbArrayAttr($attr);
+}
+
+function wbAttrAddData($data,$Item,$mode=FALSE) {
+	$data=stripcslashes(html_entity_decode($data));
+	$data=json_decode($data,true);
+	if (!is_array($Item)) {$Item=array($Item);}
+	if ($mode==FALSE) $Item=array_merge($data,$Item);
+	if ($mode==TRUE) $Item=array_merge($Item,$data);
+	return $Item;
 }
 
 function wbGetWords($str,$w) {
