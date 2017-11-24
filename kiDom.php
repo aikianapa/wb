@@ -1440,11 +1440,11 @@ abstract class kiNode
 				if (substr($name,-2)=="[]") {$name=substr($name,0,-2);}
 				if (substr($def,0,3)=="{{_") {$def="";}
                 if (isset($Item[$name]) AND $inp->attr("value")=="") {$value=$Item[$name];} else {$value=$def;}	
-                if ($inp->attr("data-name")=="dict") {
+
+                if ($value!=="") {$inp->attr("value",$value);} else {
                     if (!$inp->hasAttr("value") AND isset($Item[$name])) {$inp->attr("value",$Item[$name]);}
-                } else {
-                    if ($value!=="") {$inp->attr("value",$value);}
                 }
+
 				if ($inp->attr("type")=="checkbox") {
 					if ($inp->attr("value")=="on" OR $inp->attr("value")=="1") {$inp->checked="checked";}
 				} 
