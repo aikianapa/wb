@@ -21,6 +21,7 @@ function wbInitEnviroment() {
 	$_ENV["dbac"]=$_ENV["path_app"]."/database/_cache";	// App data
 	$_ENV["error"]=array();
 	$_ENV["env_id"]=wbNewId();
+    $_ENV["datetime"]=date("Y-m-d H:i:s");
     wbCheckWorkspace();
 	$variables=array();
 	$settings=wbItemRead("admin","settings"); 
@@ -70,7 +71,8 @@ function wbInitFunctions() {
 				"{$_ENV["path_app"]}/forms/{$form}.php", "{$_ENV["path_app"]}/forms/{$form}/{$form}.php"
 			); $res=FALSE;
 			foreach($inc as $k => $file) {
-				if (is_file("{$file}") && $res==FALSE ) {include_once("{$file}"); if ($k>1) {$res=TRUE;}; }
+				//if (is_file("{$file}") && $res==FALSE ) {include_once("{$file}"); if ($k>1) {$res=TRUE;}; }
+                if (is_file("{$file}") && $res==FALSE ) {include_once("{$file}");}
 			}
 	}
 	

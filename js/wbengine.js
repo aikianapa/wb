@@ -1154,6 +1154,7 @@ function wb_ajax() {
     $(document).delegate("[data-wb-ajax]", "click", function () {
         var link = this;
         var src = $(this).attr("data-wb-ajax");
+        var call = $(this).attr("data-wb-ajax-done");
         if (src>"") {
             var ajax = {};
             if ($(link).attr("data-wb-tpl") !== undefined) {
@@ -1199,6 +1200,9 @@ function wb_ajax() {
                         $("#" + $(this).attr("id")).modal();
                     }
                 });
+                if (call!==undefined && is_callable(call)) {
+                    (eval(call))(link, src, data);
+                }
                 $(document).trigger("wb_ajax_done", [link, src, data]);
                 wb_plugins();
                 wb_delegates();

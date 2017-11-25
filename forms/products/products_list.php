@@ -16,7 +16,7 @@
                     </div>	
 				<ul id="{{_GET[form]}}Catalog" data-wb-role="tree" data-wb-item="{{_GET[form]}}_category" data-wb-tpl="true" class="sidebar-nav list-unstyled">
 					<li>
-						<a data-wb-ajax="/form/list/products/{{id}}/" title="{{name}}" data-wb-html="#{{_GET[form]}}List .list">{{name}}</a>
+						<a data-wb-ajax="/form/list/products/{{id}}/" title="{{name}}" data-wb-html=".content-box">{{name}}</a>
 					</li>
 				</ul>
 				</div>

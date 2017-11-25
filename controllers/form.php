@@ -5,10 +5,17 @@ function form__controller() {
 	if (is_callable($call)) {
 		$_ENV["DOM"]=$call();
 	} else {
-        if (form__controller__common__controller()==false) {
+        $aCall=$_ENV["route"]["form"]."_".$_ENV["route"]["mode"]; 
+        $eCall=$_ENV["route"]["form"]."__".$_ENV["route"]["mode"];
+        if (is_callable($aCall)) {
+            $out=$aCall();
+        } elseif (is_callable($eCall)) {
+            $out=$eCall();
+        } elseif (form__controller__common__controller()==false) {
 		  echo __FUNCTION__ .": отсутствует функция ".$call."()";
 		  die;
         }
+        if (!is_object($out)) {$_ENV["DOM"]=wbFromString($out);} else {$_ENV["DOM"]=$out;}
 	}
 	wbTrigger("func",__FUNCTION__,"after");
 return $_ENV["DOM"];
@@ -20,7 +27,7 @@ function form__controller__common__controller() {
     $item=$_ENV["route"]["item"];
 	$aCall=$form."_".$mode; $eCall=$form."__".$mode;
     $out=false;
-	if (is_callable($aCall)) {$out=$aCall($item);} elseif (is_callable($eCall) AND $engine!==false) {$out=$eCall($item);}
+	if (is_callable($aCall)) {$out=$aCall($item);} elseif (is_callable($eCall)) {$out=$eCall($item);}
     if ($out==false) {return false;} else {
         if (!is_object($out)) {$out=wbFromString($out);}
         $_ENV["DOM"]=$out;
@@ -34,7 +41,7 @@ function form__controller__show() {
 	$mode="show";
     $Item=wbItemRead($form,$item);
 	$aCall=$form."_".$mode; $eCall=$form."__".$mode;
-	if (is_callable($aCall)) {$out=$aCall($Item);} elseif (is_callable($eCall) AND $engine!==false) {$out=$eCall($Item);}
+	if (is_callable($aCall)) {$out=$aCall($Item);} elseif (is_callable($eCall)) {$out=$eCall($Item);}
     if ($Item==false OR (isset($Item["active"]) AND $Item["active"]!=="on")) {
 		echo form__controller__error_404();
 		die;
@@ -81,8 +88,8 @@ function form__controller__list() {
 	$form=$_ENV["route"]["form"];
 	$mode=$_ENV["route"]["mode"];
 	$aCall=$form."_".$mode; $eCall=$form."__".$mode;
-	if (is_callable($aCall)) {$out=$aCall();} elseif (is_callable($eCall) AND $engine!==false) {$out=$eCall();}
-	if (!isset($out)) {
+	if (is_callable($aCall)) {$out=$aCall();} elseif (is_callable($eCall)) {$out=$eCall(); }
+    if (!isset($out)) {
 		$_ENV["DOM"]=wbGetForm($form,$mode);
 		$_ENV["DOM"]->wbSetData();
 	} else {
@@ -98,7 +105,7 @@ function form__controller__edit() {
 	$mode=$_ENV["route"]["mode"];
     if ($item=="" OR $item=="_new") {$item=$_GET["item"]=$_ENV["route"]["item"]=wbNewId();}
 	$aCall=$form."_".$mode; $eCall=$form."__".$mode;
-	if (is_callable($aCall)) {$out=$aCall();} elseif (is_callable($eCall) AND $engine!==false) {$out=$eCall();}
+	if (is_callable($aCall)) {$out=$aCall();} elseif (is_callable($eCall)) {$out=$eCall();}
 	if (!isset($out)) {
 		$_ENV["DOM"]=wbGetForm($form,$mode);
 		$data=wbItemRead(wbTable($form),$item);
@@ -169,10 +176,6 @@ function form__controller__setup_engine() {
     $out->wbSetData();
     echo $out;
     die;
-	
-
-
-	die;
 }
 
 ?>
