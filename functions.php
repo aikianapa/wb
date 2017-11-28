@@ -8,7 +8,6 @@ function wbInit() {
 	wbInitFunctions();
 	wbRouterAdd();
 	wbRouterGet();
-	
 }
 
 function wbInitEnviroment() {

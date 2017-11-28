@@ -1,4 +1,5 @@
 wb_include("/engine/js/php.js");
+wb_include("/engine/js/jquery.redirect.js");
 if ($("link[rel$=less]").length) wb_include("/engine/js/less.min.js");
 
 $(document).ready(function () {

@@ -1658,7 +1658,6 @@ abstract class kiNode
 		}
 	}
 
-
 	public function tagTree($Item=array()) {
 		include("wbattributes.php");
 		$this->wbSetAttributes($Item);
@@ -1723,7 +1722,12 @@ abstract class kiNode
 		if (isset($parent) AND ($parent=="false" OR $parent=="0" OR $parent==0)) {$parent=0;} else {$parent=1;}
         $tpl=$this->html();
 		$this->html("");
-		if ($branch!==0) {$tree=array(wbTreeFindBranchById($tree,$branch));}
+		if ($branch!==0) {
+            $br=explode("->",$branch);
+            foreach($br as $b) {
+                $tree=array(wbTreeFindBranchById($tree,trim($b)));
+            }
+        }
 		if ($this->hasAttr("placeholder") AND $this->is("select")) {
 			$this->prepend("<option value='' class='placeholder'>".$this->attr("placeholder")."</option>");
 		}
