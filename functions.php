@@ -178,7 +178,6 @@ function wbTable($table="data",$engine=false) {
     if (!is_file($table)) {
         $forms=array_flip(wbListForms());
         if ($tname>"" AND in_array($tname,$forms)) {
-            echo $tname;
             wbTableCreate($tname);
         }
     }
@@ -263,9 +262,11 @@ function wbItemList($table="data",$where="") {
 			$_ENV["cache"][$table]=json_decode(file_get_contents($table),true);
 		}
 		if (isset($_ENV["cache"][$table]["data"])) {$list=$_ENV["cache"][$table]["data"];}
-			array_walk($list,function(&$item,$key,$args){
+		if (!is_array($list)) {$list=array($list);}
+		array_walk($list,function(&$item,$key,$args){
 			$item=wbTrigger("form",__FUNCTION__,"AfterItemRead",$args,$item);
 		},func_get_args());
+		
 		$object = new ArrayObject($list);
 		foreach($object as $key => $item) {
 			if (!wbWhereItem($item,$where)) {unset($list[$key]);}
@@ -430,7 +431,7 @@ function wbItemSave($table,$item=null,$flush=true) {
 		wbError("func",__FUNCTION__,1001,func_get_args());
 		return null;
 	} else {
-		if (!isset($item["id"])) {$item["id"]=wbNewId(); $prev=null;} else {$prev=wbItemRead($table,$item["id"]);}
+		if (!isset($item["id"]) OR $item["id"]=="_new") {$item["id"]=wbNewId(); $prev=null;} else {$prev=wbItemRead($table,$item["id"]);}
 		$item=wbItemSetTable($table,$item);
 		$cache=wbCacheName($table,$item["id"]);
 		if ($prev!==null) {$item=array_merge($prev,$item);}

@@ -156,8 +156,15 @@ function wb_tree() {
         $(".content-w").append(edit);
         $(".content-w").find(".modal #treeData form").html(tpl);
         $(edid).after("<div class='modal-backdrop show fade'></div>");
-        $(edid).css("z-index", 10000);
-        $(edid).next(".modal-backdrop").css("z-index", 9999);
+        var zi=1050;
+        if ($(".modal:visible").length) {
+            $(".modal:visible").each(function(){
+                if (zi<$(this).css("z-index")) {zi=$(this).css("z-index");}
+            });
+            zi+=2;
+        }
+        $(edid).css("z-index", zi);
+        $(edid).next(".modal-backdrop").css("z-index", zi-1);
         $(edid).data("path", path);
         $(edid).modal();
         $(edid).undelegate("#treeDict *", "change");
@@ -457,7 +464,7 @@ function wb_multiinput() {
         $(document).data("wb-multiinput-row", data);
     });
     
-    $("[data-wb-role=multiinput]").sortable();
+    if (is_callable("sortable")) {$("[data-wb-role=multiinput]").sortable();}
     $(document).undelegate(".wb-multiinput", "mouseenter");
     $(document).delegate(".wb-multiinput", "mouseenter", function () {
         $(this).append("<div class='wb-multiinput-menu'>" + $(document).data("wb-multiinput-menu") + "</div>");
@@ -544,6 +551,7 @@ function wb_base_fix() {
 
 function wb_plugins() {
     $(document).ready(function () {
+        if (is_callable("autosize")) {autosize($('textarea[rows=auto]'));}
         if ($("[data-wb-src=datepicker]").length) {
             $("[type=datepicker]:not(.wb-plugin)").each(function () {
                 if ($(this).attr("data-date-format") == undefined) {
@@ -708,6 +716,17 @@ function wb_plugins() {
             });
         }
 
+        if ($("input[type=phone]").length) {$("input[type=phone]").mask("+7 (999) 999-99-99");}
+        if ($("input[type=tel]").length) {$("input[type=tel]").mask("+7 (999) 999-99-99");}
+        if ($("input[data-wb-mask]").length) {
+            $("input[data-wb-mask]").each(function(){
+                $(this).attr("type","text");
+                $(this).mask($(this).attr("data-wb-mask"));
+            });
+        }
+
+
+        
         if (is_callable("wb_plugin_editor")) wb_plugin_editor();
         if (is_callable("wbCommonUploader")) wbCommonUploader();
     });

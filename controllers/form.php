@@ -80,7 +80,7 @@ function form__controller__error_404($id=null) {
 	header("HTTP/1.0 404 Not Found");
     $_ENV["route"]["error"]="404";
 	$out=wbGetTpl("404.php");
-    $out->wbSetData();
+    if (is_object($out)) $out->wbSetData();
     return $out;
 }
 

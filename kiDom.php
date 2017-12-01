@@ -1222,6 +1222,7 @@ abstract class kiNode
 				}
 				}
 			}; unset($inc);
+            $this->includeTag($Item);
 			$this->wbSetValues($Item);
 			$this->contentLoop($Item);
 			$this->wbPlugins($Item);
@@ -1250,10 +1251,6 @@ abstract class kiNode
                     $sc->addClass("wb-done");
             }
 
-            if ($sc->attr("data-wb-src")=="engine") {
-					$sc->after('<script src="/engine/js/wbengine.js" type="text/javascript" charset="UTF-8"></script>');
-                    $sc->addClass("wb-done");
-            }
             
 			if ($sc->attr("data-wb-src")=="datepicker") {
 				if (!$sc->hasClass("wb-done")) {
@@ -1289,6 +1286,10 @@ abstract class kiNode
 					$sc->after(file_get_contents(__DIR__ ."/js/uploader/uploader.php"));
                     $sc->addClass("wb-done");
 				}
+		}
+		if ($sc->attr("data-wb-src")=="engine") {
+				$sc->after('<script src="/engine/js/wbengine.js" type="text/javascript" charset="UTF-8"></script>');
+				$sc->addClass("wb-done");
 		}
 
 
@@ -1741,16 +1742,16 @@ abstract class kiNode
 				$param=array("name"=>$name,"tag"=>$tag,"level"=>$level,"parent"=>$parent,"limit"=>$limit);
                 $child=wbFromString($tpl);
                 $child->tagTreeUl($item["children"],$param);
-                    
-    	if ($tag=="select") {
-							$child->children("option")->prepend(str_repeat("<span>&nbsp;&nbsp;<span>",$level));
-					} 
-                    
-                    if ($parent!==1) {
-                        $line->html($child);
-                    } else {
-                        $line->children(":first-child")->append("<{$tag}>".$child->outerHtml()."</{$tag}>");        
-                    }
+    	           if ($tag=="select") {
+							$child->children("option")->prepend(str_repeat("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>",$level));
+                       $line->append($child);
+                   } else {
+                        if ($parent!==1) {
+                            $line->html($child);
+                        } else {
+                            $line->children(":first-child")->append("<{$tag}>".$child->outerHtml()."</{$tag}>");        
+                        }
+                   }
                 
                 }
                 $level--;
@@ -1886,7 +1887,7 @@ abstract class kiNode
 									$t_step->addClass($tplid);
 									$this->append($t_step);
 								}
-								$this->find(".{$tplid}:last")->append(clearValueTags($text->outerHtml()));
+								$this->find(".{$tplid}:last")->append($text->outerHtml());
 								$stepcount++;
 								//$stepcount=$this->find(".{$tplid}:last")->children()->length;
 								if ($stepcount==$step) {$stepcount=0;}
@@ -2024,17 +2025,17 @@ public function tagInclude($Item) {
     public function includeTag($Item) {
 		 if ($this->find("include")->length) { 
 			$this->append("<div id='___include___' style='display:none;'>{$this_content}</div>");
-			foreach($this->find("include") as $inc) {
+            $Item=wbItemToArray($Item);
+             foreach($this->find("include") as $inc) {
+                $inc->wbSetAttributes($Item);
                 $from=$inc->attr("data-wb-from");
-                if ($from>"") {
-                    $Item=wbItemToArray($Item);
-                    $this->find("#___include___")->html(wbGetDataWbFrom($Item,$from));
-                }
+                if ($from=="") {$from="text";}
+                $this->find("#___include___")->html(wbGetDataWbFrom($Item,$from));
 				$attr=array("html","outer","htmlOuter","outerHtml","innerHtml","htmlInner","text","value");
 				foreach ($attr as $key => $attribute) {
 					$find=$inc->attr($attribute);
 					if ($attribute=="outer" OR $attribute=="htmlOuter") {$attribute="outerHtml";}
-					if ($attribute=="html" OR $attribute=="innerHtml" OR $attribute=="htmlInner") {$attribute="html";}
+					if ($attribute=="inner" OR $attribute=="html" OR $attribute=="innerHtml" OR $attribute=="htmlInner") {$attribute="html";}
 					if ($find>"" ) {
 						foreach($this->find("#___include___")->find($find) as $text) {
 							$inc->after($text->$attribute());
