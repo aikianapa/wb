@@ -1,9 +1,14 @@
 <div class="element-wrapper">
                     <h6 class="element-header">
-                     Список счетов
-                     <button class="btn btn-sm btn-success pull-right" data-wb-ajax="/form/edit/{{_GET[form]}}/_new" data-wb-append="body">
-                       <i class="os-icon os-icon-ui-22"></i> Добавить счёт
+                     Список накладных
+                     <button class="btn btn-sm btn-success pull-right" data-wb-ajax="/form/edit/{{_GET[form]}}/_out" data-wb-append="body">
+                       <i class="os-icon os-icon-ui-22"></i> Расходная
                      </button>
+                     <span class="pull-right">&nbsp;</span>
+                     <button class="btn btn-sm btn-warning pull-right" data-wb-ajax="/form/edit/{{_GET[form]}}/_in" data-wb-append="body">
+                       <i class="os-icon os-icon-ui-22"></i> Приходная
+                     </button>
+
                     </h6>
                     <div class="element-box">
                       <div class="table-responsive">
@@ -12,7 +17,7 @@
                             <tr>
                                 <th>Номер</th>
                                 <th>Дата</th>
-                                <th>Плательщик</th>
+                                <th>Поставщик</th>
                                 <th>Получатель</th>
                                 <th>Сумма</th>
                                 <th class="text-right">Действие</th>
@@ -22,10 +27,10 @@
                             <tr>
                               <td>{{number}}</td>
                               <td>{{date}}</td>
-                              <td role="formdata" data-wb-table="partners" data-wb-item="{{partner}}" class="hidden-ovf">
+                              <td role="formdata" data-wb-table="partners" data-wb-item="{{payer}}" class="hidden-ovf">
                                   {{name}}
                               </td>
-                              <td role="formdata" data-wb-table="partners" data-wb-item="{{organisation}}" class="hidden-ovf">
+                              <td role="formdata" data-wb-table="partners" data-wb-item="{{recipient}}" class="hidden-ovf">
                                   {{name}}
                               </td>
                                 <td>{{summ}}</td>

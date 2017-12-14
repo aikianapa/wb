@@ -19,7 +19,7 @@ function wbInitEnviroment() {
 	$_ENV["dbec"]=__DIR__."/database/_cache"; 			// Engine data
 	$_ENV["dbac"]=$_ENV["path_app"]."/database/_cache";	// App data
 	$_ENV["error"]=array();
-	$_ENV["env_id"]=wbNewId();
+	$_ENV["env_id"]=$_ENV["new_id"]=wbNewId();
     $_ENV["datetime"]=date("Y-m-d H:i:s");
     wbCheckWorkspace();
 	$variables=array();
@@ -165,8 +165,6 @@ function wbFlushDatabase() {
 	$atables=wbTableList();
 	foreach($etables as $key) {wbTableFlush($_ENV["dbe"]."/".$key);}
 	foreach($atables as $key) {wbTableFlush($_ENV["dba"]."/".$key);}
-
-	
 }
 
 function wbTable($table="data",$engine=false) {
@@ -261,7 +259,7 @@ function wbItemList($table="data",$where="") {
 		if (!isset($_ENV["cache"][$table])) {
 			$_ENV["cache"][$table]=json_decode(file_get_contents($table),true);
 		}
-		if (isset($_ENV["cache"][$table]["data"])) {$list=$_ENV["cache"][$table]["data"];}
+		if (isset($_ENV["cache"][$table]["data"])) {$list=$_ENV["cache"][$table]["data"];} else {$list=array();}
 		if (!is_array($list)) {$list=array($list);}
 		array_walk($list,function(&$item,$key,$args){
 			$item=wbTrigger("form",__FUNCTION__,"AfterItemRead",$args,$item);
@@ -451,6 +449,9 @@ function wbItemSetTable($table,$item=null) {
 	$tablename=explode("/",$table);
 	$item["_table"]=$tablename[count($tablename)-1];
     if (!isset($item["_created"]) OR $item["_created"]=="") $item["_created"]=date("Y-m-d H:i:s");
+    if (!isset($item["_creator"]) OR $item["_creator"]=="") $item["_creator"]=$_SESSION["user_id"];
+    $item["_lastdate"]=date("Y-m-d H:i:s");
+    $item["_lastuser"]=$_SESSION["user_id"];
 	return $item;
 }
 
@@ -1214,6 +1215,88 @@ function wbRole($role,$userId=null) {
 		return $res;
 	}
 
+function wbCartAction() {
+    if (!isset($_SESSION["order_id"]) OR $_SESSION["order_id"]=="") {$_SESSION["order_id"]=wbNewId();$new=true;} else {$new=false;}
+    $param=wbCartParam();
+    $order=wbItemRead("orders",$_SESSION["order_id"]);
+    if (!isset($order["id"]) OR $new=true) {
+        $order["id"]=$_SESSION["order_id"];
+        $order["user_id"]=$_SESSION["user_id"];
+        $order["date"]=date("Y-m-d H:i:s");
+    }
+    
+
+	switch($param["action"]) {
+		case "add-to-cart":       wbCartItemAdd($order); break;
+        case "cart-update":       wbCartUpdate($order); break;
+		case "cart-item-recalc":  wbCartItemRecalc($order); break;
+		case "cart-item-remove":  wbCartItemRemove($order); break;
+		case "cart-clear":        wbCartClear($order); break;
+	}
+    return $_SESSION["order_id"];
+}
+
+function wbCartUpdate($order) {
+    $order["items"]=$_POST;
+    $order["total"]=wbCartCalcTotal($order);
+    wbItemSave("orders",$order);
+}
+
+function wbCartParam() {
+    $param=array(
+    "mode"  =>$_ENV["route"]["mode"],
+    "action"=>$_ENV["route"]["params"][0]
+    );
+    $param=array_merge($param,$_POST);
+    return $param;
+}
+
+function wbCartClear($order) {
+	$order["items"]=array();
+	$order["total"]=0;
+    $order["lines"]=0;
+	wbItemSave("orders",$order);
+}
+
+function wbCartItemAdd($order) {
+    $param=wbCartParam();
+    if ($param["item"]>"" AND $param["count"]>"") {
+		$pos=wbCartItemPos($order);
+        $line=$param;
+        unset($line["mode"],$line["action"]);
+        $order["items"][$pos]=$line;
+		$order["total"]=wbCartCalcTotal($order);
+		wbItemSave("orders",$order);
+	}
+}
+
+function wbCartCalcTotal($order) {
+	$order["total"]=0;
+	foreach($order["items"] as $item) {
+		$order["total"]+=$item["count"]*$item["price"];
+	}; unset($item);
+	return $order["total"];
+}
+
+function wbCartItemPos($order) {
+    $param=wbCartParam();
+	if (!isset($order["items"])) {$order["items"]=array();}
+    $pos=0;
+	foreach($order["items"] as $key => $Item) {
+		if ($Item["form"]==$param["form"] AND $Item["item"]==$param["item"]) { return $pos;} else {$pos++;}
+	}
+	return $pos;
+}
+
+
+function wbCartItemPosCheck($Item) {
+	$res=true;
+    $param=wbCartParam();
+	foreach($param as $k => $fld) {
+		if ( $Item[$fld]!=$_GET[$fld] ) {$res=false;}
+	}
+	return $res;
+}
 
 function wbListForms() {
 	$exclude=array("common","admin","source","snippets");

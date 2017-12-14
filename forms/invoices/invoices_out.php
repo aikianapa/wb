@@ -12,10 +12,10 @@
 <form id="{{_GET[form]}}EditForm" data-wb-form="{{_GET[form]}}" data-wb-item="{{_GET[item]}}"  class="form-horizontal" role="form">
     <input type="hidden" name="id" placeholder="Имя записи"  >
 	<div class="form-group row">
-        <label class="col-sm-3 form-control-label">Номер счёта</label>
-        <div class="col-sm-3"><input type="text" class="form-control" name="number" placeholder="Номер счёта"></div>
-        <label class="col-sm-3 form-control-label">Дата счёта</label>
-        <div class="col-sm-3"><input type="datepicker" class="form-control" name="date" placeholder="Дата счёта"></div>
+        <label class="col-sm-3 form-control-label">Расходная накладная №</label>
+        <div class="col-sm-3"><input type="text" class="form-control" name="number" placeholder="Номер накладной"></div>
+        <label class="col-sm-3 form-control-label">Дата накладной</label>
+        <div class="col-sm-3"><input type="datepicker" class="form-control" name="date" placeholder="Дата накладной"></div>
 	</div>
 
 	<div class="form-group row">
