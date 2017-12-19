@@ -1565,7 +1565,6 @@ abstract class kiNode
 	public function tagMultiInput($Item) {
 		$len=count($this->find("input,select,textarea"));
 		if ($len==0) {$len=1;}
-        $this->wbSetAttributes($Item);
 		include("wbattributes.php");	
 		if ($this->attr("name") && !isset($name)) {$name=$this->attr("name");} else {$this->attr("name");}
 		$tags=array("input","select","textarea");
@@ -1652,9 +1651,10 @@ abstract class kiNode
 
 	public function tagCart() {
 		if ($this->find(".cart-item")->length) {
-			$Item=wbItemRead("orders",$_SESSION["order_id"]);
-			$this->attr("data-wb-tpl",uniqId());
-            $this->addTemplate();
+			$Item=wbReadItem("orders",$_SESSION["order_id"]);
+			$tplid=uniqId();
+			$this->attr("data-template",$tplid);
+			$this->after("<textarea id='{$tplid}' style='display:none;'>".urlencode($this->innerHtml())."</textarea>");
 			$this->wbSetData($Item);
 		}
 	}
@@ -1873,7 +1873,6 @@ abstract class kiNode
 					$val["_key"]=$key;
 					$val["_idx"]=$ndx;
 					$val["_ndx"]=$ndx+1;
-                    if (isset($val["id"])) {$val["_item"]=$val["id"];} else {$val["_item"]=$key;}
                     $val=wbCallFormFunc("BeforeShowItem",$val,$itemform);
                     $val=wbCallFormFunc("BeforeItemShow",$val,$itemform);
 					$text->wbSetData($val);

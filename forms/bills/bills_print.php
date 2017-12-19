@@ -34,7 +34,7 @@
                 </tr>
                 <tr>
                     <td valign="bottom" style="height: 3mm;">
-                        <div style="font-size:10pt;">Банк получателя</div>
+                        <div style="font-size:10pt;">Банк получателя        </div>
                     </td>
                 </tr>
             </table>
@@ -96,10 +96,10 @@
 <table width="100%">
     <tr>
         <td style="width: 30mm;">
-            <div style=" padding-left:2px;">Поставщик:	</div>
+            <div style=" padding-left:2px;">Поставщик:    </div>
         </td>
         <td>
-            <div style="font-weight:bold;  padding-left:2px;" role="formdata" data-wb-table="partners" data-wb-item="{{organisation}}">
+            <div style="font-weight:bold;  padding-left:2px;" role="formdata" data-wb-table="partners" data-wb-item="{{recipient}}">
                 ИНН {{inn}}, {{name}}
             </div>
         </td>
@@ -109,7 +109,7 @@
             <div style=" padding-left:2px;">Покупатель:    </div>
         </td>
         <td>
-            <div style="font-weight:bold;  padding-left:2px;" role="formdata" data-wb-table="partners" data-wb-item="{{partner}}">
+            <div style="font-weight:bold;  padding-left:2px;" role="formdata" data-wb-table="partners" data-wb-item="{{payer}}">
                 ИНН {{inn}}, {{name}}
             </div>
         </td>

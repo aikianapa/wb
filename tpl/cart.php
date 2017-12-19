@@ -1,1 +1,0 @@
-<div data-wb-role="include" src="form" data-wb-name="orders_cart" data-wb-hide="*"></div>

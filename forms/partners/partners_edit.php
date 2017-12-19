@@ -11,7 +11,6 @@
 
 <form id="{{_GET[form]}}EditForm" data-wb-form="{{_GET[form]}}" data-wb-item="{{_GET[item]}}"  class="form-horizontal" role="form">
     <input type="hidden" name="id" placeholder="Имя записи"  >
-    <input type="hidden" name="user_id" placeholder="ID в Users"  >
 	<div class="form-group row">
 	  <label class="col-sm-3 form-control-label">Наименование</label>
 	   <div class="col-sm-9"><input type="text" class="form-control" name="name" placeholder="Наименование"></div>
@@ -20,14 +19,6 @@
 	<div class="form-group row">
 	  <label class="col-sm-3 form-control-label">Полное наименование</label>
 	   <div class="col-sm-9"><input type="text" class="form-control" name="fullname" placeholder="Полное наименование"></div>
-	</div>
-	
-	<div class="form-group row">
-	  <label class="col-sm-3 form-control-label">Телефон</label>
-	   <div class="col-sm-3"><input type="phone" class="form-control" name="phone" placeholder="Телефон"></div>
-
-	  <label class="col-sm-2 form-control-label">Эл.почта</label>
-	   <div class="col-sm-4"><input type="email" class="form-control" name="email" placeholder="Эл.почта"></div>
 	</div>
 
 	<div class="form-group row">

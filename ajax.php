@@ -30,10 +30,6 @@ function ajax__pagination_vars() {
     return wbJsonEncode($res);
 }
 
-function ajax__cart() {
-    return wbCartAction();
-}
-
 function ajax__save($form=null) {
 	if ($form==null) {$form=$_ENV["route"]["form"];}
 	$eFunc="{$form}__formsave"; $aFunc="{$form}_formsave";

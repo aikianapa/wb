@@ -22,10 +22,10 @@
                             <tr>
                               <td>{{number}}</td>
                               <td>{{date}}</td>
-                              <td role="formdata" data-wb-table="partners" data-wb-item="{{partner}}" class="hidden-ovf">
+                              <td role="formdata" data-wb-table="partners" data-wb-item="{{payer}}" class="hidden-ovf">
                                   {{name}}
                               </td>
-                              <td role="formdata" data-wb-table="partners" data-wb-item="{{organisation}}" class="hidden-ovf">
+                              <td role="formdata" data-wb-table="partners" data-wb-item="{{recipient}}" class="hidden-ovf">
                                   {{name}}
                               </td>
                                 <td>{{summ}}</td>
