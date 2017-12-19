@@ -1,5 +1,6 @@
 <?php
 include_once(__DIR__."/../ajax.php");
+if (is_file($_ENV["path_app"]."/ajax.php")) {include_once($_ENV["path_app"]."/ajax.php");}
 function ajax__controller() {
 	wbTrigger("func",__FUNCTION__,"before");
 	$call=__FUNCTION__ ."__".$_ENV["route"]["mode"];
@@ -11,11 +12,10 @@ function ajax__controller() {
 return $_ENV["DOM"];
 }
 
-function ajax__controller__forms() {
-	$route=$_ENV["route"];
-	echo 1111111111111111111111;
-	die;
-	return false;
+function ajax__controller__cart() {
+    $res=false;
+	if (is_callable("ajax_cart")) {$res=ajax_cart();} elseif (is_callable("ajax__cart")) {$res=ajax__cart();}
+	return $res;
 }
 
 function ajax__controller__pagination() {
@@ -29,9 +29,10 @@ function ajax__controller__save() {
 }
 
 function ajax__controller__common() {
-	$call="ajax__".$_ENV["route"]["mode"];
-	if (is_callable($call)) {return @$call();} else {
-		echo __FUNCTION__ .": отсутствует функция ".$call."()";
+	$aCall="ajax_".$_ENV["route"]["mode"];
+    $eCall="ajax__".$_ENV["route"]["mode"];
+	if (is_callable($aCall)) {return $aCall();} elseif (is_callable($eCall)) {return $eCall();} else {
+		echo __FUNCTION__ .": отсутствует функция ".$aCall."()";
 		die;
 	}
 }

@@ -21,18 +21,18 @@
 	<div class="form-group row">
 	  <label class="col-sm-3 form-control-label">Поставщик</label>
 	   <div class="col-sm-9">
-           <select class="form-control select2" role="foreach" data-wb-ajax="/form/select2/partners" data-wb-where='self="on" AND active="on"' name="organisation" placeholder="Получатель">
+           <select class="form-control select2" role="foreach" data-wb-ajax="/form/select2/partners" name="partner" data-wb-where='active="on"' placeholder="Поставщик">
                <option value="{{id}}">
                    {{inn}} {{name}} 
                </option>
            </select>
         </div>
 	</div>
-    
+
 	<div class="form-group row">
-	  <label class="col-sm-3 form-control-label">Покупатель</label>
+	  <label class="col-sm-3 form-control-label">Получатель</label>
 	   <div class="col-sm-9">
-           <select class="form-control select2" role="foreach" data-wb-ajax="/form/select2/partners" name="partner" data-wb-where='active="on"' placeholder="Плательщик">
+           <select class="form-control select2" role="foreach" data-wb-ajax="/form/select2/partners" data-wb-where='self="on" AND active="on"' name="organisation" placeholder="Покупатель">
                <option value="{{id}}">
                    {{inn}} {{name}} 
                </option>

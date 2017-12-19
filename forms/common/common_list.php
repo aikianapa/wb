@@ -29,7 +29,7 @@
                               </td>
                               <td class="text-center">
                                 <div class="status-pill green" data-title="Активен" data-wb-role="where" data='active="on"' data-toggle="tooltip"></div>
-                                <div class="status-pill red" data-title="Активен" data-wb-role="where" data='active=""' data-toggle="tooltip"></div>
+                                <div class="status-pill red" data-title="Не активен" data-wb-role="where" data='active=""' data-toggle="tooltip"></div>
                               </td>
                               <td class="text-right" data-wb-role="include" src="/engine/forms/common/item_actions.php">
                               </td>

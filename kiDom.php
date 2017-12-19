@@ -1432,7 +1432,7 @@ abstract class kiNode
 		$this->wbSetAttributes($Item);
 		$text=$this->html();
 			if (isset($Item["form"])) {
-				$before=$Item["form"]."BeforeSetValues"; if (is_callable($before)) {$Item=$before($Item); }
+                $Item=wbTrigger("form",__FUNCTION__,"BeforeSetValues",func_get_args(),$Item);
 			}
 			$list=$this->find("input,select");
 			foreach($list as $inp) {
@@ -1561,12 +1561,11 @@ abstract class kiNode
 		$this->replaceWith($out);
 	}
 
-
 	public function tagMultiInput($Item) {
 		$len=count($this->find("input,select,textarea"));
 		if ($len==0) {$len=1;}
 		include("wbattributes.php");	
-		if ($this->attr("name") && !isset($name)) {$name=$this->attr("name");} else {$this->attr("name");}
+		if ($this->attr("name") AND !isset($name)) {$name=$this->attr("name");} else {$this->attr("name");}
 		$tags=array("input","select","textarea");
 		
 		$tpl=wbFromString($this->html());
@@ -1575,7 +1574,7 @@ abstract class kiNode
 		$tplId=wbNewId();
 		$this->after("<script type='text/template' id='{$tplId}'>".$template."</script>");
 		$this->attr("data-tpl","#".$tplId);
-		if (isset($Item[$name]) && is_array($Item[$name])) {
+		if (isset($Item[$name]) AND is_array($Item[$name])) {
 			$this->tagMultiInputSetData($Item[$name]);
 		} else {
 			$this->tagMultiInputSetData();
@@ -1630,12 +1629,15 @@ abstract class kiNode
 	}
 
 	public function tagHideAttrs() {
-		$hide=$this->attr("data-wb-hide");
+		$hide=trim($this->attr("data-wb-hide"));
 		$hide=trim(str_replace(","," ",$hide));
         if ($hide=="wb") {
             $list=$this->attributes();
             foreach($list as $attr) {
-                if (substr($attr->name,0,8)=="data-wb-") {$this->removeAttr($attr->name);}
+                if (substr($attr->name,0,8)=="data-wb-") {
+                    $this->removeAttr($attr->name);
+                    if (!$this->hasAttr("role")) {$this->removeClass("wb-done");}
+                }
             }
         } elseif ($hide=="*") {
             $this->after($this->innerHtml()); $this->remove();
@@ -1849,7 +1851,7 @@ abstract class kiNode
 		$tpl=$this->innerHtml(); $inner=""; $this->html("");
 		if ($step>0) {$steptpl=$this->clone(); $stepcount=0;}
 		if ($tplid=="") $tplid="tpl".wbNewId();
-		$ndx=0; $fdx=0; $n=0;
+		$ndx=0; $fdx=0; $n=0; $stp=0;
 		$count=count($Item);
 		$inner="";
 		$srcVal=array(); foreach($srcItem as $k => $v) {$srcVal["%{$k}"]=$v;}; unset($v);
@@ -1873,6 +1875,7 @@ abstract class kiNode
 					$val["_key"]=$key;
 					$val["_idx"]=$ndx;
 					$val["_ndx"]=$ndx+1;
+                    $val["_step"]=$stp;
                     $val=wbCallFormFunc("BeforeShowItem",$val,$itemform);
                     $val=wbCallFormFunc("BeforeItemShow",$val,$itemform);
 					$text->wbSetData($val);
@@ -1890,7 +1893,7 @@ abstract class kiNode
 								$this->find(".{$tplid}:last")->append($text->outerHtml());
 								$stepcount++;
 								//$stepcount=$this->find(".{$tplid}:last")->children()->length;
-								if ($stepcount==$step) {$stepcount=0;}
+								if ($stepcount==$step) {$stepcount=0; $stp++;}
 							} else { // иначе строим строку
 								$inner.=wbClearValues($text->outerHtml());
 							}
