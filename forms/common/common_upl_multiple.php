@@ -40,7 +40,7 @@
 	<script type="text/template" style="display:none;" class="wbImagesDropdownTpl">
 		<div class="dropdown-menu">
 			<a href="javascript:void(0);" class="dropdown-item delete-confirm"><i class="fa fa-trash"></i> Удалить</a>
-			<a href="javascript:void(0);" class="dropdown-item"><i class="glyphicon glyphicon-ban-circle"></i> Отмена</a>
+			<a href="javascript:void(0);" class="dropdown-item"><i class="fa fa-close"></i> Отмена</a>
 		</div>
 	</script>
 	</div>

@@ -1,3 +1,6 @@
+        <ul class="list-inline" role="foreach" data-wb-from="{{name}}" data-wb-limit="1">
+            <li>{{img}}</li>
+        </ul>
 <div class="wb-uploader single wbImagesAll">
 	<input type="hidden" name="{{name}}">
 	<div id="filelist" class="list-group">Your browser doesn't have Flash, Silverlight or HTML5 support.</div>

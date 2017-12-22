@@ -118,6 +118,8 @@ function wb_tree() {
 
         var item = $(this).parents(".wb-tree-item").attr("data-id");
         var form = $(tree).parents("[data-wb-form]").attr("data-wb-form");
+        if (form==undefined) {form="tree";}
+        var formitem = $(tree).parents("[data-wb-form]").attr("data-wb-item");
         var text = $(this).val();
         var name = $(tree).attr("name");
 
@@ -138,12 +140,11 @@ function wb_tree() {
         }
 
         var dataval = data["data"];
-        var tpl = wb_tree_data_fields(dict,dataval);
         data["_form"] = data["data"]["_form"] = form;
-        data["_id"] = data["data"]["_id"] = $(tree).parents("form[data-wb-item]").attr("data-wb-item");
-
+        data["_id"] = data["data"]["_id"] = formitem;
+        var tpl = wb_tree_data_fields(dict,dataval);
         //var tpl = $(wb_setdata(tpl, dataval, true));
-        $(tpl).find(".wb-uploader").attr("data-wb-path", "/uploads/" + form + "/" + $(tree).parents("form[data-wb-item]").attr("data-wb-item"));
+        $(tpl).find(".wb-uploader").attr("data-wb-path", "/uploads/" + form + "/" + formitem);
         data["fields"] = dict;
         data["name"] = name;
         data["data-name"] = text;
@@ -153,6 +154,7 @@ function wb_tree() {
         $(".content-w .tree-edit.modal").remove();
         edit = $(wb_setdata(edit, data, true));
         edit.find(".modal").attr("id", "tree_" + form + "_" + name);
+        edit.find(".modal .wb-uploader").attr("data-wb-path", "/uploads/" + form + "/" + formitem);
         $(".content-w").append(edit);
         $(".content-w").find(".modal #treeData form").html(tpl);
         $(edid).after("<div class='modal-backdrop show fade'></div>");
@@ -199,7 +201,6 @@ function wb_tree() {
                         $(that).children(".dd-content").val(d.value);
                     }
                     if (d.name == "data-id") {
-                            console.log(i,d);
                         $(that).children(".dd3-btn").children("span").html(d.value);
                     }
                 });

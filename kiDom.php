@@ -1632,17 +1632,17 @@ abstract class kiNode
 		$hide=trim($this->attr("data-wb-hide"));
 		$hide=trim(str_replace(","," ",$hide));
         if ($hide=="wb") {
-            $list=$this->attributes();
+            $list=$this->attributes(); $hide="";
             foreach($list as $attr) {
                 if (substr($attr->name,0,8)=="data-wb-") {
-                    $this->removeAttr($attr->name);
+                    $hide.=" ".$attr->name;
                     if (!$this->hasAttr("role")) {$this->removeClass("wb-done");}
                 }
             }
         } elseif ($hide=="*") {
             $this->after($this->innerHtml()); $this->remove();
         } 
-        $list=explode(" ",$hide);
+        $list=explode(" ",trim($hide));
 		foreach($list as $attr) {
 			$this->removeAttr($attr);
 		}

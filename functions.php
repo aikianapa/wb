@@ -56,7 +56,10 @@ function wbFormUploadPath() {
 	if ($_ENV["route"]["controller"]=="form") {
 		if (isset($_ENV["route"]["form"]) AND $_ENV["route"]["form"]>"") {$path.="/".$_ENV["route"]["form"];} else {$path.="/undefined";}
 		if (isset($_ENV["route"]["item"]) AND $_ENV["route"]["item"]>"") {$path.="/".$_ENV["route"]["item"];} else {$path.="/undefined";}
-	} else {$path.="/undefined";}
+	}elseif ($_ENV["route"]["controller"]=="ajax" AND $_ENV["route"]["mode"]=="buildfields" AND isset($_POST["data"])) {
+		if (isset($_POST["data"]["_form"]) AND $_POST["data"]["_form"]>"") {$path.="/".$_POST["data"]["_form"];} else {$path.="/undefined";}
+		if (isset($_POST["data"]["_id"]) AND $_POST["data"]["_id"]>"") {$path.="/".$_POST["data"]["_id"];} else {$path.="/undefined";}
+    } else {$path.="/undefined";}
 	return $path;
 }
 
@@ -141,7 +144,10 @@ function wbFieldBuild($param,$data=array()) {
             }
             $param["enum"]=$arr; unset($param["value"]);
             break;
-
+        case "image":
+            $tpl->wbSetValues($param);
+            $tpl->wbSetData($data);
+            break;
 	}
 	$set->find(".form-group > label")->html($param["label"]);
 	$set->find(".form-group > div")->html($tpl->outerHtml());
@@ -490,7 +496,11 @@ function wbError($type,$name,$error="__return__error__",$args=null) {
 		if (isset($_ENV["error"][$type][$name])) {unset($_ENV["error"][$type][$name]);}
 	} else {
 		if ($error=="__return__error__") {$error=$_ENV["error"][$type][$name];} else {
-			$_ENV["error"][$type][$name]=array("errno"=>$error,"error"=>$_ENV["errors"][$error]);
+            if (isset($_ENV["errors"])) {
+			     $_ENV["error"][$type][$name]=array("errno"=>$error,"error"=>$_ENV["errors"][$error]);
+            } else {
+                $_ENV["error"][$type][$name]=array("errno"=>$error,"error"=>"unknown error");
+            }
 			wbLog($type,$name,$error,$args);
 		}
 	}
