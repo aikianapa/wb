@@ -234,6 +234,20 @@ select.form-control + .select2-container {
     cursor:pointer;
 }
 
+    .box {overflow:hidden;}
+    .box-icon {
+        position: absolute;
+        font-size: 100px;
+        color: rgba(51, 149, 243, 0.1);
+        bottom: -50px;
+        right: -10px;
+    }
+    .absolute {position:absolute;}
+    .relative {position:relative;}
+    .zx0 {z-index:0;}
+    .zx1 {z-index:1;}
+    .zx2 {z-index:2;}
+
 @media screen {
     .wb-print-box {
         display: none;

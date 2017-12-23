@@ -1433,7 +1433,20 @@ function wb_pagination(pid) {
                 			} else {
                 */
                 var $source = $(this).parents(".pagination");
-                var page = $(this).attr("data");
+                if ($(this).parents(".page-item").attr("data-page")=="next") {
+                    var cur=$(this).parents(".pagination").find(".page-item.active");
+                    $(cur).next(".page-item").find("a[data-wb-ajaxpage]").trigger("click");
+                    return false;
+                }
+                if ($(this).parents(".page-item").attr("data-page")=="prev") {
+                    var cur=$(this).parents(".pagination").find(".page-item.active");
+                    $(cur).prev(".page-item").find("a[data-wb-ajaxpage]").trigger("click");
+                    return false;
+                }
+                var page = explode("/",$(this).attr("data-wb-ajaxpage"));
+                var c=count(page);
+                var page="ajax-"+page[c-3]+"-"+page[c-2];
+
                 var sort = null;
                 var desc = null;
                 //			}

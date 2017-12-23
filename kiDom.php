@@ -1606,7 +1606,6 @@ abstract class kiNode
 		return $tag->attr("vars");
 	}
 
-
 	public function wbSetAttributes($Item=array()) {
 		$attributes=$this->attributes();
 		if (is_object($attributes) && (strpos($attributes,"}}") OR strpos($attributes,"%"))) {
@@ -1738,7 +1737,7 @@ abstract class kiNode
             $item["_idx"]=$i;
             $line=wbFromString($tpl);
             $line->wbSetData($item);
-            if (is_array($item["children"]) AND count($item["children"])) {
+            if (isset($item["children"]) AND is_array($item["children"]) AND count($item["children"])) {
                 $level++;
                 if ($limit==-1 OR $level<=$limit) {
 				$param=array("name"=>$name,"tag"=>$tag,"level"=>$level,"parent"=>$parent,"limit"=>$limit);
@@ -1825,7 +1824,13 @@ abstract class kiNode
             $Item=json_decode($json,true);
         }
         
-        if (isset($count) AND $count>"") {$Item=array();$count=$count*1;for($i=1;$i<=$count;$i++){$Item[$i]=$i;};}
+        if (isset($count) AND $count>"") {
+            $fcount=$count;
+            $Item=array(); 
+            $count=$count*1;
+            for($i=1;$i<=$count;$i++){$Item[$i]=$srcItem;};
+        }
+        
 		if ($table > "") {
             $table=wbTable($table);
 			if ($item>"") {
@@ -1878,12 +1883,12 @@ abstract class kiNode
                     $val["_step"]=$stp;
                     $val=wbCallFormFunc("BeforeShowItem",$val,$itemform);
                     $val=wbCallFormFunc("BeforeItemShow",$val,$itemform);
-					$text->wbSetData($val);
 					$flag=true;
 					if ($flag==true AND $where>"") {$flag=wbWhereItem($val,$where);}
 					if ($flag==true AND $limit>"" AND $ndx>=$limit) {$flag=false;}
 						if ($flag==true) {
 							$ndx++;
+                            $text->wbSetData($val);
 							if ($step>0) { // если степ, то работаем с объектом
 								if ($stepcount==0) {
 									$t_step=$steptpl->clone();
