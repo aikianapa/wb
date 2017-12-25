@@ -108,7 +108,7 @@ print_r(wbRouter::getRoute());
   public static function returnRoute() {
 	$_GET=array();
 	$_ENV["route"]=array();
-
+    $_ENV["route"]["uri"]=$_SERVER["REQUEST_URI"];
     $controller="form"; $action="mode";
 
     $form = isset(self::$params[0]) ? self::$params[0]: 'default_form';

@@ -12,8 +12,11 @@
 <form id="{{_GET[form]}}EditForm" data-wb-form="{{_GET[form]}}" data-wb-item="{{id}}"  class="form-horizontal" role="form">
 	<div class="form-group row">
 	  <label class="col-sm-2 form-control-label">Логин</label>
-	   <div class="col-sm-4"><input type="text" class="form-control" name="id" placeholder="Логин пользователя" required ></div>
-
+      <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="id" placeholder="Логин пользователя" required data-wb-enabled="admin">
+        <input type="hidden" class="form-control" name="password">
+      <div class="input-group-addon btn btn-warning pre-icon os-icon os-icon-fingerprint" data-toggle="modal" data-target="#{{_GET[form]}}_{{_GET[mode]}}_pswd" data-wb-allow="admin"></div>
+      </div>
 	  <label class="col-sm-2 form-control-label">Группа</label>
 	   <div class="col-sm-4"><input type="text" class="form-control" name="role" placeholder="Группа"></div>
 	</div>
@@ -28,7 +31,6 @@
 <div class="tab-content  p-a m-b-md">
 <br />
 <div id="{{_GET[form]}}Descr" class="tab-pane fade show active" role="tabpanel">
-
 	<div class="form-group row">
 	  <label class="col-sm-2 form-control-label">Никнейм</label>
 	   <div class="col-sm-4"><input type="text" class="form-control" name="name" placeholder="Никнейм"></div>
@@ -49,7 +51,6 @@
 	   <div class="col-sm-6"><input type="email" class="form-control" name="email" placeholder="Электронная почта"></div>
 	</div>
 
-
 	<div class="form-group row">
 		<label class="col-sm-2 form-control-label">Аватар</label>
 		<div class="col-sm-3">
@@ -66,7 +67,7 @@
 
 
 
-		  <div class="modal-footer">
+          <div class="modal-footer">
 			<button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Закрыть</button>
 			<button type="button" class="btn btn-primary" data-wb-formsave="#{{_GET[form]}}EditForm"><span class="glyphicon glyphicon-ok"></span> Сохранить изменения</button>
 		  </div>
@@ -74,3 +75,7 @@
 		</div>
 </div>
 </div>
+<div data-wb-role="include" src="form" data-wb-name="common_changePassword_modal" data-wb-hide="*"></div>
+    
+    
+    

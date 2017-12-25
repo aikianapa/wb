@@ -1129,18 +1129,16 @@ function wb_check_email(email) {
 function wb_check_required(form) {
     var res = true;
     var idx = 0;
-    $(form).find("input[required],select[required],textarea[required],[type=password]").each(function (i) {
+    $(form).find("input[required],select[required],textarea[required],[type=password],[minlength]").each(function (i) {
+        idx++;
+        $(this).data("idx", idx);
         if ($(this).is(":not([disabled],[type=checkbox]):visible")) {
             if ($(this).val() == "") {
                 res = false;
-                idx++;
-                $(this).data("idx", idx);
                 $(document).trigger("wb_required_false", [this]);
             } else {
                 if ($(this).attr("type") == "email" && !wb_check_email($(this).val())) {
                     res = false;
-                    idx++;
-                    $(this).data("idx", idx);
                     $(this).data("error", "Введите корректный email");
                     $(document).trigger("wb_required_false", [this]);
                 } else {
@@ -1156,6 +1154,14 @@ function wb_check_required(form) {
                     $(this).data("error", "Пароли должны совпадать");
                     $(document).trigger("wb_required_false", [this]);
                 }
+            }
+        }
+        if ($(this).is("[minlength]")) {
+            var minlen=$(this).attr("minlength")*1
+            var lenstr=strlen($(this).val());
+            if (lenstr<minlen) {
+                    $(this).data("error", "Минимальная длинна поля "+minlen+" символов");
+                    $(document).trigger("wb_required_false", [this]);          
             }
         }
     });
@@ -1240,7 +1246,7 @@ function wb_ajax() {
         $(this).trigger("click");
         $(this).removeAttr("data-wb-autoload")
     });
-}
+} 
 
 $(document).unbind("wb_required_false");
 $(document).on("wb_required_false", function (event, that, text) {
