@@ -2,11 +2,11 @@
                     <h6 class="element-header">
                      Список накладных
                      <button class="btn btn-sm btn-success pull-right" data-wb-ajax="/form/edit/{{_GET[form]}}/_out" data-wb-append="body">
-                       <i class="os-icon os-icon-ui-22"></i> Расходная
+                       <i class="fa fa-plus"></i> Расходная
                      </button>
                      <span class="pull-right">&nbsp;</span>
                      <button class="btn btn-sm btn-warning pull-right" data-wb-ajax="/form/edit/{{_GET[form]}}/_in" data-wb-append="body">
-                       <i class="os-icon os-icon-ui-22"></i> Приходная
+                       <i class="fa fa-plus"></i> Приходная
                      </button>
 
                     </h6>

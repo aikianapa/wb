@@ -1,5 +1,18 @@
 /* Form Select Switches */
 
+.status-pill {
+  width: 12px;
+  height: 12px;
+  border-radius: 30px;
+  background-color: #eee;
+  display: inline-block; }
+  .status-pill.yellow {
+    background-color: #f8bc34; }
+  .status-pill.red {
+    background-color: #c21a1a; }
+  .status-pill.green {
+    background-color: #71c21a; }
+
 label.switch {
     margin: 1px 0;
     position: relative;
@@ -229,18 +242,20 @@ select.form-control + .select2-container {
 .modal[role=dialog] {
     overflow-y: auto;
 }
+.modal-dialog {width:100%;}
 
-[data-wb-href] {
+[data-wb-href],[data-wb-ajax] {
     cursor:pointer;
 }
-
-    .box {overflow:hidden;}
-    .box-icon {
+.element-box {margin-top:20px;} 
+.kt-sideleft {padding-top:140px;}
+    .card {overflow:hidden;}
+    .card-icon {
         position: absolute;
         font-size: 100px;
         color: rgba(51, 149, 243, 0.1);
-        bottom: -50px;
-        right: -10px;
+        top: -20px;
+        right: 20px;
     }
     .absolute {position:absolute;}
     .relative {position:relative;}

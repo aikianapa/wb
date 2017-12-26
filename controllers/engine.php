@@ -20,6 +20,8 @@ function engine__controller_logout() {
 function engine__controller_login() {
 	//$user=array("id"=>"admin","password"=>md5("admin"),"role"=>"admin","point"=>"/admin/","active"=>"on");
 	//wbItemSave("users",$user);
+    $_SESSION["user"]="User";
+    $_SESSION["user_role"]="user";
 	if (isset($_POST["l"]) AND $_POST["l"]>"") {
 		if ($user=wbItemRead("users",$_POST["l"])) {
 				if ($user["password"]==md5($_POST["p"]) AND $user["active"]=="on") {
@@ -34,12 +36,15 @@ function engine__controller_login() {
 function engine__controller_login_success($user) {
         $_SESSION["user_id"]=$user["id"];
         $_SESSION["user_role"]=$user["role"];
-    if ($user["point"]>"") {$point=$user["point"];} else {$point="/";}
+        if (isset($user["point"]) AND $user["point"]>"") {$point=$user["point"];} else {
+            if ($user["role"]=="admin") {$point="/admin";} else {$point="/";}
+        }
     if (!isset($user["name"])) {$user["name"]=$user["id"];}
         if (isset($user["avatar"])) {
             if (!is_array($user["avatar"])) {$user["avatar"]=json_decode($user["avatar"],true);$user["avatar"]=$user["avatar"][0];} 
             $user["avatar"]="/uploads/users/{$user["id"]}/{$user["avatar"]["img"]}";
         } else {$user["avatar"]="/engine/uploads/__system/person.svg";}
+        $_SESSION["user_name"]=$user["name"];
         $_SESSION["user"]=$user;
         header('Location: '.$point);
         die;  

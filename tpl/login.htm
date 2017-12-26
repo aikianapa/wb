@@ -1,46 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Вход в систему</title>
-    <base href="/engine/tpl/">
+    <!-- Required meta tags -->
     <meta charset="utf-8">
-    <meta content="Login" name="description">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <link href="favicon.png" rel="shortcut icon">
-    <link href="apple-touch-icon.png" rel="apple-touch-icon">
-        <script data-wb-src="jquery"></script>
-        <script data-wb-src="bootstrap"></script>
-        <link href="css/main.css?version=2.6" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Meta -->
+    <meta name="description" content="Login">
+    <base href="/engine/tpl/">
+    <title>Вход в систему</title>
+
+    <!-- vendor css -->
+    <link href="./lib/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="./lib/Ionicons/css/ionicons.css" rel="stylesheet">
+    <link href="./lib/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet">
+
+    <!-- Katniss CSS -->
+    <link rel="stylesheet" href="./css/katniss.css">
   </head>
-  <body class="auth-wrapper">
-    <div class="all-wrapper menu-side with-pattern">
-      <div class="auth-box-w">
-        <div class="logo-w">
-          <a href="/"><img alt="" src="img/logo-big.png"></a>
-        </div>
-        <h4 class="auth-header">
-          Вход в систему
-        </h4>
-        <form action="" method="post">
+
+  <body>
+
+    <div class="signpanel-wrapper">
+      <div class="signbox">
+        <div class="signbox-header">
+          <h4>Вход в систему</h4>
+          <p class="mg-b-0">&nbsp;</p>
+        </div><!-- signbox-header -->
+        <div class="signbox-body">
+            <form action="" method="post">
           <div class="form-group">
-            <label for="">Логин</label><input class="form-control" placeholder="Ваш логин" name="l" type="text">
-            <div class="pre-icon os-icon os-icon-user-male-circle"></div>
-          </div>
+            <label class="form-control-label">Логин:</label>
+            <input class="form-control" placeholder="Ваш логин" name="l" type="text">
+          </div><!-- form-group -->
           <div class="form-group">
-            <label for="">Пароль</label><input class="form-control" placeholder="Ваш пароль" name="p" type="password">
-            <div class="pre-icon os-icon os-icon-fingerprint"></div>
-          </div>
-		<div class="form-group">
-               <div data-wb-role="module" src="ulogin"></div>
-		</div>
-			  <div class="buttons-w">
-				<button class="btn btn-primary">Войти</button>
-				<div class="form-check-inline">
-				  <label class="form-check-label"><input class="form-check-input" type="checkbox">Запомнить</label>
-				</div>
-			  </div>
-        </form>
-      </div>
-    </div>
+            <label class="form-control-label">Пароль:</label>
+            <input class="form-control" placeholder="Ваш пароль" name="p" type="password">
+          </div><!-- form-group -->
+          <div class="form-group">
+            <div data-wb-role="module" src="ulogin"></div>
+          </div><!-- form-group -->
+          <button class="btn btn-dark btn-block">Войти</button>
+          <div class="tx-center bd pd-10 mg-t-40">Вы не зарегистрированы? <a href="/register">Создать аккаунт</a></div>
+            </form>
+        </div><!-- signbox-body -->
+      </div><!-- signbox -->
+    </div><!-- signpanel-wrapper -->
+
+    <script src="./lib/jquery/jquery.js"></script>
+    <script src="./lib/popper.js/popper.js"></script>
+    <script src="./lib/bootstrap/bootstrap.js"></script>
   </body>
 </html>

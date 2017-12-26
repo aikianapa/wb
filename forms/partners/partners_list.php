@@ -1,11 +1,11 @@
 <div class="element-wrapper">
     <h6 class="element-header">
         Список партнёров
+        <button class="btn btn-sm btn-success pull-right" data-wb-ajax="/form/edit/{{_GET[form]}}/_new" data-wb-append="body">
+                       <i class="fa fa-plus"></i> Добавить партнёра
+                     </button>
     </h6>
     <div class="element-box">
-        <button class="btn btn-sm btn-success pull-right" data-wb-ajax="/form/edit/{{_GET[form]}}/_new" data-wb-append="body">
-                       <i class="os-icon os-icon-ui-22"></i> Добавить партнёра
-                     </button>
         <div class="table-responsive">
             <table class="table table-lightborder">
                 <thead>

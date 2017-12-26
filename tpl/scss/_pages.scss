@@ -1,0 +1,352 @@
+
+// Tooltip and Popover
+.tooltip-static-demo {
+  .tooltip {
+    z-index: 1;
+    opacity: 1;
+    position: relative;
+    display: inline-block;
+    margin: 0 10px;
+  }
+
+  .bs-tooltip-top,
+  .bs-tooltip-bottom {
+    .arrow {
+      left: 50%;
+      margin-left: -2px;
+    }
+  }
+
+  .bs-tooltip-left,
+  .bs-tooltip-right {
+    margin-top: 5px;
+
+    .arrow {
+      top: 50%;
+      margin-top: -3px;
+    }
+  }
+}
+
+.popover-static-demo {
+  .popover {
+    z-index: 1;
+    opacity: 1;
+    position: relative;
+    display: inline-block;
+    margin: 0 10px;
+  }
+
+  .bs-popover-top,
+  .bs-popover-bottom {
+    .arrow {
+      left: 50%;
+      margin-left: -5px;
+    }
+  }
+
+  .bs-popover-left,
+  .bs-popover-right {
+    margin-top: 5px;
+
+    .arrow {
+      top: 50%;
+      margin-top: -5px;
+    }
+  }
+}
+
+
+/***** MAILBOX PAGE *****/
+.content-wrapper {
+  position: relative;
+}
+
+.content-left {
+  position: absolute;
+  top: 0;
+  left: -(240px + $app-sideleft-width);
+  width: 220px;
+  @include transition($transition-base);
+
+  @include media-breakpoint-up(lg) {
+    left: 0;
+  }
+
+  .nav {
+    margin-top: 10px;
+    flex-direction: column;
+
+    .nav-item + .nav-item { margin-top: 1px; }
+  }
+
+  .nav-link {
+    display: flex;
+    height: 40px;
+    align-items: center;
+    color: $gray-600;
+    background-color: $gray-200;
+
+    i {
+      margin-right: 7px;
+      font-size: 20px;
+      width: 20px;
+
+      &,&::before,&::after { line-height: 0; }
+    }
+
+    &.active,
+    &:hover,
+    &:focus {
+      background-color: $gray-300;
+      color: $gray-800;
+    }
+  }
+}
+
+.content-body {
+  position: relative;
+  margin-left: 0;
+  @include transition($transition-base);
+
+  @include media-breakpoint-up(lg) {
+    margin-left: 240px;
+  }
+
+  .dropdown-menu {
+    font-size: 12px;
+    box-shadow: none;
+
+    a {
+      color: $gray-600;
+
+      &:hover,
+      &:focus {
+        background-color: $gray-200;
+        color: $gray-700;
+      }
+    }
+  }
+}
+
+.content-body-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .btn-group .btn + .btn { margin-left: 1px; }
+
+  .btn {
+    border: 0;
+    display: flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      &,&::before,&::after {
+        line-height: 0;
+      }
+    }
+  }
+}
+
+.content-checkall {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: $gray-500;
+  margin-right: 1px;
+
+  .ckbox { width: 16px; }
+}
+
+.mailbox-list-group {
+  margin-top: 10px;
+
+  .list-group-item {
+    padding: 10px 15px;
+    display: flex;
+    background-color: $gray-100;
+
+    .media-body-head {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+
+      h6 { line-height: 1; }
+    }
+
+    h6 {
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    &:first-child { @include border-top-radius(0); }
+    &:last-child { @include border-bottom-radius(0); }
+
+    &.unread {
+      background-color: #fff;
+      h6 { font-weight: 500; }
+    }
+  }
+}
+
+.content-show-left {
+  @include media-breakpoint-down(md) {
+    overflow-x: hidden;
+    .content-left { left: 0; }
+    .content-body { transform: translateX(240px); }
+  }
+}
+
+/***** CHAT PAGE *****/
+.contact-list {
+  > a {
+    display: block;
+    background-color: $gray-200;
+    color: $gray-600;
+
+    &:hover,
+    &:focus {
+      color: $gray-600;
+      background-color: $gray-300;
+    }
+
+    + a { margin-top: 1px; }
+  }
+
+  .media {
+    padding: 10px 15px;
+    align-items: center;
+
+    + .media { border-top: 1px solid $gray-400; }
+  }
+}
+
+.content-left-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background-color: $gray-300;
+  padding: 10px 15px;
+  display: block;
+  margin-bottom: 1px;
+}
+
+.btn-content-left {
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+/**** EDIT PROFILE PAGE *****/
+.edit-profile-photo {
+  position: relative;
+
+  figcaption {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(#fff,0.5);
+    @include transition($transition-base);
+    opacity: 0;
+  }
+
+  &:hover,
+  &:focus {
+    figcaption { opacity: 1; }
+  }
+}
+
+.edit-profile-tag-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    width: 100%;
+    height: 40px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    background-color: $gray-200;
+
+    + li { margin-top: 1px; }
+
+    a {
+      color: $gray-500;
+      &:hover,
+      &:focus { color: $gray-600; }
+    }
+  }
+}
+
+.edit-profile-form {
+  padding: 20px;
+
+  @include media-breakpoint-up(sm) {
+    padding: 40px;
+  }
+
+  .form-group {
+    display: flex;
+    align-items: center;
+  }
+
+  .form-control-label { margin-bottom: 0; }
+}
+
+
+/***** SIGNUP / SIGNIN PAGES *****/
+.signpanel-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @include media-breakpoint-up(sm) {
+    padding: 20px 0;
+  }
+}
+
+.signbox {
+  width: 400px;
+  background-color: #fff;
+
+  &.signup { width: 500px; }
+}
+
+.signbox-header {
+  padding: 30px 0;
+  text-align: center;
+  background-color: $app-primary;
+
+  h4 {
+    color: #fff;
+    font-weight: 700;
+  }
+
+  p { color: rgba(#fff, 0.8); }
+}
+
+.signbox-body {
+  padding: 20px;
+  background-color: $gray-300;
+
+  @include media-breakpoint-up(sm) {
+    padding: 40px;
+  }
+}

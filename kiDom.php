@@ -1750,7 +1750,7 @@ abstract class kiNode
                         if ($parent!==1) {
                             $line->html($child);
                         } else {
-                            $line->children(":first-child")->append("<{$tag}>".$child->outerHtml()."</{$tag}>");        
+                            $line->append("<{$tag}>".$child."</{$tag}>");        
                         }
                    }
                 
@@ -2232,6 +2232,7 @@ public function tagThumbnail($Item=array()) {
 			$inner="";
 			$pagination=array("id"=>$class,"size"=>$size,"count"=>$count,"cache"=>$cacheId,"find"=>$find,"pages"=>array());
             if (!isset($_ENV["route"]["params"]["form"]) OR $_ENV["route"]["params"]["form"]=="") {$form=$tplId;} else {$form=$_ENV["route"]["params"]["form"];}
+            if (isset($_ENV["route"]["form"]) AND $_ENV["route"]["form"]>"") {$form=$_ENV["route"]["form"];}
 			for($i=1; $i<=$pages; $i+=$step) {
 				$href=$_ENV["route"]["controller"]."/".$_ENV["route"]["mode"]."/".$form."/".$i;
                 $pagination["pages"][$i]=array(

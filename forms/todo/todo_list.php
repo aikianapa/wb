@@ -21,14 +21,15 @@
 
 <div class="row">
 <div class="col-12">
-<ul class="nav navbar-nav pull-right">
+<h3 class="element-header">
+    Чек-лист
+<ul class="nav navbar-nav pull-right navbar-todo">
 <li class="nav-item dropdown">
 <a class="nav-link text-muted" href="#" data-toggle="dropdown">
 <i class="fa fa-ellipsis-v">
 </i>
 </a>
-
-		<div class="dropdown-menu status">
+		<div class="dropdown-menu  dropdown-menu-right status">
 			<a class="dropdown-item" href="javascript:void(0);" data-status="success">
 			<i class="fa fa-dot-circle-o text-success"></i> Активные</a>
 
@@ -41,11 +42,10 @@
 		</div>
 
 </li>
-</ul>
-
-
-
-<h3>Чек-лист</h3>
+</ul>    
+    
+    
+    </h3>
 </div>
 </div>
 <div class="row">
