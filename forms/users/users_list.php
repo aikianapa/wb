@@ -3,7 +3,7 @@
                     <h6 class="element-header">
                      Пользователи
                      <button class="btn btn-sm btn-success pull-right" data-wb-ajax="/form/edit/{{_GET[form]}}/_new" data-wb-append="body">
-                       <i class="os-icon os-icon-ui-22"></i> Добавить пользователя
+                       <i class="fa fa-plus"></i> Добавить пользователя
                      </button>
                     </h6>
                     <div class="element-box">

@@ -32,7 +32,6 @@ function wbInitEnviroment() {
 	$_ENV["variables"]=$variables;
 	$settings=array_merge($settings,$variables);
 	$_ENV["settings"]=$settings;
-	
 }
 
 function wbCheckWorkspace() {
@@ -197,9 +196,9 @@ function wbTable($table="data",$engine=false) {
 
 function wbTableCreate($table="data",$engine=false) {
 	wbTrigger("func",__FUNCTION__,"before");
-	if ($engine==false) {$db=$_ENV["dba"];} else {$_ENV["dbe"];}
+	if ($engine==false) {$db=$_ENV["dba"];} else {$db=$_ENV["dbe"];}
 	$table=wbTablePath($table,$engine);
-	if (!is_file($table)) {
+	if (!is_file($table) AND is_dir($db)) {
 		$json=json_encode(array("dict"=>array(),"data"=>array(),"view"=>array()), JSON_HEX_QUOT | JSON_HEX_APOS);
 		$res=file_put_contents($table,$json, LOCK_EX);
 		if ($res) {chmod($table,0777);} else {$table=null;}
@@ -256,7 +255,7 @@ function wbItemList($table="data",$where="") {
 	if (count(explode($_ENV["path_app"],$table))==1) {$table=wbTable($table);}
 	if (!is_file($table)) {
 		wbError("func",__FUNCTION__,1001,func_get_args());
-		return $list;
+		return array();
 	} else {
 	   wbTrigger("form",__FUNCTION__,"BeforeItemList",func_get_args(),array());
         if (!isset($_ENV["cache"][$table])) {
@@ -270,7 +269,7 @@ function wbItemList($table="data",$where="") {
 		
 		$object = new ArrayObject($list);
 		foreach($object as $key => $item) {
-			if (!wbWhereItem($item,$where)) {unset($list[$key]);}
+            if (substr($item["id"],0,1)=="_" AND $_SESSION["user_role"]!=="admin") {unset($list[$key]);} elseif (!wbWhereItem($item,$where)) {unset($list[$key]);}
 		}
 
 

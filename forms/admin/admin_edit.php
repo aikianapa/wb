@@ -1,3 +1,4 @@
+<h5 class="element-header">Настройки</h5>
 <form method="post" id="admin_settings" data-wb-form="admin" data-wb-item="settings">
         <div class="row">
           <div class="col-sm-12">
