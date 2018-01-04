@@ -269,7 +269,7 @@ function wbItemList($table="data",$where="") {
 		
 		$object = new ArrayObject($list);
 		foreach($object as $key => $item) {
-            if (substr($item["id"],0,1)=="_" AND $_SESSION["user_role"]!=="admin") {unset($list[$key]);} elseif (!wbWhereItem($item,$where)) {unset($list[$key]);}
+            if ($item["id"]=="" OR (substr($item["id"],0,1)=="_" AND $_SESSION["user_role"]!=="admin")) {unset($list[$key]);} elseif (!wbWhereItem($item,$where)) {unset($list[$key]);}
 		}
 
 
@@ -284,7 +284,7 @@ function wbTreeRead($name) {
     $tree=wbItemRead("tree",$name);
 	if (!isset($tree["tree"])) {$tree["tree"]=array();}  else {
 		$tree["tree"]=json_decode($tree["tree"],true);
-	}
+	} 
 	if (!isset($tree["_tree__dict_"])) {$tree["dict"]=array();}  else {
 		$tree["dict"]=json_decode($tree["_tree__dict_"],true);
 	}
