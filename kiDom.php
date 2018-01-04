@@ -1440,10 +1440,16 @@ abstract class kiNode
 				$name=$inp->attr("name");	$def=$inp->attr("value");
 				if (substr($name,-2)=="[]") {$name=substr($name,0,-2);}
 				if (substr($def,0,3)=="{{_") {$def="";}
-                if (isset($Item[$name]) AND $inp->attr("value")=="") {$value=$Item[$name];} else {$value=$def;}	
+                if (isset($Item[$name]) AND $inp->attr("value")=="") {
+                    if (is_array($Item[$name])) {$Item[$name]=json_encode($Item[$name]);}
+                    $value=$Item[$name];
+                } else {$value=$def;}
 
                 if ($value!=="") {$inp->attr("value",$value);} else {
-                    if (!$inp->hasAttr("value") AND isset($Item[$name])) {$inp->attr("value",$Item[$name]);}
+                    if (!$inp->hasAttr("value") AND isset($Item[$name])) {
+                        if (is_array($Item[$name])) {$Item[$name]=json_encode($Item[$name]);}
+                        $inp->attr("value",$Item[$name]);
+                    }
                 }
 
 				if ($inp->attr("type")=="checkbox") {
