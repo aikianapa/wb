@@ -125,4 +125,37 @@ function ajax__buildfields() {
 	}
 	die;
 }
+
+function ajax__mail() {
+require $_ENV["path_engine"].'/lib/phpmailer/PHPMailerAutoload.php';
+if (!isset($_POST["subject"])) {$_POST["subject"]="Письмо с сайта";}
+$out=wbGetTpl("mail.php");
+$out->wbSetData($_POST);
+$out=$out->outerHtml();
+//Create a new PHPMailer instance
+$mail = new PHPMailer;
+//Set who the message is to be sent from
+$mail->setFrom('from@example.com', 'Site Form');
+//Set an alternative reply-to address
+$mail->addReplyTo($_POST["email"], $_POST["name"]);
+//Set who the message is to be sent to
+$mail->addAddress($_ENV["settings"]["email"], $_ENV["settings"]["header"]);
+//Set the subject line
+$mail->Subject = $_POST["subject"];
+//Read an HTML message body from an external file, convert referenced images to embedded,
+//convert HTML into a basic plain-text alternative body
+$mail->msgHTML($out, dirname(__FILE__));
+$mail->CharSet = 'utf-8';
+//Replace the plain text body with one created manually
+//$mail->AltBody = 'This is a plain-text message body';
+//Attach an image file
+//$mail->addAttachment('images/phpmailer_mini.png');
+//send the message, check for errors
+
+if (!$mail->send()) {
+    echo "Ошибка отправки: " . $mail->ErrorInfo;
+} else {
+    echo "Сообщение отрпавлено!";
+}
+}
 ?>
