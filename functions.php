@@ -617,7 +617,6 @@ function wbGetItemImg($Item=null,$idx=0,$noimg="",$imgfld="images",$visible=true
 			if ($res==false AND (($visible==true AND $img["visible"]==1) OR $visible==false) AND is_file("{$_ENV["path_app"]}/uploads/{$Item["_table"]}/{$Item["id"]}/{$img["img"]}")) {
 				if ($idx==$count) {
 					$image="{$_ENV["path_app"]}/uploads/{$Item["_table"]}/{$Item["id"]}/{$img["img"]}"; $res=true;
-					echo $image;
 				}
 				$count++;
 			}

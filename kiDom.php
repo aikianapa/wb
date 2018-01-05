@@ -2088,17 +2088,32 @@ public function tagInclude($Item) {
 
 public function tagThumbnail($Item=array()) {
 	$bkg=false; $img="";
-	$src=$this->attr("src");
-	$noimg=$this->attr("noimg");
-	$form=$this->attr("form"); if ($form=="" && isset($Item["form"])) {$form=$Item["form"];}
-	$item=$this->attr("item"); if ($item=="" && isset($Item["id"])) {$item=$Item["id"];}
-	$show=$this->attr("show");
+	$src=$this->attr("src"); if ($src=="") {$src="0";}
+	$noimg=$this->attr("data-wb-noimg");
+	$form=$this->attr("data-wb-form"); if ($form=="" && isset($Item["form"])) {$form=$Item["form"];}
+    $from=$this->attr("data-wb-from"); if ($from=="") {$from="images";}
+    $item=$this->attr("data-wb-item"); if ($item=="" && isset($Item["id"])) {$item=$Item["id"];}
+	$show=$this->attr("data-wb-show");
 	$class=$this->attr("class");
 	$style=$this->attr("style");
 	$width=$this->attr("width"); if ($width=="") {$width="160px";}
 	$height=$this->attr("height"); if ($height=="") {$height="120px";}
 	$offset=$this->attr("offset");
 	$contain=$this->attr("contain");
+
+	if ($form>"" && $item>"") {$Item=wbItemRead($form,$item); }
+	$json=$this->attr('json'); 	if ($json>"") {$images=json_decode($json,true); } else {
+        if (isset($Item[$from])) {
+            if (is_array($Item[$from])) {$images=$Item[$from];} else {$images=json_decode($Item[$from],true);}
+        } else {$images="";}
+	}
+	if (is_array($images) AND is_numeric($src)) {
+		if (isset($images[$idx])) {$img=$images[$idx]["img"];} else {$img="";}
+		$src=wbGetItemImg($Item,$idx,$noimg,$from,true);
+        $src=str_replace($_ENV["path_app"],"",$src);
+		$img=explode($src,"/"); $img=$img[count($img)-1];
+		$this->attr("src",$src);
+	}
 
 	$srcSrc=$src;
 	$srcImg=explode("/",trim($src)); $srcImg=$srcImg[count($srcImg)-1];
@@ -2107,16 +2122,18 @@ public function tagThumbnail($Item=array()) {
 
 	if (!in_array($srcExt,$exts)) {$src="/engine/uploads/__system/filetypes/{$srcExt}.png"; $img="{$srcExt}.png"; $ext="png";}
 
-	if ($form>"" && $item>"") {$Item=wbItemRead($form,$item); }
-	$json=$this->attr('json'); 	if ($json>"") {$images=json_decode($json,true); } else {
-		if (isset($Item["images"])) {
-			if (is_array($Item["images"])) {$images=$Item["images"];} else {$images=json_decode($Item["images"],true);}
-		} else {$images="";}
-	}
+
+    
 	if (is_numeric($this->attr("src"))) {$idx=$this->attr("src"); $this->removeAttr("src"); $num=true;} else {
 		$idx=$this->parents("[idx]")->attr("idx"); if ($idx>"" && $src=="") {$num=true;} else {$idx=0;}
 	}
-		$size=$this->attr("size");
+    if ($this->attr("data-wb-size")>"") {$size=$this->attr("data-wb-size");}
+    if ($size=="") {$size=$this->attr("size");}
+    if ($size=="" AND isset($Item["intext_position"])) {
+        if (isset($Item["intext_position"]["width"]) AND $Item["intext_position"]["width"]>"") {$width=$Item["intext_position"]["width"];} else {$width="200";}
+        if (isset($Item["intext_position"]["height"]) AND $Item["intext_position"]["height"]>"") {$height=$Item["intext_position"]["height"];} else {$height="160";}
+        $size="{$width}px;{$height}px;src";
+    }
 			if ($size>"") {
 				$size=explode(";",$size);
 				if (count($size)==1) {$size[1]=$size[0];}
@@ -2132,9 +2149,9 @@ public function tagThumbnail($Item=array()) {
 			}
 
 	if (!is_file($_ENV["path_app"].$src) && !is_file($_SERVER["DOCUMENT_ROOT"].$src)) {
-		if (isset($Item["img"]) && !isset($Item["images"]) && isset($Item["%images"]) && !is_file($src)) {
+		if (isset($Item["img"]) && !isset($Item[$from]) && isset($Item["%{$from}"]) && !is_file($src)) {
 			$tmpItem=array();
-			$tmpItem["images"]=$Item["%images"];
+			$tmpItem[$from]=$Item["%{$from}"];
 			$tmpItem["form"]=$Item["%form"];
 			$tmpItem["id"]=$Item["%id"];
 			$src=wbGetItemImg($tmpItem,$idx,$noimg);
@@ -2150,17 +2167,6 @@ public function tagThumbnail($Item=array()) {
 
 	$img=explode("/",trim($src)); $img=$img[count($img)-1];
 	$ext=explode(".",trim($src)); $ext=$ext[count($ext)-1];
-
-/*	if (is_array($images)
-	//AND is_numeric($this->attr("src"))
-	) {
-		if (isset($images[$idx])) {$img=$images[$idx]["img"];} else {$img="";}
-		$src=wbGetItemImg($Item,$idx,$noimg,"images",false);
-		$img=explode($src,"/"); $img=$img[count($img)-1];
-		$this->attr("src",$src);
-	}
-	*/
-
     $this->src=$src;
     
 	if ($src==array()) {$src="";}
