@@ -1,0 +1,14 @@
+DirectoryIndex index.php
+AddDefaultCharset UTF-8
+
+RewriteBase /
+RewriteEngine On
+RewriteRule ^database(.*)$ index.php [L,QSA]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+RewriteRule ^(.*)$ index.php [L,QSA]
+
+RewriteCond %{REQUEST_URI} ^/tpl/$
+RewriteRule ^.*$ /? [R=301,L]

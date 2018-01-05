@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Meta -->
+    <meta name="description" content="Login">
+    <base href="/engine/tpl/">
+    <title>Вход в систему</title>
+
+    <!-- vendor css -->
+    <link href="./lib/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="./lib/Ionicons/css/ionicons.css" rel="stylesheet">
+    <link href="./lib/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet">
+
+    <!-- Katniss CSS -->
+    <link rel="stylesheet" href="./css/katniss.css">
+  </head>
+
+  <body>
+
+    <div class="signpanel-wrapper">
+      <div class="signbox">
+        <div class="signbox-header">
+          <h4>Вход в систему</h4>
+          <p class="mg-b-0">&nbsp;</p>
+        </div><!-- signbox-header -->
+        <div class="signbox-body">
+            <form action="" method="post">
+          <div class="form-group">
+            <label class="form-control-label">Логин:</label>
+            <input class="form-control" placeholder="Ваш логин" name="l" type="text">
+          </div><!-- form-group -->
+          <div class="form-group">
+            <label class="form-control-label">Пароль:</label>
+            <input class="form-control" placeholder="Ваш пароль" name="p" type="password">
+          </div><!-- form-group -->
+          <div class="form-group">
+            <div data-wb-role="module" src="ulogin"></div>
+          </div><!-- form-group -->
+          <button class="btn btn-dark btn-block">Войти</button>
+          <div class="tx-center bd pd-10 mg-t-40">Вы не зарегистрированы? <a href="/register">Создать аккаунт</a></div>
+            </form>
+        </div><!-- signbox-body -->
+      </div><!-- signbox -->
+    </div><!-- signpanel-wrapper -->
+
+    <script src="./lib/jquery/jquery.js"></script>
+    <script src="./lib/popper.js/popper.js"></script>
+    <script src="./lib/bootstrap/bootstrap.js"></script>
+  </body>
+</html>

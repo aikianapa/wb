@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <base href="/engine/tpl/">
+    <title>Установка</title>
+    <!-- vendor css -->
+    <link href="./lib/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="./lib/Ionicons/css/ionicons.css" rel="stylesheet">
+    <link href="./lib/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet">
+    <link href="./lib/highlightjs/github.css" rel="stylesheet">
+    <link href="./lib/jquery.steps/jquery.steps.css" rel="stylesheet">
+    <!-- Katniss CSS -->
+    <link rel="stylesheet" href="./css/katniss.css"> </head>
+
+<body>
+    <div class="kt-pagebody">
+        <div class="row">
+            <div class="col-12 col-lg-10 ml-lg-auto mr-lg-auto col-xl-8">
+                <div class="card col-12 pd-20 pd-sm-40">
+                    <h6 class="card-body-title">Установка системы</h6>
+                    <p class="mg-b-20 mg-sm-b-30">Мастер установки поможет вам настроить систему.</p>
+                    <form id="setup" method="post">
+                        <input type="hidden" name="setup" value="done" />
+                        <div id="wizard">
+                            <h3>Персонализация</h3>
+                            <section>
+                                <div class="row success">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label for="">Заголовок сайта</label>
+                                            <input class="form-control" placeholder="Заголовок сайта" type="text" name="header" required> </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="">Электронная почта</label>
+                                            <input class="form-control" placeholder="Электронная почта" type="email" name="email" required> </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <h3>Безопасность</h3>
+                            <section>
+                                <div class="form-group">
+                                    <label for="">Логин</label>
+                                    <input class="form-control" placeholder="Логин суперпользователя" type="text" value="admin" name="login" required> </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="">Пароль</label>
+                                            <input class="form-control" placeholder="Пароль" type="password" name="password" required> </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="">Проверка пароля</label>
+                                            <input class="form-control" placeholder="Проверка пароля" type="password" name="password_check" required> </div>
+                                    </div>
+                            </section>
+                            <h3>Шаблон</h3>
+                            <section>
+                                <div class="form-group">
+                                    <label>Базовый шаблон</label>
+                                    <select class="form-control" placeholder="Базовый шаблон" required>
+                                        <option value=""> Выберите базовый шаблон </option>
+                                        <option value="single"> Одностраничный сайт </option>
+                                        <option value="multi"> Многостраничный сайт </option>
+                                    </select>
+                                </div>
+                            </section>
+                                <h3>Установка</h3>
+                                <section>
+                                <p>Всё готово к установке системы. Нажмите кнопку Установить для продолжения.</p>
+                                </section>
+                            </div>
+                    </form>
+                    </div>
+                </div>
+                <!-- card -->
+            </div>
+        </div>
+        <!-- kt-pagebody -->
+        <script src="./lib/jquery/jquery.js"></script>
+        <script src="./lib/popper.js/popper.js"></script>
+        <script src="./lib/bootstrap/bootstrap.js"></script>
+        <script src="./lib/jquery.steps/jquery.steps.js"></script>
+        <script src="./js/katniss.js"></script>
+        <script data-wb-src="engine"></script>
+        <script data-wb-src="plugins"></script>
+        <script>
+            $(document).ready(function () {
+                'use strict';
+                $('#wizard').steps({
+                    headerTag: 'h3'
+                    , bodyTag: 'section'
+                    , autoFocus: true
+                    , labels: {
+                        next: "Дальше"
+                        , previous: "Назад"
+                        , finish: "Установить"
+                    }
+                    , titleTemplate: '<span class="number">#index#</span> <span class="title">#title#</span>'
+                    , onStepChanging: function (event, currentIndex, newIndex) {
+                            return wb_check_required("#setup");                            
+                    }, 
+                    onFinishing:  function (event, currentIndex) {
+                        $("form#setup").submit();
+                    }
+                });
+            });
+        </script>
+</body>
+
+</html>
