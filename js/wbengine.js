@@ -807,6 +807,13 @@ function wb_plugin_editor() {
             // это работает
             CKEDITOR.instances[i].on('change', function () {
                 CKEDITOR.instances[i].updateElement();
+                
+                var fldname=CKEDITOR.instances[i].element.$.name;
+                
+                $(document).trigger("editorChange",{
+                    "value" : CKEDITOR.instances[i].getData(),
+                    "field"	: fldname
+                });
             });
         }
 
@@ -829,28 +836,8 @@ function wb_plugin_editor() {
         			   });			   
         			});
         */
-
-        $(document).on("sourceChange", function (e, data) {
-            var form = data.form;
-            var field = data.field;
-            var value = data.value;
-
-            $(this).html(data.value);
-            if (CKEDITOR.instances[$("[name=" + field + "]").attr("id")] !== undefined) {
-                CKEDITOR.instances[$("[name=" + field + "]").attr("id")].setData(value);
-
-            }
-            e.preventDefault();
-            return false;
-
-
-
-        });
-
-
     }
 }
-
 
 function wb_formsave() {
     // <button data-formsave="#formId" data-src="/path/ajax.php"></button>
@@ -1663,12 +1650,39 @@ function wb_call_source_events(eid, fldname) {
 
     $(document).on("editorChange", function (e, data) {
         $(document).data("editor", true);
-        var eid = "#" + $(".ace_editor[name=" + data.field + "]").attr("id");
+        var field=data.field;
+        var eid = "#" + $(".ace_editor[name=" + field + "]").attr("id");
         var form = $(eid).parents("form");
         $(form).data(eid).getSession().setValue(data.value);
+        if (!$(form).find("textarea[name="+field+"]").length) {
+            $(form).prepend("<textarea class='hidden' name='"+field+"'></textarea>");
+        };
+        //$(form).find("textarea[name="+field+"]").val(data.value);
         setTimeout(function () {
             $(document).data("editor", false);
         }, 30);
+        console.log("Trigger: editorChange");
+        e.preventDefault();
+        return false;
+    });
+    
+
+    $(document).on("sourceChange", function (e, data) {
+        var form = data.form;
+        var field = data.field;
+        var value = data.value;
+        //$(this).html(data.value);
+        if (CKEDITOR.instances[$("[name=" + field + "]").attr("id")] !== undefined) {
+            CKEDITOR.instances[$("[name=" + field + "]").attr("id")].setData(value);
+        } else {
+            if (!$(form).find("textarea[name="+field+"]").length) {
+                $(form).prepend("<textarea class='hidden' name='"+field+"'></textarea>");
+            };
+            $(form).find("textarea[name="+field+"]").val(value);
+        }
+        console.log("Trigger: sourceChange");
+        e.preventDefault();
+        return false;
     });
 
 

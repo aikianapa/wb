@@ -8,7 +8,7 @@ function engine__controller() {
 		echo __FUNCTION__ .": отсутствует функция ".$call."()";
 		die;
 	}
-	wbTrigger("func",__FUNCTION__,"after");
+	wbTrigger("func",__FUNCTION__,"after");    
 	return $_ENV["DOM"];
 }
 

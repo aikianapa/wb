@@ -21,6 +21,7 @@
 	<li class="nav-item"><a class="nav-link" href="#pageText" data-toggle="tab" >Контент</a></li>
 	<li class="nav-item"><a class="nav-link" href="#pageSource" data-toggle="tab" >Исходный код</a></li>
 	<li class="nav-item"><a class="nav-link" href="#pageImages" data-toggle="tab">Изображения</a></li>
+    <li class="nav-item"><a class="nav-link" href="#pageSeo" data-toggle="tab">СЕО</a></li>
 </ul>
 </div>
 <div class="tab-content  p-a m-b-md">
@@ -46,26 +47,16 @@
 		</div>
 	</div>
 
-	<div class="form-group row">
-	  <label class="col-sm-2 form-control-label">Описание</label>
-	   <div class="col-sm-10"><input type="text" class="form-control" name="meta_description" placeholder="Описание"></div>
-	</div>
-
   <div class="form-group row">
     <label class="col-sm-2 form-control-label">Отображать</label>
     <div class="col-sm-2"><label class="switch switch-success"><input type="checkbox" name="active"><span></span></label></div>
 	</div>
-
-	<div class="form-group row">
-	  <label class="col-sm-2 form-control-label">Ключевые слова</label>
-	   <div class="col-sm-10"><input type="text" class="form-control input-tags" name="meta_keywords" placeholder="Ключевые слова"></div>
-	</div>
-
 </div>
 
 <div id="pageText" class="tab-pane fade" data-wb-role="include" src="editor" role="tabpanel"></div>
 <div id="pageSource" class="tab-pane fade" data-wb-role="include" src="source" role="tabpanel"></div>
 <div id="pageImages" class="tab-pane fade" data-wb-role="include" src="uploader" role="tabpanel"></div>
+<div id="pageSeo" class="tab-pane fade" data-wb-role="include" src="seo" role="tabpanel"></div>
 </div>
 </form>
 

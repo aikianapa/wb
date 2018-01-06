@@ -1976,6 +1976,9 @@ public function tagInclude($Item) {
             case "source":
                 $this_content=wbGetForm("common",$src);
                 break;
+            case "seo":
+                $this_content=wbGetForm("common",$src);
+                break;
             case "form":
                 $form=""; $mode="";
                 $arr=explode("_",$name);
