@@ -764,13 +764,16 @@ function wbWherePhp($str="",$item=array()) {
                     "#"=>" !== ",
                     "=="=>" == ",
 	)))." ";
+
 	$exclude=array("AND","OR","LIKE","NOT_LIKE","IN_ARRAY");
-	preg_match_all('/\w+(?!\")\b/iu',$str,$arr);
-	foreach($arr[0] as $a => $fld) {
-		if (!in_array(strtoupper($fld),$exclude)) {
-			$str=str_replace(" {$fld} ",' $item["'.$fld.'"] ',$str);
-		}
-	}
+    preg_match_all('/\w+(?!\")\b/iu',$str,$arr); // возникают ошибки если в тексте пробел
+    foreach($arr[0] as $a => $fld) {
+        if (!in_array(strtoupper($fld),$exclude)) {
+            if (isset($item[$fld])) {
+                $str=str_replace(" {$fld} ",' $item["'.$fld.'"] ',$str);
+            }
+        }
+    }
 
 	preg_match_all('/in_array\s\(\s(.*),array \(/',$str,$arr);
 	foreach($arr[1] as $a => $fld) {

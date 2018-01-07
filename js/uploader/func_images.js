@@ -247,6 +247,7 @@ function wbImagesToField(id) {
 	var store=$('#'+ id + ' > input[name]');
 	$("#"+id+" ul li.thumbnail").each(function(i){
 		if ($(this).hasClass("selected")) {var sel=1;} else {var sel=0;}
+        if ($("#"+id).hasClass("single")) {var sel=1};
 		var img = {
 			img: $(this).attr("data-name"),
 			title: $(this).attr("title"),

@@ -1714,11 +1714,12 @@ abstract class kiNode
 
 	public function tagTreeUl($Item=array(),$param=null) {
      
-		$limit=-1; $level=0; $tree=$Item; $branch=0; $parent=1;
+		$limit=-1; $level=0; $tree=$Item; $branch=0; $parent=1; $children=1;
 		if ($param==null) {
 			include("wbattributes.php");
-			$name=$this->attr("name"); 
+			$name=$this->attr("name");
 			if (isset($from)) {$name=$from;}
+            if ($children=="false" OR $children=="0") {$children=0;} elseif ($children=="true" OR $children=="1") {$children=1;}
 			if ($name=="" AND isset($item)) {$name=$item;}
 			if (!is_array($Item[$name])) {$tree=json_decode($Item[$name],true);} else {$tree=$Item[$name];}
 			$tag=$this->tag();
@@ -1756,7 +1757,7 @@ abstract class kiNode
                         if ($parent!==1) {
                             $line->html($child);
                         } else {
-                            $line->children(":first-child")->append("<{$tag}>".$child->outerHtml()."</{$tag}>");        
+                            if ($children==1) $line->children(":first-child")->append("<{$tag}>".$child->outerHtml()."</{$tag}>");        
                         }
                    }
                 

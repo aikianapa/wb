@@ -66,6 +66,14 @@ function form__controller__show() {
         if (!isset($Item["head_noadd_glob"]) OR $Item["head_noadd_glob"]!=="on") {
             if (isset($_ENV["settings"]["head_add"]) AND isset($_ENV["settings"]["head_add_active"]) AND $_ENV["settings"]["head_add_active"]=="on")  {$_ENV["DOM"]->find("head")->append($_ENV["settings"]["head_add"]);}    
         }
+        if (isset($Item["meta_description"]) AND $Item["meta_description"]>"") {
+            $_ENV["DOM"]->find("head meta[name=description]")->remove();
+            $_ENV["DOM"]->find("head")->prepend("<meta name='description' content='{$Item["meta_description"]}'>");
+        }
+        if (isset($Item["meta_keywords"]) AND $Item["meta_keywords"]>"") {
+            $_ENV["DOM"]->find("head meta[name=keywords]")->remove();
+            $_ENV["DOM"]->find("head")->prepend("<meta name='keywords' content='{$Item["meta_keywords"]}'>");
+        }
     }
     if ($_ENV["DOM"]->find("body")->length) {
         // Вставки в тэг BODY
@@ -73,7 +81,6 @@ function form__controller__show() {
         if (!isset($Item["body_noadd_glob"]) OR $Item["body_noadd_glob"]!=="on") {
             if (isset($_ENV["settings"]["body_add"]) AND isset($_ENV["settings"]["body_add_active"]) AND $_ENV["settings"]["body_add_active"]=="on") {$_ENV["DOM"]->append($_ENV["settings"]["body_add"]);}
         }
-        
     }
 	return $_ENV["DOM"];
 }

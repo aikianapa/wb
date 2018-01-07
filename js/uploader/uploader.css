@@ -21,4 +21,4 @@
 .wb-uploader.single {margin-top:0;}
 .wb-uploader.single .uploader {padding-top:0;}
 .wb-uploader.single .gallery {text-align:left;}
-.wb-uploader.single .thumbnail img  {padding: 1px; border-radius: 6px;  background-size: contain;}
+.wb-uploader.single .thumbnail img  {padding: 1px; border-radius: 6px;  background-size: contain; opacity:1;}

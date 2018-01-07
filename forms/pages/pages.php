@@ -61,7 +61,11 @@ function _pageBeforeShowItem($Item) {
 */
 
 function _pagesAfterItemRead($Item) {
-	if ($_GET["mode"]=="list") {
+    if ($_ENV["route"]["mode"]=="show") {
+        if (!isset($Item["title"]) OR $Item["title"]=="") {$Item["title"]=$Item["header"];}
+        if ($Item["title"]=="") {$Item["title"]=$_ENV["settings"]["header"];}
+    }
+	if ($_ENV["route"]["mode"]=="list") {
 		$Item["images_count"]=count(json_decode($Item["images"],true));
 		unset($Item["text"]);
 	}
