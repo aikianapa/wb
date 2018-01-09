@@ -51,9 +51,9 @@ function form__controller__show() {
         } else {
             $out=wbGetForm($form,$mode);
             if ($_ENV["error"]["wbGetForm"]!=="noform") { $_ENV["DOM"]=$out; } else {
-                if (!isset($Item["template"]) OR $Item["template"]=="") {$Item["template"]="default.php";}
                 if (is_callable("wbBeforeShowItem")) {$Item=wbBeforeShowItem($Item);}
                 $Item=wbCallFormFunc("BeforeShowItem",$Item,$form,$mode);
+                if (!isset($Item["template"]) OR $Item["template"]=="") {$Item["template"]="default.php";}
                 $_ENV["DOM"]=wbGetTpl($Item["template"]);
                 if (!is_object($_ENV["DOM"])) {$_ENV["DOM"]=wbFromString($_ENV["DOM"]);}
             }

@@ -14,7 +14,7 @@
 
                     <div class="form-group row">
                         <label class="col-sm-2 form-control-label">Дата/время</label>
-                        <div class="col-sm-4"><input type="datetimepicker" class="form-control" data-format="" name="date" placeholder="Дата"></div>
+                        <div class="col-sm-4"><input type="datetimepicker" class="form-control" data-format="" name="date" placeholder="Дата" required></div>
                         <label class="col-sm-2 form-control-label">Отображать</label>
                         <div class="col-sm-2"><label class="switch switch-success"><input type="checkbox" name="active"><span></span></label></div>
                     </div>
@@ -23,6 +23,7 @@
 <ul class="nav nav-tabs" role="tablist">
 	<li class="nav-item"><a class="nav-link active" href="#{{_GET[form]}}Descr" data-toggle="tab">Новость</a></li>
 	<li class="nav-item"><a class="nav-link" href="#{{_GET[form]}}Images" data-toggle="tab">Изображения</a></li>
+    <li class="nav-item"><a class="nav-link" href="#{{_GET[form]}}Seo" data-toggle="tab">СЕО</a></li>
 </ul>
 </div>
 <div class="tab-content  p-a m-b-md">
@@ -31,7 +32,7 @@
 
 	<div class="form-group row">
 	  <label class="col-sm-3 form-control-label">Заголовок</label>
-	   <div class="col-sm-9"><input type="text" class="form-control" name="header" placeholder="Заголовок"></div>
+	   <div class="col-sm-9"><input type="text" class="form-control" name="header" placeholder="Заголовок" required></div>
 	</div>
 
 	<div class="form-group row">
@@ -52,18 +53,9 @@
 	   <div class="col-sm-9" data-wb-role="include" src="editor"></div>
 	</div>
 
-	<div class="form-group row">
-        <label class="col-sm-3 form-control-label">Описание<br><small>meta description</small></label>
-        <div class="col-sm-9"><input type="text" class="form-control" name="meta_description" placeholder="Описание"></div>
-	</div>
-
-	<div class="form-group row">
-	  <label class="col-sm-3 form-control-label">Ключевые слова<br><small>meta keywords</small></label>
-	   <div class="col-sm-9"><input type="text" class="form-control input-tags" name="meta_keywords" placeholder="Ключевые слова"></div>
-	</div>
-
 </div>
 <div id="{{_GET[form]}}Images" class="tab-pane fade" data-wb-role="include" src="uploader" role="tabpanel"></div>
+<div id="{{_GET[form]}}Seo" class="tab-pane fade" data-wb-role="include" src="seo" role="tabpanel"></div>
 </div>
 
                 </form>

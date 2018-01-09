@@ -524,6 +524,10 @@ function wbGetTpl($tpl=null,$path=false) {
 	return $out;
 }
 
+function wbLoopProtect($func) {
+    if (!isset($_ENV["wbGetFormStack"])) {$_ENV["wbGetFormStack"]=array();}
+    $_ENV["wbGetFormStack"][]=$func;
+}
 
 function wbGetForm($form=NULL,$mode=NULL,$engine=null) {
 	$_ENV["error"][__FUNCTION__]="";

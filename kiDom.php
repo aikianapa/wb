@@ -1207,6 +1207,7 @@ abstract class kiNode
 			foreach($nodes as $inc) {
 				if (!$inc->parents("[type=text/template]")->length) {
 				$inc->wbUserAllow();
+                $inc->wbWhere($Item);
 				$tag=$inc->wbCheckTag();
 				if (!$tag==FALSE && !$inc->hasClass("wb-done")) {
 					if ($inc->has("[data-wb-json]")) {$inc->json=wbSetValuesStr($inc->json,$Item);}
@@ -1230,6 +1231,14 @@ abstract class kiNode
       gc_collect_cycles();
 	}
 
+    public function wbWhere($Item){
+        $where=$this->attr("data-wb-where");
+        if ($where=="") $where=$this->attr("where");
+        if ($where>"" AND !wbWhereItem($Item,$where)) {
+			$this->remove();
+		}
+    }
+    
 
 	public function wbPlugins(){
 		$script=$this->find("script[data-wb-src]:not(.wb-done)");
