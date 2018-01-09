@@ -769,7 +769,7 @@ function wbWherePhp($str="",$item=array()) {
     preg_match_all('/\w+(?!\")\b/iu',$str,$arr); // возникают ошибки если в тексте пробел
     foreach($arr[0] as $a => $fld) {
         if (!in_array(strtoupper($fld),$exclude)) {
-            if (isset($item[$fld])) {
+            if (isset($item[$fld]) AND $a==0) {
                 $str=str_replace(" {$fld} ",' $item["'.$fld.'"] ',$str);
             }
         }
