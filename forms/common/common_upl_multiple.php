@@ -31,7 +31,9 @@
 
 	</li>
 	<ul class="gallery list-inline" data-wb-role="foreach" data-wb-from="images">
-		<li class="thumbnail col-3" data-name="{{img}}" title="{{title}}" alt="{{alt}}" >
+        <meta role="variable" var="class" value="" data-wb-hide="*">
+        <meta role="variable" var="class" value="selected" where='visible="1"' data-wb-hide="*">
+		<li class="thumbnail col-3 {{_VAR[class]}}" data-name="{{img}}" title="{{title}}" alt="{{alt}}" >
 			<img data-wb-role='thumbnail' size='320px;240px;bkg' style='height:auto;' class='img-fluid' src="{{%path}}/{{img}}"/>
 			<a href="#" class="btn btn-outline-primary delete" data-toggle="dropdown"><span class="fa fa-trash"></span></a>
 			<a href="#" class="btn btn-outline-primary info"><span class="fa fa-info"></span></a>

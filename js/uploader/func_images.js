@@ -271,6 +271,8 @@ function wbImagesAddToList(id,name,vis) {
 	$(images).each(function(i,img){
 		if (img["img"]==name) {title=img["title"]; alt=img["alt"]; visible=img["visible"];}
 	});
+    
+    console.log(visible);
 	var form=$('#'+id).attr("data-wb-form");
 	var item=$('#'+id).attr("data-wb-item");
 	var path=$('#'+id).attr("data-wb-path");
