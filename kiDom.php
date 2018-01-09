@@ -2233,14 +2233,13 @@ public function tagThumbnail($Item=array()) {
               $_SESSION["temp"][$class]["error"],
               $_SESSION["temp"][$class]["errors"]
              );
-		if (is_object($this->parent("table")) && $this->parent("table")->find("thead th[data-sort]")->length) {
+		if (is_object($this->parent("table")) && $this->parent("table")->find("thead th[data-wb-sort]")->length) {
 			$this->parent("table")->find("thead")->attr("data-wb-cache",$cacheId);
 			$this->parent("table")->find("thead")->attr("data-wb-size",$size);
 			$this->parent("table")->find("thead")->attr("data-wb",$class);
 		}
 		if ($pages>0) {
 			$find=urlencode($find);
-			//$pag=wbFromString("<div><ul id='{$class}' class='pagination' data-wb-size='{$size}' data-wb-count='{$count}' data-wb-cache='{$cacheId}' data-wb-find='{$find}'></ul></div>");
 			$pag=wbGetForm("common","pagination");
 			$pag->wrapInner("<div></div>");
 			$step=1;
@@ -2263,7 +2262,6 @@ public function tagThumbnail($Item=array()) {
 				if ($page>=10 && $page<20 && $i<20) {$step=1;}
 			}
 			$pag->wbSetData($pagination);
-
 			$pag->find("[data-page={$page}]")->addClass("active");
 			if ($pages==1) {
 				$style=$pag->find("ul")->attr("style");

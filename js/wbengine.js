@@ -1487,6 +1487,7 @@ function wb_pagination(pid) {
                 else {
                     var cache = $source.attr("data-wb-cache");
                     var size = $source.attr("data-wb-size");
+                    var sort = $source.attr("data-wb-sort");
                     var idx = $source.attr("data-wb-idx");
                     var arr = explode("-", page);
                     var tpl = $("#" + tid).html();
