@@ -1,10 +1,55 @@
 /**
- * @license Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
- * For licensing, see LICENSE.html or http://ckeditor.com/license
+ * @license Copyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
 CKEDITOR.editorConfig = function( config ) {
 	// Define changes to default configuration here. For example:
-	// config.language = 'fr';
+	config.language = 'ru';
+    config.skin = 'bootstrapck';
 	// config.uiColor = '#AADC6E';
 };
+CKEDITOR.config.toolbarGroups = [
+/*                {
+                    name: 'document'
+                    , groups: ['document', 'doctools']
+                }
+			,    */
+
+                {
+                    name: 'mode'
+                },
+
+            { name: 'editing',     groups: [ 'find' ] }
+                , {
+                    name: 'clipboard'
+                    , groups: ['clipboard', 'undo']
+                }
+                , {
+                    name: 'links'
+                }
+                , {
+                    name: 'insert'
+                }
+                , {
+                    name: 'others'
+                }
+				, '/'
+                , {
+                    name: 'basicstyles'
+                    , groups: ['basicstyles', 'cleanup']
+                }
+                , {
+                    name: 'paragraph'
+                    , groups: ['list', 'indent', 'blocks', 'align']
+                }
+                , {
+                    name: 'colors'
+                }
+                , {
+                    name: 'tools'
+                },
+                {
+    name: 'styles', groups: ['Styles','Format']
+}
+			];

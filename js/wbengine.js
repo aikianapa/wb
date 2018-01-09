@@ -758,7 +758,7 @@ function wb_plugin_editor() {
             }
             var editor = $(this).ckeditor();
             CKEDITOR.config.extraPlugins = 'youtube';
-            CKEDITOR.config.toolbarGroups = [
+            /*CKEDITOR.config.toolbarGroups = [
                 {
                     name: 'document'
                     , groups: ['document', 'doctools']
@@ -795,8 +795,8 @@ function wb_plugin_editor() {
                 , {
                     name: 'tools'
                 }
-			];
-            CKEDITOR.config.skin = 'bootstrapck';
+			];*/
+            //CKEDITOR.config.skin = 'bootstrapck';
             CKEDITOR.config.allowedContent = true;
             CKEDITOR.config.forceEnterMode = true;
             CKEDITOR.plugins.registered['save'] = {
