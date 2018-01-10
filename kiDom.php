@@ -512,7 +512,7 @@ class ki extends CLexer
 					'content' => http_build_query($_POST),
 				)
 			));
-			
+
 			return ki::fromString(file_get_contents($file,false,$context));
 		}
 	}
@@ -1238,7 +1238,7 @@ abstract class kiNode
 			$this->remove();
 		}
     }
-    
+
 
 	public function wbPlugins(){
 		$script=$this->find("script[data-wb-src]:not(.wb-done)");
@@ -1260,7 +1260,7 @@ abstract class kiNode
                     $sc->addClass("wb-done");
             }
 
-            
+
 			if ($sc->attr("data-wb-src")=="datepicker") {
 				if (!$sc->hasClass("wb-done")) {
                     $lang="ru"; if ($sc->attr("data-wb-lang")>"") {$lang=$sc->attr("data-wb-lang");}
@@ -1452,7 +1452,7 @@ abstract class kiNode
                 if (isset($Item[$name]) AND $inp->attr("value")=="") {
                     if (is_array($Item[$name])) {$Item[$name]=wbJsonEncode($Item[$name]);}
                     $value=$Item[$name];
-                } else {$value=$def;}	
+                } else {$value=$def;}
 
                 if ($value!=="") {$inp->attr("value",$value);} else {
                     if (!$inp->hasAttr("value") AND isset($Item[$name])) {
@@ -1463,7 +1463,7 @@ abstract class kiNode
 
 				if ($inp->attr("type")=="checkbox") {
 					if ($inp->attr("value")=="on" OR $inp->attr("value")=="1") {$inp->checked="checked";}
-				} 
+				}
 
 				if ($inp->is("select") AND $inp->attr("value")>"") {
 					$value=$inp->attr("value");
@@ -1478,7 +1478,7 @@ abstract class kiNode
 				}
 				$inp->wbSetMultiValue($Item);
 			};
-			
+
 			$list=$this->find("textarea");
 			foreach($list as $inp) {
 				$name=$inp->attr("name");	$def=$inp->attr("value");
@@ -1487,7 +1487,7 @@ abstract class kiNode
 			unset($inp,$list);
 			if (!is_array($Item)) {$Item=array($Item);}
 			$this->html(wbSetValuesStr($this->html(),$Item));
-		
+
 			$this->includeTextarea($Item);
 		if ($obj==FALSE) {return $this->outerHtml();}
 	}
@@ -1579,13 +1579,13 @@ abstract class kiNode
 	public function tagMultiInput($Item) {
 		$len=count($this->find("input,select,textarea"));
 		if ($len==0) {$len=1;}
-		include("wbattributes.php");	
+		include("wbattributes.php");
 		if ($this->attr("name") AND !isset($name)) {$name=$this->attr("name");} else {$this->attr("name");}
 		$tags=array("input","select","textarea");
-		
+
 		$tpl=wbFromString($this->html());
 		$template=$this->innerHtml();
-		
+
 		$tplId=wbNewId();
 		$this->after("<script type='text/template' id='{$tplId}'>".$template."</script>");
 		$this->attr("data-tpl","#".$tplId);
@@ -1615,7 +1615,7 @@ abstract class kiNode
 			unset($line);
 		}
 	}
-	
+
 
 	public function getAttrVars() {
 		return $tag->attr("vars");
@@ -1655,13 +1655,13 @@ abstract class kiNode
             }
         } elseif ($hide=="*") {
             $this->after($this->innerHtml()); $this->remove();
-        } 
+        }
         $list=explode(" ",trim($hide));
 		foreach($list as $attr) {
 			$this->removeAttr($attr);
 		}
 
-		
+
         		$this->removeAttr("data-wb-hide");
 	}
 
@@ -1678,7 +1678,7 @@ abstract class kiNode
 	public function tagTree($Item=array()) {
 		include("wbattributes.php");
 		$this->wbSetAttributes($Item);
-		$name=$this->attr("name"); if (isset($from)) {$name=$from;}		
+		$name=$this->attr("name"); if (isset($from)) {$name=$from;}
 		if ($name=="" AND isset($item)) {$name=$item;}
 		$type=$this->attr("type");
 		if (isset($dict)) {
@@ -1701,7 +1701,7 @@ abstract class kiNode
 			$this->tagTreeUl($Item);
 		}
     }
-	
+
 	public function tagTreeData($data=array()) {
 		$tree=wbGetForm("common","tree_ol");
 		$tree->find("input[name]")->remove();
@@ -1722,7 +1722,7 @@ abstract class kiNode
 	}
 
 	public function tagTreeUl($Item=array(),$param=null) {
-     
+
 		$limit=-1; $level=0; $tree=$Item; $branch=0; $parent=1; $children=1;
 		if ($param==null) {
 			include("wbattributes.php");
@@ -1737,8 +1737,8 @@ abstract class kiNode
 			foreach($param as $k =>$val) {$$k=$val;}
 			$tree=$Item;
 		}
-		if (isset($parent) AND ($parent=="false" OR $parent=="0" OR $parent==0)) {$parent=0;} else {$parent=1;}
-        $tpl=$this->html();
+		if ($parent=="false" OR $parent=="0") {$parent=0;} else {$parent=1;}
+    $tpl=$this->html();
 		$this->html("");
 		if ($branch!==0) {
             $br=explode("->",$branch);
@@ -1760,23 +1760,28 @@ abstract class kiNode
                 $child=wbFromString($tpl);
                 $child->tagTreeUl($item["children"],$param);
     	           if ($tag=="select") {
-							$child->children("option")->prepend(str_repeat("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>",$level));
-                       $line->append($child);
+                       if ($parent!==1) {$level--;}
+                       $child->children("option")->prepend(str_repeat("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>",$level));
+                       if ($parent!==1) {
+                         $line->html($child);
+                       } else {
+                         $line->append($child);
+                       }
                    } else {
                         if ($parent!==1) {
                             $line->html($child);
                         } else {
-                            if ($children==1) $line->children(":first-child")->append("<{$tag}>".$child->outerHtml()."</{$tag}>");        
+                            if ($children==1) $line->children(":first-child")->append("<{$tag}>".$child->outerHtml()."</{$tag}>");
                         }
                    }
-                
+
                 }
                 $level--;
             }
             $this->append($line);
         }
     }
-    
+
 	public function tagImageLoader($Item) {
 			if ($this->attr("load")!==1) {
 				$form=$_GET["form"];
@@ -1839,14 +1844,14 @@ abstract class kiNode
         if (isset($json) AND $json> "") {
             $Item=json_decode($json,true);
         }
-        
+
         if (isset($count) AND $count>"") {
             $fcount=$count;
-            $Item=array(); 
+            $Item=array();
             $count=$count*1;
             for($i=1;$i<=$count;$i++){$Item[$i]=$srcItem;};
         }
-        
+
 		if ($table > "") {
             $table=wbTable($table);
 			if ($item>"") {
@@ -1923,7 +1928,7 @@ abstract class kiNode
 				}
 				unset($Item[$key]);
 		};
-        
+
 		$count=$n;
 
 			if ($step>0) {
@@ -2041,16 +2046,16 @@ public function tagInclude($Item) {
 			}
 			if ($name>"") {$this_content->find("textarea.{$ssrc}")->attr("name",$name);}
 		}
-        if ($this->find("include")->length) { 
+        if ($this->find("include")->length) {
             $this->includeTag($Item);
         } else {
 			$this->append($this_content);
-		} 
+		}
 		$this->wbSetData($Item);
 	}
 
     public function includeTag($Item) {
-		 if ($this->find("include")->length) { 
+		 if ($this->find("include")->length) {
 			$this->append("<div id='___include___' style='display:none;'>{$this_content}</div>");
             $Item=wbItemToArray($Item);
              foreach($this->find("include") as $inc) {
@@ -2074,7 +2079,7 @@ public function tagInclude($Item) {
 			$this->find("#___include___")->remove();
          }
     }
-    
+
 	public function tagFormData($Item=array()) {
 		$srcItem=$Item;
 		include("wbattributes.php");
@@ -2136,7 +2141,7 @@ public function tagThumbnail($Item=array()) {
 	if (!in_array($srcExt,$exts)) {$src="/engine/uploads/__system/filetypes/{$srcExt}.png"; $img="{$srcExt}.png"; $ext="png";}
 
 
-    
+
 	if (is_numeric($this->attr("src"))) {$idx=$this->attr("src"); $this->removeAttr("src"); $num=true;} else {
 		$idx=$this->parents("[idx]")->attr("idx"); if ($idx>"" && $src=="") {$num=true;} else {$idx=0;}
 	}
@@ -2181,7 +2186,7 @@ public function tagThumbnail($Item=array()) {
 	$img=explode("/",trim($src)); $img=$img[count($img)-1];
 	$ext=explode(".",trim($src)); $ext=$ext[count($ext)-1];
     $this->src=$src;
-    
+
 	if ($src==array()) {$src="";}
 	if ($img=="" AND $bkg==true) {$src="/engine/uploads/__system/image.svg"; $img="image.svg"; $ext="svg";}
 	if ($src=="" AND $bkg==true) {$src="/engine/uploads/__system/image.svg"; $img="image.svg"; $ext="svg";} else {
@@ -2321,8 +2326,8 @@ public function tagThumbnail($Item=array()) {
 
 	public function hasRole($role) {
 		$tl=array();
-		if 		($this->hasAttr("data-wb-role")) {$tl=wbAttrToArray($this->attr("data-wb-role"));} 
-		elseif 	($this->hasAttr("role")) 		{$tl=wbAttrToArray($this->attr("role"));} 
+		if 		($this->hasAttr("data-wb-role")) {$tl=wbAttrToArray($this->attr("data-wb-role"));}
+		elseif 	($this->hasAttr("role")) 		{$tl=wbAttrToArray($this->attr("role"));}
 		if (in_array($role,$tl)) {return true;} else {return false;}
 	}
 
@@ -5165,7 +5170,7 @@ class kiNodesList extends kiList
 // Класс для работы $_SESSION через memcache
 /*class MemcachedSessionHandler implements \SessionHandlerInterface
 {
-    
+
     private $memcached;
     private $ttl;
     private $prefix;
