@@ -1207,7 +1207,7 @@ abstract class kiNode
 			foreach($nodes as $inc) {
 				if (!$inc->parents("[type=text/template]")->length) {
 				$inc->wbUserAllow();
-                if (!$inc->is("[data-wb-role=foreach]")) $inc->wbWhere($Item);
+        $inc->wbWhere($Item);
 				$tag=$inc->wbCheckTag();
 				if (!$tag==FALSE && !$inc->hasClass("wb-done")) {
 					if ($inc->has("[data-wb-json]")) {$inc->json=wbSetValuesStr($inc->json,$Item);}
@@ -1234,9 +1234,15 @@ abstract class kiNode
     public function wbWhere($Item){
         $where=$this->attr("data-wb-where");
         if ($where=="") $where=$this->attr("where");
+        if ($where>"" AND $this->hasRole("foreach")) {
+          // в foreach считаем, что это условие цикла
+          $this->attr("where",$where);
+          $this->removeAttr("data-wb-where");
+          return;
+        }
         if ($where>"" AND !wbWhereItem($Item,$where)) {
-			$this->remove();
-		}
+			       $this->remove();
+		    }
     }
 
 

@@ -686,7 +686,7 @@ function wbRecurseDelete($src) {
 function wbRecurseCopy($src,$dst) {
   $dir = opendir($src);
 	if (is_resource($dir)) {
-		@mkdir($dst);
+mkdir($dst);
 		while(false !== ( $file = readdir($dir)) ) {
 			if (( $file != '.' ) && ( $file != '..' )) {
 				if ( is_dir($src . '/' . $file) ) {
