@@ -1207,7 +1207,7 @@ abstract class kiNode
 			foreach($nodes as $inc) {
 				if (!$inc->parents("[type=text/template]")->length) {
 				$inc->wbUserAllow();
-                $inc->wbWhere($Item);
+                if (!$inc->is("[data-wb-role=foreach]")) $inc->wbWhere($Item);
 				$tag=$inc->wbCheckTag();
 				if (!$tag==FALSE && !$inc->hasClass("wb-done")) {
 					if ($inc->has("[data-wb-json]")) {$inc->json=wbSetValuesStr($inc->json,$Item);}

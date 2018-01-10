@@ -5,7 +5,7 @@ function form__controller() {
 	if (is_callable($call)) {
 		$_ENV["DOM"]=$call();
 	} else {
-        $aCall=$_ENV["route"]["form"]."_".$_ENV["route"]["mode"]; 
+        $aCall=$_ENV["route"]["form"]."_".$_ENV["route"]["mode"];
         $eCall=$_ENV["route"]["form"]."__".$_ENV["route"]["mode"];
         if (is_callable($aCall)) {
             $out=$aCall();
@@ -37,14 +37,14 @@ function form__controller__common__controller() {
 
 function form__controller__show() {
 	$form=$_ENV["route"]["form"];
-    $item=$_ENV["route"]["item"];
+  $item=$_ENV["route"]["item"];
 	$mode="show";
-    $Item=wbItemRead($form,$item);
+  $Item=wbItemRead($form,$item);
 	$aCall=$form."_".$mode; $eCall=$form."__".$mode;
 	if (is_callable($aCall)) {$out=$aCall($Item);} elseif (is_callable($eCall)) {$out=$eCall($Item);}
-    if ($Item==false OR (isset($Item["active"]) AND $Item["active"]!=="on")) {
-		echo form__controller__error_404();
-		die;
+  if (!in_array($form,$_ENV["forms"]) OR $Item==false OR (isset($Item["active"]) AND $Item["active"]!=="on")) {
+			echo form__controller__error_404();
+			die;
 	} else {
         if (isset($out)) {
             $_ENV["DOM"]=wbFromString($out);
@@ -62,9 +62,9 @@ function form__controller__show() {
 	}
     if ($_ENV["DOM"]->find("head")->length) {
         // Вставки в тэг HEAD
-        if (isset($Item["head_add"]) AND isset($Item["head_add_active"]) AND $Item["head_add_active"]=="on")  {$_ENV["DOM"]->find("head")->append($Item["head_add"]);} 
+        if (isset($Item["head_add"]) AND isset($Item["head_add_active"]) AND $Item["head_add_active"]=="on")  {$_ENV["DOM"]->find("head")->append($Item["head_add"]);}
         if (!isset($Item["head_noadd_glob"]) OR $Item["head_noadd_glob"]!=="on") {
-            if (isset($_ENV["settings"]["head_add"]) AND isset($_ENV["settings"]["head_add_active"]) AND $_ENV["settings"]["head_add_active"]=="on")  {$_ENV["DOM"]->find("head")->append($_ENV["settings"]["head_add"]);}    
+            if (isset($_ENV["settings"]["head_add"]) AND isset($_ENV["settings"]["head_add_active"]) AND $_ENV["settings"]["head_add_active"]=="on")  {$_ENV["DOM"]->find("head")->append($_ENV["settings"]["head_add"]);}
         }
         if (isset($Item["meta_description"]) AND $Item["meta_description"]>"") {
             $_ENV["DOM"]->find("head meta[name=description]")->remove();
@@ -101,7 +101,7 @@ function form__controller__remove() {
 function form__controller__error_404($id=null) {
 	header("HTTP/1.0 404 Not Found");
     $_ENV["route"]["error"]="404";
-	$out=wbGetTpl("404.php");
+		$out=wbGetTpl("404.php");
     if (is_object($out)) $out->wbSetData();
     return $out;
 }
@@ -147,7 +147,7 @@ function form__controller__default_mode() {
 function form__controller__select2() {
     $form=""; $where=""; $tpl=""; $val="";
     $form=$_ENV["route"]["form"];
-    $custom="form_controller_select2_{$form}"; 
+    $custom="form_controller_select2_{$form}";
     if (is_callable($custom)) {return $custom();} else {
         $result=array();
         $single=false;
