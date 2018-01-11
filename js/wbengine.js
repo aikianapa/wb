@@ -560,7 +560,18 @@ function wb_plugins() {
         if (is_callable("autosize")) {
             autosize($('textarea[rows=auto]'));
         }
-        if ($("[data-wb-src=datepicker]").length) {
+
+        if ($("script[src*=photoswipe]").length && $("a[href$='.jpeg'],a[href$='.jpg'],a[href$='.png'],a[href$='.gif']").length) {
+      	var myPhotoSwipe = $("a[href$='.jpeg'],a[href$='.jpg'],a[href$='.png'],a[href$='.gif']").photoSwipe({
+      		allowUserZoom: true,
+      		captionAndToolbarFlipPosition: true,
+      		captionAndToolbarAutoHideDelay: 0,
+      		backButtonHideEnabled: false,
+      		jQueryMobile: false
+      		});
+      	}
+
+        if ($("script[src*=datetimepicker]").length) {
             $("[type=datepicker]:not(.wb-plugin)").each(function () {
                 if ($(this).attr("data-date-format") == undefined) {
                     $(this).attr("data-date-format", "dd.mm.yyyy"); // Plugin Format
@@ -833,7 +844,7 @@ function wb_plugin_editor() {
         							if (fldname>"" && $("textarea#"+instance).parents("form").find("[name="+fldname+"]").length) {
         								$("textarea#"+instance).parents("form").find("[name="+fldname+"]:not(.ace_editor)").html(CKEDITOR.instances[instance].getData());
         							} else {
-        								$("textarea#"+instance).html(CKEDITOR.instances[instance].getData());	
+        								$("textarea#"+instance).html(CKEDITOR.instances[instance].getData());
         							}
         							$(document).trigger("editorChange",{
         								"value" : CKEDITOR.instances[instance].getData(),
@@ -841,7 +852,7 @@ function wb_plugin_editor() {
         							});
         						$("textarea#"+instance).trigger("change");
         				});
-        			   });			   
+        			   });
         			});
         */
         $(document).on("sourceChange", function (e, data) {
@@ -953,7 +964,7 @@ function wb_formsave_obj(formObj) {
         console.log("call: " + name + "_before_formsave");
         var ptpl = formObj.attr("parent-template");
         var padd = formObj.attr("data-wb-add");
-        // обработка switch и checkbox 
+        // обработка switch и checkbox
         var ui_switch = "";
         formObj.find("input[type=checkbox]:not(.bs-switch)").each(function () {
             var swname = $(this).attr("name");
@@ -1779,22 +1790,22 @@ function wb_call_source_events(eid, fldname) {
 }
 
 function is_callable(v, syntax_only, callable_name) {
-    // Returns true if var is callable.    
-    //   
-    // version: 902.821  
-    // discuss at: http://phpjs.org/functions/is_callable  
-    // +   original by: Brett Zamir  
-    // %        note 1: The variable callable_name cannot work as a string variable passed by reference as in PHP (since JavaScript does not support passing strings by reference), but instead will take the name of a global variable and set that instead  
-    // %        note 2: When used on an object, depends on a constructor property being kept on the object prototype  
-    // *     example 1: is_callable('is_callable');  
-    // *     returns 1: true  
-    // *     example 2: is_callable('bogusFunction', true);  
-    // *     returns 2:true // gives true because does not do strict checking  
-    // *     example 3: function SomeClass () {}  
-    // *     example 3: SomeClass.prototype.someMethod = function(){};  
-    // *     example 3: var testObj = new SomeClass();  
-    // *     example 3: is_callable([testObj, 'someMethod'], true, 'myVar');  
-    // *     example 3: alert(myVar); // 'SomeClass::someMethod'  
+    // Returns true if var is callable.
+    //
+    // version: 902.821
+    // discuss at: http://phpjs.org/functions/is_callable
+    // +   original by: Brett Zamir
+    // %        note 1: The variable callable_name cannot work as a string variable passed by reference as in PHP (since JavaScript does not support passing strings by reference), but instead will take the name of a global variable and set that instead
+    // %        note 2: When used on an object, depends on a constructor property being kept on the object prototype
+    // *     example 1: is_callable('is_callable');
+    // *     returns 1: true
+    // *     example 2: is_callable('bogusFunction', true);
+    // *     returns 2:true // gives true because does not do strict checking
+    // *     example 3: function SomeClass () {}
+    // *     example 3: SomeClass.prototype.someMethod = function(){};
+    // *     example 3: var testObj = new SomeClass();
+    // *     example 3: is_callable([testObj, 'someMethod'], true, 'myVar');
+    // *     example 3: alert(myVar); // 'SomeClass::someMethod'
     var name = ''
         , obj = {}
         , method = '';

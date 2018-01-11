@@ -1235,12 +1235,8 @@ abstract class kiNode
         $where=$this->attr("data-wb-where");
         if ($where=="") $where=$this->attr("where");
         if ($where>"" AND $this->hasRole("foreach")) {
-          // в foreach считаем, что это условие цикла
-          $this->attr("where",$where);
-          $this->removeAttr("data-wb-where");
           return;
-        }
-        if ($where>"" AND !wbWhereItem($Item,$where)) {
+        } elseif ($where>"" AND !wbWhereItem($Item,$where)) {
 			       $this->remove();
 		    }
     }
@@ -1250,61 +1246,58 @@ abstract class kiNode
 		$script=$this->find("script[data-wb-src]:not(.wb-done)");
 		foreach($script as $sc) {
             if ($sc->attr("data-wb-src")=="jquery") {
-                if (!$sc->hasClass("wb-done")) {
-					$sc->after('<script src="/engine/js/jquery.min.js" type="text/javascript" charset="UTF-8"></script>');
-                    $sc->addClass("wb-done");
-                }
+					        $sc->after('<script src="/engine/js/jquery.min.js" type="text/javascript" charset="UTF-8"></script>');
+                  $sc->remove();
             }
             if ($sc->attr("data-wb-src")=="bootstrap3") {
-					$sc->before('<link href="/engine/js/bootstrap3/bootstrap.min.css" rel="stylesheet">');
-					$sc->after('<script src="/engine/js/bootstrap3/bootstrap.min.js" type="text/javascript" charset="UTF-8"></script>');
-                    $sc->addClass("wb-done");
+					         $sc->before('<link href="/engine/js/bootstrap3/bootstrap.min.css" rel="stylesheet">');
+					         $sc->after('<script src="/engine/js/bootstrap3/bootstrap.min.js" type="text/javascript" charset="UTF-8"></script>');
+                   $sc->remove();
             }
             if ($sc->attr("data-wb-src")=="bootstrap") {
- 					$sc->before('<link href="/engine/js/bootstrap/bootstrap.min.css" rel="stylesheet">');
-					$sc->after('<script src="/engine/js/bootstrap/bootstrap.min.js" type="text/javascript" charset="UTF-8"></script>');
-                    $sc->addClass("wb-done");
+ 					     $sc->before('<link href="/engine/js/bootstrap/bootstrap.min.css" rel="stylesheet">');
+					     $sc->after('<script src="/engine/js/bootstrap/bootstrap.min.js" type="text/javascript" charset="UTF-8"></script>');
+               $sc->remove();
             }
 
 
 			if ($sc->attr("data-wb-src")=="datepicker") {
-				if (!$sc->hasClass("wb-done")) {
-                    $lang="ru"; if ($sc->attr("data-wb-lang")>"") {$lang=$sc->attr("data-wb-lang");}
+          $lang="ru"; if ($sc->attr("data-wb-lang")>"") {$lang=$sc->attr("data-wb-lang");}
 					$sc->before('<link href="/engine/js/datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet">');
 					if ($lang>"") $sc->after("<script src='/engine/js/datetimepicker/locales/bootstrap-datetimepicker.{$lang}.js' type='text/javascript' charset='UTF-8'></script>");
 					$sc->after('<script src="/engine/js/datetimepicker/bootstrap-datetimepicker.min.js" type="text/javascript" charset="UTF-8"></script>');
-					$sc->addClass("wb-done");
-				}
+					$sc->remove();
 			}
-            if ($sc->attr("data-wb-src")=="plugins") {
-                $sc->before('<link href="/engine/js/plugins/plugins.css" rel="stylesheet">');
-                $sc->after('<script src="/engine/js/plugins/plugins.js" type="text/javascript"></script>');
-                $sc->addClass("wb-done");
-            }
+      if ($sc->attr("data-wb-src")=="plugins") {
+          $sc->before('<link href="/engine/js/plugins/plugins.css" rel="stylesheet">');
+          $sc->after('<script src="/engine/js/plugins/plugins.js" type="text/javascript"></script>');
+          $sc->remove();
+      }
       if ($sc->attr("data-wb-src")=="ckeditor") {
-				if (!$sc->hasClass("wb-done")) {
 					//$sc->before('<link href="/engine/js/ckeditor/style.css" rel="stylesheet">');
 					$sc->after('<script src="/engine/js/ckeditor/adapters/jquery.js" type="text/javascript"></script>');
                     $sc->after('<script src="/engine/js/ckeditor/bootstrap-ckeditor-fix.js" type="text/javascript"></script>');
                     $sc->after('<script src="/engine/js/ckeditor/ckeditor.js" type="text/javascript"></script>');
-                    $sc->addClass("wb-done");
-				}
+                    $sc->remove();
 			}
       if ($sc->attr("data-wb-src")=="source") {
-				if (!$sc->hasClass("wb-done")) {
-					$sc->after('<script language="javascript" src="/engine/js/ace/ace.js"></script>');
-                    $sc->addClass("wb-done");
-				}
+				$sc->after('<script language="javascript" src="/engine/js/ace/ace.js"></script>');
+        $sc->remove();
 			}
 		if ($sc->attr("data-wb-src")=="uploader") {
-				if (!$sc->hasClass("wb-done")) {
 					$sc->after(file_get_contents(__DIR__ ."/js/uploader/uploader.php"));
-                    $sc->addClass("wb-done");
-				}
+          $sc->remove();
 		}
+
+    if ($sc->attr("data-wb-src")=="imgviewer") {
+					$sc->after(file_get_contents(__DIR__ ."/js/photoswipe/photoswipe.php"));
+          $sc->remove();
+		}
+
+
 		if ($sc->attr("data-wb-src")=="engine") {
 				$sc->after('<script src="/engine/js/wbengine.js" type="text/javascript" charset="UTF-8"></script>');
-				$sc->addClass("wb-done");
+				$sc->remove();
 		}
 
 
