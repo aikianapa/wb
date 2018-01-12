@@ -68,7 +68,7 @@ function wbFormUploadPath() {
 function wbInitFunctions() {
 	wbTrigger("func",__FUNCTION__,"before");
 	if (is_file($_ENV["path_app"]."/functions.php")) {require_once($_ENV["path_app"]."/functions.php");}
-	$forms=wbListForms();
+	$forms=wbListForms(false);
 	foreach($forms as $form) {
 			$inc=array(
 				"{$_ENV["path_engine"]}/forms/{$form}.php", "{$_ENV["path_engine"]}/forms/{$form}/{$form}.php",
@@ -1316,8 +1316,9 @@ function wbCartItemPosCheck($Item) {
 	return $res;
 }
 
-function wbListForms() {
-	$exclude=array("forms/common","forms/admin","forms/source","forms/snippets");
+function wbListForms($exclude=true) {
+	if ($exclude==true) {$exclude=array("forms/common","forms/admin","forms/source","forms/snippets");}
+	elseif (!is_array($exclude)) {$exclude=array();}
 	$list=array();
 	$eList=wbListFilesRecursive($_ENV["path_engine"] ."/forms",true);
 	$aList=wbListFilesRecursive($_ENV["path_app"] ."/forms",true);

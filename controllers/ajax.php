@@ -1,6 +1,7 @@
 <?php
 include_once(__DIR__."/../ajax.php");
 if (is_file($_ENV["path_app"]."/ajax.php")) {include_once($_ENV["path_app"]."/ajax.php");}
+wbInitFunctions();
 function ajax__controller() {
 	wbTrigger("func",__FUNCTION__,"before");
 	$call=__FUNCTION__ ."__".$_ENV["route"]["mode"];
