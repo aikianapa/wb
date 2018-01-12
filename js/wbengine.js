@@ -261,6 +261,7 @@ function wb_tree_dict_change(fields, tree) {
         });
         dict.push(fld);
     });
+
     $(tree).children("[data-name=dict]").val(JSON.stringify(dict));
     var res = wb_tree_data_fields(dict);
     return res;
@@ -382,6 +383,11 @@ function wb_tree_data_set(that, path, values) {
     $(that).children(".data").html("<![CDATA[" + JSON.stringify(values) + "]]>");
     data = JSON.stringify(data);
     $(tree).children("input[name=" + name + "]").val(data);
+
+    $(tree).find("textarea.source:not(.wb-done)").each(function(){
+          wb_call_source($(this).attr("id"));
+    });
+
     return data;
 }
 
@@ -855,19 +861,20 @@ function wb_plugin_editor() {
         			   });
         			});
         */
-        $(document).on("sourceChange", function (e, data) {
-            var form = data.form;
-            var field = data.field;
-            var value = data.value;
-            $(this).html(data.value);
-            if (CKEDITOR.instances[$("[name=" + field + "]").attr("id")] !== undefined) {
-                CKEDITOR.instances[$("[name=" + field + "]").attr("id")].setData(value);
-            }
-            e.preventDefault();
-            return false;
-        });
     }
 }
+
+$(document).on("sourceChange", function (e, data) {
+    var form = data.form;
+    var field = data.field;
+    var value = data.value;
+    if (CKEDITOR.instances[$("[name=" + field + "]").attr("id")] !== undefined) {
+        CKEDITOR.instances[$("[name=" + field + "]").attr("id")].setData(value);
+    }
+    $("textarea[name=" + field + "]").val(value);
+    e.preventDefault();
+    return false;
+});
 
 function wb_formsave() {
     // <button data-formsave="#formId" data-src="/path/ajax.php"></button>
@@ -1623,18 +1630,18 @@ function wb_call_source(id) {
         if ($(document).data("sourceClipboard") == undefined) {
             $(document).data("sourceClipboard", "");
         }
-        $(form).data(eid, ace.edit(id));
-        $(form).data(eid).setTheme("ace/theme/chrome");
-        $(form).data(eid).setOptions({
+        var srced = ace.edit(id);
+        srced.setTheme("ace/theme/chrome");
+        srced.setOptions({
             enableBasicAutocompletion: true
             , enableSnippets: true
         });
-        $(form).data(eid).getSession().setUseWrapMode(true);
-        $(form).data(eid).getSession().setUseSoftTabs(true);
-        $(form).data(eid).setDisplayIndentGuides(true);
-        $(form).data(eid).setHighlightActiveLine(false);
-        $(form).data(eid).setAutoScrollEditorIntoView(true);
-        $(form).data(eid).commands.addCommand({
+        srced.getSession().setUseWrapMode(true);
+        srced.getSession().setUseSoftTabs(true);
+        srced.setDisplayIndentGuides(true);
+        srced.setHighlightActiveLine(false);
+        srced.setAutoScrollEditorIntoView(true);
+        srced.commands.addCommand({
             name: 'save'
             , bindKey: {
                 win: 'Ctrl-S'
@@ -1646,8 +1653,8 @@ function wb_call_source(id) {
             }
             , readOnly: false
         });
-        $(form).data(eid).gotoLine(0, 0);
-        $(form).data(eid).resize(true);
+        srced.gotoLine(0, 0);
+        srced.resize(true);
         if ($("#cke_text .cke_contents").length) {
             var ace_height = $("#cke_text .cke_contents").height();
         }
@@ -1655,23 +1662,24 @@ function wb_call_source(id) {
             var ace_height = 400;
         }
         $(".ace_editor").css("height", ace_height);
-        $(form).data(eid).setTheme(theme);
-        $(form).data(eid).setFontSize(fsize);
-        $(form).data(eid).setValue(source);
-        $(form).data(eid).gotoLine(0, 0);
-        $(form).data(eid).getSession().setMode("ace/mode/php");
-        wb_call_source_events(eid, fldname);
-        return $(form).data(eid);
+        srced.setTheme(theme);
+        srced.setFontSize(fsize);
+        srced.setValue(source);
+        srced.gotoLine(0, 0);
+        srced.getSession().setMode("ace/mode/php");
+        $(form).data(eid,srced);
+        wb_call_source_events(srced, eid, fldname);
+        return srced;
     }
 }
 
-function wb_call_source_events(eid, fldname) {
+function wb_call_source_events(srced, eid, fldname) {
+console.log(eid);
     var tmp = explode("-", eid);
     var toolbar = tmp[0] + "-toolbar-" + tmp[1] + " ";
     $(toolbar).data("editor", false);
     $(toolbar).next(".ace_editor").attr("name", fldname).attr("id", substr(eid, 1));
-    var form = $(eid).parents("form");
-    $(form).data(eid).getSession().on('change', function (e) {
+    srced.getSession().on('change', function (e) {
         if ($(toolbar).data("editor") == undefined) {
             $(toolbar).data("editor", false);
         }
@@ -1679,7 +1687,7 @@ function wb_call_source_events(eid, fldname) {
             $(toolbar).data("editor", true);
             setTimeout(function () {
                 $(document).trigger("sourceChange", {
-                    "value": $(form).data(eid).getSession().getValue()
+                    "value": srced.getSession().getValue()
                     , "field": fldname
                     , "form": $(toolbar).parents("form")
                 });
@@ -1690,15 +1698,15 @@ function wb_call_source_events(eid, fldname) {
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         if ($(e.target.hash).find(eid).length) {
             var form = $(eid).parents("form");
-            var val = $(form).data(eid).getSession().getValue();
-            $(form).data(eid).getSession().setValue(val);
+            var val = srced.getSession().getValue();
+            srced.getSession().setValue(val);
         }
     });
     $(document).on("editorChange", function (e, data) {
         $(document).data("editor", true);
         var eid = "#" + $(".ace_editor[name=" + data.field + "]").attr("id");
         var form = $(eid).parents("form");
-        $(form).data(eid).getSession().setValue(data.value);
+        srced.getSession().setValue(data.value);
         setTimeout(function () {
             $(document).data("editor", false);
         }, 30);
@@ -1715,36 +1723,36 @@ function wb_call_source_events(eid, fldname) {
             var fsize = 12;
             setcookie("sourceEditorFsize", fsize);
         }
-        //if ($(this).hasClass("btnCopy")) 		{$(document).data("sourceFile",$(form).data(eid).getCopyText());}
-        //if ($(this).hasClass("btnPaste")) 		{$(form).data(eid).insert($(document).data("sourceFile"));}
+        //if ($(this).hasClass("btnCopy")) 		{$(document).data("sourceFile",srced.getCopyText());}
+        //if ($(this).hasClass("btnPaste")) 		{srced.insert($(document).data("sourceFile"));}
         if ($(this).hasClass("btnCopy")) {
-            $(document).data("sourceClipboard", $(form).data(eid).getCopyText());
+            $(document).data("sourceClipboard", srced.getCopyText());
         }
         if ($(this).hasClass("btnPaste")) {
-            $(form).data(eid).insert($(document).data("sourceClipboard"));
+            srced.insert($(document).data("sourceClipboard"));
         }
         if ($(this).hasClass("btnUndo")) {
-            $(form).data(eid).execCommand("undo");
+            srced.execCommand("undo");
         }
         if ($(this).hasClass("btnRedo")) {
-            $(form).data(eid).execCommand("redo");
+            srced.execCommand("redo");
         }
         if ($(this).hasClass("btnFind")) {
-            $(form).data(eid).execCommand("find");
+            srced.execCommand("find");
         }
         if ($(this).hasClass("btnReplace")) {
-            $(form).data(eid).execCommand("replace");
+            srced.execCommand("replace");
         }
         if ($(this).hasClass("btnLight")) {
-            $(form).data(eid).setTheme("ace/theme/chrome");
+            srced.setTheme("ace/theme/chrome");
             setcookie("sourceEditorTheme", "ace/theme/chrome");
         }
         if ($(this).hasClass("btnDark")) {
-            $(form).data(eid).setTheme("ace/theme/monokai");
+            srced.setTheme("ace/theme/monokai");
             setcookie("sourceEditorTheme", "ace/theme/monokai");
         }
         if ($(this).hasClass("btnClose")) {
-            $(form).data(eid).setValue("");
+            srced.setValue("");
             $(document).data("sourceFile", null);
             $("#sourceEditorToolbar .btnSave").removeClass("btn-danger");
         }
@@ -1752,14 +1760,14 @@ function wb_call_source_events(eid, fldname) {
             if (fsize > 8) {
                 fsize = fsize * 1 - 1;
             }
-            $(form).data(eid).setFontSize(fsize);
+            srced.setFontSize(fsize);
             setcookie("sourceEditorFsize", fsize);
         }
         if ($(this).hasClass("btnFontUp")) {
             if (fsize < 20) {
                 fsize = fsize * 1 + 1;
             }
-            $(form).data(eid).setFontSize(fsize);
+            srced.setFontSize(fsize);
             setcookie("sourceEditorFsize", fsize);
         }
         if ($(this).hasClass("btnFullScr")) {

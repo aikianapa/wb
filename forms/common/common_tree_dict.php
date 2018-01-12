@@ -15,6 +15,7 @@
 					<option value="checkbox">checkbox</option>
 					<option disabled>--== Плагины ==--</option>
 					<option value="editor">editor</option>
+					<option value="source">source</option>
 					<option value="image">image</option>
 					<option value="multiinput">multiinput</option>
 					<option value="switch">switch</option>

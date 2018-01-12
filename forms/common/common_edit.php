@@ -19,7 +19,7 @@
 <ul class="nav nav-tabs" role="tablist">
 	<li class="nav-item"><a class="nav-link active" href="#{{_GET[form]}}Descr" data-toggle="tab">Характеристики</a></li>
 	<li class="nav-item"><a class="nav-link" href="#{{_GET[form]}}Text" data-toggle="tab" >Контент</a></li>
-	<li class="nav-item"><a class="nav-link" href="#{{_GET[form]}}ource" data-toggle="tab" >Исходный код</a></li>
+	<li class="nav-item"><a class="nav-link" href="#{{_GET[form]}}Source" data-toggle="tab" >Исходный код</a></li>
 	<li class="nav-item"><a class="nav-link" href="#{{_GET[form]}}Images" data-toggle="tab">Изображения</a></li>
 </ul>
 </div>
@@ -51,7 +51,7 @@
 </div>
 
 <div id="{{_GET[form]}}Text" class="tab-pane fade" data-wb-role="include" src="editor" role="tabpanel"></div>
-<div id="{{_GET[form]}}ource" class="tab-pane fade" data-wb-role="include" src="source" role="tabpanel"></div>
+<div id="{{_GET[form]}}Source" class="tab-pane fade" data-wb-role="include" src="source" role="tabpanel"></div>
 <div id="{{_GET[form]}}Images" class="tab-pane fade" data-wb-role="include" src="uploader" role="tabpanel"></div>
 </div>
 </form>

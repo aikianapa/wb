@@ -1962,7 +1962,7 @@ public function tagModule($Item=array()) {
 	$this->replaceWith($out);
 }
 
-public function tagInclude($Item) {
+public function tagInclude($Item=array()) {
 		$src=$ssrc=$this->attr("src"); $res=0;
 		$did=$this->attr("data-wb-id");
 		$dad=$this->attr("data-wb-add");
@@ -1973,10 +1973,10 @@ public function tagInclude($Item) {
 		$dfs=$this->attr("data-wb-formsave");
 		$class=$this->attr("data-wb-class");
 		$name=$this->attr("data-wb-name");
-		if ($name=="") $name=$this->attr("name");
+    if ($name=="") {$name=$this->attr("name");}
         switch($src) {
             case "modal":
-                $src="/engine/forms/form_comModal.php";
+                $this_content=wbGetForm("common",$src);
                 break;
             case "imgviewer":
                 $src="/engine/js/imgviewer.php";
@@ -1985,9 +1985,11 @@ public function tagInclude($Item) {
                 $this_content=wbGetForm("common",$src);
                 break;
             case "editor":
+                if ($name=="") {$name="text";}
                 $this_content=wbGetForm("common",$src);
                 break;
             case "source":
+              if ($name=="") {$name="source";}
                 $this_content=wbGetForm("common",$src);
                 break;
             case "seo":
@@ -2041,9 +2043,13 @@ public function tagInclude($Item) {
 					$editor->attr("id","{$ssrc}-{$sid}");
 					$editor->parent("div")->find(".source-toolbar")->attr("id","{$ssrc}-toolbar-{$sid}");;
 				}
-				if ($editor->attr("name")=="") {$editor->attr("name","text");}
+				if ($editor->attr("name")=="") {$editor->attr("name",$name);}
 			}
-			if ($name>"") {$this_content->find("textarea.{$ssrc}")->attr("name",$name);}
+			$this_content->find("textarea.{$ssrc}")->attr("name",$name);
+      if ($ssrc=="source" AND !$this_content->parents("form")->find("[name={$name}]")->length) {
+          $this_content->append("<textarea class='hidden wb-done' name='$name'></textarea>");
+      }
+
 		}
         if ($this->find("include")->length) {
             $this->includeTag($Item);
