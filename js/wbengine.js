@@ -836,42 +836,63 @@ function wb_plugin_editor() {
                 }
             }
         });
+
+
         for (var i in CKEDITOR.instances) {
             // это работает
             CKEDITOR.instances[i].on('change', function () {
                 CKEDITOR.instances[i].updateElement();
+                var instance=CKEDITOR.instances[i].name;
+                console.log(instance,CKEDITOR.instances[i]);
+                var fldname=$("textarea#"+instance).attr("name");
+                var value=CKEDITOR.instances[i].getData();
+                if (fldname>"" && $("textarea#"+instance).parents("form").find("[name="+fldname+"]").length) {
+                  $("textarea#"+instance).parents("form").find("[name="+fldname+"]:not(.ace_editor,.editor)").val(value);
+                } else {
+                  $("textarea#"+instance).val(value);
+                }
+                $(document).trigger("editorChange",{
+                  						"value" : value,
+                    					"field"	: fldname
+                  });
             });
         }
-        /*
+/*
+
         			CKEDITOR.on('instanceReady', function(){
         			   $.each( CKEDITOR.instances, function(instance) {
         				CKEDITOR.instances[instance].on("change", function(e) {
         							var fldname=$("textarea#"+instance).attr("name");
         							if (fldname>"" && $("textarea#"+instance).parents("form").find("[name="+fldname+"]").length) {
-        								$("textarea#"+instance).parents("form").find("[name="+fldname+"]:not(.ace_editor)").html(CKEDITOR.instances[instance].getData());
+        								$("textarea#"+instance).parents("form").find("[name="+fldname+"]:not(.ace_editor)").val(CKEDITOR.instances[instance].getData());
         							} else {
-        								$("textarea#"+instance).html(CKEDITOR.instances[instance].getData());
+        								$("textarea#"+instance).val(CKEDITOR.instances[instance].getData());
         							}
-        							$(document).trigger("editorChange",{
-        								"value" : CKEDITOR.instances[instance].getData(),
-        								"field"	: fldname
-        							});
-        						$("textarea#"+instance).trigger("change");
+        	//						$(document).trigger("editorChange",{
+        		//						"value" : CKEDITOR.instances[instance].getData(),
+        			//					"field"	: fldname
+        		//					});
+        						//$("textarea#"+instance).trigger("change");
         				});
         			   });
         			});
-        */
+*/
+
     }
 }
 
 $(document).on("sourceChange", function (e, data) {
-    var form = data.form;
-    var field = data.field;
-    var value = data.value;
-    if (CKEDITOR.instances[$("[name=" + field + "]").attr("id")] !== undefined) {
-        CKEDITOR.instances[$("[name=" + field + "]").attr("id")].setData(value);
-    }
-    $("textarea[name=" + field + "]").val(value);
+      $(document).data("sourceChange", true);
+      var form = data.form;
+      var field = data.field;
+      var value = data.value;
+      if (CKEDITOR.instances[$("[name=" + field + "]").attr("id")] !== undefined) {
+          CKEDITOR.instances[$("[name=" + field + "]").attr("id")].setData(value);
+      }
+      $("[name=" + field + "]").val(value);
+      setTimeout(function () {
+          $(document).data("sourceChange", false);
+      }, 250);
     e.preventDefault();
     return false;
 });
@@ -1683,7 +1704,7 @@ console.log(eid);
         if ($(toolbar).data("editor") == undefined) {
             $(toolbar).data("editor", false);
         }
-        if ($(toolbar).data("editor") == false && $(document).data("editor") !== true) {
+        if ($(toolbar).data("editor") == false && $(document).data("editorChange") !== true) {
             $(toolbar).data("editor", true);
             setTimeout(function () {
                 $(document).trigger("sourceChange", {
@@ -1703,13 +1724,15 @@ console.log(eid);
         }
     });
     $(document).on("editorChange", function (e, data) {
-        $(document).data("editor", true);
-        var eid = "#" + $(".ace_editor[name=" + data.field + "]").attr("id");
-        var form = $(eid).parents("form");
-        srced.getSession().setValue(data.value);
-        setTimeout(function () {
-            $(document).data("editor", false);
-        }, 30);
+        if ($(document).data("sourceChange")!==true) {
+          $(document).data("editorChange", true);
+          var eid = "#" + $(".ace_editor[name=" + data.field + "]").attr("id");
+          var form = $(eid).parents("form");
+          srced.getSession().setValue(data.value);
+          setTimeout(function () {
+              $(document).data("editorChange", false);
+          }, 100);
+        }
     });
     $(document).undelegate(toolbar + " button", "click");
     $(document).delegate(toolbar + " button", "click", function (e) {

@@ -1989,7 +1989,7 @@ public function tagInclude($Item=array()) {
                 $this_content=wbGetForm("common",$src);
                 break;
             case "source":
-              if ($name=="") {$name="source";}
+              if ($name=="") {$name="text";}
                 $this_content=wbGetForm("common",$src);
                 break;
             case "seo":
