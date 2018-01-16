@@ -127,9 +127,11 @@ function wb_tree() {
         else {
             var dict = $.parseJSON(dict);
         }
-        var dataval = data["data"];
+        if (trim(data["data"])=="") {data["data"]={};}
         data["_form"] = data["data"]["_form"] = form;
+        data["_item"] = data["data"]["_item"] = formitem;
         data["_id"] = data["data"]["_id"] = formitem;
+        var dataval = data["data"];
         var tpl = wb_tree_data_fields(dict, dataval);
         //var tpl = $(wb_setdata(tpl, dataval, true));
         $(tpl).find(".wb-uploader").attr("data-wb-path", "/uploads/" + form + "/" + formitem);
@@ -261,9 +263,10 @@ function wb_tree_dict_change(fields, tree) {
         });
         dict.push(fld);
     });
-
+    var trid=json_decode($(tree).children("[name=tree]").val(),true);
+    var trid=trid[0]["id"];
     $(tree).children("[data-name=dict]").val(JSON.stringify(dict));
-    var res = wb_tree_data_fields(dict);
+    var res = wb_tree_data_fields(dict,{_form:"tree",_item:trid});
     return res;
 }
 
@@ -284,8 +287,8 @@ function wb_tree_data_fields(dictdata, datadata) {
         , type: 'POST'
         , url: "/ajax/buildfields/"
         , data: {
-            dict: dict
-            , data: data
+            dict: dict,
+            data: data
         }
         , success: function (data) {
             res = data;

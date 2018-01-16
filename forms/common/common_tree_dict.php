@@ -16,6 +16,7 @@
 					<option disabled>--== Плагины ==--</option>
 					<option value="editor">editor</option>
 					<option value="source">source</option>
+					<option value="gallery">gallery</option>
 					<option value="image">image</option>
 					<option value="multiinput">multiinput</option>
 					<option value="switch">switch</option>

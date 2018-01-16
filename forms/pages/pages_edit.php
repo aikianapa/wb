@@ -9,7 +9,7 @@
       </div>
       <div class="modal-body">
 
-<form id="pagesEditForm" data-wb-form="pages" data-wb-item="{{_GET[item]}}"  class="form-horizontal" role="form">
+<form id="pagesEditForm" data-wb-form="{{_form}}" data-wb-item="{{_item}}"  class="form-horizontal" role="form">
 	<div class="form-group row">
 	  <label class="col-sm-2 form-control-label">Имя записи</label>
 	   <div class="col-sm-10"><input type="text" class="form-control" name="id" placeholder="Имя записи" required ></div>

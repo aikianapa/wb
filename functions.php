@@ -150,6 +150,11 @@ function wbFieldBuild($param,$data=array()) {
             $tpl->wbSetValues($param);
             $tpl->wbSetData($data);
             break;
+				case "gallery":
+            $tpl->wbSetValues($param);
+            $tpl->wbSetData($data);
+						$tpl->find(".wb-uploader")->attr("data-wb-path","/uploads/{$data['_form']}/{$data['_item']}/");
+            break;
 	}
 	$set->find(".form-group > label")->html($param["label"]);
 	$set->find(".form-group > div")->html($tpl->outerHtml());
