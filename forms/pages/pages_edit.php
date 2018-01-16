@@ -10,9 +10,18 @@
       <div class="modal-body">
 
 <form id="pagesEditForm" data-wb-form="{{_form}}" data-wb-item="{{_item}}"  class="form-horizontal" role="form">
+
 	<div class="form-group row">
-	  <label class="col-sm-2 form-control-label">Имя записи</label>
-	   <div class="col-sm-10"><input type="text" class="form-control" name="id" placeholder="Имя записи" required ></div>
+	  <label class="col-sm-3 form-control-label">Страница</label>
+    <div class="input-group col-sm-9">
+      <span class="input-group-addon">{{_SRV[HTTP_HOST]}}/</span>
+      <input type="text" class="form-control" name="id" placeholder="Имя страницы" required >
+    </div>
+	</div>
+
+  <div class="form-group row">
+	  <label class="col-sm-3 form-control-label">Техническое описание</label>
+	   <div class="col-sm-9"><input type="text" class="form-control" name="techdescr" placeholder="Техническое описание" ></div>
 	</div>
 
 <div class="nav-active-primary">

@@ -27,7 +27,7 @@
                     <div class="col-sm-4 col-xs-12">
                         <input class="form-control" placeholder="Значение" type="text" name="value"> </div>
                     <div class="col-sm-5 col-xs-12">
-                        <input class="form-control" placeholder="Заголовок" type="text" name="header"> </div>
+                        <input class="form-control" placeholder="Описание" type="text" name="header"> </div>
                 </div>
                 <div class="col-sm-12">
                     <button type="button" class="btn btn-primary mg-t-20" data-wb-formsave="#admin_settings">Сохранить</button>

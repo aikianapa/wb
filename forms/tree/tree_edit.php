@@ -11,14 +11,19 @@
 
 <form id="{{_GET[form]}}EditForm" data-wb-form="{{_GET[form]}}" data-wb-item="{{_GET[item]}}"  class="form-horizontal" role="form">
 	<div class="form-group row">
-	  <label class="col-sm-2 form-control-label">Имя записи</label>
-	   <div class="col-sm-10"><input type="text" class="form-control" name="id" placeholder="Имя записи" required ></div>
+	  <label class="col-sm-3 form-control-label">Имя записи</label>
+	   <div class="col-sm-9"><input type="text" class="form-control" name="id" placeholder="Имя записи" required ></div>
 	</div>
 
 <div class="tab-content  p-a m-b-md">
 	<div class="form-group row">
-	  <label class="col-sm-2 form-control-label">Заголовок</label>
-	   <div class="col-sm-10"><input type="text" class="form-control" name="header" placeholder="Заголовок"></div>
+	  <label class="col-sm-3 form-control-label">Заголовок</label>
+	   <div class="col-sm-9"><input type="text" class="form-control" name="header" placeholder="Заголовок"></div>
+	</div>
+
+  <div class="form-group row">
+	  <label class="col-sm-3 form-control-label">Техническое описание</label>
+	   <div class="col-sm-9"><input type="text" class="form-control" name="techdescr" placeholder="Техническое описание" ></div>
 	</div>
 
 	<div data-wb-role="tree" name="tree"></div>

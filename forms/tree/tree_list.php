@@ -19,7 +19,7 @@
 		  <tbody data-wb-role="foreach" data-wb-table="tree" data-wb-add="true" data-wb-size="20" data-wb-sort="id">
 			<tr>
 			  <td class="nowrap">{{id}}</td>
-			  <td>{{header}}</td>
+			  <td>{{header}}<br><small>{{techdescr}}</small></td>
 			  <td class="text-right" data-wb-role="include" src="/engine/forms/common/item_actions.php">
 			  </td>
 			</tr>

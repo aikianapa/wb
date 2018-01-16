@@ -1,5 +1,5 @@
-<div class="card card-default">
-  <div id="sourceEditorToolbar" class="source-toolbar card-header">
+<div class="card card-default clearfix">
+  <div id="sourceEditorToolbar" class="source-toolbar card-header col-12">
     <div class="btn-group">
       <button class="btn btn-sm btn-default btnCopy"><i class="fa fa-files-o"></i></button>
       <button class="btn btn-sm btn-default btnPaste"><i class="fa fa-clipboard"></i></button>
@@ -23,7 +23,7 @@
     <button class="btn btn-sm btn-default btnFullScr"><i class="fa fa-arrows-alt "></i></button>
     <button class="btn btn-sm btn-default btnSave"><i class="fa fa-save "></i></button>
   </div>
-  <textarea class="source"></textarea>
+  <textarea class="source col-12"></textarea>
 </div>
 
 <style type="text/css" media="screen">
