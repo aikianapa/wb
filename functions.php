@@ -22,8 +22,8 @@ function wbInitEnviroment() {
 	$_ENV["dbac"]=$_ENV["path_app"]."/database/_cache";	// App data
 	$_ENV["error"]=array();
 	$_ENV["env_id"]=$_ENV["new_id"]=wbNewId();
-  $_ENV["datetime"]=date("Y-m-d H:i:s");
-	$_ENV["forms"]=wbListForms();
+    $_ENV["datetime"]=date("Y-m-d H:i:s");
+	$_ENV["forms"]=wbListForms(false);
     wbCheckWorkspace();
 	$variables=array();
 	$settings=wbItemRead("admin","settings");
@@ -68,8 +68,7 @@ function wbFormUploadPath() {
 function wbInitFunctions() {
 	wbTrigger("func",__FUNCTION__,"before");
 	if (is_file($_ENV["path_app"]."/functions.php")) {require_once($_ENV["path_app"]."/functions.php");}
-	$forms=wbListForms(false);
-	foreach($forms as $form) {
+	foreach($_ENV["forms"] as $form) {
 			$inc=array(
 				"{$_ENV["path_engine"]}/forms/{$form}.php", "{$_ENV["path_engine"]}/forms/{$form}/{$form}.php",
 				"{$_ENV["path_app"]}/forms/{$form}.php", "{$_ENV["path_app"]}/forms/{$form}/{$form}.php"
@@ -187,8 +186,7 @@ function wbTable($table="data",$engine=false) {
 	$table=wbTablePath($table,$engine);
 	$_ENV[$table]["name"]=$tname;
     if (!is_file($table)) {
-        $forms=wbListForms();
-        if ($tname>"" AND in_array($tname,$forms)) {
+        if ($tname>"" AND in_array($tname,$_ENV["forms"])) {
             wbTableCreate($tname);
         }
     }
@@ -1323,7 +1321,7 @@ function wbCartItemPosCheck($Item) {
 
 function wbListForms($exclude=true) {
 	if ($exclude==true) {$exclude=array("forms/common","forms/admin","forms/source","forms/snippets");}
-	elseif (!is_array($exclude)) {$exclude=array();}
+	elseif (!is_array($exclude)) {$exclude=array("forms/snippets");}
 	$list=array();
 	$eList=wbListFilesRecursive($_ENV["path_engine"] ."/forms",true);
 	$aList=wbListFilesRecursive($_ENV["path_app"] ."/forms",true);
@@ -1333,15 +1331,15 @@ function wbListForms($exclude=true) {
 	foreach($arr as $i => $data) {
 			$name=$data["file"];
 			$path=$data["path"];
+			$path=str_replace(array($_ENV["path_engine"],$_ENV["path_app"]),array(".","."),$path);
 			$inc=strpos($name,".inc");
 			$ext=explode(".",$name); $ext=$ext[count($ext)-1];
 			$name=substr($name,0,-(strlen($ext)+1));
 			$name=explode("_",$name); $name=$name[0];
-			$flag=true;
 			foreach($exclude as $exc) {
-			if (strpos($path,$exc)) {$flag=false;} }
-			if ($ext=="php" && !$inc && $flag==true && $name>"") {
-				$exclude[]=$list[]=$name;
+			if (!strpos($path,$exc)) {$flag=true;} else {$flag=false;} }
+			if (($ext=="php" OR $ext=="htm") && !$inc && $flag==true && $name>"" && !in_array($name,$list)) {
+				$list[]=$name;
 			}
 	}
 	unset($arr);
