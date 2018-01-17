@@ -444,6 +444,7 @@ function wb_tree_serialize(that, branch) {
             var child = false;
             var open = false;
         }
+        if (count(child)==0) {child=false;open=false;}
         tree_data.push({
             id: id
             , name: name
