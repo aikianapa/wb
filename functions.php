@@ -370,7 +370,9 @@ function wbJsonEncode($Item=array()) {
     return json_encode($Item, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 }
 
-function wbItemRead($table,$id) {
+function wbItemRead($table=null,$id=null) {
+	if ($table==null) {$table=$_ENV["route"]["form"];}
+	if ($id==null) {$id=$_ENV["route"]["item"];}
   wbTrigger("form",__FUNCTION__,"BeforeItemRead",func_get_args(),array());
 	if (count(explode($_ENV["path_app"],$table))==1) {$table=wbTable($table);}
 	$cache=wbCacheName($table,$id);

@@ -1874,7 +1874,7 @@ abstract class kiNode
 
 		if ($add=="true") {$this->find(":first-child",0)->attr("item","{{id}}");}
 		$tpl=$this->innerHtml(); $inner=""; $this->html("");
-		if ($step>0) {$steptpl=$this->clone(); $stepcount=0;}
+		if ($step>0) {$steptpl=$this->clone(); $stepcount=0; $steps=wbFromString("");}
 		if ($tplid=="") $tplid="tpl".wbNewId();
 		$ndx=0; $fdx=0; $n=0; $stp=0;
 		$count=count($Item);
@@ -1913,9 +1913,9 @@ abstract class kiNode
 								if ($stepcount==0) {
 									$t_step=$steptpl->clone();
 									$t_step->addClass($tplid);
-									$this->append($t_step);
+									$steps->append($t_step);
 								}
-								$this->find(".{$tplid}:last")->append($text->outerHtml());
+								$steps->find(".{$tplid}:last")->append($text->outerHtml());
 								$stepcount++;
 								//$stepcount=$this->find(".{$tplid}:last")->children()->length;
 								if ($stepcount==$step) {$stepcount=0; $stp++;}
@@ -1931,6 +1931,7 @@ abstract class kiNode
 		$count=$n;
 
 			if ($step>0) {
+        $this->replaceWith($steps->html());
 				foreach ($this->find(".{$tplid}") as $tid) {$tid->removeClass($tplid);}; unset($tid);
 			} else {
 				$this->html($inner);
