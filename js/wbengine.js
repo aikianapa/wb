@@ -1,8 +1,9 @@
 wb_include("/engine/js/php.js");
 wb_include("/engine/js/jquery.redirect.js");
-if ($("link[rel$=less]").length) wb_include("/engine/js/less.min.js");
+if ($("link[rel$=less],style[rel$=less]").length) wb_include("/engine/js/less.min.js");
 $(document).ready(function () {
     wb_delegates();
+    $("body").removeClass("cursor-wait");
 });
 
 function wb_delegates() {
@@ -298,6 +299,22 @@ function wb_tree_data_fields(dictdata, datadata) {
         }
     });
     return res;
+}
+
+function wb_ajax_loader() {
+  if (is_callable("ajax_loader")) {
+    ajax_loader();
+  } else {
+    $("body").addClass("cursor-wait");
+  }
+}
+
+function wb_ajax_loader_done() {
+  if (is_callable("ajax_loader_done")) {
+    ajax_loader_done();
+  } else {
+    $("body").removeClass("cursor-wait");
+  }
 }
 
 function wb_tree_data_get(that, path) {
@@ -1234,6 +1251,7 @@ function wb_check_required(form) {
 function wb_ajax() {
     $(document).undelegate("[data-wb-ajax]", "click");
     $(document).delegate("[data-wb-ajax]", "click", function () {
+        wb_ajax_loader();
         var link = this;
         var src = $(this).attr("data-wb-ajax");
         var call = $(this).attr("data-wb-ajax-done");
@@ -1288,6 +1306,7 @@ function wb_ajax() {
                 $(document).trigger("wb_ajax_done", [link, src, data]);
                 wb_plugins();
                 wb_delegates();
+                wb_ajax_loader_done();
             });
         }
         else {

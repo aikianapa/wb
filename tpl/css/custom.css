@@ -1,5 +1,6 @@
+.cursor-wait {cursor:wait;}
+body.cursor-wait * {cursor:wait;}
 /* Form Select Switches */
-
 .status-pill {
   width: 12px;
   height: 12px;

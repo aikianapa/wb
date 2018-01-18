@@ -634,7 +634,6 @@ function wbGetItemImg($Item=null,$idx=0,$noimg="",$imgfld="images",$visible=true
 }
 
 function wbListFiles($dir) {
-
 	$list=array();
 	if ($dircont = scandir($dir)) {
            $i=0; $idx=0;
