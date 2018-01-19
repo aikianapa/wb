@@ -1543,4 +1543,8 @@ function wbTranslit($textcyr = null, $textlat = null) {
     else return null;
 }
 
+function wbBr2nl($str) {
+$str = preg_replace("/(rn|n|r)/", "", $str);
+return preg_replace("=<br */?>=i", "n", $str);
+}
 ?>

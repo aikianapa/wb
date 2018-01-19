@@ -2160,7 +2160,7 @@ public function tagThumbnail($Item=array()) {
 		$idx=$this->parents("[idx]")->attr("idx"); if ($idx>"" && $src=="") {$num=true;} else {$idx=0;}
 	}
     if ($this->attr("data-wb-size")>"") {$size=$this->attr("data-wb-size");}
-    if ($size=="") {$size=$this->attr("size");}
+    if (!isset($size) OR $size=="") {$size=$this->attr("size");}
     if ($size=="" AND isset($Item["intext_position"])) {
         if (isset($Item["intext_position"]["width"]) AND $Item["intext_position"]["width"]>"") {$width=$Item["intext_position"]["width"];} else {$width="200";}
         if (isset($Item["intext_position"]["height"]) AND $Item["intext_position"]["height"]>"") {$height=$Item["intext_position"]["height"];} else {$height="160";}

@@ -28,21 +28,23 @@ function wb_get_cdata(text) {
 }
 
 function wb_tree() {
-    $.get("/ajax/getform/common/tree_rowmenu/", function (data) {
-        $(document).data("wb-tree-rowmenu", data);
-    });
-    $.get("/ajax/getform/common/tree_row/", function (data) {
-        $(document).data("wb-tree-row", data);
-    });
-    $.get("/ajax/getform/common/tree_ol/", function (data) {
-        $(document).data("wb-tree-ol", data);
-    });
-    $.get("/ajax/getform/common/tree_edit/", function (data) {
-        $(document).data("wb-tree-edit", data);
-    });
-    $.get("/ajax/getform/common/tree_dict/", function (data) {
-        $(document).data("wb-tree-dict", data);
-    });
+    if ($(document).data("wb-tree-rowmenu")==undefined) {
+      $.get("/ajax/getform/common/tree_rowmenu/", function (data) {
+          $(document).data("wb-tree-rowmenu", data);
+      });
+      $.get("/ajax/getform/common/tree_row/", function (data) {
+          $(document).data("wb-tree-row", data);
+      });
+      $.get("/ajax/getform/common/tree_ol/", function (data) {
+          $(document).data("wb-tree-ol", data);
+      });
+      $.get("/ajax/getform/common/tree_edit/", function (data) {
+          $(document).data("wb-tree-edit", data);
+      });
+      $.get("/ajax/getform/common/tree_dict/", function (data) {
+          $(document).data("wb-tree-dict", data);
+      });
+    }
     setTimeout(function () {
         $(document).find(".wb-tree-item.dd-collapsed").each(function () {
             $(this).find("button[data-action=collapse]").hide();
@@ -490,12 +492,14 @@ function wb_newid() {
 }
 
 function wb_multiinput() {
+  if ($(document).data("wb-multiinput-menu")==undefined) {
     $.get("/ajax/getform/common/multiinput_menu/", function (data) {
         $(document).data("wb-multiinput-menu", data);
     });
     $.get("/ajax/getform/common/multiinput_row/", function (data) {
         $(document).data("wb-multiinput-row", data);
     });
+  }
     if (is_callable("sortable")) {
         $("[data-wb-role=multiinput]").sortable();
     }
@@ -760,7 +764,7 @@ function wb_plugins() {
                 });
             });
         }
-        if ($('.rating').length && $("script[src*=plugins]").length) {
+        if (is_callable("rating") && $('.rating').length) {
             $('.rating:not(.wb-plugin)').each(function () {
                 $(this).addClass("wb-plugin");
                 $(this).rating({
@@ -769,17 +773,19 @@ function wb_plugins() {
                 });
             });
         }
-        if ($("input[type=phone]").length) {
-            $("input[type=phone]").mask("+7 (999) 999-99-99");
-        }
-        if ($("input[type=tel]").length) {
-            $("input[type=tel]").mask("+7 (999) 999-99-99");
-        }
-        if ($("input[data-wb-mask]").length) {
-            $("input[data-wb-mask]").each(function () {
-                $(this).attr("type", "text");
-                $(this).mask($(this).attr("data-wb-mask"));
-            });
+        if (is_callable("mask")) {
+          if ($("input[type=phone]").length) {
+              $("input[type=phone]").mask("+7 (999) 999-99-99");
+          }
+          if ($("input[type=tel]").length) {
+              $("input[type=tel]").mask("+7 (999) 999-99-99");
+          }
+          if ($("input[data-wb-mask]").length) {
+              $("input[data-wb-mask]").each(function () {
+                  $(this).attr("type", "text");
+                  $(this).mask($(this).attr("data-wb-mask"));
+              });
+          }
         }
         if (is_callable("wb_plugin_editor")) wb_plugin_editor();
         if (is_callable("wbCommonUploader")) wbCommonUploader();
@@ -1255,11 +1261,20 @@ function wb_ajax() {
         var link = this;
         var src = $(this).attr("data-wb-ajax");
         var call = $(this).attr("data-wb-ajax-done");
+        var flag=true;
+        var that=this;
         if (src > "") {
             var ajax = {};
             if ($(link).attr("data-wb-tpl") !== undefined) {
                 ajax.tpl = $($(link).attr("data-wb-tpl")).html();
             }
+            if ($(this).is("button,[type=button],[type=submit]") && ($(this).parents("form").length)) {
+              var form=$(this).parents("form");
+              flag=wb_check_required(form);
+              ajax=$(form).serialize();
+            }
+            if (flag==true) {
+            $(that).attr("disabled",true);
             $.post(src, ajax, function (data) {
                 var html = $("<div>" + data + "</div>");
                 var mid = "";
@@ -1307,7 +1322,9 @@ function wb_ajax() {
                 wb_plugins();
                 wb_delegates();
                 wb_ajax_loader_done();
+                $(that).removeAttr("disabled");
             });
+            }
         }
         else {
             if ($(this).attr("data-wb-href") > "") {
@@ -1337,7 +1354,7 @@ $(document).on("wb_required_false", function (event, that, text) {
             text = "Заполните поле: " + $(that).attr("placeholder");
         }
     }
-    $.bootstrapGrowl(text, {
+    if (is_callable("bootstrapGrowl")) {$.bootstrapGrowl(text, {
         ele: 'body'
         , type: 'warning'
         , offset: {
@@ -1349,7 +1366,7 @@ $(document).on("wb_required_false", function (event, that, text) {
         , delay: delay
         , allow_dismiss: true
         , stackup_spacing: 10
-    });
+    });}
 });
 
 function wb_set_inputs(selector, data) {
@@ -1380,7 +1397,7 @@ function wb_set_inputs(selector, data) {
     return $(html).outerHTML();
 }
 
-function wb_setdata(selector, data, ret) {
+function wb_setdata(selector, data, ret) { 
     if (selector == undefined) {
         var selector = "body";
     }

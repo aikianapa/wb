@@ -2,7 +2,7 @@
 include_once($_SERVER["DOCUMENT_ROOT"]."/engine/functions.php");
 wbInit();
 
-if ($_GET["mode"]=="ajax") {echo source__ajax();}
+if (isset($_GET["mode"]) AND $_GET["mode"]=="ajax") {echo source__ajax();}
 
 
 function source__list() {

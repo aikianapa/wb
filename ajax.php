@@ -54,7 +54,7 @@ function ajax__save($form=null) {
 		if ($res) {
 			$ret["error"]=0;
 		} else {$ret["error"]=1; $ret["text"]=$res;
-			header("HTTP/1.0 404 Not Found");	
+			header("HTTP/1.0 404 Not Found");
 		}
 	}
 	return json_encode($ret);
@@ -126,36 +126,69 @@ function ajax__buildfields() {
 	die;
 }
 
+function ajax__mailer() {
+	ajax__mail();
+}
+
 function ajax__mail() {
-require $_ENV["path_engine"].'/lib/phpmailer/PHPMailerAutoload.php';
 if (!isset($_POST["subject"])) {$_POST["subject"]="Письмо с сайта";}
-$out=wbGetTpl("mail.php");
+if (isset($_POST["_tpl"])) {$out=wbGetTpl($_POST["_tpl"]);}
+		elseif (isset($_POST["_form"])) {$out=wbGetTpl($_POST["_form"]);}
+		else {$out=wbGetTpl("mail.php");}
+if (!isset($_POST["email"])) {$_POST["email"]=$_ENV["route"]["mode"]."@".$_ENV["route"]["host"];}
+if (!isset($_POST["name"])) {$_POST["name"]="Site Mailer";}
+
 $out->wbSetData($_POST);
 $out=$out->outerHtml();
-//Create a new PHPMailer instance
-$mail = new PHPMailer;
-//Set who the message is to be sent from
-$mail->setFrom('from@example.com', 'Site Form');
-//Set an alternative reply-to address
-$mail->addReplyTo($_POST["email"], $_POST["name"]);
-//Set who the message is to be sent to
-$mail->addAddress($_ENV["settings"]["email"], $_ENV["settings"]["header"]);
-//Set the subject line
-$mail->Subject = $_POST["subject"];
-//Read an HTML message body from an external file, convert referenced images to embedded,
-//convert HTML into a basic plain-text alternative body
-$mail->msgHTML($out, dirname(__FILE__));
-$mail->CharSet = 'utf-8';
-//Replace the plain text body with one created manually
-//$mail->AltBody = 'This is a plain-text message body';
-//Attach an image file
-//$mail->addAttachment('images/phpmailer_mini.png');
-//send the message, check for errors
 
-if (!$mail->send()) {
-    echo "Ошибка отправки: " . $mail->ErrorInfo;
+if ($_ENV["route"]["mode"]=="mailer") {
+	require $_ENV["path_engine"].'/lib/phpmailer/PHPMailerAutoload.php';
+	//Create a new PHPMailer instance
+	$mail = new PHPMailer(true);
+
+/*
+    $mail->SMTPDebug = 2;                                 // Enable verbose debug output
+    $mail->isSMTP();                                      // Set mailer to use SMTP
+    $mail->Host = 'smtp1.example.com;smtp2.example.com';  // Specify main and backup SMTP servers
+    $mail->SMTPAuth = true;                               // Enable SMTP authentication
+    $mail->Username = 'user@example.com';                 // SMTP username
+    $mail->Password = 'secret';                           // SMTP password
+    $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
+    $mail->Port = 587;                                    // TCP port to connect to
+*/
+
+	//Set who the message is to be sent from
+	$mail->setFrom($_POST["email"], 'Site Form');
+	//Set an alternative reply-to address
+	$mail->addReplyTo($_POST["email"], $_POST["name"]);
+	//Set who the message is to be sent to
+	$mail->addAddress("oleg_frolov@mail.ru", $_ENV["settings"]["header"]);
+	//Set the subject line
+	$mail->Subject = $_POST["subject"];
+	//Read an HTML message body from an external file, convert referenced images to embedded,
+	//convert HTML into a basic plain-text alternative body
+	$mail->msgHTML($out, dirname(__FILE__));
+	$mail->CharSet = 'utf-8';
+	//Replace the plain text body with one created manually
+	//$mail->AltBody = 'This is a plain-text message body';
+	//Attach an image file
+	//$mail->addAttachment('images/phpmailer_mini.png');
+	//send the message, check for errors
+	$res=$mail->send();
+	$error=$mail->ErrorInfo;
+} else {
+	$headers  = 'MIME-Version: 1.0' . "\r\n";
+	$headers .= 'Content-type: text/html; charset=utf-8' . "\r\n";
+	$res=mail($_ENV["settings"]["email"], $_POST["subject"], $out,$headers);
+	$error="unknown";
+}
+if (!$res) {
+    echo "Ошибка отправки: " . $error;
 } else {
     echo "Сообщение отрпавлено!";
+}
+if (isset($_POST["callback"]) AND is_callable($_POST["_callback"])) {
+	@$_POST["_callback"]($res);
 }
 }
 ?>
