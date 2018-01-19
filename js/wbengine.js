@@ -760,7 +760,7 @@ function wb_plugins() {
                 });
             });
         }
-        if ($('.rating').length) {
+        if ($('.rating').length && $("script[src*=plugins]").length) {
             $('.rating:not(.wb-plugin)').each(function () {
                 $(this).addClass("wb-plugin");
                 $(this).rating({
