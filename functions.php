@@ -1524,7 +1524,7 @@ function wbCallFormFunc($name,$Item,$form=null,$mode=null) {
 	$sf=$_GET["form"]; $_GET["form"]=$form;
 //	formCurrentInclude($form);
 	$func=$form.$name; $_func="_".$func;
-	if (is_callable($func)) {$Item=$func($Item,$mode);} else {
+		if (is_callable($func)) {$Item=$func($Item,$mode);} else {
 		if (is_callable($_func)) {$Item=$_func($Item,$mode);}
 	}
 	$_GET["form"]=$sf;
