@@ -105,9 +105,9 @@
             $(".content-box .update-process .btn-success").hide();
             $(".content-box .update-process .progress-bar-info").css("width", start + "%");
         }
-        setTimeout(function () {
+
             $.ajax({
-                async: true
+                async: false
                 , type: 'POST'
                 , url: "/engine/update.php?step=" + step
                 , success: function (data) {
@@ -135,6 +135,6 @@
                     }
                 }
             });
-        }, 500);
+
     }
 </script>

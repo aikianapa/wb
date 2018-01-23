@@ -11,8 +11,8 @@ function wbInit() {
 }
 
 function wbInitEnviroment() {
-    $_SESSION["user"]="User";
-    //$_SESSION["user_role"]="user";
+  if (!isset($_SESSION["user"])) {$_SESSION["user"]="User";}
+  if (!isset($_SESSION["user_role"])) {$_SESSION["user_role"]="user";}
 	wbTrigger("func",__FUNCTION__,"before");
 	$_ENV["path_engine"]=__DIR__;
 	$_ENV["path_app"]=$_SERVER["DOCUMENT_ROOT"];
@@ -22,7 +22,7 @@ function wbInitEnviroment() {
 	$_ENV["dbac"]=$_ENV["path_app"]."/database/_cache";	// App data
 	$_ENV["error"]=array();
 	$_ENV["env_id"]=$_ENV["new_id"]=wbNewId();
-    $_ENV["datetime"]=date("Y-m-d H:i:s");
+  $_ENV["datetime"]=date("Y-m-d H:i:s");
 	$_ENV["forms"]=wbListForms(false);
     wbCheckWorkspace();
 	$variables=array();
@@ -275,7 +275,7 @@ function wbItemList($table="data",$where="") {
 
 		$object = new ArrayObject($list);
 		foreach($object as $key => $item) {
-            if (substr($item["id"],0,1)=="_" AND $_SESSION["user_role"]!=="admin") {unset($list[$key]);} elseif (!wbWhereItem($item,$where)) {unset($list[$key]);}
+        if (substr($item["id"],0,1)=="_" AND $_SESSION["user_role"]!=="admin") {unset($list[$key]);} elseif (!wbWhereItem($item,$where)) {unset($list[$key]);}
 		}
 
 

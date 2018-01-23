@@ -1958,14 +1958,15 @@ abstract class kiNode
 public function tagModule($Item=array()) {
 	$src=$this->attr("src");
   $attributes=array();
-  $exclude=array("data-wb-role","class","src");
+  $exclude=array("role","data-wb-role","class","src");
 	$module=$_ENV["route"]["scheme"]."://".$_ENV["route"]["host"]."/module/{$src}/";
 	$out=wbFromFile($module);
 	$out->wbSetData($Item);
-  foreach($this->attributes() as $an => $av) {
+  $ats=$this->attributes();
+  foreach($ats as $an => $av) {
     if (!in_array($an,$exclude)) {$out->find(":first:not(style,script,br)")->attr($an,$av);}
   }
-  $out->find(":first:not(style,script,br)")->html($this->html());
+  $out->find(":first:not(style,script,br)")->append($this->html());
 	$this->replaceWith($out);
 }
 
