@@ -129,14 +129,10 @@
                     </table>
                 </div>
                 <div class="col-sm-12">
-<<<<<<< HEAD
                     <button type="button" class="btn btn-warning pull-right" data-wb-ajax="/ajax/admin/backup/backup/{{name}}/?confirm=true&date={{created}}" data-wb-append="body" id="admin_btn_backup">
                       <i class="fa fa-cloud-upload"></i>
                       Создать резервную копию
                     </button>
-=======
-                    <button type="button" class="btn btn-warning pull-right" id="admin_btn_backup"><i class="fa fa-cloud-upload"></i> Создать резервную копию</button>
->>>>>>> alpha
                 </div>
             </div>
         </div>
