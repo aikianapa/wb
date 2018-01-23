@@ -870,7 +870,6 @@ function wb_plugin_editor() {
             CKEDITOR.instances[i].on('change', function () {
                 CKEDITOR.instances[i].updateElement();
                 var instance=CKEDITOR.instances[i].name;
-                console.log(instance,CKEDITOR.instances[i]);
                 var fldname=$("textarea#"+instance).attr("name");
                 var value=CKEDITOR.instances[i].getData();
                 if (fldname>"" && $("textarea#"+instance).parents("form").find("[name="+fldname+"]").length) {
@@ -1397,7 +1396,7 @@ function wb_set_inputs(selector, data) {
     return $(html).outerHTML();
 }
 
-function wb_setdata(selector, data, ret) { 
+function wb_setdata(selector, data, ret) {
     if (selector == undefined) {
         var selector = "body";
     }
@@ -1735,7 +1734,6 @@ function wb_call_source(id) {
 }
 
 function wb_call_source_events(srced, eid, fldname) {
-console.log(eid);
     var tmp = explode("-", eid);
     var toolbar = tmp[0] + "-toolbar-" + tmp[1] + " ";
     $(toolbar).data("editor", false);
