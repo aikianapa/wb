@@ -25,7 +25,7 @@ switch ($step) {
 		$res=array("next"=>"Распаковка архива","error"=>0);
 		break;
 	case 4:
-		exec("cd {$root} && unzip master.zip &&	rm master.zip");
+		exec("cd {$root} && unzip -q master.zip &&	rm master.zip");
 		$res=array("next"=>"Удаление предыдущей версии");
 		if (is_dir("{$root}/wb-master")) {$res["error"]=false;} else {$res["error"]=true;}
 		break;
