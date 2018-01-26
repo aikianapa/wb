@@ -86,7 +86,7 @@
     	</div>
     </div>
     <div id="{{_form}}Map" class="tab-pane fade show" role="tabpanel">
-      <div data-wb-role="module" src="yamap" editable></div>
+      <div data-wb-role="module" src="yamap" editable zoom="12"></div>
     </div>
   </div>
 </form>

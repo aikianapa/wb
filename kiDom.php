@@ -1957,16 +1957,30 @@ abstract class kiNode
 
 public function tagModule($Item=array()) {
 	$src=$this->attr("src");
+  $e=$_ENV["path_engine"]."/modules/{$src}/{$src}.php";
+  $a=$_ENV["path_app"]."/modules/{$src}/{$src}.php";
+  if (is_file($e)) {require_once($e);}
+  if (is_file($a)) {require_once($a);}
   $attributes=array();
   $exclude=array("role","data-wb-role","class","src");
 	$module=$_ENV["route"]["scheme"]."://".$_ENV["route"]["host"]."/module/{$src}/";
 	$out=wbFromFile($module);
-	$out->wbSetData($Item);
+  $func=$src."_afterRead"; $_func=$src."__afterRead";
+    // функция вызывается после получения шаблона модуля
+		if (is_callable($func)) {$func($out,$Item);} else {
+		if (is_callable($_func)) {$_func($out,$Item);}
+	}
+  $out->wbSetData($Item);
   $ats=$this->attributes();
   foreach($ats as $an => $av) {
     if (!in_array($an,$exclude)) {$out->find(":first:not(style,script,br)")->attr($an,$av);}
   }
   $out->find(":first:not(style,script,br)")->append($this->html());
+  $func=$src."_beforeShow"; $_func=$src."__beforeShow";
+    // функция вызывается перед выдачей модуля во внешний шаблон
+	if (is_callable($func)) {$func($out,$Item);} else {
+		if (is_callable($_func)) {$_func($out,$Item);}
+	}
 	$this->replaceWith($out);
 }
 

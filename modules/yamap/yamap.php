@@ -6,8 +6,14 @@ function yamap__init() {
 		if (is_callable($call)) {$out=@$call();}
 		die;
 	} else {
-		$out=file_get_contents(__DIR__ ."/yamap_canvas.php");
+		$out=wbFromFile(__DIR__ ."/yamap_canvas.php");
 		return $out;
 	}
+}
+
+function yamap__beforeShow($out,$Item) {
+		if (!$out->find("[editable]")->length) {
+			$out->find(".yamap_editor")->remove();
+		}
 }
 ?>

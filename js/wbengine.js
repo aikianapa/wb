@@ -492,15 +492,13 @@ function wb_newid() {
 }
 
 function wb_multiinput() {
-  if ($(document).data("wb-multiinput-menu")==undefined) {
-    $.get("/ajax/getform/common/multiinput_menu/", function (data) {
-        $(document).data("wb-multiinput-menu", data);
-    });
-    $.get("/ajax/getform/common/multiinput_row/", function (data) {
-        $(document).data("wb-multiinput-row", data);
-    });
-  }
-    if (is_callable("sortable")) {
+    if ($("[data-wb-role=multiinput]").length && $(document).data("wb-multiinput-menu")==undefined) {
+        $.get("/ajax/getform/common/multiinput_menu/", function (data) {
+            $(document).data("wb-multiinput-menu", data);
+        });
+        $.get("/ajax/getform/common/multiinput_row/", function (data) {
+            $(document).data("wb-multiinput-row", data);
+        });
         $("[data-wb-role=multiinput]").sortable();
     }
     $(document).undelegate(".wb-multiinput", "mouseenter");
@@ -522,6 +520,7 @@ function wb_multiinput() {
     $(document).undelegate(".wb-multiinput-menu .dropdown-item", "click");
     $(document).delegate(".wb-multiinput-menu .dropdown-item", "click", function (e) {
         var multi = $(this).parents("[data-wb-role=multiinput]");
+        var line=$(this).parents(".wb-multiinput");
         var tpl = $($(multi).attr("data-tpl")).html();
         var row = $(document).data("wb-multiinput-row");
         var name = $(multi).attr("name");
@@ -531,13 +530,15 @@ function wb_multiinput() {
             , "id": "_new"
         }, true);
         if ($(this).attr("href") == "#after") {
-            $(this).parents(".wb-multiinput").after(row);
+            $(line).after(row);
         }
         if ($(this).attr("href") == "#before") {
-            $(this).parents(".wb-multiinput").before(row);
+            $(line).before(row);
         }
         if ($(this).attr("href") == "#remove") {
-            $(this).parents(".wb-multiinput").remove();
+            console.log("Trigger: before_remove");
+            $(multi).trigger("before_remove",line);
+            $(line).remove();
         }
         if (!$(multi).find(".wb-multiinput").length) {
             $(multi).append(row);

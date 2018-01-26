@@ -14,9 +14,12 @@ if (!isset($_ENV["route"]["form"]) OR $_ENV["route"]["form"]!=="default_form") {
 	}
 }
 if (!is_object($_ENV["DOM"])) {$_ENV["DOM"]=wbFromString($_ENV["DOM"]);}
-$_ENV["DOM"]->wbSetData($_ENV["ITEM"]);
-$hide=$_ENV["DOM"]->find("data-wb-hide");
-foreach($hide as $h) {$h->tagHideAttrs();}
+if ($_ENV["route"]["controller"]!=="module") {
+	// чтобы вставки модуля не пометились .wb-done
+	$_ENV["DOM"]->wbSetData($_ENV["ITEM"]);
+	$hide=$_ENV["DOM"]->find("data-wb-hide");
+	foreach($hide as $h) {$h->tagHideAttrs();}
+}
 //echo $_ENV["DOM"]->beautyHtml();
 echo $_ENV["DOM"]->outerHtml();
 wbFlushDatabase();
