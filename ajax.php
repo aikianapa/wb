@@ -34,6 +34,28 @@ function ajax__cart() {
     return wbCartAction();
 }
 
+function ajax_alive() {
+	$ret=false;
+	if (isset($_SESSION["user_role"]) && $_SESSION["user_role"]>"") {
+		if ($_POST["data"]=="wb_get_user_role") {
+			$ret["user_role"]=$_SESSION["user_role"];
+			$ret["mode"]="wb_set_user_role";
+			$out=wbGetForm("common","modal");
+			$out->find(".modal")->attr("id","wb_session_die");
+			$out->find(".modal-header")->html("<h6 class='text-danger'><i class='fa fa-exclamation-triangle'></i> Сессия завершена</h6>");
+			$out->find(".modal-body")->html("<center>Истёк период ожидания сессиии!<br>Пожалуйста, выполните <a href='/login'>вход в систему</a> заново.</center>");
+			$out->find(".modal-footer")->html("<a class='btn btn-primary' href='/login'><i class='fa fa-sign-in'></i> Войти в систему</a>");
+			$ret["msg"]=$out->outerHtml();
+		} elseif ($_POST["data"]==$_SESSION["user_role"]) {
+			$ret=true;
+		} elseif ($_POST["data"]=="wb_session_die") {
+			$ret["mode"]=$_POST["data"];
+		}
+	}
+	return json_encode($ret);
+}
+
+
 function ajax__save($form=null) {
 	if ($form==null) {$form=$_ENV["route"]["form"];}
 	$eFunc="{$form}__formsave"; $aFunc="{$form}_formsave";

@@ -2,6 +2,7 @@ wb_include("/engine/js/php.js");
 wb_include("/engine/js/jquery.redirect.js");
 if ($("link[rel$=less],style[rel$=less]").length) wb_include("/engine/js/less.min.js");
 $(document).ready(function () {
+    wb_alive();
     wb_delegates();
     $("body").removeClass("cursor-wait");
 });
@@ -15,6 +16,27 @@ function wb_delegates() {
     wb_multiinput();
     wb_tree();
 }
+
+function wb_alive() {
+  var post="wb_get_user_role";
+	setInterval(function(){
+		$.post("/ajax/alive",{data:post},function(ret){
+      ret=json_decode(ret);
+      if (ret==false) {post="wb_session_die";}
+      if (ret.mode!==undefined && ret.mode=="wb_session_die") {
+          $(".modal#wb_session_die").modal("show");
+          console.log("session_die");
+      }
+      if (ret.mode!==undefined && ret.mode=="wb_set_user_role" && ret.user_role!==undefined && ret.user_role>"") {
+          if (!$(".modal#wb_session_die").length) {$("body").append(ret.msg);}
+          $(document).data("user_role",ret.user_role);
+          post=$(document).data("user_role");
+      }
+			//if (ret==false && document.location.pathname=="/admin") {document.location.href="/login";}
+		});
+	},60000);
+}
+
 
 function wb_include(url) {
     if (!$(document).find("script[src='" + url + "']").length) {
