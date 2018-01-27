@@ -1981,6 +1981,7 @@ public function tagModule($Item=array()) {
 	if (is_callable($func)) {$func($out,$Item);} else {
 		if (is_callable($_func)) {$_func($out,$Item);}
 	}
+  $out->wbSetData($Item);
 	$this->replaceWith($out);
 }
 
@@ -2126,9 +2127,9 @@ public function tagInclude($Item=array()) {
         if (isset($vars) AND $vars>"") {$Item=wbAttrAddData($vars,$Item);}
 		if (isset($call) AND is_callable($call)) {$Item=$call($Item);}
 		if (is_array($srcItem)) {foreach($srcItem as $k => $v) {$Item["%{$k}"]=$v;}; unset($v);}
-        $this->includeTag($Item);
+    $this->includeTag($Item);
 		$Item=wbCallFormFunc("BeforeShowItem",$Item,$table,$mode);
-        $Item=wbCallFormFunc("BeforeItemShow",$Item,$table,$mode);
+    $Item=wbCallFormFunc("BeforeItemShow",$Item,$table,$mode);
 		$this->wbSetData($Item);
 		//$this->html(clearValueTags($this->html()));
     }

@@ -164,20 +164,22 @@ function yamap_geo(canvas) {
     $(canvas).find(".yamap_editor").delegate(".finder","keyup",function(){
         var map=$(canvas).data("map");
         var clusterer=$(canvas).data("clusterer");
-        var addr=$(this).val();
+        var finder=$(this).val();
         var geo=$(this).parents(".wb-multiinput").find("[data-wb-field=geopos]");
+        var addr=$(this).parents(".wb-multiinput").find("[data-wb-field=address]");
         var title=$(this).parents(".wb-multiinput").find("[data-wb-field=title]").val();
         var pos=yamap_pos($(geo).val());
         var zoom=$(this).parents("[zoom]").attr("zoom");
 
 
-        ymaps.geocode(addr, {results: 1}).then(function(res) {
+        ymaps.geocode(finder, {results: 1}).then(function(res) {
             var obj = res.geoObjects.get(0);
             var pos = res.geoObjects.get(0).geometry._coordinates;
             $(geo).val(implode(" ",pos));
+            $(addr).val(finder);
             var point={
                 pos: pos
-              , content: addr
+              , content: finder
               , title: title
               , geofld: geo
             };
