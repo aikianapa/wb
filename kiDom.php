@@ -1879,7 +1879,7 @@ abstract class kiNode
 		$ndx=0; $fdx=0; $n=0; $stp=0;
 		$count=count($Item);
 		$inner="";
-		$srcVal=array(); foreach($srcItem as $k => $v) {$srcVal["%{$k}"]=$v;}; unset($v);
+		$srcVal=array(); foreach($srcItem as $k => $v) {$srcVal["%{$k}"]=$v;}; unset($v); $srcVal["_parent"]=$srcItem;
 
 		$ndx=0; $n=0; $f=0;
 		$tmptpl=wbFromString($tpl);

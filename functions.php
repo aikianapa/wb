@@ -275,7 +275,12 @@ function wbItemList($table="data",$where="") {
 
 		$object = new ArrayObject($list);
 		foreach($object as $key => $item) {
-        if (substr($item["id"],0,1)=="_" AND $_SESSION["user_role"]!=="admin") {unset($list[$key]);} elseif (!wbWhereItem($item,$where)) {unset($list[$key]);}
+        if 	(
+								(substr($item["id"],0,1)=="_" AND $_SESSION["user_role"]!=="admin")
+						OR
+								($item==null)
+
+						) {unset($list[$key]);} elseif (!wbWhereItem($item,$where)) {unset($list[$key]);}
 		}
 
 
