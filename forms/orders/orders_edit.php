@@ -1,5 +1,5 @@
 <div class="modal fade" id="{{_GET[form]}}_{{_GET[mode]}}" data-keyboard="false" data-backdrop="true" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -54,29 +54,32 @@
                         <br />
                         <div id="{{_GET[form]}}Descr" class="tab-pane fade show active" role="tabpanel">
                             <div class="wb-cart" data-wb-writable="false">
+
                             <div data-wb-role="multiinput" name="items">
-                                <div class="row cart-item">
-                                    <input type="hidden" name="item" class="cart-item-id">	
+                                <div class="cart-item col">
+                                  <div class="row">
+                                    <input type="hidden" name="item" class="cart-item-id">
                                     <input type="hidden" name="form" class="cart-item-form">
-                                    <div class="col-sm-5" role="formdata" data-wb-form="{{form}}" data-wb-item="{{item}}">
+                                    <div class="col-5" role="formdata" data-wb-form="{{form}}" data-wb-item="{{item}}">
                                         <input type="text" class="form-control" value="{{name}}">
                                     </div>
-                                    <div class="col-sm-2">
+                                    <div class="col-2">
                                         <input type="number" name="count" min="0" class="form-control cart-item-count">
                                     </div>
-                                    <div class="col-sm-2">
+                                    <div class="col-2">
                                         <input type="number" name="price" min="0" class="form-control cart-item-price">
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-3">
                                         <input type="number" class="form-control cart-item-total">
                                     </div>
+                                  </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-sm-9">
+                            <div class="form-group row">
+                                <div class="col-9">
                                     ИТОГО:
                                 </div>
-                                <div class="col-sm-3">
+                                <div class="col-3">
                                     <input type="number" name="total" readonly class="form-control cart-total">
                                 </div>
                             </div>

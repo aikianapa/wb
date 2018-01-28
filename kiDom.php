@@ -129,7 +129,11 @@ print_r(wbRouter::getRoute());
 
 	}
 	$tmp=explode("?",$_SERVER["REQUEST_URI"]);
-	if (isset($tmp[1]) AND isset($_ENV["route"]["params"])) {parse_str($tmp[1],$get); $_ENV["route"]["params"]=(array)$_ENV["route"]["params"]+(array)$get;}
+	if (isset($tmp[1])) {
+    parse_str($tmp[1],$get);
+    if (!isset($_ENV["route"]["params"])) {$_ENV["route"]["params"]=array();}
+    $_ENV["route"]["params"]=(array)$_ENV["route"]["params"]+(array)$get;
+  }
 	$_GET=array_merge($_GET,$_ENV["route"]);
 	if (isset($_GET["engine"]) && $_GET["engine"]=="true") {$_SERVER["SCRIPT_NAME"]="/engine".$_SERVER["SCRIPT_NAME"];}
 	if (isset($_SERVER["SCHEME"]) && $_SERVER["SCHEME"]>"") {$scheme=$_SERVER["SCHEME"];} else {$scheme="http";}
