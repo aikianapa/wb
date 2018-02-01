@@ -12,7 +12,7 @@ function comments__widget() {
 
 function comments__edit() {
 	$out=wbGetForm("comments","edit");
-    $Item=wbItemRead("comments",$_ENV["route"]["item"]); 
+    $Item=wbItemRead("comments",$_ENV["route"]["item"]);
 	$Item=_commentsBeforeItemShow($Item);
 	$out->wbSetData($Item);
 	return $out->outerHtml();
@@ -49,7 +49,7 @@ function _commentsBeforeItemShow($Item,$mode=NULL) {
 			if (!isset($Item["date"]) OR $Item["date"]=="") {$Item["date"]=date("Y-m-d H:i:s"); } else {	$Item["date"]=date("Y-m-d H:i:s",$time); }
 			break;
 		case "list"	:
-			$Item["date"]=date("d.m.Y H:i",$time);
+			$Item["dateshow"]=date("d.m.Y H:i",$time);
 			$Item["text"]=wbGetWords(strip_tags($Item["text"]),50);
 			$Item["smalltext"]=wbGetWords(strip_tags($Item["text"]),10);
 			if ($_SESSION["user_id"]!=="admin" && (!$Item["show"]==1 OR !$Item["show"]=="on") ) {$Item=NULL;}

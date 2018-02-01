@@ -44,4 +44,18 @@ function filemanager__getdir() {
 		echo $out;
 }
 
+function filemanager__getfile() {
+		if (wbRole("admin") && isset($_POST["file"])) {
+				echo file_get_contents($_ENV["path_app"].$_POST["file"]);
+		}
+}
+
+function filemanager__putfile() {
+		$res=false;
+		if (wbRole("admin") && isset($_POST["file"]) && isset($_POST["text"])) {
+				$res=file_put_contents($_ENV["path_app"].$_POST["file"],$_POST["text"]);
+		}
+		echo json_encode($res);
+}
+
 ?>

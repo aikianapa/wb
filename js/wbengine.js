@@ -217,6 +217,7 @@ function wb_cart() {
 
 
 function wb_alive() {
+  if ($("body").attr("data-wb-alive")=="true") {
   var post = "wb_get_user_role";
   setInterval(function() {
     $.post("/ajax/alive", {
@@ -240,6 +241,7 @@ function wb_alive() {
       //if (ret==false && document.location.pathname=="/admin") {document.location.href="/login";}
     });
   }, 60000);
+  }
 }
 
 
@@ -813,7 +815,7 @@ function wb_base_fix() {
 
 function wb_plugins() {
   $(document).ready(function() {
-    if (is_callable("autosize")) {
+    if (wb_plugins_loaded()) {
       autosize($('textarea[rows=auto]'));
     }
 
@@ -883,7 +885,7 @@ function wb_plugins() {
         $(this).trigger("wb-tree-init", this);
       });
     }
-    if ($('.select2:not(.wb-plugin)').length) {
+    if (wb_plugins_loaded() && $('.select2:not(.wb-plugin)').length) {
       $('.select2:not(.wb-plugin').each(function() {
         var that = this;
         if ($(this).is("[data-wb-ajax]")) {
@@ -959,7 +961,7 @@ function wb_plugins() {
       });
       $('.select2').addClass("wb-plugin");
     }
-    if ($('.input-tags').length) {
+    if (wb_plugins_loaded() && $('.input-tags').length) {
       $('.input-tags').each(function() {
         if ($(this).attr("placeholder") !== undefined) {
           var ph = $(this).attr("placeholder");
@@ -1520,7 +1522,7 @@ function wb_ajax() {
           if ($(link).attr("data-wb-prepend") !== undefined) {
             $($(link).attr("data-wb-prepend")).prepend(data);
           }
-          $("<div>" + data + "</div>").find(".modal[id]").each(function(i) {
+          $("<div>" + data + "</div>").find(".modal[id]:not(.hidden)").each(function(i) {
             if (i == 0) {
               $("#" + $(this).attr("id")).modal();
             }
@@ -1563,7 +1565,7 @@ $(document).on("wb_required_false", function(event, that, text) {
       text = "Заполните поле: " + $(that).attr("placeholder");
     }
   }
-  if (is_callable("bootstrapGrowl")) {
+  if (wb_plugins_loaded()) {
     $.bootstrapGrowl(text, {
       ele: 'body',
       type: 'warning',
@@ -1868,7 +1870,7 @@ function wb_pagination(pid) {
 }
 
 function wb_call_source(id) {
-  var eid = "#" + id;
+  if (substr(id,0,1)=="#") {var eid=id; id=substr(id,1);} else {var eid = "#" + id;}
   if (!$(eid).parents(".formDesignerEditor").length) {
     $(document).data("sourceFile", null);
     var form = $(eid).parents("form");
@@ -1908,8 +1910,10 @@ function wb_call_source(id) {
         mac: 'Command-S'
       },
       exec: function() {
-        console.log(form);
-        //wb_formsave(form);
+        if (form!==undefined) {
+          console.log(form);
+          wb_formsave(form);
+        }
       },
       readOnly: false
     });
@@ -2032,19 +2036,15 @@ function wb_call_source_events(srced, eid, fldname) {
     }
     if ($(this).hasClass("btnFullScr")) {
       var div = $(this).parents(toolbar).parent();
-      var offset = div.offset();
-      if (!div.hasClass("fullscr")) {
-        div.parents(".modal").addClass("fullscr");
-        div.addClass("fullscr");
-        $(this).parents(".modal").css("overflow-y", "hidden");
-        $("pre.ace_editor").css("height", $(window).height() - $(toolbar).height() - $(toolbar).next(".nav").height() - 15);
+      div.parents(".modal").toggleClass("fullscr");
+      if (div.parents(".modal").hasClass("fullscr")) {
+          var offset=div.find("pre.ace_editor").offset();
+          div.find("pre.ace_editor").height($(window).height() - offset.top - 15);
       } else {
-        div.removeAttr("style");
-        $("pre.ace_editor").css("height", "500px");
-        div.removeClass("fullscr");
-        div.parents(".modal").removeClass("fullscr");
-        $(this).parents(".modal").css("overflow-y", "auto");
+          div.find("pre.ace_editor").height(400);
       }
+
+      srced.resize();
       window.dispatchEvent(new Event('resize'));
     }
     if ($(this).hasClass("btnSave")) {

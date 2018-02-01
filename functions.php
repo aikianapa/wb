@@ -372,7 +372,7 @@ function wbWhereNotLike($ref,$val) {
 }
 
 function wbJsonEncode($Item=array()) {
-    return json_encode($Item, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    return json_encode($Item, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE);
 }
 
 function wbItemRead($table=null,$id=null) {
@@ -424,7 +424,7 @@ function wbItemRemove($table=null,$id=null,$flush=true) {
 		if ($id!==null) {
 			$item=wbItemRead($table,$id);
 			if (is_array($item) && $table!=="users" && !isset($item["super"]) && $item["super"]!=="on") {$item["__wbFlag__"]="remove";}
-			$item=json_encode($item, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE);
+			$item=wbJsonEncode($item);
 		}
 		if (!is_dir($cache) AND $item!==null) {$res=file_put_contents($cache,$item, LOCK_EX);}
 		if (!$res) {wbError("func",__FUNCTION__,1007,func_get_args());}
@@ -446,7 +446,7 @@ function wbItemSave($table,$item=null,$flush=true) {
 		$cache=wbCacheName($table,$item["id"]);
 		if ($prev!==null) {$item=array_merge($prev,$item);}
         $item=wbTrigger("form",__FUNCTION__,"BeforeItemSave",func_get_args(),$item);
-		if (!is_dir($cache)) {$res=file_put_contents($cache,json_encode($item, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE), LOCK_EX);}
+		if (!is_dir($cache)) {$res=file_put_contents($cache,wbJsonEncode($item), LOCK_EX);}
 		if (!$res) {wbError("func",__FUNCTION__,1007,func_get_args());} else {
             wbTrigger("form",__FUNCTION__,"AfterItemSave",func_get_args(),$item);
         }
@@ -1219,13 +1219,14 @@ function wbChangeQuot($Tag) {
 
 function wbRole($role,$userId=null) {
 	$res=false;
+	if (!is_array($role)) {$role=wbAttrToArray($role);}
 	if ($userId==null) {
-		if (in_array($role,$_SESSION["user_role"])) {$res=true;}
+		 $res=in_array($_SESSION["user_role"],$role);
 	} else {
 		$user=wbReadItem("users",$userId);
-		if (in_array($role,$user["role"])) {$res=true;}
+		$res=in_array($user["role"],$role);
 	}
-
+	return $res;
 }
 
 	function wbControls($set="") {

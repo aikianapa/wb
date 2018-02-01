@@ -1,7 +1,7 @@
 <div class="element-wrapper">
     <h6 class="element-header">
         Список коментариев
-        <button class="btn btn-sm btn-success pull-right" data-wb-ajax="/form/edit/{{_GET[form]}}/_new" data-wb-append="body">
+        <button class="btn btn-sm btn-success pull-right" data-wb-ajax="/form/edit/{{_form}}/_new" data-wb-append="body">
            <i class="fa fa-plus"></i> Добавить коментарий
          </button>
     </h6>
@@ -18,9 +18,9 @@
                         <th class="text-right"> Действие </th>
                     </tr>
                 </thead>
-                <tbody data-wb-role="foreach" data-wb-table="{{_GET[form]}}" data-wb-add="true" data-wb-size="12" data-wb-sort="id">
+                <tbody data-wb-role="foreach" data-wb-table="{{_form}}" data-wb-add="true" data-wb-size="12" data-wb-sort="date:d">
                     <tr>
-                        <td class="{{class}}">{{date}}</td>
+                        <td class="{{class}}">{{dateshow}}</td>
                         <td class="{{class}}">{{name}}</td>
                         <td>{{email}}</td>
                         <td>{{rating}}</td>

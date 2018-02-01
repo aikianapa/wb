@@ -1740,7 +1740,8 @@ abstract class kiNode
 			foreach($param as $k =>$val) {$$k=$val;}
 			$tree=$Item;
 		}
-		if ($parent=="false" OR $parent=="0") {$parent=0;} else {$parent=1;}
+    if ($parent=="disabled") {$pardis=1;} else {$pardis=0;}
+    if ($parent=="false" OR $parent=="0") {$parent=0;} else {$parent=1;}
     $tpl=$this->html();
 		$this->html("");
 		if ($branch!==0) {
@@ -1757,9 +1758,10 @@ abstract class kiNode
             $line=wbFromString($tpl);
             $line->wbSetData($item);
             if (isset($item["children"]) AND is_array($item["children"]) AND count($item["children"])) {
+                $line->children("option")->attr("disabled",true);
                 $level++;
                 if ($limit==-1 OR $level<=$limit) {
-				$param=array("name"=>$name,"tag"=>$tag,"level"=>$level,"parent"=>$parent,"limit"=>$limit);
+				        $param=array("name"=>$name,"tag"=>$tag,"level"=>$level,"parent"=>$parent,"limit"=>$limit);
                 $child=wbFromString($tpl);
                 $child->tagTreeUl($item["children"],$param);
     	           if ($tag=="select") {
