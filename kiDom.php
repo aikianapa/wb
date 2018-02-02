@@ -1696,7 +1696,7 @@ abstract class kiNode
 			if (isset($Item[$name]) && $Item[$name]!=="[]" && $Item[$name]!=="") {$tree->tagTreeData($Item[$name]);} else {$tree->find("ol")->append(wbGetForm("common","tree_row"));}
 			$this->prepend($tree);
 			$this->addClass("wb-tree dd");
-            $this->wbSetData($Item);
+      $this->wbSetData($Item);
 		} elseif ($type=="select") {
 				$this->tagTreeUl($Item);
 		} else {
@@ -1725,23 +1725,23 @@ abstract class kiNode
 	}
 
 	public function tagTreeUl($Item=array(),$param=null) {
-
-		$limit=-1; $level=0; $tree=$Item; $branch=0; $parent=1; $children=1;
+		$limit=-1; $lvl=0; $idx=0; $tree=$Item; $branch=0; $parent=1; $pardis=0; $children=1;
 		if ($param==null) {
 			include("wbattributes.php");
 			$name=$this->attr("name");
-			if (isset($from)) {$name=$from;}
-            if ($children=="false" OR $children=="0") {$children=0;} elseif ($children=="true" OR $children=="1") {$children=1;}
+      if (isset($from)) {$name=$from;}
 			if ($name=="" AND isset($item)) {$name=$item;}
 			if (!is_array($Item[$name])) {$tree=json_decode($Item[$name],true);} else {$tree=$Item[$name];}
 			$tag=$this->tag();
 			if (!isset($limit) OR $limit=="false" OR $limit*1<0) {$limit=-1;} else {$limit=$limit*1;}
+      if ($parent=="disabled") {$pardis=1;$parent=1;} else {$pardis=0;}
+      if ($parent=="false" OR $parent=="0") {$parent=0;} elseif ($parent=="true") {$parent=1;}
+      if ($children=="false" OR $children*1==0) {$children=0;} elseif ($children=="true" OR $children=="1") {$children=1;}
 		} else {
 			foreach($param as $k =>$val) {$$k=$val;}
 			$tree=$Item;
 		}
-    if ($parent=="disabled") {$pardis=1;} else {$pardis=0;}
-    if ($parent=="false" OR $parent=="0") {$parent=0;} else {$parent=1;}
+    if (!isset($level)) {$level="";}
     $tpl=$this->html();
 		$this->html("");
 		if ($branch!==0) {
@@ -1750,44 +1750,43 @@ abstract class kiNode
                 $tree=array(wbTreeFindBranchById($tree,trim($b)));
             }
         }
-		if ($this->hasAttr("placeholder") AND $this->is("select")) {
-			$this->prepend("<option value='' class='placeholder'>".$this->attr("placeholder")."</option>");
-		}
+    		if ($this->hasAttr("placeholder") AND $this->is("select")) {
+    			$this->prepend("<option value='' class='placeholder'>".$this->attr("placeholder")."</option>");
+    		}
         foreach($tree as $i => $item) {
-            $item["_idx"]=$i;
-            $line=wbFromString($tpl);
-            $line->wbSetData($item);
-            if (isset($item["children"]) AND is_array($item["children"]) AND count($item["children"])) {
-                $line->children("option")->attr("disabled",true);
-                $level++;
-                if ($limit==-1 OR $level<=$limit) {
-				        $param=array("name"=>$name,"tag"=>$tag,"level"=>$level,"parent"=>$parent,"limit"=>$limit);
-                $child=wbFromString($tpl);
-                $child->tagTreeUl($item["children"],$param);
-    	           if ($tag=="select") {
-                       if ($parent!==1) {$level--;}
-                       $child->children("option")->prepend(str_repeat("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>",$level));
-                       if ($parent!==1) {
-                         $line->html($child);
-                       } else {
-                         $line->append($child);
-                       }
-                   } else {
-                        if ($parent!==1) {
-                            $line->html($child);
-                        } else {
-                            if ($children==1) {
-                              $line->append("<{$tag}>".$child->outerHtml()."</{$tag}>");}
-                            else {
-                              $line->children(":first-child")->append("<{$tag}>".$child->outerHtml()."</{$tag}>");
-                            }
-                        }
-                   }
 
+                  $lvl++;
+                  $item["_idx"]=$idx; $idx++;
+                  $line=wbFromString($tpl);
+                  $line->wbSetData($item);
+
+                  if (isset($item["children"]) AND is_array($item["children"]) AND count($item["children"])  AND $children!==0) {
+                    if ($pardis==1 AND ($limit!==$lvl-1)) {$line->children()->attr("disabled",true);}
+                    $child=wbFromString($tpl);
+                    $child->tagTreeUl($item["children"],array("name"=>$name,"tag"=>$tag,"lvl"=>$lvl,"idx"=>$idx,"level"=>$level,"pardis"=>$pardis,"parent"=>$parent,"children"=>$children,"limit"=>$limit));
+                    if (($limit==-1 OR $lvl<=$limit)) {
+              	          if ($tag=="select") {
+                                 if ($parent!==1) {$lvl--;}
+                                 $child->children("option")->prepend(str_repeat("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>",$lvl));
+                                 $child->wbSetValues($item);
+                                 if ($parent!==1) {
+                                   $line->html($child);
+                                 } else {
+                                   $line->append($child);
+                                 }
+
+                          } else {
+                               if ($parent!==1) {
+                                   $line->html($child);
+                               } else {
+                                   if ($children==1) $line->children(":first-child")->append("<{$tag}>".$child->outerHtml()."</{$tag}>");
+                               }
+                          }
+                    }
                 }
-                $level--;
-            }
-            $this->append($line);
+                $lvl--;
+
+            if (isset($line)) $this->append($line);
         }
     }
 
