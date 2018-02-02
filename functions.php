@@ -205,7 +205,7 @@ function wbTableCreate($table="data",$engine=false) {
 	if ($engine==false) {$db=$_ENV["dba"];} else {$db=$_ENV["dbe"];}
 	$table=wbTablePath($table,$engine);
 	if (!is_file($table) AND is_dir($db)) {
-		$json=json_encode(array("dict"=>array(),"data"=>array(),"view"=>array()), JSON_HEX_QUOT | JSON_HEX_APOS);
+		$json=wbJsonEncode(array("dict"=>array(),"data"=>array(),"view"=>array()));
 		$res=file_put_contents($table,$json, LOCK_EX);
 		if ($res) {chmod($table,0777);} else {$table=null;}
 	} else {
@@ -444,8 +444,8 @@ function wbItemSave($table,$item=null,$flush=true) {
 		if (!isset($item["id"]) OR $item["id"]=="_new") {$item["id"]=wbNewId(); $prev=null;} else {$prev=wbItemRead($table,$item["id"]);}
 		$item=wbItemSetTable($table,$item);
 		$cache=wbCacheName($table,$item["id"]);
-		if ($prev!==null) {$item=array_merge($prev,$item);}
-        $item=wbTrigger("form",__FUNCTION__,"BeforeItemSave",func_get_args(),$item);
+		if (is_array($prev) AND isset($prev["id"]) AND $prev["id"]==$item["id"]) {$item=array_merge($prev,$item);}
+    $item=wbTrigger("form",__FUNCTION__,"BeforeItemSave",func_get_args(),$item);
 		if (!is_dir($cache)) {$res=file_put_contents($cache,wbJsonEncode($item), LOCK_EX);}
 		if (!$res) {wbError("func",__FUNCTION__,1007,func_get_args());} else {
             wbTrigger("form",__FUNCTION__,"AfterItemSave",func_get_args(),$item);
@@ -470,16 +470,16 @@ function wbTableFlush($table) {
 	$cache=wbCacheName($table);
 	$clist=wbListFiles($cache);
 	$data=json_decode(file_get_contents($table),true);
-	if (!isset($data["data"])) {$data["data"]=array();}
+	if (!isset($data)) {$data=array("data"=>array());}
 	foreach($clist as $key) {
 		$data["data"][$key]=$item=json_decode(file_get_contents($cache."/".$key),true);
 		if (isset($item["__wbFlag__"]) AND $item["__wbFlag__"]=="remove") {
-			unset($data["data"][$key]);
+			if ($_SESSION["user_role"]=="admin") {unset($data["data"][$key]);} else {unset($item["__wbFlag__"]);$item["_removed"]=true;$data["data"][$key]=$item;}
 		}
 		unlink($cache."/".$key);
 	}
 	$_ENV["cache"][$table]=$data;
-	$data=json_encode($data, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE);
+	$data=wbJsonEncode($data);
 	$res=file_put_contents($table,$data, LOCK_EX);
 	return $res;
 }

@@ -1776,7 +1776,11 @@ abstract class kiNode
                         if ($parent!==1) {
                             $line->html($child);
                         } else {
-                            if ($children==1) $line->children(":first-child")->append("<{$tag}>".$child->outerHtml()."</{$tag}>");
+                            if ($children==1) {
+                              $line->append("<{$tag}>".$child->outerHtml()."</{$tag}>");}
+                            else {
+                              $line->children(":first-child")->append("<{$tag}>".$child->outerHtml()."</{$tag}>");
+                            }
                         }
                    }
 
