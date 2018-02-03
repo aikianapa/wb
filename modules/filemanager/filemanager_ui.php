@@ -4,76 +4,75 @@
      <i class="fa fa-plus"></i>
    </button>
 </h6>
-<div class="col-12"  id="filemanager">
+<div class="col-12" id="filemanager">
         <div class="content-wrapper">
           <div class="content-left">
             <button class="btn btn-default btn-block mg-b-20">Загрузить файл</button>
-
             <label class="content-left-label">Действия</label>
             <ul class="nav mg-t-1-force">
               <li class="nav-item">
-                <a href="" class="nav-link">
-                  <i class="icon ion-ios-folder-outline"></i>
+                <a href="#newdir" class="nav-link">
+                  <i class="fa fa-folder-o"></i>
                   <span>Новая директория</span>
                 </a>
               </li><!-- nav-item -->
               <li class="nav-item">
-                <a href="" class="nav-link">
-                  <i class="icon ion-ios-folder-outline"></i>
+                <a href="#newfile" class="nav-link">
+                  <i class="fa fa-file-o"></i>
                   <span>Новый файл</span>
                 </a>
               </li><!-- nav-item -->
               <li class="nav-item">
                 <a href="" class="nav-link">
-                  <i class="icon ion-ios-folder-outline"></i>
+                  <i class="fa fa-i-cursor"></i>
                   <span>Переименовать</span>
                 </a>
               </li><!-- nav-item -->
               <li class="nav-item">
                 <a href="" class="nav-link">
-                  <i class="icon ion-ios-folder-outline"></i>
+                  <i class="fa fa-trash-o"></i>
                   <span>Удалить</span>
                 </a>
               </li><!-- nav-item -->
               <li class="nav-item">
                 <a href="" class="nav-link">
-                  <i class="icon ion-ios-folder-outline"></i>
+                  <i class="fa fa-edit"></i>
                   <span>Редактировать</span>
                 </a>
               </li><!-- nav-item -->
               <li class="nav-item">
                 <a href="" class="nav-link">
-                  <i class="icon ion-ios-folder-outline"></i>
+                  <i class="fa fa-file-archive-o"></i>
                   <span>Архивировать</span>
                 </a>
               </li><!-- nav-item -->
               <li class="nav-item">
                 <a href="" class="nav-link">
-                  <i class="icon ion-ios-folder-outline"></i>
+                  <i class="fa fa-file-archive-o"></i>
                   <span>Разахивировать</span>
                 </a>
               </li><!-- nav-item -->
               <li class="nav-item">
                 <a href="" class="nav-link">
-                  <i class="icon ion-ios-folder-outline"></i>
+                  <i class="fa fa-download"></i>
                   <span>Скачать</span>
                 </a>
               </li><!-- nav-item -->
               <li class="nav-item">
                 <a href="" class="nav-link">
-                  <i class="icon ion-ios-folder-outline"></i>
+                  <i class="fa fa-copy"></i>
                   <span>Копировать</span>
                 </a>
               </li><!-- nav-item -->
               <li class="nav-item">
                 <a href="" class="nav-link">
-                  <i class="icon ion-ios-folder-outline"></i>
+                  <i class="fa fa-cut"></i>
                   <span>Вырезать</span>
                 </a>
               </li><!-- nav-item -->
               <li class="nav-item">
                 <a href="" class="nav-link">
-                  <i class="icon ion-ios-folder-outline"></i>
+                  <i class="fa fa-paste"></i>
                   <span>Вставить</span>
                 </a>
               </li><!-- nav-item -->
@@ -103,21 +102,24 @@
                     <input type="checkbox"><span></span>
                   </label>
                 </td>
-                <td class="col">
+                <td class="col name">
                   <i class="fa {{type}} {{ext}} tx-22 tx-primary lh-0 valign-middle"></i>
                   <span class="pd-l-5">{{name}}</span>
                 </td>
                 <td class="hidden-xs-down">{{ext}}</td>
                 <td class="dropdown">
-                  <a href="#" data-toggle="dropdown" class="btn pd-y-3 tx-gray-500 hover-info"><i class="icon ion-more"></i></a>
-                  <div class="dropdown-menu dropdown-menu-right pd-10">
+                  <a href="#" data-toggle="dropdown" class="btn pd-y-3 tx-gray-500 hover-info" data-wb-where='type!="back"'><i class="icon ion-more"></i></a>
+                  <div class="dropdown-menu dropdown-menu-right pd-10" data-wb-where='type!="back"'>
                     <nav class="nav nav-style-1 flex-column">
-                      <a href="" class="nav-link">Info</a>
-                      <a href="" class="nav-link">Download</a>
-                      <a href="" class="nav-link">Rename</a>
-                      <a href="" class="nav-link">Move</a>
-                      <a href="" class="nav-link">Copy</a>
-                      <a href="" class="nav-link">Delete</a>
+                      <a href="#edit" class="nav-link" data-wb-where='type="file"'><i class="fa fa-edit"></i> Редактировать</a>
+                      <a href="#rendir" class="nav-link" data-wb-where='type="dir"'><i class="fa fa-i-cursor"></i> Переименовать</a>
+                      <a href="#renfile" class="nav-link" data-wb-where='type="file"'><i class="fa fa-i-cursor"></i> Переименовать</a>
+                      <a href="#renlink" class="nav-link" data-wb-where='type="dir1" OR type="file1"'><i class="fa fa-i-cursor"></i> Переименовать</a>
+                      <a href="#clone" class="nav-link" data-wb-where='type="file"'><i class="fa fa-copy"></i> Дублировать</a>
+                      <a href="{{href}}" download="{{name}}" class="nav-link" data-wb-where='type="file"'><i class="fa fa-download"></i> Скачать</a>
+                      <a href="#rmfile" class="nav-link" data-wb-where='type="file"'><i class="fa fa-remove"></i> Удалить</a>
+                      <a href="#rmdir" class="nav-link" data-wb-where='type="dir"'><i class="fa fa-remove"></i> Удалить</a>
+                      <a href="#rmlink" class="nav-link" data-wb-where='type="dir1" OR type="file1"'><i class="fa fa-remove"></i> Удалить</a>
                     </nav>
                   </div><!-- dropdown-menu -->
                 </td>
@@ -140,6 +142,38 @@
     </div>
   </div>
 </div>
+
+<div id="filemanagerModalDialog" class="modal fade hidden" tabindex="-1" role="dialog" aria-hidden="true">
+  <meta name="newdir" title="Новая директория" content="Создать новую директорию с именем:<br> {{newname}}">
+  <meta name="newfile" title="Новый файл" content="Создать новый файл с именем:<br> {{newname}}">
+  <meta name="rmdir" title="Удаление директории" content="Удалить директорию <b>{{_POST[name]}}</b> со всем её содержимым? {{dirname}}" invisible="dirname">
+  <meta name="rmfile" title="Удаление файла" content="Удалить файл <b>{{_POST[name]}}</b>? {{filename}}" invisible="filename">
+  <meta name="rendir" title="Переименование директории" content="Переименовать директорию <b>{{_POST[name]}}</b> в: {{dirname}} {{oldname}}" visible="dirname" invisible="oldname">
+  <meta name="renfile" title="Переименование файла" content="Переименовать файл <b>{{_POST[name]}}</b> в: {{filename}} {{oldname}}" visible="filename" invisible="oldname">
+  <input type="text" class="form-control" name="newname">
+  <input type="hidden" class="form-control" name="dirname" value="{{_POST[name]}}">
+  <input type="hidden" class="form-control" name="filename" value="{{_POST[name]}}">
+  <input type="hidden" class="form-control" name="oldname" value="{{_POST[name]}}">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form></form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+        <button type="button" class="btn btn-primary">Выполнить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div class="nav-active-primary mg-t-5" data-wb-append="#filemanagerSrc .source-toolbar">
     <ul class="nav nav-tabs" role="tablist" id="filemanagerTabs">
         <li class="nav-item"><a class="nav-link" href="" data-toggle="tab" aria-expanded="false"> <i class="fa fa-close"></a></i></li>
@@ -202,6 +236,83 @@ $(document).ready(function(){
       filemanagerGetDir(path);
     }
   });
+
+  $("#filemanager").undelegate("#list tr.dir td.name","click");
+  $("#filemanager").delegate("#list tr.dir td.name","click",function(){
+      if (!$("#filemanager #list .dropdown-menu.show").length) {
+        $(this).parents("tr").trigger("dblclick");
+      }
+  });
+  $("#filemanager").undelegate("#list tr.dir1 td.name","click");
+  $("#filemanager").delegate("#list tr.dir1 td.name","click",function(){
+      if (!$("#filemanager #list .dropdown-menu.show").length) {
+        $(this).parents("tr").trigger("dblclick");
+      }
+  });
+
+  $("#filemanager").undelegate("a","click");
+  $("#filemanager").delegate("a.nav-link","click",function(){
+      $("#filemanager #filemanagerModalDialog").remove();
+      var href=$(this).attr("href");
+      var post={"path":$("#filemanager #list").data("path")};
+      if ($(this).parents("tr[data-name]").length) {
+        var parent=$(this).parents("tr[data-name]");
+        post["name"]=$(parent).attr("data-name");
+        if ($(parent).hasClass("dir")) {post["type"]="dir";}
+        if ($(parent).hasClass("dir1")) {post["type"]="dir-link";}
+        if ($(parent).hasClass("file")) {post["type"]="file";}
+        if ($(parent).hasClass("file1")) {post["type"]="file-link";}
+      }
+      $("#filemanager").data("post",post);
+      $("#filemanager").data("line",$(this).parents("tr"));
+      if (substr(href,0,1)=="#" && !in_array(href,["#edit"])) {
+          $.post("/module/filemanager/dialog/"+substr(href,1),post,function(data){
+              $("#filemanager").append(data);
+              $("#filemanager #filemanagerModalDialog").modal("show");
+        	});
+      }
+      if (href=="#edit") {
+          $(this).parents("tr").find("td.name").trigger("dblclick");
+      }
+  });
+
+  $("#filemanager").undelegate("#filemanagerModalDialog .btn-primary","click");
+  $("#filemanager").delegate("#filemanagerModalDialog .btn-primary","click",function(){
+      var action=$(this).attr("data-action");
+      var post=$("#filemanager #filemanagerModalDialog .modal-body form").serialize();
+      var data=$("#filemanager").data("post");
+      post+="&type="+data["type"]+"&path="+data["path"];
+      $("#filemanager #filemanagerModalDialog").modal("hide");
+      $.post("/module/filemanager/action/"+action,post,function(data){
+          var data=json_decode(data);
+          var line=$("#filemanager").data("line");
+          console.log(data);
+          $("#filemanager #filemanagerModalDialog").modal("hide");
+          if (line!==undefined && data.action=="change_name") {
+              $(line).find("td.name > span").html(data.name);
+              $(line).attr("data-name",data.name);
+              if (data.ext!==undefined) {$(line).find("td.name + td").html(data.ext);}
+          }
+
+
+          $("#filemanager").data("post",undefined);
+          $("#filemanager").data("line",undefined);
+      });
+  });
+
+
+  $("#filemanager").undelegate("#list tr.back td.name","click");
+  $("#filemanager").delegate("#list tr.back td.name","click",function(){
+      $(this).parents("tr").trigger("dblclick");
+  });
+
+  $("#filemanager").undelegate("#list tr","contextmenu");
+  $("#filemanager").delegate("#list tr","contextmenu",function(){
+      $(this).find("td.dropdown > a").trigger("click");
+      return false;
+  });
+
+
   $("#filemanager").delegate(".breadcrumb a","click",function(e){
     var idx=$(this).parents("li").attr("idx");
     var path="";
@@ -279,7 +390,6 @@ $(document).ready(function(){
 
     $("#filemanagerSrc").undelegate(".btnFullScr","click");
     $("#filemanagerSrc").delegate(".btnFullScr","click",function(){
-
       editor.resize();
     });
 
