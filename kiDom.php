@@ -2044,7 +2044,7 @@ public function tagInclude($Item=array()) {
                 $this_content=wbFromFile($module);
                 break;
         }
-		$vars=$this->attr("data-vars");	if ($vars>"") {$Item=wbAttrAddData($vars,$Item);}
+		$vars=$this->attr("data-wb-vars");	if ($vars>"") {$Item=wbAttrAddData($vars,$Item);}
     if (!isset($this_content)) {
 		if ($src=="") {$src=$this->html(); $this_content=ki::fromString($src);} else {
 			$tplpath=explode("/",$src);

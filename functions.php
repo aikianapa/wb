@@ -756,7 +756,7 @@ function wbWhereItem($item,$where=NULL) {
 	$res=true;
 	if (!$where==NULL) {
 		if (substr($where,0,1)=="%") {$phpif=substr($where,1);} else {$phpif=wbWherePhp($where,$item);}
-        if ($phpif>"") @eval('if ( '.$phpif.' ) { $res=1; } else { $res=0; } ;');
+    if ($phpif>"") @eval('if ( '.$phpif.' ) { $res=1; } else { $res=0; } ;');
 	};
 	return $res;
 }
@@ -1441,12 +1441,12 @@ function wbListTpl() {
 	$dir=$_ENV["path_app"]."/tpl";
 	$list=array(); $result=array();
 	if (is_dir($dir)) {
-		$list=wbListFilesRecursive($dir);
+		$list=wbListFilesRecursive($dir,true);
 		foreach($list as $l => $val) {
-			if (substr($val,-4)==".php") {
-				$list[$l]=str_replace($dir,"",$val);
-				if (substr_count($list[$l],"/")==1) {$list[$l]=substr($list[$l],1);}
-				$result[]=$list[$l];
+			if ( (substr($val["file"],-4)==".php" OR substr($val["file"],-4)==".htm" OR substr($val["file"],-5)==".html") AND !strpos(".inc.",$val["file"])) {
+				$path=str_replace($dir,"",$val["path"]);
+				$res=substr($path."/".$val["file"],1);
+				$result[]=$res;
 			}
 		}
 	}

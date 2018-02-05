@@ -730,24 +730,26 @@ function wb_multiinput() {
   if ($("[data-wb-role=multiinput]").length) {$("[data-wb-role=multiinput]").sortable();}
   $(document).undelegate(".wb-multiinput", "mouseenter");
   $(document).delegate(".wb-multiinput", "mouseenter", function() {
-    $(this).append("<div class='wb-multiinput-menu'>" + $(document).data("wb-multiinput-menu") + "</div>");
+    $(document).data("wb-multiinput",this);
   });
   $(document).undelegate(".wb-multiinput", "mouseleave");
   $(document).delegate(".wb-multiinput", "mouseleave", function() {
-    $(this).find(".wb-multiinput-menu").remove();
+//    $("body").find(".wb-multiinput-menu").remove();
   });
   $(document).undelegate(".wb-multiinput", "contextmenu");
   $(document).delegate(".wb-multiinput", "contextmenu", function(e) {
+    $("body").find(".wb-multiinput-menu").remove();
+    $("body").append("<div class='wb-multiinput-menu'>" + $(document).data("wb-multiinput-menu") + "</div>");
     var relativeX = (e.clientX - 10);
     var relativeY = (e.clientY - 10);
-    $(this).find(".wb-multiinput-menu").css("margin-left", relativeX + "px").css("margin-top", relativeY + "px").css("top", 0).css("left", 0);
-    $(this).find(".wb-multiinput-menu [data-toggle=dropdown]").trigger("click");
+    $("body").find(".wb-multiinput-menu").css("left", relativeX + "px").css("top", relativeY + "px");
+    $("body").find(".wb-multiinput-menu [data-toggle=dropdown]").trigger("click");
     return false;
   });
   $(document).undelegate(".wb-multiinput-menu .dropdown-item", "click");
   $(document).delegate(".wb-multiinput-menu .dropdown-item", "click", function(e) {
-    var multi = $(this).parents("[data-wb-role=multiinput]");
-    var line = $(this).parents(".wb-multiinput");
+    var line = $(document).data("wb-multiinput");
+    var multi = $(line).parents("[data-wb-role=multiinput]");
     var tpl = $($(multi).attr("data-tpl")).html();
     var row = $(document).data("wb-multiinput-row");
     var name = $(multi).attr("name");

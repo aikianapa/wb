@@ -39,7 +39,7 @@
 	  <label class="col-sm-3 form-control-label">Короткое описание</label>
         <div class="col-sm-9"><textarea class="form-control" name="descr" placeholder="Короткое описание"></textarea></div>
 	</div>
-    
+
 	<div class="form-group row">
         <label class="col-sm-3 form-control-label">
             Текст новости

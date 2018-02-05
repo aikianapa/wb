@@ -140,6 +140,7 @@ label.switch-primary input:checked+span {
 .wb-multiinput-menu {
   position: absolute;
   margin-top: -3px;
+  z-index:99999;
 }
 
 .wb-tree .dd-item * {
