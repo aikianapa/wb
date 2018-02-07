@@ -1,5 +1,9 @@
 <?php
 function form__controller() {
+	if (!in_array($_ENV["route"]["form"],$_ENV["forms"])) {
+		echo form__controller__error_404();
+		die;
+	}
 	wbTrigger("func",__FUNCTION__,"before");
 	$call=__FUNCTION__ ."__".$_ENV["route"]["mode"];
 	if (is_callable($call)) {
@@ -103,6 +107,7 @@ function form__controller__error_404($id=null) {
     $_ENV["route"]["error"]="404";
 		$out=wbGetTpl("404.php");
     if (is_object($out)) $out->wbSetData();
+		wbLog("func",__FUNCTION__,404,$_ENV["route"]);
     return $out;
 }
 

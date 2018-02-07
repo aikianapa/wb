@@ -26,45 +26,43 @@ function engine__controller_login()
     if (isset($_POST["l"]) and $_POST["l"]>"") {
         if ($user=wbItemRead("users", $_POST["l"])) {
             if ($user["password"]==md5($_POST["p"]) and $user["active"]=="on") {
-                engine__controller_login_success($user);
+                wbLog("func",__FUNCTION__,100,$_POST);
+                $_SESSION["user_id"]=$user["id"];
+                $_SESSION["user_role"]=$user["role"];
+                if (isset($user["point"]) and $user["point"]>"") {
+                    $point=$user["point"];
+                } else {
+                    if ($user["role"]=="admin") {
+                        $point="/admin";
+                    } else {
+                        $point="/";
+                    }
+                }
+                if (!isset($user["name"])) {
+                    $user["name"]=$user["id"];
+                }
+
+                if (isset($user["avatar"])) {
+                    if (!is_array($user["avatar"])) {
+                        $user["avatar"]=json_decode($user["avatar"], true);
+                        $user["avatar"]=$user["avatar"][0];
+                    }
+                    $user["avatar"]="/uploads/users/{$user["id"]}/{$user["avatar"]["img"]}";
+                } else {
+                    $user["avatar"]="/engine/uploads/__system/person.svg";
+                }
+                $_SESSION["user_name"]=$user["name"];
+                $_SESSION["user_avatar"]=$user["avatar"];
+                //$_SESSION["user"]=$user;
+                header('Location: '.$point);
+                die;
+            } else {
+                wbLog("func",__FUNCTION__,101,$_POST);
             }
         }
     }
     $_ENV["DOM"]=wbGetTpl("login.htm");
     return $_ENV["DOM"];
-}
-
-function engine__controller_login_success($user)
-{
-    $_SESSION["user_id"]=$user["id"];
-    $_SESSION["user_role"]=$user["role"];
-    if (isset($user["point"]) and $user["point"]>"") {
-        $point=$user["point"];
-    } else {
-        if ($user["role"]=="admin") {
-            $point="/admin";
-        } else {
-            $point="/";
-        }
-    }
-    if (!isset($user["name"])) {
-        $user["name"]=$user["id"];
-    }
-
-    if (isset($user["avatar"])) {
-        if (!is_array($user["avatar"])) {
-            $user["avatar"]=json_decode($user["avatar"], true);
-            $user["avatar"]=$user["avatar"][0];
-        }
-        $user["avatar"]="/uploads/users/{$user["id"]}/{$user["avatar"]["img"]}";
-    } else {
-        $user["avatar"]="/engine/uploads/__system/person.svg";
-    }
-    $_SESSION["user_name"]=$user["name"];
-    $_SESSION["user_avatar"]=$user["avatar"];
-    //$_SESSION["user"]=$user;
-    header('Location: '.$point);
-    die;
 }
 
 function engine__controller_register()

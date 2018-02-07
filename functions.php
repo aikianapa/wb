@@ -191,6 +191,7 @@ function wbTable($table="data",$engine=false) {
         }
     }
     if (!is_file($table)) {
+	debug_print_backtrace(); die;
         wbError("func",__FUNCTION__,1001,func_get_args());
         $table=null;
 	} else {
@@ -589,6 +590,8 @@ function wbGetForm($form=NULL,$mode=NULL,$engine=null) {
 
 function wbErrorList() {
 	$_ENV["errors"]=array(
+		100=>"Успешный вход в систему {{l}}",
+		101=>"Не удачный вход в систему {{l}}",
 		404=>"Страница не существует",
 		1001=>"Таблица {{0}} не существует",
 		1002=>"Таблица {{0}} уже существует",
@@ -609,7 +612,6 @@ function wbLog($type,$name,$error,$args) {
 	} else {
 		$error=wbError($type,$name);
 	}
-
 	if (is_array($args)) {
 		foreach($args as $key => $arg) {
 			$error["error"]=str_replace("{{".$key."}}",$arg,$error["error"]);
