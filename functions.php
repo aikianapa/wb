@@ -413,8 +413,7 @@ function wbCacheName($table,$id=null) {
 }
 
 function wbItemRemove($table=null,$id=null,$flush=true) {
-    wbTrigger("form",__FUNCTION__,"BeforeItemRemove",func_get_args(),array());
-
+  wbTrigger("form",__FUNCTION__,"BeforeItemRemove",func_get_args(),array());
 	if (count(explode($_ENV["path_app"],$table))==1) {$table=wbTable($table);}
 	if (!is_file($table)) {
 		wbError("func",__FUNCTION__,1001,func_get_args());
@@ -427,11 +426,12 @@ function wbItemRemove($table=null,$id=null,$flush=true) {
 			$item=wbJsonEncode($item);
 		}
 		if (!is_dir($cache) AND $item!==null) {$res=file_put_contents($cache,$item, LOCK_EX);}
-		if (!$res) {wbError("func",__FUNCTION__,1007,func_get_args());}
+		if (!$res) {wbError("func",__FUNCTION__,1007,func_get_args());} else  {
+			wbLog("func",__FUNCTION__,1008,func_get_args());
+		}
 	}
 	if ($flush==true) {wbTableFlush($table);}
-
-    wbTrigger("form",__FUNCTION__,"AfterItemRemove",func_get_args(),array());
+  wbTrigger("form",__FUNCTION__,"AfterItemRemove",func_get_args(),array());
 }
 
 function wbItemSave($table,$item=null,$flush=true) {
@@ -478,9 +478,12 @@ function wbTableFlush($table) {
 		}
 		unlink($cache."/".$key);
 	}
-	$_ENV["cache"][$table]=$data;
-	$data=wbJsonEncode($data);
-	$res=file_put_contents($table,$data, LOCK_EX);
+	if (count($clist) AND $_ENV["cache"][$table]!==$data) {
+		$_ENV["cache"][$table]=$data;
+		$data=wbJsonEncode($data);
+		$res=file_put_contents($table,$data, LOCK_EX);
+		wbLog("func",__FUNCTION__,1009,func_get_args());
+	} else {$res=null;}
 	return $res;
 }
 
@@ -587,20 +590,25 @@ function wbErrorList() {
 		1005=>"Не удалось записать таблицу {{0}}",
 		1006=>"Запись {{1}} в таблице {{0}} не существует",
 		1007=>"Не удалось сохранить запись в таблицу {{0}}",
+		1008=>"Удаление записи {{1}} в таблице {{0}}",
+		1009=>"Сброс данных из кэша таблицы {{0}}"
 	);
 }
 
 function wbLog($type,$name,$error,$args) {
 	$log = fopen($_ENV["path_app"]."/wblog.txt", "a");
-	$error=wbError($type,$name);
+	if (isset($_ENV["errors"][$error])) {
+		$error=array("errno"=>$error,"error"=>$_ENV["errors"][$error]);
+	} else {
+		$error=wbError($type,$name);
+	}
+
 	if (is_array($args)) {
 		foreach($args as $key => $arg) {
 			$error["error"]=str_replace("{{".$key."}}",$arg,$error["error"]);
 		}
 	}
-	fwrite($log, date("d-m-Y H:i:s")." {$type} {$name} [{$error["errno"]}]: {$error["error"]}\n");
-
-
+	fwrite($log, date("d-m-Y H:i:s")." {$type} {$name} [{$error["errno"]}]: {$error["error"]} [{$_SERVER["REMOTE_ADDR"]} : {$_SERVER["REQUEST_URI"]}]\n");
 }
 
 function wbNewId($separator="") {
