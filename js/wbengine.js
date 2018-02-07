@@ -223,19 +223,19 @@ function wb_alive() {
     $.post("/ajax/alive", {
       data: post
     }, function(ret) {
-      ret = json_decode(ret);
+      ret = json_decode(ret,true);
       if (ret == false) {
         post = "wb_session_die";
       }
-      if (ret.mode !== undefined && ret.mode == "wb_session_die") {
+      if (ret["mode"] !== undefined && ret["mode"] == "wb_session_die") {
         $(".modal#wb_session_die").modal("show");
         console.log("session_die");
       }
-      if (ret.mode !== undefined && ret.mode == "wb_set_user_role" && ret.user_role !== undefined && ret.user_role > "") {
+      if (ret["mode"] !== undefined && ret["mode"] == "wb_set_user_role" && ret["user_role"] !== undefined && ret["user_role"] > "") {
         if (!$(".modal#wb_session_die").length) {
           $("body").append(ret.msg);
         }
-        $(document).data("user_role", ret.user_role);
+        $(document).data("user_role", ret["user_role"]);
         post = $(document).data("user_role");
       }
       //if (ret==false && document.location.pathname=="/admin") {document.location.href="/login";}
