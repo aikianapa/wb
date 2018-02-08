@@ -91,6 +91,7 @@
                         <td>Дата</td>
                         <td>Тип</td>
                         <td>Имя файла</td>
+                        <td>Зазмер</td>
                         <td>Действие</td>
                       </thead>
                       <tbody data-wb-role="foreach" id="adminBackupsList" data-wb-from="backups" data-wb-sort="_created:d" data-wb-limit="10">
@@ -98,6 +99,7 @@
                           <td>{{date}}</td>
                           <td>{{type}}</td>
                           <td>{{name}}</td>
+                          <td>{{size}}</td>
                           <td>
 
                             <div class="btn-group">

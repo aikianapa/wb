@@ -1,11 +1,12 @@
 <?php
+set_time_limit(600);
 $root=$_SERVER['DOCUMENT_ROOT'];
 $step=$_REQUEST["step"];
 $engine="{$root}/engine";
-
+if (!is_dir($root."/backup")) {@mkdir($root."/backup",0766);}
 switch ($step) {
 	default:
-		$res=array("next"=>"Получение актуальной версии Web Basic Engine","error"=>0,"count"=>6);
+		$res=array("next"=>"Получение актуальной версии Web Basic Engine","error"=>0,"count"=>7);
 		break;
 	case 1:
 		exec("cd {$root} && wget https://codeload.github.com/aikianapa/wb/zip/master && mv master master.zip && chmod 0777 master.zip");
@@ -13,27 +14,30 @@ switch ($step) {
 		if (is_file("{$root}/master.zip")) {$res["error"]=false;} else {$res["error"]=true;}
 		break;
 	case 2:
-		if (!is_dir($root."/backup")) {@mkdir($root."/backup");}
 		$name="backup-e-".date("YmdHis").".zip";
 		exec("cd {$root} && zip -r backup/{$name} engine/ -x '*.git*'");
 		$res=array("next"=>"Создание резервной копии приложения","error"=>0);
 		break;
 	case 3:
-		if (!is_dir($root."/backup")) {@mkdir($root."/backup");}
 		$name="backup-a-".date("YmdHis").".zip";
-		exec("cd {$root} && zip -r backup/{$name} . -x '*engine*' -x '*backup*'");
-		$res=array("next"=>"Распаковка архива","error"=>0);
+		exec("cd {$root} && zip -r backup/{$name} . -x '*engine*' -x '*backup*' -x '*uploads*'");
+		$res=array("next"=>"Создание резервной копии загрузок","error"=>0);
 		break;
 	case 4:
+		$name="backup-u-".date("YmdHis").".zip";
+		exec("cd {$root} && zip -r backup/{$name} uploads/ ");
+		$res=array("next"=>"Распаковка архива","error"=>0);
+		break;
+	case 5:
 		exec("cd {$root} && unzip -q master.zip &&	rm master.zip");
 		$res=array("next"=>"Удаление предыдущей версии");
 		if (is_dir("{$root}/wb-master")) {$res["error"]=false;} else {$res["error"]=true;}
 		break;
-	case 5:
+	case 6:
 		$res=array("next"=>"Обновление системы","error"=>0);
 		exec("cd {$root} && rm -rf {$engine}/!(update.php) && rm -rf {$engine}/.*");
 		break;
-	case 6:
+	case 7:
 		$res=array("next"=>"Обновление выполнено","error"=>0);
 		recurse_copy($root."/wb-master",$engine);
 		exec("cd {$root} && rm -R wb-master && rm master.zip");
