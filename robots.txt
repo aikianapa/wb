@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /database
+Disallow: /ajax
+Disallow: /engine
+Disallow: /forms
+Disallow: /tpl
+Disallow: /backup
+Disallow: /cgi-bin
