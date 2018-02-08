@@ -11,6 +11,12 @@
             <label class="content-left-label">Действия</label>
             <ul class="nav mg-t-1-force">
               <li class="nav-item">
+                <a href="#refresh" class="nav-link">
+                  <i class="fa fa-refresh"></i>
+                  <span>Обновить список</span>
+                </a>
+              </li><!-- nav-item -->
+              <li class="nav-item">
                 <a href="#newdir" class="nav-link">
                   <i class="fa fa-folder-o"></i>
                   <span>Новая директория</span>
@@ -22,56 +28,56 @@
                   <span>Новый файл</span>
                 </a>
               </li><!-- nav-item -->
-              <li class="nav-item">
-                <a href="" class="nav-link">
+              <li class="nav-item hidden allow-single allow-dir allow-file allow-dir1 allow-file1">
+                <a href="#rename" class="nav-link">
                   <i class="fa fa-i-cursor"></i>
                   <span>Переименовать</span>
                 </a>
               </li><!-- nav-item -->
-              <li class="nav-item">
-                <a href="" class="nav-link">
+              <li class="nav-item hidden allow-all">
+                <a href="#remove" class="nav-link">
                   <i class="fa fa-trash-o"></i>
                   <span>Удалить</span>
                 </a>
               </li><!-- nav-item -->
-              <li class="nav-item">
-                <a href="" class="nav-link">
+              <li class="nav-item hidden allow-single allow-file allow-file1">
+                <a href="#edit" class="nav-link">
                   <i class="fa fa-edit"></i>
                   <span>Редактировать</span>
                 </a>
               </li><!-- nav-item -->
-              <li class="nav-item">
-                <a href="" class="nav-link">
+              <li class="nav-item hidden allow-all" data-no-ext="zip">
+                <a href="#zip" class="nav-link">
                   <i class="fa fa-file-archive-o"></i>
                   <span>Архивировать</span>
                 </a>
               </li><!-- nav-item -->
-              <li class="nav-item">
-                <a href="" class="nav-link">
+              <li class="nav-item hidden allow-single allow-file" data-ext="zip">
+                <a href="#unzip" class="nav-link">
                   <i class="fa fa-file-archive-o"></i>
                   <span>Разахивировать</span>
                 </a>
               </li><!-- nav-item -->
-              <li class="nav-item">
-                <a href="" class="nav-link">
+              <li class="nav-item hidden allow-single allow-file">
+                <a href="#dnload" class="nav-link">
                   <i class="fa fa-download"></i>
                   <span>Скачать</span>
                 </a>
               </li><!-- nav-item -->
-              <li class="nav-item">
-                <a href="" class="nav-link">
+              <li class="nav-item hidden allow-all">
+                <a href="#copy" class="nav-link">
                   <i class="fa fa-copy"></i>
                   <span>Копировать</span>
                 </a>
               </li><!-- nav-item -->
-              <li class="nav-item">
-                <a href="" class="nav-link">
+              <li class="nav-item hidden allow-all">
+                <a href="#cut" class="nav-link">
                   <i class="fa fa-cut"></i>
                   <span>Вырезать</span>
                 </a>
               </li><!-- nav-item -->
-              <li class="nav-item">
-                <a href="" class="nav-link">
+              <li class="nav-item hidden allow-buffer">
+                <a href="#paste" class="nav-link">
                   <i class="fa fa-paste"></i>
                   <span>Вставить</span>
                 </a>
@@ -96,7 +102,7 @@
               </ul-->
 
             <table id="list" class="table table-striped mg-b-0" data-wb-role="foreach" data-wb-from="result" data-wb-tpl="false" data-wb-size="false" data-wb-hide="wb">
-              <tr class="col-12 {{type}}{{link}} {{ext}}" data-name="{{name}}">
+              <tr class="col-12 {{type}}{{link}} {{ext}}" data-name="{{name}}" data-ext="{{ext}}">
                 <td class="valign-middle">
                   <label class="ckbox mg-b-0">
                     <input type="checkbox"><span></span>
@@ -119,7 +125,7 @@
                       <a href="{{href}}" download="{{name}}" class="nav-link" data-wb-where='type="file"'><i class="fa fa-download"></i> Скачать</a>
                       <a href="#rmfile" class="nav-link" data-wb-where='type="file"'><i class="fa fa-remove"></i> Удалить</a>
                       <a href="#rmdir" class="nav-link" data-wb-where='type="dir"'><i class="fa fa-remove"></i> Удалить</a>
-                      <a href="#rmlink" class="nav-link" data-wb-where='type="dir1" OR type="file1"'><i class="fa fa-remove"></i> Удалить</a>
+                      <a href="#rmlink" class="nav-link" data-wb-where='type="dir1" OR type="file1"'><i class="fa fa-trash-o"></i> Удалить</a>
                     </nav>
                   </div><!-- dropdown-menu -->
                 </td>
@@ -150,6 +156,7 @@
   <meta name="rmfile" title="Удаление файла" content="Удалить файл <b>{{_POST[name]}}</b>? {{filename}}" invisible="filename">
   <meta name="rendir" title="Переименование директории" content="Переименовать директорию <b>{{_POST[name]}}</b> в: {{dirname}} {{oldname}}" visible="dirname" invisible="oldname">
   <meta name="renfile" title="Переименование файла" content="Переименовать файл <b>{{_POST[name]}}</b> в: {{filename}} {{oldname}}" visible="filename" invisible="oldname">
+  <meta name="paste" title="Вставка" content="Некоторые объекты уже существуют в этой директории.<br> Выполнить перезапись существующих объектов?">
   <input type="text" class="form-control" name="newname">
   <input type="hidden" class="form-control" name="dirname" value="{{_POST[name]}}">
   <input type="hidden" class="form-control" name="filename" value="{{_POST[name]}}">
@@ -237,6 +244,7 @@ $(document).ready(function(){
     }
   });
 
+
   $("#filemanager").undelegate("#list tr.dir td.name","click");
   $("#filemanager").delegate("#list tr.dir td.name","click",function(){
       if (!$("#filemanager #list .dropdown-menu.show").length) {
@@ -250,8 +258,8 @@ $(document).ready(function(){
       }
   });
 
-  $("#filemanager").undelegate("a","click");
-  $("#filemanager").delegate("a.nav-link","click",function(){
+  $("#filemanager").undelegate("#list a.nav-link, a.nav-link[href='#newdir'], a.nav-link[href='#newfile']","click");
+  $("#filemanager").delegate("#list a.nav-link, a.nav-link[href='#newdir'], a.nav-link[href='#newfile']","click",function(){
       $("#filemanager #filemanagerModalDialog").remove();
       var href=$(this).attr("href");
       var post={"path":$("#filemanager #list").data("path")};
@@ -276,27 +284,76 @@ $(document).ready(function(){
       }
   });
 
+  $("#filemanager").undelegate(".content-left .nav a.nav-link","click");
+  $("#filemanager").delegate(".content-left .nav a.nav-link","click",function(){
+      var check=$("#filemanager #list").find("tr:not(.back) [type=checkbox]:checked");
+      var count=$(check).length;
+      var href=$(this).attr("href");
+      if (count==1) {
+          if ($(check).parents("tr.dir").length) {var type="dir";}
+          if ($(check).parents("tr.file").length) {var type="file";}
+          if ($(check).parents("tr.dir1").length) {var type="dir1";}
+          if ($(check).parents("tr.file1").length) {var type="file1";}
+      }
+
+      switch(href) {
+          case '#rename':
+              if (count==1) {$(check).parents("tr").find("a[href='#ren"+type+"']").trigger("click");}
+              break
+          case '#edit':
+              if (count==1) {$(check).parents("tr").find("a[href='#edit']").trigger("click");}
+              break
+          case '#dnload':
+          // не работает!!!!
+              if (count==1) {$(check).parents("tr").find("a[download]").trigger("click");}
+              break
+          case '#remove':
+              if (type!=="dir" && type!=="file") {type="link";}
+              if (count==1) {$(check).parents("tr").find("a[href='#rm"+type+"']").trigger("click");}
+              break
+          case '#copy':
+              $("#filemanager").data("buffer",$("#filemanager #list").find("tr:not(.back) [type=checkbox]:checked").parents("tr"));
+              $("#filemanager").data("bufferpath",$("#filemanager #list").data("path"));
+              $("#filemanager").data("buffertype","copy");
+              $("#filemanager .allow-buffer").show();
+              break
+          case '#paste':
+              if ($("#filemanager").data("bufferpath")!==$("#filemanager #list").data("path")) {
+                filemanagerPaste();
+              }
+              break
+          case "#refresh":
+              filemanager_reload_list();
+              break
+      }
+      return false;
+  });
+
   $("#filemanager").undelegate("#filemanagerModalDialog .btn-primary","click");
   $("#filemanager").delegate("#filemanagerModalDialog .btn-primary","click",function(){
       var action=$(this).attr("data-action");
-      var post=$("#filemanager #filemanagerModalDialog .modal-body form").serialize();
-      var data=$("#filemanager").data("post");
-      post+="&type="+data["type"]+"&path="+data["path"];
+      if (action=="paste") {
+            var post=$("#filemanager").data("post");
+      } else {
+            var post=$("#filemanager #filemanagerModalDialog .modal-body form").serialize();
+            var data=$("#filemanager").data("post");
+            post+="&type="+data["type"]+"&path="+data["path"];
+      }
       $("#filemanager #filemanagerModalDialog").modal("hide");
       $.post("/module/filemanager/action/"+action,post,function(data){
           var data=json_decode(data);
           var line=$("#filemanager").data("line");
-          console.log(data);
           $("#filemanager #filemanagerModalDialog").modal("hide");
           if (line!==undefined && data.action=="change_name") {
               $(line).find("td.name > span").html(data.name);
               $(line).attr("data-name",data.name);
               if (data.ext!==undefined) {$(line).find("td.name + td").html(data.ext);}
           }
-
-
           $("#filemanager").data("post",undefined);
           $("#filemanager").data("line",undefined);
+          if (data.action=="reload_list") {filemanager_reload_list();}
+
+
       });
   });
 
@@ -309,6 +366,40 @@ $(document).ready(function(){
   $("#filemanager").undelegate("#list tr","contextmenu");
   $("#filemanager").delegate("#list tr","contextmenu",function(){
       $(this).find("td.dropdown > a").trigger("click");
+      return false;
+  });
+
+  $("#filemanager").undelegate("#list tr [type=checkbox]","change");
+  $("#filemanager").delegate("#list tr [type=checkbox]","change",function(){
+      var menu=$("#filemanager .content-left .nav");
+      var count=$(this).parents("#list").find("tr:not(.back) [type=checkbox]:checked").length;
+      $(menu).find(".nav-item.hidden").hide();
+      if (count==1) {
+          var check=$(this).parents("#list").find("[type=checkbox]:checked");
+          var ext=$(check).parents("tr").attr("data-ext");
+          if ($(check).parents("tr.dir").length) {var type="dir";}
+          if ($(check).parents("tr.file").length) {var type="file";}
+          if ($(check).parents("tr.dir1").length) {var type="dir1";}
+          if ($(check).parents("tr.file1").length) {var type="file1";}
+          $(menu).find(".nav-item.allow-single.allow-"+type).show();
+          $(menu).find(".nav-item.allow-all").show();
+          if (ext!==undefined) {
+              $(menu).find(".nav-item[data-ext]").each(function(){
+                  if (!in_array(ext,explode(",",$(this).attr("data-ext")))) {$(this).hide();}
+              });
+              $(menu).find(".nav-item[data-no-ext]").each(function(){
+                  if (in_array(ext,explode(",",$(this).attr("data-no-ext")))) {$(this).hide();}
+              });
+          }
+      }
+      if (count>1) {
+        $(menu).find(".nav-item.allow-all").show();
+      }
+      if (count==0) {
+        $("#filemanager").data("buffer",undefined);
+        $("#filemanager").data("bufferpath",undefined);
+        $("#filemanager .allow-buffer").hide();
+      }
       return false;
   });
 
@@ -400,6 +491,44 @@ $(document).ready(function(){
     });
 
   }
+
+function filemanagerPaste() {
+    var spath=$("#filemanager").data("bufferpath");
+    var dpath=$("#filemanager #list").data("path");
+    var method=$("#filemanager").data("buffertype");
+    var list=[];
+    $($("#filemanager").data("buffer")).each(function(){
+        var type="file";
+        if ($(this).hasClass("dir")) {type="dir";}
+        if ($(this).hasClass("dir1")) {type="dir";}
+        if ($(this).hasClass("file")) {type="file";}
+        if ($(this).hasClass("file1")) {type="file";}
+        var item={
+          name: $(this).attr("data-name"),
+          path: spath,
+          type: type
+        };
+        list.push(item);
+    });
+    $.post("/module/filemanager/dialog/paste",{list:list,method:method,path:dpath},function(data){
+        var data=json_decode(data);
+        console.log(data);
+        $("#filemanager").data("post",data.post);
+        if (data.res=="dialog") {
+            $("#filemanager #filemanagerModalDialog").remove();
+            $("#filemanager").append(data.action);
+            $("#filemanager #filemanagerModalDialog").modal("show");
+        }
+        if (data.action=="reload_list") {
+            filemanager_reload_list();
+        }
+    });
+}
+
+function filemanager_reload_list() {
+    $("#filemanager").find(".breadcrumb .breadcrumb-item:last > a").trigger("click");
+}
+
 
 function filemanagerEditFile(file) {
   $.post("/module/filemanager/getfile/",{file:file},function(data){

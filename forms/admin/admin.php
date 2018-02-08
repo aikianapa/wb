@@ -40,10 +40,7 @@ function ajax__admin()
 function _adminBackup($Item, $mode)
 {
     set_time_limit(600);
-    if (!wbRole("admin")) {
-        return;
-        die;
-    }
+    if (!wbRole("admin")) {die;}
     $out="";
     $name=$_ENV["route"]["item"];
     $action=$_ENV["route"]["action"];

@@ -710,21 +710,25 @@ function wbRecurseDelete($src) {
 }
 
 function wbRecurseCopy($src,$dst) {
-  $dir = opendir($src);
-	if (is_resource($dir)) {
-mkdir($dst);
-		while(false !== ( $file = readdir($dir)) ) {
-			if (( $file != '.' ) && ( $file != '..' )) {
-				if ( is_dir($src . '/' . $file) ) {
-					wbRecurseCopy($src . '/' . $file,$dst . '/' . $file);
-					chmod($dst.'/'.$file,0777);
-				} else {
-					copy($src . '/' . $file,$dst . '/' . $file);
-					chmod($dst.'/'.$file,0766);
+	if (is_file($src)) {
+			copy($src,$dst);
+	} else {
+		  $dir = opendir($src);
+			if (is_resource($dir)) {
+				mkdir($dst);
+				while(false !== ( $file = readdir($dir)) ) {
+					if (( $file != '.' ) && ( $file != '..' )) {
+						if ( is_dir($src . '/' . $file) ) {
+							wbRecurseCopy($src . '/' . $file,$dst . '/' . $file);
+							chmod($dst.'/'.$file,0777);
+						} else {
+							copy($src . '/' . $file,$dst . '/' . $file);
+							chmod($dst.'/'.$file,0766);
+						}
+					}
 				}
+				closedir($dir);
 			}
-		}
-		closedir($dir);
 	}
 }
 
