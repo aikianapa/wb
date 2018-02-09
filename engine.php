@@ -1,6 +1,6 @@
 <?php
-session_start();
-require __DIR__."/functions.php";
+if (!isset($_SESSION)) {session_start();}
+require_once __DIR__."/functions.php";
 wbInit();
 $_ENV["ITEM"]=array();
 if (!isset($_ENV["route"]["form"]) OR $_ENV["route"]["form"]!=="default_form") {

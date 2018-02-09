@@ -2,7 +2,7 @@
 
 function _adminAfterItemRead($Item, $mode=null)
 {
-    if ($_ENV["route"]["mode"]=="edit" and $_ENV["route"]["item"]=="settings") {
+    if (isset($_ENV["route"]) AND $_ENV["route"]["mode"]=="edit" AND $_ENV["route"]["item"]=="settings") {
         $backups=wbListFiles($_ENV["path_app"]."/backup", true);
         $Item["backups"]=array();
         foreach ($backups as $key => $name) {
