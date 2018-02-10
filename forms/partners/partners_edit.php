@@ -19,6 +19,7 @@
   <div class="nav-active-primary">
   <ul class="nav nav-tabs" role="tablist">
   	<li class="nav-item"><a class="nav-link active" href="#{{_form}}Descr" data-toggle="tab">Характеристики</a></li>
+    <li class="nav-item"><a class="nav-link" href="#{{_form}}Text" data-toggle="tab">Описание</a></li>
     <li class="nav-item"><a class="nav-link" href="#{{_form}}Map" data-toggle="tab">Карта</a></li>
   </ul>
   </div>
@@ -88,6 +89,7 @@
     <div id="{{_form}}Map" class="tab-pane fade show" role="tabpanel">
       <div data-wb-role="module" src="yamap" editable zoom="12"></div>
     </div>
+    <div id="{{_form}}Text" class="tab-pane fade" data-wb-role="include" src="editor" role="tabpanel"></div>
   </div>
 </form>
 

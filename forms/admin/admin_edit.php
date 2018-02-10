@@ -251,7 +251,7 @@
         }
         if (msg == undefined) {
             var msg = "Инициализация";
-            var panel = '<div class="widget update-process ">' + '	<div class="widget-content themed-background-dark text-light-op">Обновление системы</div>' + '	<div class="widget-content themed-background-muted text-center">' + '		<div class="progress progress-striped active">' + '			<div class="progress-bar progress-bar-info" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width: 0%">' + msg + '			</div>' + '		</div>' + '		<a href="/admin/" class="btn btn-success">Завершить обновление</a>' + '	</div>' + '</div>';
+            var panel = '<div class="widget update-process ">' + '	<div class="widget-content themed-background-dark text-light-op">Обновление системы</div>' + '	<div class="widget-content themed-background-muted text-center">' + '		<div class="progress progress-striped active">' + '			<div class="progress-bar progress-bar-info" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width: 0%">' + msg + '			</div>' + '		</div>' + '<br><a href="/admin/" class="btn btn-success">Обновление завершено</a>' + '	</div>' + '</div>';
             $(".content-box").html(panel);
             $(".content-box .update-process .btn-success").hide();
             $(".content-box .update-process .progress-bar-info").css("width", start + "%");
@@ -283,6 +283,9 @@
                     else {
                         $(".content-box .update-process .progress").removeClass("progress-striped active");
                         $(".content-box .update-process .btn-success").show("slow");
+                        setTimeout(function(){
+                            window.location.reload(true);
+                        },1500);
                     }
                 }
             });

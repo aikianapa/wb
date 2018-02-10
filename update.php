@@ -1,5 +1,5 @@
 <?php
-set_time_limit(600);
+set_time_limit(60000);
 $root=$_SERVER['DOCUMENT_ROOT'];
 $step=$_REQUEST["step"];
 $engine="{$root}/engine";
