@@ -22,5 +22,4 @@ if ($_ENV["route"]["controller"]!=="module") {
 }
 //echo $_ENV["DOM"]->beautyHtml();
 echo $_ENV["DOM"]->outerHtml();
-wbFlushDatabase();
 ?>

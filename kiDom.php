@@ -516,13 +516,17 @@ class ki extends CLexer
 					'content' => http_build_query($_POST),
 				)
 			));
-
-			return ki::fromString(file_get_contents($file,false,$context));
+            $fp = fopen ($file,"r");
+            flock ($fp, LOCK_SH);
+            $res=file_get_contents($file,false,$context);
+            flock ($fp, LOCK_UN);
+            fclose ($fp);
+			return ki::fromString($res);
 		}
 	}
 
 	public function file_get_html($file="") {
-		return ki::fromString(file_get_contents($file));
+		return ki::fromString(wb_file_get_contents($file));
 	}
 
 	public function str_get_html($str="") {
@@ -1289,12 +1293,12 @@ abstract class kiNode
         $sc->remove();
 			}
 		if ($sc->attr("data-wb-src")=="uploader") {
-					$sc->after(file_get_contents(__DIR__ ."/js/uploader/uploader.php"));
+					$sc->after(wb_file_get_contents(__DIR__ ."/js/uploader/uploader.php"));
           $sc->remove();
 		}
 
     if ($sc->attr("data-wb-src")=="imgviewer") {
-					$sc->after(file_get_contents(__DIR__ ."/js/photoswipe/photoswipe.php"));
+					$sc->after(wb_file_get_contents(__DIR__ ."/js/photoswipe/photoswipe.php"));
           $sc->remove();
 		}
 
