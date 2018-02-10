@@ -16,6 +16,7 @@ function filemanager__init()
 
 function filemanager__getdir($result=false)
 {
+    if (filemanager__allow()) {
     $list=array();
     $dir=$_ENV["path_app"];
     if ($_ENV["route"]["params"]["dir"]>"") {
@@ -56,6 +57,7 @@ function filemanager__getdir($result=false)
 	    $out->wbSetData($arr);
 	    echo $out;
 		}
+    }
 }
 
 function filemanager__getfile()
