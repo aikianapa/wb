@@ -495,7 +495,7 @@ function wbTableFlush($table) {
 function wb_file_get_contents($file) {
     $fp = fopen ($file,"r");
     flock ($fp, LOCK_SH);
-    $contents = fgets($fp);
+    $contents = file_get_contents($file);
     flock ($fp, LOCK_UN);
     fclose ($fp);
     return $contents;

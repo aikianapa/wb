@@ -21,6 +21,7 @@
   	<li class="nav-item"><a class="nav-link active" href="#{{_form}}Descr" data-toggle="tab">Характеристики</a></li>
     <li class="nav-item"><a class="nav-link" href="#{{_form}}Text" data-toggle="tab">Описание</a></li>
     <li class="nav-item"><a class="nav-link" href="#{{_form}}Map" data-toggle="tab">Карта</a></li>
+    <li class="nav-item"><a class="nav-link" href="#{{_form}}Images" data-toggle="tab">Изображения</a></li>
   </ul>
   </div>
   <div class="tab-content  p-a m-b-md">
@@ -90,6 +91,13 @@
       <div data-wb-role="module" src="yamap" editable zoom="12"></div>
     </div>
     <div id="{{_form}}Text" class="tab-pane fade" data-wb-role="include" src="editor" role="tabpanel"></div>
+    <div id="{{_form}}Images" class="tab-pane fade" data-wb-role="include" src="uploader" role="tabpanel">
+        <div class="form-group row">
+            <label class="col-sm-2 form-control-label">Логотип</label>
+            <div class="col-sm-3">
+                <input type="hidden" name="logo" data-wb-role="uploader"> </div>
+        </div>  
+    </div>
   </div>
 </form>
 

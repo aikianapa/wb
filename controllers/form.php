@@ -169,7 +169,8 @@ function form__controller__select2() {
         }
         if ($single AND count($result)>0) {$result=$result[0];}
         header('Content-Type: application/json');
-        return wbJsonEncode($result);
+        echo wbJsonEncode($result);
+        die;
     }
 }
 
