@@ -25,6 +25,14 @@ function _adminAfterItemRead($Item, $mode=null)
     return $Item;
 }
 
+function _adminBeforeItemSave($Item)
+{
+    if ($Item["id"]=="settings") {
+        unset($Item["backups"]);        
+    }
+    return $Item;
+}
+
 function ajax__admin()
 {
   if (wbRole("admin")) {

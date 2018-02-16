@@ -40,20 +40,24 @@ class JsonTable {
 	protected $fileData = array();
 	
 	public function __construct($_jsonFile, $create = false) {
-		if (!file_exists($_jsonFile)) {
+		if (file_exists($_jsonFile)) {
+            $this->jsonFile = $_jsonFile;
+            $this->fileData = json_decode(file_get_contents($this->jsonFile), true);
+            $this->lockFile();
+        } else {
 			if($create === true)
 			{
 				$this->createTable($_jsonFile, true);
+                $this->jsonFile = $_jsonFile;
+                $this->fileData = json_decode(file_get_contents($this->jsonFile), true);
+                $this->lockFile();
 			}
 			else
 			{
-				throw new Exception("JsonTable Error: Table not found: ".$_jsonFile);
+				//throw new Exception("JsonTable Error: Table not found: ".$_jsonFile);
+                return null;
 			}
 		}
-
-		$this->jsonFile = $_jsonFile;
-		$this->fileData = json_decode(file_get_contents($this->jsonFile), true);
-		$this->lockFile();
 	}
 	
 	public function __destruct() {
@@ -68,8 +72,9 @@ class JsonTable {
 	}
 	
 	protected function save() {
-		if (ftruncate($this->fileHandle, 0) && fwrite($this->fileHandle, json_encode($this->fileData))) return true;
-		else throw new Exception("JsonTable Error: Can't write data to: ".$this->jsonFile);
+        if ($this->fileHandle!==null && ftruncate($this->fileHandle, 0) && fwrite($this->fileHandle, json_encode($this->fileData))) return true;
+		else return false;
+            //throw new Exception("JsonTable Error: Can't write data to: ".$this->jsonFile);
 	}
 	
 	public function selectAll() {
@@ -77,21 +82,22 @@ class JsonTable {
 	}
 	
 	public function select($key, $val = null) {
-		$result = array();
-		if (is_array($key)) $result = $this->select($key[1], $key[2]);
-		else {
-			$data = $this->fileData;
+            $result = array();
+        if (is_array($key)) {
+            $result = $this->select($key[1], $key[2]);
+        } else {
+            $data = $this->fileData;
 			foreach($data as $_key => $_val) {
-				if ($val==null AND isset($data[$_key]) AND wbWhereItem($data[$_key],$key)) {
-						$result[] = $data[$_key];
-				} elseif ($val !==null AND isset($data[$_key][$key])) {
-					if ($data[$_key][$key] == $val) {
-						$result[] = $data[$_key];
-					}
+                if ($key=="id" AND isset($_val["id"]) AND $_val["id"]==$val AND $val!=="" AND $val!==null) {
+                    $result[$val] = $_val;
+                } else {
+                    if ($val==null AND wbWhereItem($_val,$key) ) {
+				        $result[$_val["id"]] = $_val;
+                    }
 				}
 			}
-		}
-		return $result;
+        }
+            return $result;
 	}
 	
 	public function updateAll($data = array()) {
@@ -104,22 +110,26 @@ class JsonTable {
 		if (is_array($key)) $result = $this->update($key[1], $key[2], $key[3]);
 		else {
 			$data = $this->fileData;
-			foreach($data as $_key => $_val) {
-				if (isset($data[$_key][$key])) {
-					if ($data[$_key][$key] == $val) {
-						$data[$_key] = $newData;
-						$result = true;
-						break;
-					}
-				}
-			}
-			if ($result) $this->fileData = $data;
+            if ($key=="id" AND !isset($data[$val]) AND isset($newData["id"])) {
+                $result=$this->insert($newData);
+            } else {
+                foreach($data as $_key => $_val) {
+                    if (is_array($_val) AND wbWhereItem($data[$_key],$key)) {
+                        if ($data[$_key][$key] == $val) {
+                            $data[$_key] = array_merge($data[$_key],$newData);
+                            $result = true;
+                            break;
+                        }
+                    }
+                }
+                if ($result) $this->fileData = $data;
+            }
 		}
 		return $result;
 	}
 	
 	public function insert($data = array(), $create = false) {
-        if (isset($data["id"])) {
+        if (isset($data["id"]) OR $create = true) {
             if (isset($data[0]) && substr_compare($data[0],$this->jsonFile,0)) $data = $data[1];
             $this->fileData[$data["id"]] = $data;
             return true;
@@ -161,6 +171,7 @@ class JsonTable {
 
 		if(fclose(fopen($tablePath, 'a')))
 		{
+            chmod($tablePath,0766);
 			return true;
 		}
 		else

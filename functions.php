@@ -1,5 +1,6 @@
 <?php
 include_once (__DIR__."/kiDom.php");
+include_once (__DIR__."/lib/jsondb.class.php");
 function wbInit() {
 	wbErrorList();
 	wbTrigger("func",__FUNCTION__,"before");
@@ -8,6 +9,7 @@ function wbInit() {
 	wbInitFunctions();
 	wbRouterAdd();
 	wbRouterGet();
+    wbTableList();
 }
 
 function wbInitEnviroment() {
@@ -24,10 +26,13 @@ function wbInitEnviroment() {
 	$_ENV["env_id"]=$_ENV["new_id"]=wbNewId();
     $_ENV["datetime"]=date("Y-m-d H:i:s");
 	$_ENV["forms"]=wbListForms(false);
+    $_ENV["tables"]=wbTableList();
+    $_ENV["DBA"]=new JsonDB( $_ENV["dba"]."/" );
+    $_ENV["DBE"]=new JsonDB( $_ENV["dbe"]."/" );
     wbCheckWorkspace();
 	$variables=array();
 	$settings=wbItemRead("admin","settings");
-	if (!$settings) {$settings=array();} else {
+    if (!$settings) {$settings=array();} else {
 		foreach((array)$settings["variables"] as $v) {
 			$variables[$v["var"]]=$v["value"];
 		}
@@ -180,6 +185,8 @@ function wbFlushDatabase() {
 }
 
 function wbTable($table="data",$engine=false) {
+    // ** DEPRICATED ** //
+    /*
 	wbTrigger("func",__FUNCTION__,"before");
 	if ($engine==false) {$db=$_ENV["dba"];} else {$_ENV["dbe"];}
 	$tname=$table;
@@ -198,17 +205,19 @@ function wbTable($table="data",$engine=false) {
 		$_ENV["cache"][$table]=json_decode(wb_file_get_contents($table),true);
 	}
 	wbTrigger("func",__FUNCTION__,"after",func_get_args(), $table);
+    */
+    $table=explode("/",$table); $table=array_pop($table);
 	return $table;
 }
 
 function wbTableCreate($table="data",$engine=false) {
 	wbTrigger("func",__FUNCTION__,"before");
 	if ($engine==false) {$db=$_ENV["dba"];} else {$db=$_ENV["dbe"];}
-	$table=wbTablePath($table,$engine);
-	if (!is_file($table) AND is_dir($db)) {
-		$json=wbJsonEncode(array("dict"=>array(),"data"=>array(),"view"=>array()));
-		$res=file_put_contents($table,$json, LOCK_EX);
-		if ($res) {chmod($table,0777);} else {$table=null;}
+	$table=explode("/",$table); $table=array_pop($table);
+	if (!wbTableExist($table)) {
+        $_ENV["DBA"]->createTable($table);
+        if (!is_file($_ENV["dba"]."/".$table.".json")) {$res=true;} else {$res=false;}
+		if ($res) {chmod($table,0777);wbError("func",__FUNCTION__,1011,func_get_args());} else {$table=null; wbError("func",__FUNCTION__,1010,func_get_args());}
 	} else {
 		wbError("func",__FUNCTION__,1002,func_get_args());
 	}
@@ -220,24 +229,32 @@ function wbTableCreate($table="data",$engine=false) {
 function wbTableRemove($table=null,$engine=false) {
 	$res=false;
 	if (wbRole("admin")) {
-		$cache=wbTableCachePath($table,$engine);
-		$table=wbTablePath($table,$engine);
-		wbRrecurseDelete($cache);
-		if (is_file($table)) {
-			wbRrecurseDelete($cache);
-			unlink($table);
+        if (wbTableExist($table)) {
+            unlink($_ENV["dba"]."/".$table.".json");
 			if (is_file($table)) { // не удалилось
 				wbError("func",__FUNCTION__,1003,func_get_args());
-			}
-			$res=$table;
-		} else { // не существует
-				wbError("func",__FUNCTION__,1001,func_get_args());
-		}
+			} else {
+                $res=$table;
+            }
+
+        } else {
+            wbError("func",__FUNCTION__,1001,func_get_args());
+        }
 	}
 	return $res;
 }
 
+
+function wbTableExist($table) {
+    if (is_file($_ENV["dba"]."/".$table.".json")) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 function wbTablePath($table="data",$engine=false) {
+    // *** DEPRICATED *** //
 	if ($engine==false) {$db=$_ENV["dba"];} else {$_ENV["dbe"];}
 	$table=$db."/".$table;
 	wbTrigger("func",__FUNCTION__,"after",func_get_args(),$table);
@@ -252,24 +269,31 @@ function wbTableCachePath($table="data",$engine=false) {
 }
 
 function wbTableList($engine=false) {
-		if ($engine==false) {$db=$_ENV["dba"];} else {$db=$_ENV["dbe"];}
+    if ($engine==false) {$db=$_ENV["dba"];} else {$db=$_ENV["dbe"];}
 	$list=wbListFiles($db);
+    foreach($list as $i => $table) {
+        if (array_pop(explode(".",$table))!=="json") {
+            unset($list[$i]);
+        } else {
+            $list[$i]=substr($table,0,-5);
+        }
+    }
 	wbTrigger("func",__FUNCTION__,"after",func_get_args(),$list);
 	return $list;
 }
 
-function wbListItems($table="pages",$where=null,$sort="id") {return wbItemList($table,$where,$sort);}
+function wbListItems($table="pages",$where="",$sort="id") {return wbItemList($table,$where,$sort);}
 function wbItemList($table="pages",$where="",$sort="id") {
-	if (count(explode($_ENV["path_app"],$table))==1) {$table=wbTable($table);}
-	if (!is_file($table)) {
+	$table=wbTable($table);
+	if (!is_file($_ENV["dba"]."/".$table.".json")) {
 		wbError("func",__FUNCTION__,1001,func_get_args());
 		return array();
 	} else {
 	   wbTrigger("form",__FUNCTION__,"BeforeItemList",func_get_args(),array());
         if (!isset($_ENV["cache"][$table])) {
-			$_ENV["cache"][$table]=json_decode(wb_file_get_contents($table),true);
+			$_ENV["cache"][$table]=$_ENV["DBA"]->select($table,$where);
 		}
-		if (isset($_ENV["cache"][$table]["data"])) {$list=$_ENV["cache"][$table]["data"];} else {$list=array();}
+		if (is_array($_ENV["cache"][$table])) {$list=$_ENV["cache"][$table];} else {$list=array();}
 		if (!is_array($list)) {$list=array($list);}
 		
 		$object = new ArrayObject($list);
@@ -376,24 +400,21 @@ function wbJsonEncode($Item=array()) {
 }
 
 function wbItemRead($table=null,$id=null) {
-	if ($table==null) {$table=$_ENV["route"]["form"];}
+    if ($table==null) {$table=$_ENV["route"]["form"];}
 	if ($id==null) {$id=$_ENV["route"]["item"];}
     wbTrigger("form",__FUNCTION__,"BeforeItemRead",func_get_args(),array());
-	if (count(explode($_ENV["path_app"],$table))==1) {$table=wbTable($table);}
-	$cache=wbCacheName($table,$id);
-	if (is_file($cache)) {
-		$item=json_decode(wb_file_get_contents($cache),true);
-	} else {
-		$list=wbItemList($table);
-		if (isset($list[$id])) {
-			$item=$list[$id];
-		} else {
-			wbError("func",__FUNCTION__,1006,func_get_args());
-			$item=null;
-		}
-	}
-	if (is_array($item) AND isset($item["__wbFlag__"])) { // если стоит флаг удаления, то возвращаем null
-		if ($item["__wbFlag__"]=="remove") {$item=null;}
+    $table=explode("/",$table); $table=array_pop($table);
+    if (isset($_ENV["cache"][$table][$id])) {$item=$_ENV["cache"][$table][$id];} else {
+        $list=$_ENV["DBA"]->select($table,"id",$id);
+        if (isset($list[$id])) {
+            $item=$list[$id];
+        } else {
+            wbError("func",__FUNCTION__,1006,func_get_args());
+            $item=null;
+        }
+    }
+	if (is_array($item) AND isset($item["_remove"])) { // если стоит флаг удаления, то возвращаем null
+		if ($item["_remove"]==true) {$item=null;}
 	} else {
 		$item=wbTrigger("form",__FUNCTION__,"AfterItemRead",func_get_args(),$item);
 	}
@@ -401,6 +422,7 @@ function wbItemRead($table=null,$id=null) {
 }
 
 function wbCacheName($table,$id=null) {
+    // *** DEPRICATED *** //
 	$tmp=explode($_ENV["dbe"],$table);
 	if (count($tmp)==2) {$dbc=$_ENV["dbec"];$db=$_ENV["dbe"];} else {$dbc=$_ENV["dbac"];$db=$_ENV["dba"];}
 	$tname=str_replace($db."/","",$table);
@@ -414,21 +436,26 @@ function wbCacheName($table,$id=null) {
 function wbItemRemove($table=null,$id=null,$flush=true) {
     $res=false;
     wbTrigger("form",__FUNCTION__,"BeforeItemRemove",func_get_args(),array());
-	if (count(explode($_ENV["path_app"],$table))==1) {$table=wbTable($table);}
-	if (!is_file($table)) {
+	$table=explode("/",$table); $table=array_pop($table);
+	if (!is_file($_ENV["dba"]."/".$table.".json")) {
 		wbError("func",__FUNCTION__,1001,func_get_args());
 		return null;
 	} else {
-		$cache=wbCacheName($table,$id);
 		if ($id!==null) {
 			$item=wbItemRead($table,$id);
-			if (is_file($cache) AND is_array($item)) {
-                wbItemSetTable($table,$item=null);
-                $item["__wbFlag__"]="remove";
-                $res=file_put_contents($cache,wbJsonEncode($item), LOCK_EX);
+			if (is_array($item)) {
+                if (wbRole("admin")) {
+                    $res=$_ENV["DBA"]->delete($table,"id",$id);
+                } else {
+                    $item["_remove"]=true;
+                    $res=$_ENV["DBA"]->update($table,"id",$item["id"],$item);
+                }
             }
             if (!$res) {wbError("func",__FUNCTION__,1007,func_get_args());} else  {
                 wbLog("func",__FUNCTION__,1008,func_get_args());
+            } 
+            if (isset($_ENV["cache"][$table][$id])) {
+                unset($_ENV["cache"][$table][$id]);
             }
         }
 	}
@@ -436,24 +463,26 @@ function wbItemRemove($table=null,$id=null,$flush=true) {
   wbTrigger("form",__FUNCTION__,"AfterItemRemove",func_get_args(),array());
 }
 
-function wbItemSave($table,$item=null,$flush=true) {
-	if (count(explode($_ENV["path_app"],$table))==1) {$table=wbTable($table);}
+function wbItemSave($table,$item=null) {
+//	if (count(explode($_ENV["path_app"],$table))==1) {$table=wbTable($table);}
+    $table=explode("/",$table); $table=array_pop($table);
 	$res=null;
-	if (!is_file($table)) {
+	if (!is_file($_ENV["dba"]."/".$table.".json")) {
 		wbError("func",__FUNCTION__,1001,func_get_args());
 		return null;
 	} else {
 		if (!isset($item["id"]) OR $item["id"]=="_new") {$item["id"]=wbNewId(); $prev=null;} else {$prev=wbItemRead($table,$item["id"]);}
-		$cache=wbCacheName($table,$item["id"]);
 		if (is_array($prev) AND isset($prev["id"]) AND $prev["id"]==$item["id"]) {$item=array_merge($prev,$item);}
         $item=wbItemSetTable($table,$item);
         $item=wbTrigger("form",__FUNCTION__,"BeforeItemSave",func_get_args(),$item);
-		if (!is_dir($cache)) {$res=file_put_contents($cache,wbJsonEncode($item), LOCK_EX);}
+        $res=$_ENV["DBA"]->update($table,"id",$item["id"],$item);
 		if (!$res) {wbError("func",__FUNCTION__,1007,func_get_args());} else {
             wbTrigger("form",__FUNCTION__,"AfterItemSave",func_get_args(),$item);
+        } 
+        if (isset($_ENV["cache"][$table])) {
+            $_ENV["cache"][$table][$item["id"]]=$item;
         }
 	}
-	if ($flush==true) {wbTableFlush($table);}
 	return $res;
 }
 
@@ -478,7 +507,7 @@ function wbTableFlush($table) {
             foreach($clist as $key) {
                 $item=json_decode(wb_file_get_contents($cache."/".$key),true);
                 if ($data["data"][$key]["_lastdate"]!==$item["_lastdate"]) {$data["data"][$key]=$item; $flag=true;}
-                if (isset($item["_removed"]) AND $item["_removed"]==true) {
+                if (isset($item["_remove"]) AND $item["_remove"]==true) {
                     if (wbRole("admin")) {unset($data["data"][$key]);}
                 }
                 unlink($cache."/".$key);
@@ -505,10 +534,8 @@ function wbTrigger($type,$name,$trigger,$args=null,$data=null) {
 	if (!isset($_ENV["error"][$type])) {$_ENV["error"][$type]=array();}
 	switch ($type) {
 		case "form":
-			if (isset($_ENV[$args[0]]["name"])) {
-				$call=$_ENV[$args[0]]["name"].$trigger;
-				if (is_callable($call)) {$data=$call($data);} else {$call="_".$call; if (is_callable($call)) {$data=$call($data);}}
-			}
+            $call=$args[0].$trigger;
+			if (is_callable($call)) {$data=$call($data);} else {$call="_".$call; if (is_callable($call)) {$data=$call($data);}}
 			return $data;
 			break;
 		case "func":
@@ -607,7 +634,9 @@ function wbErrorList() {
 		1006=>"Запись {{1}} в таблице {{0}} не существует",
 		1007=>"Не удалось сохранить запись в таблицу {{0}}",
 		1008=>"Удаление записи {{1}} в таблице {{0}}",
-		1009=>"Сброс данных из кэша таблицы {{0}}"
+		1009=>"Сброс данных из кэша таблицы {{0}}",
+        1010=>"Не удалось создать таблицу {{0}}",
+        1010=>"Создание таблицы {{0}}",
 	);
 }
 

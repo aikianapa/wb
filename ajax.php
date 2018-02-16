@@ -3,8 +3,12 @@ function ajax__pagination() {
 	$res=array();
 	foreach($_POST as $key =>$val) {$$key=$val;}
     $vars=wbItemToArray(json_decode($vars,true));
+    $tmp_a=$_ENV["DBA"];
+    $tmp_e=$_ENV["DBE"];
     $_ENV=array_merge($_ENV,$vars);
-
+    $_ENV["DBA"]=$tmp_a;
+    $_ENV["DBE"]=$tmp_e;
+    unset($vars,$tmp_a,$tmp_e);
     if (!isset($page)) $page=1;
 	if (!isset($find)) $find="";
 	$fe=wbFromString("<div>".$foreach."</div>");
@@ -67,7 +71,7 @@ function ajax__save($form=null) {
 		if ($_POST["id"]=="" && $_GET["item"]>"") {$_POST["id"]=$_GET["item"];}
 		$table=wbTable($form);
 		$res=wbItemSave($table,$_POST); $ret=array();
-		wbTableFlush($table);
+//		wbTableFlush($table);
 		if (isset($_GET["copy"])) {
 			$old=str_replace("//","/",$_ENV["path_app"]."/uploads/{$form}/{$_GET["copy"]}/");
 			$new=str_replace("//","/",$_ENV["path_app"]."/uploads/{$form}/{$_GET["item"]}/");

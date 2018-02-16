@@ -1876,7 +1876,7 @@ abstract class kiNode
 					}
 				}
 			}  else {
-				$Item=wbItemList($table,$where);
+                $Item=wbItemList($table,$where);
 			}
 		}
 		if (is_string($Item)) $Item=json_decode($Item,true);

@@ -33,11 +33,22 @@ function filemanager__getdir($result=false)
                 $ext=pathinfo($current_file, PATHINFO_EXTENSION);
                 $link=is_link($current_file);
                 $href=$_ENV["route"]["params"]["dir"]."/".$dircont[$i];
+                $perms=substr(sprintf('%o', fileperms($current_file)), -4);
                 if (is_file($current_file)) {
-                    $list[] = array("type"=>"file","path"=>$dir,"href"=>$href,"link"=>$link,"ext"=>$ext,"name"=>$dircont[$i]);
+                    $size=filesize($current_file);
+                    if ($size>1024) {
+                        $size=sprintf("%u",$size/1024)."Кб";
+                    } elseif ($size>1024*1024) {
+                        $size=sprintf("%u",$size/1024*1024)."Мб";
+                    } elseif ($size>1024*1024*1024) {
+                        $size=sprintf("%u",$size/1024*1024*1024)."Гб";
+                    } else {
+                        $size.="";
+                    }
+                    $list[] = array("type"=>"file","path"=>$dir,"perms"=>$perms,"size"=>$size,"href"=>$href,"link"=>$link,"ext"=>$ext,"name"=>$dircont[$i]);
                 }
                 if (is_dir($current_file)) {
-                    $list[] = array("type"=>"dir","path"=>$dir,"href"=>$href,"link"=>$link,"ext"=>$ext,"name"=>$dircont[$i]);
+                    $list[] = array("type"=>"dir","path"=>$dir,"perms"=>$perms,"size"=>"-","href"=>$href,"link"=>$link,"ext"=>"DIR","name"=>$dircont[$i]);
                 }
             }
             $i++;
@@ -154,6 +165,12 @@ function filemanager__action()
         echo $call();
     }
 }
+
+function filemanager__action_multi() {
+    
+    return json_encode(null);
+}
+
 
 function filemanager__action_newdir()
 {

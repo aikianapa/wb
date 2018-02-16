@@ -6,7 +6,7 @@ $engine="{$root}/engine";
 if (!is_dir($root."/backup")) {@mkdir($root."/backup",0766);}
 switch ($step) {
 	default:
-		$res=array("next"=>"Получение актуальной версии Web Basic Engine","error"=>0,"count"=>7);
+		$res=array("next"=>"Получение актуальной версии Web Basic Engine","error"=>0,"count"=>8);
 		break;
 	case 1:
 		exec("cd {$root} && wget https://codeload.github.com/aikianapa/wb/zip/master && mv master master.zip && chmod 0777 master.zip");
@@ -38,10 +38,19 @@ switch ($step) {
 		exec("cd {$root} && rm -rf {$engine}/!(update.php) && rm -rf {$engine}/.*");
 		break;
 	case 7:
-		$res=array("next"=>"Обновление выполнено","error"=>0);
 		recurse_copy($root."/wb-master",$engine);
 		exec("cd {$root} && rm -R wb-master && rm master.zip");
+        $res=array("next"=>"Постобработка, ждите....","error"=>0,"count"=>8);
 		break;
+	case 8:
+        $dir = opendir($engine);
+        while(false !== ( $file = readdir($dir)) ) {
+             if (is_file($file) && substr($file,0,8)=="updater_") {
+                 file_get_contents("/engine/".$file);
+             }
+        }
+        $res=array("next"=>"Обновление выполнено","error"=>0);
+        break;
 
 }
 echo json_encode($res);
