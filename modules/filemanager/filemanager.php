@@ -36,12 +36,13 @@ function filemanager__getdir($result=false)
                 $perms=substr(sprintf('%o', fileperms($current_file)), -4);
                 if (is_file($current_file)) {
                     $size=filesize($current_file);
-                    if ($size>1024) {
-                        $size=sprintf("%u",$size/1024)."Кб";
+
+                    if ($size>1024*1024*1024) {
+                        $size=sprintf("%u",$size/(1024*1024*1024))."Гб";
                     } elseif ($size>1024*1024) {
-                        $size=sprintf("%u",$size/1024*1024)."Мб";
-                    } elseif ($size>1024*1024*1024) {
-                        $size=sprintf("%u",$size/1024*1024*1024)."Гб";
+                        $size=sprintf("%u",$size/(1024*1024))."Мб";
+                    } elseif ($size>1024) {
+                        $size=sprintf("%u",$size/1024)."Кб";
                     } else {
                         $size.="";
                     }
