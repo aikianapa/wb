@@ -1,5 +1,5 @@
 <?php
-function ajax__todo() {
+    function ajax__todo() {
 	$res=false;
 	if (isset($_ENV["route"]["params"][0])) {
 		$call = __FUNCTION__ ."_".$_ENV["route"]["params"][0];
@@ -20,8 +20,7 @@ function ajax__todo_add() {
 		"time"		=> "",
 		"created"	=> date("Y-m-d H:i:s")
 	);
-	$todo=wbTable("todo");
-	$res=wbItemSave($todo,$Item);
+	$res=wbItemSave("todo",$Item);
 	if ($res) {$res=array("id"=>$Item["id"]);}
 	return $res;
 }
@@ -29,11 +28,10 @@ function ajax__todo_add() {
 
 function ajax__todo_upd() {
 	$res=false;
-	$todo=wbTable("todo");
-	$Item=wbItemRead($todo,$_POST["id"]);
+	$Item=wbItemRead("todo",$_POST["id"]);
 	if ($Item["user"]==$_SESSION["user_id"]) {
 		foreach($_POST as $key => $val) {	$Item[$key]=$_POST[$key];	}
-		$res=wbItemSave($todo,$Item);
+		$res=wbItemSave("todo",$Item);
 		if ($res) {$res=true;}
 	}
 	return $res;
@@ -51,15 +49,14 @@ function ajax__todo_counter() {
 
 function ajax__todo_getitem() {
 	$res=false;
-	$Item=wbItemRead(wbTable("todo"),$_POST["id"]);
+	$Item=wbItemRead("todo",$_POST["id"]);
 	if ($Item["user"]==$_SESSION["user_id"]) {$res=$Item;}
 	return $res;
 }
 
 function ajax__todo_getitemhtml() {
 	$res=false;
-	$todo=wbTable("todo");
-	$Item=wbItemRead($todo,$_POST["id"]);
+	$Item=wbItemRead("todo",$_POST["id"]);
 	if (is_callable("todoBeforeShowItem")) {$Item=todoBeforeShowItem($Item);}
 	if ($Item["user"]==$_SESSION["user_id"]) {
 		$tpl=wbGetForm("todo","list");
@@ -76,12 +73,12 @@ function ajax__todo_getitemhtml() {
 
 function ajax__todo_getlist() {
 	$where='user = "'.$_SESSION["user_id"].'" AND category="'.$_GET["category"].'"';
-	$tpl=aikiGetForm("todo","list");
+	$tpl=wbGetForm("todo","list");
 	$tpl=$tpl->find(".task-list",0)->clone();
 	$tpl->removeClass("loaded");
 	$tpl->attr("where",$where);
 
-	$out=aikiFromString("<div></div>");
+	$out=wbFromString("<div></div>");
 	$out->find("div")->append($tpl);
 	$out->contentSetData($list);
 	echo $out->find("div")->html();
@@ -93,9 +90,6 @@ function ajax__todo_getlist() {
 
 function ajax__todo_generate() {
 	$res=false;
-
-
-
 	for ($i=1; $i<5000; $i++) {
 
 	$Item=array(

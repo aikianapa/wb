@@ -12,7 +12,7 @@ var CompTodo = function() {
             var todoInputVal    = '';
             var todoForm		= $('#todo-form');
             var todoEdit		= $('.item-title');
-            var todoNav			= $('#list .navbar-nav');
+            var todoNav			= $('#todo-status-menu');
 
             $('.todo-done input:checkbox').prop('checked', true);
             $('.todo-list .list-item').each(function(){
@@ -31,7 +31,7 @@ var CompTodo = function() {
 				var todoInputVal    = '';
 				var todoForm		= $('#todo-form');
 				var todoEdit		= $('.item-title');
-				var todoNav			= $('#list .navbar-nav');
+				var todoNav			= $('#todo-status-menu');
 
 
 			todoNav.off('click','a[data-status]');

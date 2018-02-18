@@ -83,6 +83,8 @@ function engine__controller_admin()
         }
         echo $res;
         die;
+    } else {
+        wbSetChmod();
     }
     return $_ENV["DOM"];
 }
@@ -108,7 +110,3 @@ function engine__controller_include()
     die;
 }
 
-function engine__controller__ui()
-{
-    echo 234;
-}

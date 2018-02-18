@@ -257,7 +257,7 @@ function wb_get_cdata(text) {
 }
 
 function wb_tree() {
-  if ($(document).data("wb-tree-rowmenu") == undefined) {
+  if ($(document).data("wb-tree-rowmenu") == undefined && $(".wb-tree").length) {
     $.get("/ajax/getform/common/tree_rowmenu/", function(data) {
       $(document).data("wb-tree-rowmenu", data);
     });

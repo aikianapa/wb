@@ -1,6 +1,5 @@
 <?php
 include_once (__DIR__."/kiDom.php");
-include_once (__DIR__."/lib/jsondb.class.php");
 function wbInit() {
 	wbErrorList();
 	wbTrigger("func",__FUNCTION__,"before");
@@ -27,8 +26,6 @@ function wbInitEnviroment() {
     $_ENV["datetime"]=date("Y-m-d H:i:s");
 	$_ENV["forms"]=wbListForms(false);
     $_ENV["tables"]=wbTableList();
-    $_ENV["DBA"]=new JsonDB( $_ENV["dba"]."/" );
-    $_ENV["DBE"]=new JsonDB( $_ENV["dbe"]."/" );
     wbCheckWorkspace();
 	$variables=array();
 	$settings=wbItemRead("admin","settings");
@@ -79,7 +76,6 @@ function wbInitFunctions() {
 				"{$_ENV["path_app"]}/forms/{$form}.php", "{$_ENV["path_app"]}/forms/{$form}/{$form}.php"
 			); $res=FALSE;
 			foreach($inc as $k => $file) {
-				//if (is_file("{$file}") && $res==FALSE ) {include_once("{$file}"); if ($k>1) {$res=TRUE;}; }
                 if (is_file("{$file}") && $res==FALSE ) {include_once("{$file}");}
 			}
 	}
@@ -169,10 +165,10 @@ function wbFieldBuild($param,$data=array()) {
 
 function wbInitDatabase() {
 	wbTrigger("func",__FUNCTION__,"before");
-	if (!is_dir($_ENV["dbe"])) {mkdir($_ENV["dbe"],0777);}
-	if (!is_dir($_ENV["dba"])) {mkdir($_ENV["dba"],0777);}
-	if (!is_dir($_ENV["dbec"])) {mkdir($_ENV["dbec"],0777);}
-	if (!is_dir($_ENV["dbac"])) {mkdir($_ENV["dbac"],0777);}
+	if (!is_dir($_ENV["dbe"])) {mkdir($_ENV["dbe"],0766);}
+	if (!is_dir($_ENV["dba"])) {mkdir($_ENV["dba"],0766);}
+	if (!is_dir($_ENV["dbec"])) {mkdir($_ENV["dbec"],0766);}
+	if (!is_dir($_ENV["dbac"])) {mkdir($_ENV["dbac"],0766);}
 
 }
 
@@ -185,65 +181,96 @@ function wbFlushDatabase() {
 }
 
 function wbTable($table="data",$engine=false) {
-    // ** DEPRICATED ** //
-    /*
-	wbTrigger("func",__FUNCTION__,"before");
-	if ($engine==false) {$db=$_ENV["dba"];} else {$_ENV["dbe"];}
-	$tname=$table;
-	$table=wbTablePath($table,$engine);
-	$_ENV[$table]["name"]=$tname;
+  wbTrigger("func",__FUNCTION__,"before");
+  if ($engine==false) {$db=$_ENV["dba"];} else {$_ENV["dbe"];}
+    $tname=wbTableName($table);
+    $table=wbTablePath($tname,$engine);
     if (!is_file($table)) {
         if ($tname>"" AND in_array($tname,$_ENV["forms"])) {
             wbTableCreate($tname);
         }
     }
     if (!is_file($table)) {
-	debug_print_backtrace(); die;
         wbError("func",__FUNCTION__,1001,func_get_args());
         $table=null;
-	} else {
-		$_ENV["cache"][$table]=json_decode(wb_file_get_contents($table),true);
-	}
-	wbTrigger("func",__FUNCTION__,"after",func_get_args(), $table);
-    */
-    $table=explode("/",$table); $table=array_pop($table);
-	return $table;
+    } else {
+        $_ENV[$table]["name"]=$tname;
+    }
+      wbTrigger("func",__FUNCTION__,"after",func_get_args(), $table);
+      return $table;
+}
+
+function wbTableName($table) {
+    $table=explode("/",$table);
+    $table=array_pop($table);
+    $table=str_replace(".json","",$table);
+    return $table;
 }
 
 function wbTableCreate($table="data",$engine=false) {
-	wbTrigger("func",__FUNCTION__,"before");
-	if ($engine==false) {$db=$_ENV["dba"];} else {$db=$_ENV["dbe"];}
-	$table=explode("/",$table); $table=array_pop($table);
-	if (!wbTableExist($table)) {
-        $_ENV["DBA"]->createTable($table);
-        if (!is_file($_ENV["dba"]."/".$table.".json")) {$res=true;} else {$res=false;}
-		if ($res) {chmod($table,0777);wbError("func",__FUNCTION__,1011,func_get_args());} else {$table=null; wbError("func",__FUNCTION__,1010,func_get_args());}
-	} else {
-		wbError("func",__FUNCTION__,1002,func_get_args());
-	}
-	wbTrigger("func",__FUNCTION__,"after",func_get_args(), $table);
-	return $table;
+  wbTrigger("func",__FUNCTION__,"before");
+  if ($engine==false) {$db=$_ENV["dba"];} else {$db=$_ENV["dbe"];}
+  $table=wbTablePath($table,$engine);
+  if (!is_file($table) AND is_dir($db)) {
+    $json=wbJsonEncode(null);
+    $res=file_put_contents($table,$json, LOCK_EX);
+    if ($res) {chmod($table,0766);} else {$table=null;}
+  } else {
+    wbError("func",__FUNCTION__,1002,func_get_args());
+  }
+  wbTrigger("func",__FUNCTION__,"after",func_get_args(), $table);
+  return $table;
 }
 
 
 function wbTableRemove($table=null,$engine=false) {
-	$res=false;
-	if (wbRole("admin")) {
-        if (wbTableExist($table)) {
-            unlink($_ENV["dba"]."/".$table.".json");
-			if (is_file($table)) { // не удалилось
-				wbError("func",__FUNCTION__,1003,func_get_args());
-			} else {
-                $res=$table;
-            }
-
-        } else {
-            wbError("func",__FUNCTION__,1001,func_get_args());
-        }
-	}
-	return $res;
+  $res=false;
+  if (wbRole("admin")) {
+    $cache=wbTableCachePath($table,$engine);
+    $table=wbTablePath($table,$engine);
+    wbRrecurseDelete($cache);
+    if (is_file($table)) {
+      wbRrecurseDelete($cache);
+      unlink($table);
+      if (is_file($table)) { // не удалилось
+        wbError("func",__FUNCTION__,1003,func_get_args());
+      }
+      $res=$table;
+    } else { // не существует
+        wbError("func",__FUNCTION__,1001,func_get_args());
+    }
+  }
+  return $res;
 }
 
+
+function wbTableFlush($table) {
+  // Сброс кэша в общий файл
+    $res=false;
+    $table=wbTable($table);
+    $tname=wbTableName($table);
+    if (is_file($table) AND isset($_ENV["cache"][$table])) {
+            $fp = fopen ($file,"r");
+            flock ($fp, LOCK_SH);
+            $data = json_decode(wb_file_get_contents($table),true);
+            $flag=false;
+            foreach($_ENV["cache"][$table] as $key => $item) {
+                $item["_table"]=$tname;
+                if ($data[$key]["_lastdate"]!==$item["_lastdate"]) {$data[$key]=$item; $flag=true;}
+                if (isset($item["_removed"]) AND $item["_removed"]==true) {
+                    if (wbRole("admin")) {unset($data[$key]);}
+                }
+            }
+            if ($flag) {
+                $res=file_put_contents($table,wbJsonEncode($data), LOCK_EX);
+                wbLog("func",__FUNCTION__,1009,func_get_args());
+            } else {$res=null;}
+            flock ($fp, LOCK_UN);
+            fclose ($fp);
+        unset($_ENV["cache"][$table]);
+  }
+  return $res;
+}
 
 function wbTableExist($table) {
     if (is_file($_ENV["dba"]."/".$table.".json")) {
@@ -254,9 +281,8 @@ function wbTableExist($table) {
 }
 
 function wbTablePath($table="data",$engine=false) {
-    // *** DEPRICATED *** //
 	if ($engine==false) {$db=$_ENV["dba"];} else {$_ENV["dbe"];}
-	$table=$db."/".$table;
+	$table=$db."/".$table.".json";
 	wbTrigger("func",__FUNCTION__,"after",func_get_args(),$table);
 	return $table;
 }
@@ -272,7 +298,8 @@ function wbTableList($engine=false) {
     if ($engine==false) {$db=$_ENV["dba"];} else {$db=$_ENV["dbe"];}
 	$list=wbListFiles($db);
     foreach($list as $i => $table) {
-        if (array_pop(explode(".",$table))!=="json") {
+        $tmp=explode(".",$table);
+        if (array_pop($tmp)!=="json") {
             unset($list[$i]);
         } else {
             $list[$i]=substr($table,0,-5);
@@ -284,34 +311,36 @@ function wbTableList($engine=false) {
 
 function wbListItems($table="pages",$where="",$sort="id") {return wbItemList($table,$where,$sort);}
 function wbItemList($table="pages",$where="",$sort="id") {
-	$table=wbTable($table);
-	if (!is_file($_ENV["dba"]."/".$table.".json")) {
-		wbError("func",__FUNCTION__,1001,func_get_args());
-		return array();
-	} else {
-	   wbTrigger("form",__FUNCTION__,"BeforeItemList",func_get_args(),array());
+    $args=func_get_args();
+    $list=array();
+    $tname=wbTableName($table);
+    $table=wbTable($table);
+    if (!is_file($table)) {
+        wbError("func",__FUNCTION__,1001,func_get_args());
+        return array();
+    } else {
+         wbTrigger("form",__FUNCTION__,"BeforeItemList",func_get_args(),array());
         if (!isset($_ENV["cache"][$table])) {
-			$_ENV["cache"][$table]=$_ENV["DBA"]->select($table,$where);
-		}
-		if (is_array($_ENV["cache"][$table])) {$list=$_ENV["cache"][$table];} else {$list=array();}
-		if (!is_array($list)) {$list=array($list);}
-		
-		$object = new ArrayObject($list);
-		foreach($object as $key => $item) {
-            $item=wbTrigger("form",__FUNCTION__,"AfterItemRead",$args,$item);
-            if 	(
-								(substr($item["id"],0,1)=="_" AND $_SESSION["user_role"]!=="admin")
-						OR
-								($item==null)
-            
-                        OR      (isset($item["_remove"]) AND $item["_remove"]==true)
+            $list=$_ENV["cache"][$table]=json_decode(wb_file_get_contents($table),true);
+        }
+        if (!is_array($list)) {$list=array();}
+        $object = new ArrayObject($list);
+        foreach($object as $key => $item) {
+                $item["_table"]=$tname;
+                $item=wbTrigger("form",__FUNCTION__,"AfterItemRead",$args,$item);
+                if   (
+                    (substr($item["id"],0,1)=="_" AND $_SESSION["user_role"]!=="admin")
+                OR
+                    ($item==null)
 
-						) {unset($list[$key]);} elseif (!wbWhereItem($item,$where)) {unset($list[$key]);}
-		  }
-	}
-	$list=wbTrigger("form",__FUNCTION__,"AfterItemList",func_get_args(),$list);
-	$list=wbTrigger("func",__FUNCTION__,"after",func_get_args(),$list);
-	return $list;
+                OR  (isset($item["_removed"]) AND $item["_removed"]==true)
+
+                ) {unset($list[$key]);} elseif (!wbWhereItem($item,$where)) {unset($list[$key]);}
+          }
+  }
+  $list=wbTrigger("form",__FUNCTION__,"AfterItemList",func_get_args(),$list);
+  $list=wbTrigger("func",__FUNCTION__,"after",func_get_args(),$list);
+  return $list;
 }
 
 function wbTreeRead($name) {
@@ -400,29 +429,30 @@ function wbJsonEncode($Item=array()) {
 }
 
 function wbItemRead($table=null,$id=null) {
-    if ($table==null) {$table=$_ENV["route"]["form"];}
-	if ($id==null) {$id=$_ENV["route"]["item"];}
+  if ($table==null) {$table=$_ENV["route"]["form"];}
+  if ($id==null) {$id=$_ENV["route"]["item"];}
     wbTrigger("form",__FUNCTION__,"BeforeItemRead",func_get_args(),array());
-    $table=explode("/",$table); $table=array_pop($table);
-    if (isset($_ENV["cache"][$table][$id])) {$item=$_ENV["cache"][$table][$id];} else {
-        $list=$_ENV["DBA"]->select($table,"id",$id);
-        if (isset($list[$id])) {
-            $item=$list[$id];
-        } else {
-            wbError("func",__FUNCTION__,1006,func_get_args());
-            $item=null;
-        }
-    }
-	if (is_array($item) AND isset($item["_remove"])) { // если стоит флаг удаления, то возвращаем null
-		if ($item["_remove"]==true) {$item=null;}
-	} else {
-		$item=wbTrigger("form",__FUNCTION__,"AfterItemRead",func_get_args(),$item);
-	}
-	return $item;
+    $table=wbTable($table);
+    if (isset($_ENV["cache"][$table][$id])) {
+        $item=$_ENV["cache"][$table][$id];
+    } else {
+            $list=wbItemList($table);
+            if (isset($list[$id])) {
+              $item=$list[$id];
+            } else {
+              wbError("func",__FUNCTION__,1006,func_get_args());
+              $item=null;
+            }
+      }
+      if (is_array($item) AND isset($item["_removed"])) { // если стоит флаг удаления, то возвращаем null
+        if ($item["_removed"]=="remove") {$item=null;}
+      } else {
+        $item=wbTrigger("form",__FUNCTION__,"AfterItemRead",func_get_args(),$item);
+      }
+  return $item;
 }
 
 function wbCacheName($table,$id=null) {
-    // *** DEPRICATED *** //
 	$tmp=explode($_ENV["dbe"],$table);
 	if (count($tmp)==2) {$dbc=$_ENV["dbec"];$db=$_ENV["dbe"];} else {$dbc=$_ENV["dbac"];$db=$_ENV["dba"];}
 	$tname=str_replace($db."/","",$table);
@@ -436,89 +466,65 @@ function wbCacheName($table,$id=null) {
 function wbItemRemove($table=null,$id=null,$flush=true) {
     $res=false;
     wbTrigger("form",__FUNCTION__,"BeforeItemRemove",func_get_args(),array());
-	$table=explode("/",$table); $table=array_pop($table);
-	if (!is_file($_ENV["dba"]."/".$table.".json")) {
-		wbError("func",__FUNCTION__,1001,func_get_args());
-		return null;
-	} else {
-		if ($id!==null) {
-			$item=wbItemRead($table,$id);
-			if (is_array($item)) {
-                if (wbRole("admin")) {
-                    $res=$_ENV["DBA"]->delete($table,"id",$id);
-                } else {
-                    $item["_remove"]=true;
-                    $res=$_ENV["DBA"]->update($table,"id",$item["id"],$item);
-                }
-            }
-            if (!$res) {wbError("func",__FUNCTION__,1007,func_get_args());} else  {
-                wbLog("func",__FUNCTION__,1008,func_get_args());
-            } 
-            if (isset($_ENV["cache"][$table][$id])) {
-                unset($_ENV["cache"][$table][$id]);
-            }
+    $table=wbTable($table);
+  if (!is_file($table)) {
+    wbError("func",__FUNCTION__,1001,func_get_args());
+    return null;
+  } else {
+    if ($id!==null) {
+        $item=wbItemRead($table,$id);
+        if (is_array($item)) {
+            $item["_removed"]=true;
+            $_ENV["cache"][$table][$id]=$item;
         }
-	}
-	if ($flush==true) {wbTableFlush($table);}
-  wbTrigger("form",__FUNCTION__,"AfterItemRemove",func_get_args(),array());
+        $res=wbItemSave($table,$item);
+    }
+  }
+    if (!$res) {wbError("func",__FUNCTION__,1007,func_get_args());} else  {
+        wbLog("func",__FUNCTION__,1008,func_get_args());
+    }
+    wbTrigger("form",__FUNCTION__,"AfterItemRemove",func_get_args(),array());
+    return $res;
 }
 
-function wbItemSave($table,$item=null) {
-//	if (count(explode($_ENV["path_app"],$table))==1) {$table=wbTable($table);}
-    $table=explode("/",$table); $table=array_pop($table);
-	$res=null;
-	if (!is_file($_ENV["dba"]."/".$table.".json")) {
-		wbError("func",__FUNCTION__,1001,func_get_args());
-		return null;
-	} else {
-		if (!isset($item["id"]) OR $item["id"]=="_new") {$item["id"]=wbNewId(); $prev=null;} else {$prev=wbItemRead($table,$item["id"]);}
-		if (is_array($prev) AND isset($prev["id"]) AND $prev["id"]==$item["id"]) {$item=array_merge($prev,$item);}
+function wbSetChmod($ext=".json") {
+    foreach($_ENV["tables"] as $table) {
+        if (is_file($_ENV["dba"]."/".$table.$ext)) {
+            chmod($_ENV["dba"]."/".$table.$ext,0766);
+        }
+    }
+}
+
+function wbItemSave($table,$item=null,$flush=true) {
+    $table=wbTable($table);
+  $res=null;
+  if (!is_file($table)) {
+    wbError("func",__FUNCTION__,1001,func_get_args());
+    return null;
+  } else {
+        if (!isset($_ENV["cache"][$table])) {$_ENV["cache"][$table]=wbItemList($table);}
+        if (!isset($item["id"]) OR $item["id"]=="_new") {$item["id"]=wbNewId();} else {
+            if (isset($_ENV["cache"][$table][$item["id"]])) {
+                $item=array_merge($_ENV["cache"][$table][$item["id"]],$item);
+            }
+        }
         $item=wbItemSetTable($table,$item);
         $item=wbTrigger("form",__FUNCTION__,"BeforeItemSave",func_get_args(),$item);
-        $res=$_ENV["DBA"]->update($table,"id",$item["id"],$item);
-		if (!$res) {wbError("func",__FUNCTION__,1007,func_get_args());} else {
-            wbTrigger("form",__FUNCTION__,"AfterItemSave",func_get_args(),$item);
-        } 
-        if (isset($_ENV["cache"][$table])) {
-            $_ENV["cache"][$table][$item["id"]]=$item;
-        }
-	}
-	return $res;
+        $_ENV["cache"][$table][$item["id"]]=$item;
+        wbTrigger("form",__FUNCTION__,"AfterItemSave",func_get_args(),$item);
+        $res=true;
+    }
+    if ($flush==true) {$res=wbTableFlush($table);}
+  return $res;
 }
 
 function wbItemSetTable($table,$item=null) {
-	$tablename=explode("/",$table);
-	$item["_table"]=$tablename[count($tablename)-1];
+    $item["_table"]=wbTableName($table);
     if (!isset($item["_created"]) OR $item["_created"]=="") {$item["_created"]=date("Y-m-d H:i:s");}
     if (!isset($item["_creator"]) OR $item["_creator"]=="") {$item["_creator"]=$_SESSION["user_id"];}
     $item["_lastdate"]=date("Y-m-d H:i:s");
     $item["_lastuser"]=$_SESSION["user_id"];
 	return $item;
-}
-
-function wbTableFlush($table) {
-	// Сброс кэша в общий файл
-	$res=false;
-	$cache=wbCacheName($table);
-	$clist=wbListFiles($cache);
-	if (is_file($table)) {
-        $data=json_decode(wb_file_get_contents($table),true);
-            $flag=false;
-            foreach($clist as $key) {
-                $item=json_decode(wb_file_get_contents($cache."/".$key),true);
-                if ($data["data"][$key]["_lastdate"]!==$item["_lastdate"]) {$data["data"][$key]=$item; $flag=true;}
-                if (isset($item["_remove"]) AND $item["_remove"]==true) {
-                    if (wbRole("admin")) {unset($data["data"][$key]);}
-                }
-                unlink($cache."/".$key);
-            }
-            if ($flag) {
-                $_ENV["cache"][$table]=$data;
-                $res=file_put_contents($table,wbJsonEncode($data), LOCK_EX);
-                wbLog("func",__FUNCTION__,1009,func_get_args());
-            } else {$res=null;}
-	}
-	return $res;
 }
 
 function wb_file_get_contents($file) {
@@ -534,7 +540,7 @@ function wbTrigger($type,$name,$trigger,$args=null,$data=null) {
 	if (!isset($_ENV["error"][$type])) {$_ENV["error"][$type]=array();}
 	switch ($type) {
 		case "form":
-            $call=$args[0].$trigger;
+            $call=wbTableName($args[0]).$trigger;
 			if (is_callable($call)) {$data=$call($data);} else {$call="_".$call; if (is_callable($call)) {$data=$call($data);}}
 			return $data;
 			break;
@@ -694,7 +700,7 @@ function wbGetItemImg($Item=null,$idx=0,$noimg="",$imgfld="images",$visible=true
 
 function wbListFiles($dir) {
 	$list=array();
-	if ($dircont = scandir($dir)) {
+	if (is_dir($dir) AND $dircont = scandir($dir)) {
            $i=0; $idx=0;
            while (isset($dircont[$i])) {
                if ($dircont[$i] !== '.' && $dircont[$i] !== '..') {
@@ -1605,6 +1611,4 @@ function wbTranslit($textcyr = null, $textlat = null) {
 
 function wbBr2nl($str) {
 $str = preg_replace("/(rn|n|r)/", "", $str);
-return preg_replace("=<br */?>=i", "n", $str);
-}
-?>
+return preg_replace("=<br */?>=i", "n", $str); } ?>

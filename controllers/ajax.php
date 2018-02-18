@@ -1,11 +1,16 @@
 <?php
-include_once(__DIR__."/../ajax.php");
-if (is_file($_ENV["path_app"]."/ajax.php")) {include_once($_ENV["path_app"]."/ajax.php");}
-wbInitFunctions();
 function ajax__controller() {
+    include_once(__DIR__."/../ajax.php");
+    if (is_file($_ENV["path_app"]."/ajax.php")) {include_once($_ENV["path_app"]."/ajax.php");}
+    wbInitFunctions();
 	wbTrigger("func",__FUNCTION__,"before");
-	$call=__FUNCTION__ ."__".$_ENV["route"]["mode"];
-	if (is_callable($call)) {$_ENV["DOM"]=$call();} else {
+	$ecall=__FUNCTION__ ."__".$_ENV["route"]["mode"];
+    $acall=__FUNCTION__ ."_".$_ENV["route"]["mode"];
+	if (is_callable($ecall)) {
+        $_ENV["DOM"]=$ecall();
+    } elseif (is_callable($acall)) {
+        $_ENV["DOM"]=$aecall();
+    } else {
 		$call=__FUNCTION__ ."__common";
 		echo @$call();
 	}

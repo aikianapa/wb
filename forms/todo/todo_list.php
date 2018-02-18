@@ -23,7 +23,7 @@
 <div class="col-12">
 <h3 class="element-header">
     Чек-лист
-<ul class="nav navbar-nav pull-right">
+<ul class="nav navbar-nav pull-right" id="todo-status-menu">
 <li class="nav-item dropdown">
 <a class="nav-link text-muted" href="#" data-toggle="dropdown">
 <i class="fa fa-ellipsis-v">

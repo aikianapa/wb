@@ -50,9 +50,3 @@
 	#{{_form}}List #{{_form}}Catalog a {overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
 	#{{_form}}List .content-left {width: 100%;}
 </style>
-<script>
-
-	$(document).on("tree_after_formsave",function(event,name,item,form,res){
-		template_set_data("#{{_form}}Catalog");
-	});
-</script>

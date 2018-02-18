@@ -1,10 +1,10 @@
 <?php
 function form__controller() {
-	if (!in_array($_ENV["route"]["form"],$_ENV["forms"])) {
+	wbTrigger("func",__FUNCTION__,"before");
+	if ($_ENV["route"]["mode"]!=="setup_engine" AND !in_array($_ENV["route"]["form"],$_ENV["forms"])) {
 		echo form__controller__error_404();
 		die;
 	}
-	wbTrigger("func",__FUNCTION__,"before");
 	$call=__FUNCTION__ ."__".$_ENV["route"]["mode"];
 	if (is_callable($call)) {
 		$_ENV["DOM"]=$call();
@@ -41,9 +41,9 @@ function form__controller__common__controller() {
 
 function form__controller__show() {
 	$form=$_ENV["route"]["form"];
-  $item=$_ENV["route"]["item"];
+    $item=$_ENV["route"]["item"];
 	$mode="show";
-  $Item=wbItemRead($form,$item);
+    $Item=wbItemRead($form,$item);
 	$aCall=$form."_".$mode; $eCall=$form."__".$mode;
 	if (is_callable($aCall)) {$out=$aCall($Item);} elseif (is_callable($eCall)) {$out=$eCall($Item);}
   if (!in_array($form,$_ENV["forms"]) OR $Item==false OR (isset($Item["active"]) AND $Item["active"]!=="on")) {
@@ -176,16 +176,11 @@ function form__controller__select2() {
 
 function form__controller__setup_engine() {
 	if (is_dir($_ENV["dba"]) AND is_dir($_ENV["path_app"]."/tpl")) {
-        $out=wbGetTpl("setup.htm");
-        $error="<p><h4>ВНИМАНИЕ!</h4> Установка невозможна, так как в дирректории
-        <i>{$_ENV["path_app"]}</i> уже выполнялась установка.
-        Пожалуйста, удалите содержимое дирректории, кроме папки engine и попробуйте снова.</p>";
-        $out->find("#error .alert-warning")->html($error);
-        $out->find(".step-content.active")->removeClass("active");
-        $out->find("#error.step-content")->addClass("active");
+        $out=wbGetTpl("/engine/tpl/setup.htm",true);
+        $out->find("#setup")->remove();
         $out->wbSetData();
         echo $out;
-         die;
+        die;
      } elseif (isset($_POST["setup"]) AND $_POST["setup"]=="done" AND !is_dir($_ENV["path_app"]."/form")) {
 		unset($_ENV["DOM"],$_ENV["errors"]);
 		wbRecurseCopy($_ENV["path_engine"]."/_setup/",$_ENV["path_app"]);
@@ -195,12 +190,15 @@ function form__controller__setup_engine() {
 		wbTableCreate("news");
 		wbTableCreate("orders");
 		$user=array("id"=>$_POST["login"],"password"=>md5($_POST["password"]),"role"=>"admin","point"=>"/admin/","active"=>"on","super"=>"on");
+        $settings=array("id"=>"settings","header"=>$_POST["header"],"email"=>$_POST["email"]);
 		wbItemSave("users",$user);
+        wbItemSave("admin",$settings);
 
 		header('Location: '.'/');
 		die;
 	}
-    $out=wbGetTpl("setup.htm");
+    $out=wbGetTpl("/engine/tpl/setup.htm",true);
+    $out->find("#error")->remove();
     $out->wbSetData();
     echo $out;
     die;

@@ -69,9 +69,7 @@ function ajax__save($form=null) {
 		if (!isset($_POST["id"])) {$_POST["id"]="";}
 		if (!isset($_GET["item"])) {$_POST["id"]="";}
 		if ($_POST["id"]=="" && $_GET["item"]>"") {$_POST["id"]=$_GET["item"];}
-		$table=wbTable($form);
-		$res=wbItemSave($table,$_POST); $ret=array();
-//		wbTableFlush($table);
+		$res=wbItemSave($form,$_POST); $ret=array();
 		if (isset($_GET["copy"])) {
 			$old=str_replace("//","/",$_ENV["path_app"]."/uploads/{$form}/{$_GET["copy"]}/");
 			$new=str_replace("//","/",$_ENV["path_app"]."/uploads/{$form}/{$_GET["item"]}/");
