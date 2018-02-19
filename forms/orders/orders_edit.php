@@ -48,7 +48,7 @@
                     <div class="tab-content  p-a m-b-md">
                         <br />
                         <div id="{{_form}}Descr" class="tab-pane fade show active" role="tabpanel">
-                            <div class="wb-cart" data-wb-writable="false">
+                            <div class="wb-cart" data-wb-role="cart">
 
                             <div data-wb-role="multiinput" name="items">
                                 <div class="cart-item col">
@@ -59,20 +59,20 @@
                                         <input type="text" class="form-control" value="{{name}}">
                                     </div>
                                     <div class="col-2">
-                                        <input type="number" name="count" min="0" class="form-control cart-item-count">
+                                        <input type="number" name="count" min="0" class="form-control cart-item-count" data-wb-enabled="admin manager">
                                     </div>
                                     <div class="col-2">
-                                        <input type="number" name="price" min="0" class="form-control cart-item-price">
+                                        <input type="number" name="price" min="0" class="form-control cart-item-price" data-wb-enabled="admin manager">
                                     </div>
                                     <div class="col-3">
-                                        <input type="number" class="form-control cart-item-total">
+                                        <input type="number" class="form-control cart-item-total" disabled>
                                     </div>
                                   </div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <div class="col-9">
-                                    <label class="form-control-label">ИТОГО:</label>
+                                    <label class="form-control">ИТОГО:</label>
                                 </div>
                                 <div class="col-3">
                                     <input type="number" name="total" readonly class="form-control cart-total">

@@ -1,28 +1,20 @@
 <?php
 include_once (__DIR__."/functions.php");
 wbInit();
+$_SESSION["user_role"]="admin";
 
-$upd=wbItemRead("admin","updates");
-if (!isset($upd["ready"])) {
-        $_SESSION["user_role"]="admin";
-        $list=wbListFiles($_ENV["dba"]);
-        foreach ($list as $table) {
-            $ext=pathinfo($_ENV["dba"]."/".$table, PATHINFO_EXTENSION);
-            if ($ext=="" AND !is_file($_ENV["dba"]."/".$table.".json")) {
-                $_ENV["DBA"]->createTable($table);
-                $tlist=wbItemListOld($table);
-                foreach($tlist as $item) {
-                    $_ENV["DBA"]->insert($table,$item,true);
-                }
-            }
+$list=wbListFiles($_ENV["dba"]);
+foreach ($list as $table) {
+    $ext=pathinfo($_ENV["dba"]."/".$table, PATHINFO_EXTENSION);
+    if ($ext=="") {
+        wbTableCreate($table);
+        $tlist=wbItemListOld($table);
+        foreach($tlist as $item) {
+            wbItemSave($table,$item);
         }
-
-        $upd=wbItemRead("admin","updates");
-        if (!isset($upd["ready"])) {$upd["ready"]=array();}
-        if (!in_array(__FILE__,$upd["ready"])) {$upd["ready"][]=__FILE__;}
-        wbRecurseDelete($_ENV["dba"]."/_cache");
+    }
 }
-//unlink(__FILE__);
+echo __FILE__;
 
 function wbItemReadOld($table=null,$id=null) {
 	if ($table==null) {$table=$_ENV["route"]["form"];}

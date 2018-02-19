@@ -1315,11 +1315,10 @@ function wbCartAction() {
         $order["date"]=date("Y-m-d H:i:s");
     }
 
-
-	switch($param["action"]) {
+    switch($param["action"]) {
 		case "add-to-cart":       wbCartItemAdd($order); break;
-    case "cart-update":   		wbCartUpdate($order); break;
-		case "cart-item-recalc":  wbCartItemRecalc($order); break;
+        case "cart-update":   	  wbCartUpdate($order); break;
+		//case "cart-item-recalc":  wbCartItemRecalc($order); break;
 		case "cart-item-remove":  wbCartItemRemove($order); break;
 		case "cart-clear":        wbCartClear($order); break;
 	}
@@ -1333,9 +1332,10 @@ function wbCartUpdate($order) {
 }
 
 function wbCartParam() {
-		$param=$_ENV["route"]["params"];
+	$param=$_ENV["route"]["params"];
     $param["mode"]=$_ENV["route"]["mode"];
-		$param=array_merge($param,$_POST);
+	$param=array_merge($param,$_REQUEST);
+    $param["action"]=$param[0];
     return $param;
 }
 
@@ -1349,13 +1349,13 @@ function wbCartClear($order) {
 function wbCartItemAdd($order) {
     $param=wbCartParam();
     if ($param["item"]>"" AND $param["count"]>"") {
-				$pos=wbCartItemPos($order);
+		$pos=wbCartItemPos($order);
         $line=$param;
         unset($line["mode"],$line["action"]);
         $order["items"][$pos]=$line;
-				$order["total"]=wbCartCalcTotal($order);
-				wbItemSave("orders",$order);
-		}
+        $order["total"]=wbCartCalcTotal($order);
+		wbItemSave("orders",$order);
+    }
 }
 
 function wbCartCalcTotal($order) {

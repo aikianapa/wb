@@ -1674,11 +1674,16 @@ abstract class kiNode
 
 	public function tagCart() {
 		if ($this->find(".cart-item")->length) {
-			$Item=wbReadItem("orders",$_SESSION["order_id"]);
+			$Item=wbItemRead("orders",$_SESSION["order_id"]);
 			$tplid=uniqId();
 			$this->attr("data-template",$tplid);
-			$this->after("<textarea id='{$tplid}' style='display:none;'>".urlencode($this->innerHtml())."</textarea>");
+			$this->addTemplate($this->innerHtml());
 			$this->wbSetData($Item);
+            $items=$this->find(".cart-item");
+            $idx=0;
+            foreach($items as $i) {
+                if ($i->attr("idx")=="") {$i->attr("idx",$idx); $idx++;}
+            }
 		}
 	}
 
