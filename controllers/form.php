@@ -111,6 +111,12 @@ function form__controller__error_404($id=null) {
     return $out;
 }
 
+function form__controller__error_301() {
+    header("HTTP/1.1 301 Moved Permanently");
+    header("Location: /");
+    die;
+}
+
 function form__controller__list() {
 	$form=$_ENV["route"]["form"];
 	$mode=$_ENV["route"]["mode"];

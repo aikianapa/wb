@@ -20,6 +20,7 @@ if ($_ENV["route"]["controller"]!=="module") {
 	$hide=$_ENV["DOM"]->find("data-wb-hide");
 	foreach($hide as $h) {$h->tagHideAttrs();}
 }
+$_ENV["DOM"]->outerHtml();
 //echo $_ENV["DOM"]->beautyHtml();
 echo $_ENV["DOM"]->outerHtml();
 ?>

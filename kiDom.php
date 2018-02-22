@@ -138,8 +138,21 @@ print_r(wbRouter::getRoute());
 	if (isset($_GET["engine"]) && $_GET["engine"]=="true") {$_SERVER["SCRIPT_NAME"]="/engine".$_SERVER["SCRIPT_NAME"];}
 	if (isset($_SERVER["SCHEME"]) && $_SERVER["SCHEME"]>"") {$scheme=$_SERVER["SCHEME"];} else {$scheme="http";}
 	$_ENV["route"]["scheme"]=$scheme;
-	$_ENV["route"]["host"]=$_SERVER["HTTP_HOST"];
-
+    $_ENV["route"]["host"]=$_SERVER["HTTP_HOST"];
+    $_ENV["route"]["port"]=$_SERVER["SERVER_PORT"];
+    $tmp=explode(".",$_ENV["route"]["host"]);
+    $count=count($tmp);
+    if ($count==1) {
+        $_ENV["route"]["domain"]=$tmp[count($tmp)-1];
+        $_ENV["route"]["zone"]="";
+        $_ENV["route"]["subdomain"]="";
+    } else {
+        $_ENV["route"]["domain"]=$tmp[count($tmp)-2].".".$tmp[count($tmp)-1];
+        $_ENV["route"]["zone"]=$tmp[count($tmp)-1];
+        if ($tmp>2) {unset($tmp[$count-1],$tmp[$count-2]); $_ENV["route"]["subdomain"]=implode(".",$tmp);}
+    }
+    $_ENV["route"]["hostp"]=$_ENV["route"]["scheme"]."://".$_ENV["route"]["domain"];
+    if ($_ENV["route"]["port"]!=="80") {$_ENV["route"]["hostp"].=":".$_ENV["route"]["port"];}
     if ($form=='default_form' && $mode='default_mode' && $_SERVER["QUERY_STRING"]>"") {
 		parse_str($_SERVER["QUERY_STRING"],$_GET);
 		$_ENV["route"]=array("scheme"=>$scheme,"host"=>$_SERVER["HTTP_HOST"],"controller"=>$controller,$controller=>$_GET["form"], $action=>$_GET["mode"] , "params"=>$_GET);
@@ -1254,17 +1267,17 @@ abstract class kiNode
 		$script=$this->find("script[data-wb-src]:not(.wb-done)");
 		foreach($script as $sc) {
             if ($sc->attr("data-wb-src")=="jquery") {
-					        $sc->after('<script src="/engine/js/jquery.min.js" type="text/javascript" charset="UTF-8"></script>');
+					        $sc->after('<script src="/engine/js/jquery.min.js" ></script>');
                   $sc->remove();
             }
             if ($sc->attr("data-wb-src")=="bootstrap3") {
 					         $sc->before('<link href="/engine/js/bootstrap3/bootstrap.min.css" rel="stylesheet">');
-					         $sc->after('<script src="/engine/js/bootstrap3/bootstrap.min.js" type="text/javascript" charset="UTF-8"></script>');
+					         $sc->after('<script src="/engine/js/bootstrap3/bootstrap.min.js" ></script>');
                    $sc->remove();
             }
             if ($sc->attr("data-wb-src")=="bootstrap") {
  					     $sc->before('<link href="/engine/js/bootstrap/bootstrap.min.css" rel="stylesheet">');
-					     $sc->after('<script src="/engine/js/bootstrap/bootstrap.min.js" type="text/javascript" charset="UTF-8"></script>');
+					     $sc->after('<script src="/engine/js/bootstrap/bootstrap.min.js" ></script>');
                $sc->remove();
             }
 
@@ -1273,19 +1286,19 @@ abstract class kiNode
           $lang="ru"; if ($sc->attr("data-wb-lang")>"") {$lang=$sc->attr("data-wb-lang");}
 					$sc->before('<link href="/engine/js/datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet">');
 					if ($lang>"") $sc->after("<script src='/engine/js/datetimepicker/locales/bootstrap-datetimepicker.{$lang}.js' type='text/javascript' charset='UTF-8'></script>");
-					$sc->after('<script src="/engine/js/datetimepicker/bootstrap-datetimepicker.min.js" type="text/javascript" charset="UTF-8"></script>');
+					$sc->after('<script src="/engine/js/datetimepicker/bootstrap-datetimepicker.min.js" ></script>');
 					$sc->remove();
 			}
       if ($sc->attr("data-wb-src")=="plugins") {
           $sc->before('<link href="/engine/js/plugins/plugins.css" rel="stylesheet">');
-          $sc->after('<script src="/engine/js/plugins/plugins.js" type="text/javascript"></script>');
+          $sc->after('<script src="/engine/js/plugins/plugins.js"></script>');
           $sc->remove();
       }
       if ($sc->attr("data-wb-src")=="ckeditor") {
 					//$sc->before('<link href="/engine/js/ckeditor/style.css" rel="stylesheet">');
-					$sc->after('<script src="/engine/js/ckeditor/adapters/jquery.js" type="text/javascript"></script>');
-                    $sc->after('<script src="/engine/js/ckeditor/bootstrap-ckeditor-fix.js" type="text/javascript"></script>');
-                    $sc->after('<script src="/engine/js/ckeditor/ckeditor.js" type="text/javascript"></script>');
+					$sc->after('<script src="/engine/js/ckeditor/adapters/jquery.js"></script>');
+                    $sc->after('<script src="/engine/js/ckeditor/bootstrap-ckeditor-fix.js"></script>');
+                    $sc->after('<script src="/engine/js/ckeditor/ckeditor.js"></script>');
                     $sc->remove();
 			}
       if ($sc->attr("data-wb-src")=="source") {
@@ -1304,7 +1317,7 @@ abstract class kiNode
 
 
 		if ($sc->attr("data-wb-src")=="engine") {
-				$sc->after('<script src="/engine/js/wbengine.js" type="text/javascript" charset="UTF-8"></script>');
+				$sc->after('<script src="/engine/js/wbengine.js" ></script>');
 				$sc->remove();
 		}
 
@@ -1401,6 +1414,8 @@ abstract class kiNode
 			}
 		}; unset($inc);
 		$this->find("[data-wb-remove]")->remove();
+        $hide=$this->find(".wb-done[data-wb-hide]");
+        foreach($hide as $h) {$h->tagHideAttrs();}
 		//$this->find("input[data-wb-role=tree].wb-done")->remove();
 		//$this->find("input[role=tree].wb-done")->remove();
 	}
@@ -1552,6 +1567,7 @@ abstract class kiNode
 		if (($where>"" AND wbWhereItem($Item,$where)) OR $where=="") {
 			if ($var>"") $_ENV["variables"]["{$var}"]=wbSetValuesStr($this->attr("value"),$Item);
 		}
+        if ($this->attr("data-wb-hide")!=="false") {$this->remove();}
 		return $Item;
 	}
 
@@ -1660,7 +1676,8 @@ abstract class kiNode
                     if (!$this->hasAttr("role")) {$this->removeClass("wb-done");}
                 }
             }
-        } elseif ($hide=="*") {
+            $this->removeAttr("data-wb-hide");
+        } elseif ($hide=="*" AND $this->hasClass("wb-done")) {
             $this->after($this->innerHtml()); $this->remove();
         }
         $list=explode(" ",trim($hide));
@@ -1974,24 +1991,32 @@ abstract class kiNode
 	}
 
 public function tagModule($Item=array()) {
-	$src=$this->attr("src");
+  $src=$this->attr("src");
   $e=$_ENV["path_engine"]."/modules/{$src}/{$src}.php";
   $a=$_ENV["path_app"]."/modules/{$src}/{$src}.php";
   if (is_file($e)) {require_once($e);}
   if (is_file($a)) {require_once($a);}
   $attributes=array();
-  $exclude=array("role","data-wb-role","class","src");
-	$module=$_ENV["route"]["scheme"]."://".$_ENV["route"]["host"]."/module/{$src}/";
+  //$exclude=array("role","data-wb-role","class","src");
+    $this->removeClass("wb-done");
+    $exclude=array("data-wb-role","src");
+	$module=$_ENV["route"]["hostp"]."/module/{$src}/";
 	$out=wbFromFile($module);
-  $func=$src."_afterRead"; $_func=$src."__afterRead";
+    $func=$src."_afterRead"; $_func=$src."__afterRead";
     // функция вызывается после получения шаблона модуля
-		if (is_callable($func)) {$func($out,$Item);} else {
-		if (is_callable($_func)) {$_func($out,$Item);}
+		if (is_callable($func)) {$func($out,$Item,$this);} else {
+		if (is_callable($_func)) {$_func($out,$Item,$this);}
 	}
   $out->wbSetData($Item);
   $ats=$this->attributes();
   foreach($ats as $an => $av) {
-    if (!in_array($an,$exclude)) {$out->find(":first:not(style,script,br)")->attr($an,$av);}
+    if (!in_array($an,$exclude)) {
+        if ($an=="class") {
+            $out->find(":first:not(style,script,br)")->addClass($av);
+        } else {
+            $out->find(":first:not(style,script,br)")->attr($an,$av);    
+        }
+    }
   }
   $out->find(":first:not(style,script,br)")->append($this->html());
   $func=$src."_beforeShow"; $_func=$src."__beforeShow";
@@ -1999,7 +2024,7 @@ public function tagModule($Item=array()) {
 	if (is_callable($func)) {$func($out,$Item);} else {
 		if (is_callable($_func)) {$_func($out,$Item);}
 	}
-  $out->wbSetData($Item);
+    $out->wbSetData($Item);
 	$this->replaceWith($out);
 }
 
@@ -2048,7 +2073,7 @@ public function tagInclude($Item=array()) {
                 break;
             case "module":
                 $_SESSION["module"]=array($name=>$this->attributes());
-                $module=$_ENV["route"]["scheme"]."://".$_ENV["route"]["host"]."/module/{$name}/";
+                $module=$_ENV["route"]["hostp"]."/module/{$name}/";
                 unset($_SESSION["module"]);
                 $this_content=wbFromFile($module);
                 break;
@@ -2064,7 +2089,7 @@ public function tagInclude($Item=array()) {
 			if (is_file($_SERVER["DOCUMENT_ROOT"].$file)) {
 				$src=$_SERVER["DOCUMENT_ROOT"].$file;
 			} else {
-				if (substr($src,0,7)!=="http://") { if (substr($src,0,1)!="/") {$src="/".$src;} $src="http://".$_SERVER['HTTP_HOST'].$src;}
+				if (substr($src,0,7)!=="{$_ENV["route"]["scheme"]}://") { if (substr($src,0,1)!="/") {$src="/".$src;} $src=$_ENV["route"]["hostp"].$src;}
 			}
 			$this_content=ki::fromFile($src);
 		}
@@ -2355,7 +2380,7 @@ public function tagThumbnail($Item=array()) {
 		} else {
 			$file=$_SESSION["prj_path"].$src;
 			if (is_file($_SERVER["DOCUMENT_ROOT"].$file)) {$src=$file;}
-			if (substr($src,0,7)!="http://") { if (substr($src,0,1)!="/") {$src="/".$src;} $src=$_SERVER['DOCUMEN_ROOT'].$src; }
+			if (substr($src,0,7)!="{$_ENV["route"]["scheme"]}://") { if (substr($src,0,1)!="/") {$src="/".$src;} $src=$_SERVER['DOCUMEN_ROOT'].$src; }
 			$inner->find(".comGallery")->html(ki::fromFile($src));
 		}
 		$this->html($inner);
