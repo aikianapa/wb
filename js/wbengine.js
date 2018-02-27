@@ -456,6 +456,7 @@ function wb_tree() {
                     }
                 });
                 var cdata = JSON.stringify($(edid).find("#treeData > form").serializeArray());
+                            console.log(path);
                 wb_tree_data_set(that, path, cdata);
                 $(tree).find("input[name='" + name + "']").val(JSON.stringify(wb_tree_serialize($(tree).children(".dd-list"))));
             }

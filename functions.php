@@ -121,7 +121,7 @@ function wbGetDataWbFrom($Item,$str) {
         eval('$res=$Item'.$fld.';');
         return $res;
     } else {
-        return $Item[$str];
+        if (isset($Item[$str])) return $Item[$str];
     }
 }
 
@@ -165,6 +165,21 @@ function wbFieldBuild($param,$data=array()) {
             $tpl->wbSetValues($param);
             $tpl->wbSetData($data);
 						$tpl->find(".wb-uploader")->attr("data-wb-path","/uploads/{$data['_form']}/{$data['_item']}/");
+            break;
+        case "multiinput":
+            $flds=wbFromString("");
+            if (substr($param["value"],0,2)=="[{") {
+                $arr=json_encode($param["value"],true);
+            } else {
+                $arr=explode(";",$param["value"]);
+                foreach($arr as $i => $name) {
+                    $line=wbFromString($tpl->find("[data-wb-role=multiinput]")->html());
+                    $line->find("input")->attr("name",$name);
+                    $flds->append($line);
+                }
+                $tpl->find("[data-wb-role=multiinput]")->html($flds);
+                unset($flds);
+            }
             break;
 	}
 	$set->find(".form-group > label")->html($param["label"]);
@@ -713,6 +728,7 @@ function wbLog($type,$name,$error,$args) {
 	}
 	if (is_array($args)) {
 		foreach($args as $key => $arg) {
+            if (is_array($arg)) {$arg=implode(",",$arg);}
 			$error["error"]=str_replace("{{".$key."}}",$arg,$error["error"]);
 		}
 	}
@@ -1081,8 +1097,8 @@ function wbLoadController() {
         
             $ecall=$_ENV["route"]["controller"]."__controller";
 			$acall=$_ENV["route"]["controller"]."_controller";
-            if (is_callable($acall)) return $acall(array($__page,$Item));
-            if (is_callable($ecall)) return $ecall(array($__page,$Item));
+            if (is_callable($acall)) return $acall(array($_ENV["DOM"],$_ENV["ITEM"]));
+            if (is_callable($ecall)) return $ecall(array($_ENV["DOM"],$_ENV["ITEM"]));
             echo "Ошибка загрузки контроллера: {$_ENV["route"]["controller"]}";
             die;
     }

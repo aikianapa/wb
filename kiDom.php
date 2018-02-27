@@ -1255,11 +1255,12 @@ abstract class kiNode
     public function wbWhere($Item){
         $where=$this->attr("data-wb-where");
         if ($where=="") $where=$this->attr("where");
+        if ($this->is("meta")) {$this->attr("data-wb-done","true");}
         if ($where>"" AND $this->hasRole("foreach")) {
-          return;
+            return;
         } elseif ($where>"" AND !wbWhereItem($Item,$where)) {
 			       $this->remove();
-		    }
+        }
     }
 
 
@@ -1414,10 +1415,8 @@ abstract class kiNode
 			}
 		}; unset($inc);
 		$this->find("[data-wb-remove]")->remove();
-        $hide=$this->find(".wb-done[data-wb-hide]");
+        $hide=$this->find(".wb-done[data-wb-hide],[data-wb-done=true]");
         foreach($hide as $h) {$h->tagHideAttrs();}
-		//$this->find("input[data-wb-role=tree].wb-done")->remove();
-		//$this->find("input[role=tree].wb-done")->remove();
 	}
 
 	public function excludeTextarea($Item=array()) {
@@ -1677,6 +1676,7 @@ abstract class kiNode
                 }
             }
             $this->removeAttr("data-wb-hide");
+            $this->removeAttr("data-wb-done");
         } elseif ($hide=="*" AND $this->hasClass("wb-done")) {
             $this->after($this->innerHtml()); $this->remove();
         }
@@ -1684,9 +1684,8 @@ abstract class kiNode
 		foreach($list as $attr) {
 			$this->removeAttr($attr);
 		}
-
-
-        		$this->removeAttr("data-wb-hide");
+        if (!$this->is("[data-wb-role]") AND !$this->is("[role]") AND $this->is("[data-wb-done=true]")) {$this->removeAttr("data-wb-done");}
+        $this->removeAttr("data-wb-hide");
 	}
 
 	public function tagCart() {
@@ -1855,6 +1854,7 @@ abstract class kiNode
 		$srcItem=$Item;
 		$field=""; $sort=""; $add=""; $step=""; $id=""; $limit=""; $table=""; $cacheId=0;
 		include("wbattributes.php");
+        if (!isset($where)) {$where="";}
 		if (!isset($tpl) OR $tpl!=="false") {
 			$tplid=$this->attr("data-wb-tpl");
 			if ($tplid=="") {$this->addTemplate();}
@@ -1888,7 +1888,7 @@ abstract class kiNode
 
 		if ($table > "") {
             $table=wbTable($table);
-			if ($item>"") {
+			if (isset($item) AND $item>"") {
 				$Item[0]=wbItemRead($table,$item);
                 if ($field>"") {
 					$Item=$Item[0][$field];
@@ -1939,7 +1939,7 @@ abstract class kiNode
                     $val=wbCallFormFunc("BeforeShowItem",$val,$itemform);
                     $val=wbCallFormFunc("BeforeItemShow",$val,$itemform);
 					$flag=true;
-					if ($flag==true AND $where>"") {$flag=wbWhereItem($val,$where);}
+					if ($flag==true AND isset($where)) {$flag=wbWhereItem($val,$where);}
 					if ($flag==true AND $limit>"" AND $ndx>=$limit) {$flag=false;}
 						if ($flag==true) {
 							$ndx++;
@@ -2100,7 +2100,7 @@ public function tagInclude($Item=array()) {
 		if ($dfs=="false") {$this_content->find("[data-wb-formsave]")->remove();}
 		if ($class>"") {$this_content->find(":first")->addClass($class);}
 
-		if (($ssrc=="editor" OR $ssrc=="source") && !$this_content->find("textarea.{$ssrc}").length) {
+		if (($ssrc=="editor" OR $ssrc=="source") && !$this_content->find("textarea.{$ssrc}.wb-done")->length) {
 			if ($did>"") {
 				$this_content->find(":first")->removeAttr("id");
 				$this_content->find("textarea.{$ssrc}")->attr("id",$did);
@@ -2129,6 +2129,7 @@ public function tagInclude($Item=array()) {
 
     public function includeTag($Item) {
 		 if ($this->find("include")->length) {
+            $this_content=$this->html();
 			$this->append("<div id='___include___' style='display:none;'>{$this_content}</div>");
             $Item=wbItemToArray($Item);
              foreach($this->find("include") as $inc) {

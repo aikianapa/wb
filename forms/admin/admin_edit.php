@@ -1,16 +1,19 @@
 <h5 class="element-header">Настройки</h5>
 <form method="post" id="admin_settings" data-wb-form="admin" data-wb-item="settings" data-wb-allow="admin">
     <div class="nav-active-primary">
-        <ul class="nav nav-tabs" role="tablist">
+        <ul class="nav nav-pills flex-column flex-md-row" role="tablist">
             <li class="nav-item"><a class="nav-link active" href="#adminMain" data-toggle="tab">Основные</a></li>
             <li class="nav-item"><a class="nav-link" href="#adminAdd" data-toggle="tab">Вставки</a></li>
             <li class="nav-item"><a class="nav-link" href="#adminTree" data-toggle="tab">Каталог</a></li>
             <li class="nav-item"><a class="nav-link" href="#adminUpdate" data-toggle="tab">Обновление</a></li>
             <li class="nav-item"><a class="nav-link" href="#adminBackups" data-toggle="tab">Бэкапы</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" data-wb-ajax="/module/sitemap" data-wb-html=".content-box">Карта сайта</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" data-wb-ajax="/form/list/users" data-wb-html=".content-box">Пользователи</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" data-wb-ajax="/form/list/source" data-wb-html=".content-box">Проводник</a></li>
         </ul>
     </div>
     <div class="tab-content pd-y-20">
-        <div id="adminMain" class="tab-pane fade show active" role="tabpanel">
+        <div id="adminMain" class="tab-pane active" role="tabpanel">
             <div class="row">
                 <div class="col-sm-12">
                     <div class="form-group">
@@ -35,7 +38,7 @@
                 </div>
             </div>
         </div>
-        <div id="adminAdd" class="tab-pane fade" role="tabpanel">
+        <div id="adminAdd" class="tab-pane" role="tabpanel">
             <div class="row">
                 <div class="col-xl-6">
                     <div class="row">
@@ -81,7 +84,6 @@
                 </div>
             </div>
         </div>
-
         <div id="adminBackups" class="tab-pane fade" role="tabpanel">
             <div class="row">
                 <div class="col-sm-12">
@@ -90,7 +92,7 @@
                         <!--td><label class="ckbox mg-b-0"><input type="checkbox"><span></span></label></td-->
                         <td>Дата</td>
                         <td>Тип</td>
-                        <td>Имя файла</td>
+                        <td class="d-none d-sm-table-cell">Имя файла</td>
                         <td>Зазмер</td>
                         <td>Действие</td>
                       </thead>
@@ -98,7 +100,7 @@
                         <tr data-name="{{name}}">
                           <td>{{date}}</td>
                           <td>{{type}}</td>
-                          <td>{{name}}</td>
+                          <td class="d-none d-sm-table-cell">{{name}}</td> 
                           <td>{{size}}</td>
                           <td>
 

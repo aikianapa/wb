@@ -42,21 +42,27 @@ function form__controller__common__controller() {
 function form__controller__show() {
 	$form=$_ENV["route"]["form"];
     $item=$_ENV["route"]["item"];
-	$mode="show";
-    $Item=wbItemRead($form,$item);
-	$aCall=$form."_".$mode; $eCall=$form."__".$mode;
+    $mode="show";
+    $Item=$_ENV["ITEM"]=wbItemRead($form,$item);
+    if (!$Item) {
+        $fid=wbFurlGet($form,$item);
+        if ($fid) {$item=$fid;} else {form__controller__error_404();}
+        $Item=$_ENV["ITEM"]=wbItemRead($form,$item);
+    }
+    if (is_callable("wbBeforeShowItem")) {$Item=$_ENV["ITEM"]=wbBeforeShowItem($Item);}
+    $Item=$_ENV["ITEM"]=wbCallFormFunc("BeforeShowItem",$Item,$form,$mode);
+
+    $aCall=$form."_".$mode; $eCall=$form."__".$mode;
 	if (is_callable($aCall)) {$out=$aCall($Item);} elseif (is_callable($eCall)) {$out=$eCall($Item);}
-  if (!in_array($form,$_ENV["forms"]) OR $Item==false OR (isset($Item["active"]) AND $Item["active"]!=="on")) {
+    if (!in_array($form,$_ENV["forms"]) OR $Item==false OR (isset($Item["active"]) AND $Item["active"]!=="on")) {
 			echo form__controller__error_404();
 			die;
 	} else {
         if (isset($out)) {
-            $_ENV["DOM"]=wbFromString($out);
+            if (is_string($out)) {$_ENV["DOM"]=wbFromString($out);} elseif (is_object($out)) {$_ENV["DOM"]=$out;}
         } else {
             $out=wbGetForm($form,$mode);
             if ($_ENV["error"]["wbGetForm"]!=="noform") { $_ENV["DOM"]=$out; } else {
-                if (is_callable("wbBeforeShowItem")) {$Item=wbBeforeShowItem($Item);}
-                $Item=wbCallFormFunc("BeforeShowItem",$Item,$form,$mode);
                 if (!isset($Item["template"]) OR $Item["template"]=="") {$Item["template"]="default.php";}
                 $_ENV["DOM"]=wbGetTpl($Item["template"]);
                 if (!is_object($_ENV["DOM"])) {$_ENV["DOM"]=wbFromString($_ENV["DOM"]);}
