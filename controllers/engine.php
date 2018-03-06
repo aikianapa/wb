@@ -13,11 +13,6 @@ function engine__controller()
     return $_ENV["DOM"];
 }
 
-function engine__controller_logout()
-{
-    unset($_SESSION["user_id"],$_SESSION["user_role"],$_SESSION["user"]);
-    header('Location: /login/');
-}
 
 function engine__controller_login()
 {
@@ -25,44 +20,49 @@ function engine__controller_login()
     //wbItemSave("users",$user);
     if (isset($_POST["l"]) and $_POST["l"]>"") {
         if ($user=wbItemRead("users", $_POST["l"])) {
-            if ($user["password"]==md5($_POST["p"]) and $user["active"]=="on") {
+            if ($user["password"]==md5($_POST["p"]) AND $user["active"]=="on") {
                 wbLog("func",__FUNCTION__,100,$_POST);
-                $_SESSION["user_id"]=$user["id"];
-                $_SESSION["user_role"]=$user["role"];
-                if (isset($user["point"]) and $user["point"]>"") {
-                    $point=$user["point"];
-                } else {
-                    if ($user["role"]=="admin") {
-                        $point="/admin";
-                    } else {
-                        $point="/";
-                    }
-                }
-                if (!isset($user["name"])) {
-                    $user["name"]=$user["id"];
-                }
-
-                if (isset($user["avatar"])) {
-                    if (!is_array($user["avatar"])) {
-                        $user["avatar"]=json_decode($user["avatar"], true);
-                        $user["avatar"]=$user["avatar"][0];
-                    }
-                    $user["avatar"]="/uploads/users/{$user["id"]}/{$user["avatar"]["img"]}";
-                } else {
-                    $user["avatar"]="/engine/uploads/__system/person.svg";
-                }
-                $_SESSION["user_name"]=$user["name"];
-                $_SESSION["user_avatar"]=$user["avatar"];
-                //$_SESSION["user"]=$user;
-                header('Location: '.$point);
-                die;
+                engine__controller_login_success($user);
             } else {
+                wbTrigger("func",__FUNCTION__,"false",func_get_args(),$user);
                 wbLog("func",__FUNCTION__,101,$_POST);
             }
         }
     }
     $_ENV["DOM"]=wbGetTpl("login.htm");
     return $_ENV["DOM"];
+}
+
+function engine__controller_login_success($user) {
+        $_SESSION["user_id"]=$user["id"];
+        $_SESSION["user_role"]=$user["role"];
+        if (isset($user["point"]) AND $user["point"]>"") {
+            $point=$user["point"];
+        } else {
+            if ($user["role"]=="admin") {
+                $point="/admin";
+            } else {
+                $point="/";
+            }
+        }
+        if (!isset($user["name"])) {
+            $user["name"]=$user["id"];
+        }
+
+        if (isset($user["avatar"])) {
+            if (!is_array($user["avatar"])) {
+                $user["avatar"]=json_decode($user["avatar"], true);
+                $user["avatar"]=$user["avatar"][0];
+            }
+            $user["avatar"]="/uploads/users/{$user["id"]}/{$user["avatar"]["img"]}";
+        } else {
+            $user["avatar"]="/engine/uploads/__system/person.svg";
+        }
+        $_SESSION["user_name"]=$user["name"];
+        $_SESSION["user_avatar"]=$user["avatar"];
+        //$_SESSION["user"]=$user;
+        header('Location: '.$point);
+        die;
 }
 
 function engine__controller_register()
@@ -94,19 +94,19 @@ function engine__controller_admin_ui()
     include_once(__DIR__."/admin_ui.php");
 }
 
-function engine__controller__logout()
+function engine__controller_logout()
 {
-    $_SESSION["user"]=$_SESSION["user_role"]="";
+    unset($_SESSION["user_id"],$_SESSION["user_role"],$_SESSION["user"]);
     setcookie("user_id", "", time()-3600, "/");
     unset($_COOKIE["user_id"]);
-    header("Refresh: 0; URL=http://{$_SERVER["HTTP_HOST"]}");
+    header("Refresh: 0; URL=/");
     echo "Выход из системы, ждите...";
     die;
 }
 
 function engine__controller_include()
 {
-    include_once($_ENV["pathRoot"].$_SERVER["SCRIPT_NAME"]);
+    include_once($_ENV["path_app"].$_SERVER["SCRIPT_NAME"]);
     die;
 }
 

@@ -12,8 +12,8 @@ function wbInit() {
 }
 
 function wbInitEnviroment() {
-  if (!isset($_SESSION["user"])) {$_SESSION["user"]="User";}
-  if (!isset($_SESSION["user_role"])) {$_SESSION["user_role"]="user";}
+  if (!isset($_SESSION["user"])) {$_SESSION["user"]="";}
+  if (!isset($_SESSION["user_role"])) {$_SESSION["user_role"]="";}
   if (!isset($_SESSION["trigger"])) {$_SESSION["trigger"]=array();}
 	wbTrigger("func",__FUNCTION__,"before");
 	$_ENV["path_engine"]=__DIR__;
@@ -275,24 +275,26 @@ function wbTableFlush($table) {
     $res=false;
     $table=wbTable($table);
     $tname=wbTableName($table);
+    $cache=$_ENV["cache"][$table];
     if (is_file($table) AND isset($_ENV["cache"][$table])) {
             $fp = fopen ($file,"r");
             flock ($fp, LOCK_SH);
-            $data = json_decode(wb_file_get_contents($table),true);
+            $data = json_decode(file_get_contents($table),true);
             $flag=false;
-            foreach($_ENV["cache"][$table] as $key => $item) {
+            foreach($cache as $key => $item) {
                 $item["_table"]=$tname;
-                if ($data[$key]["_lastdate"]!==$item["_lastdate"]) {$data[$key]=$item; $flag=true;}
+                if (!isset($data[$key]) OR json_encode($data[$key]) !== json_encode($item)) {$data[$key]=$item; $flag=true;}
                 if (isset($item["_removed"]) AND $item["_removed"]==true) {
                     if (wbRole("admin")) {unset($data[$key]);}
                 }
             }
-            if ($flag) {
-                $res=file_put_contents($table,wbJsonEncode($data), LOCK_EX);
-                wbLog("func",__FUNCTION__,1009,func_get_args());
-            } else {$res=null;}
+            $data=wbJsonEncode($data);
             flock ($fp, LOCK_UN);
             fclose ($fp);
+            if ($flag) {
+                $res=file_put_contents($table,$data, LOCK_EX);
+                wbLog("func",__FUNCTION__,1009,func_get_args());
+            } else {$res=null;}
         unset($_ENV["cache"][$table]);
   }
   return $res;
@@ -575,7 +577,9 @@ function wbTrigger($type,$name,$trigger,$args=null,$data=null) {
 			return $data;
 			break;
 		case "func":
-			if ($trigger=="before") wbError($type,$name,null);
+            $call=$name."_".$trigger;
+			if (is_callable($call)) {$data=$call($data);} else {wbError($type,$name,null);}
+            return $data;
 			break;
 		default:
 			break;

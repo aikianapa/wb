@@ -14,8 +14,7 @@ function ulogin__init() {
 			if ($check!==false) {
 				$check["token"]=$_POST['token'];
 				wbItemSave("users",$check);
-				$out="<script language='javascript'>document.location.href='/module/ulogin/login/{$check["id"]}/{$_POST['token']}';</script>";
-
+				$out="<script language='javascript'>document.location.href='/module/ulogin/login/{$check['id']}/{$_POST['token']}';</script>";
 			} else {
 				$out.="<div>Авторизация {$user["network"]} не удалась!</div>";
 			}
@@ -28,7 +27,7 @@ function ulogin__login() {
 	$user_id=$_ENV["route"]["params"][1];
 	$token=$_ENV["route"]["params"][2];
 	$user=wbItemRead("users",$user_id);
-	if ($user["token"]==$token) {
+	if ($user["token"]==$token AND $user["active"]=="on") {
         if (!is_callable("engine__controller_login_success")) {include_once($_ENV["path_engine"]."/controllers/engine.php");}
         engine__controller_login_success($user); 
 	} else {
