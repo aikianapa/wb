@@ -1566,10 +1566,15 @@ abstract class kiNode
 		if (!isset($_ENV["var"])) {$_ENV["var"]=array();}
 		$this->wbSetAttributes($Item);
 		$var=$this->attr("var");
-		if (!isset($where)) $where=$this->attr("where");
-		if (($where>"" AND wbWhereItem($Item,$where)) OR $where=="") {
-			if ($var>"") $_ENV["variables"]["{$var}"]=wbSetValuesStr($this->attr("value"),$Item);
-		}
+        if (strtoupper(substr($var,0,5))=="_SESS") {
+            $var=str_replace(array('[',']','_SESS'),array('["','"]','_SESSION'),$var);
+            eval('$'.$var.' = "'.$this->attr("value").'";');
+        } else {
+            if (!isset($where)) $where=$this->attr("where");
+            if (($where>"" AND wbWhereItem($Item,$where)) OR $where=="") {
+                if ($var>"") $_ENV["variables"]["{$var}"]=wbSetValuesStr($this->attr("value"),$Item);
+            }
+        }
         if ($this->attr("data-wb-hide")!=="false") {$this->remove();}
 		return $Item;
 	}
