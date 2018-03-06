@@ -33,7 +33,7 @@ function wb_cart() {
     $("[data-wb-role=cart] .add-to-art").unbind("click");
     $(document).undelegate("form[data-wb-role=cart] .add-to-cart", "click");
     $(document).delegate("form[data-wb-role=cart] .add-to-cart", "click", function () {
-        $(this).trigger("add-to-cart-click");
+        $(this).trigger("cart-add-click");
         var that = $(this);
         var form = $(this).parents("form[data-wb-role=cart]").serialize();
         var ajax = $(this).parents("form[data-wb-role=cart]").attr("data-wb-ajax");

@@ -1383,15 +1383,21 @@ function wbCartAction() {
         $order["user_id"]=$_SESSION["user_id"];
         $order["date"]=date("Y-m-d H:i:s");
     }
-
+    
     switch($param["action"]) {
 		case "add-to-cart":       wbCartItemAdd($order); break;
         case "cart-update":   	  wbCartUpdate($order); break;
 		//case "cart-item-recalc":  wbCartItemRecalc($order); break;
 		case "cart-item-remove":  wbCartItemRemove($order); break;
 		case "cart-clear":        wbCartClear($order); break;
+        case "getdata":            wbCartGetData($order); break;
 	}
     return $_SESSION["order_id"];
+}
+
+function wbCartGetData($order) {
+    echo json_encode($order);
+    die;
 }
 
 function wbCartUpdate($order) {

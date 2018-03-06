@@ -12,6 +12,21 @@
     
     function filemanagerListEvents() {
 
+    $("#filemanager").off("checkbox");
+    $("#filemanager").on("checkbox", function() {
+            var menu = $("#filemanager .content-left .nav");
+            var count = $("#filemanager #list").find("tr:not(.back) [type=checkbox]:checked").length;
+
+            if (count > 1) {
+                $(menu).find(".nav-item.allow-all").show();
+            }
+            if (count == 0) {
+                $("#filemanager").data("buffer", undefined);
+                $("#filemanager").data("bufferpath", undefined);
+                $("#filemanager .allow-buffer").hide();
+            }
+    });
+        
     $("#filemanager").delegate("#list tr", "dblclick", function() {
             var path = $("#filemanager #list").data("path");
             if ($(this).is(".dir,.dir1")) {
@@ -94,7 +109,7 @@
         $("#filemanager").undelegate("#list tr [type=checkbox]", "change");
         $("#filemanager").delegate("#list tr [type=checkbox]", "change", function() {
             var menu = $("#filemanager .content-left .nav");
-            var count = $(this).parents("#list").find("tr:not(.back) [type=checkbox]:checked").length;
+            var count = $("#filemanager #list").find("tr:not(.back) [type=checkbox]:checked").length;
             var type;
             $(menu).find(".nav-item.hidden").hide();
             if (count == 1) {
@@ -127,14 +142,7 @@
                     });
                 }
             }
-            if (count > 1) {
-                $(menu).find(".nav-item.allow-all").show();
-            }
-            if (count == 0) {
-                $("#filemanager").data("buffer", undefined);
-                $("#filemanager").data("bufferpath", undefined);
-                $("#filemanager .allow-buffer").hide();
-            }
+            $("#filemanager").trigger("checkbox");
             return false;
         });   
     }

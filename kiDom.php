@@ -519,6 +519,7 @@ class ki extends CLexer
 	}
 
 	public function fromFile($file="") {
+		$res = "";
 		if ($file=="") {
 			return ki::fromString("");
 		} else {
@@ -529,11 +530,14 @@ class ki extends CLexer
 					'content' => http_build_query($_POST),
 				)
 			));
-            $fp = fopen ($file,"r");
-            flock ($fp, LOCK_SH);
-            $res=file_get_contents($file,false,$context);
-            flock ($fp, LOCK_UN);
-            fclose ($fp);
+            $url=parse_url($file);
+			if (is_file($file) OR (isset($url["scheme"])) ) {
+				$fp = fopen ($file,"r");
+				flock ($fp, LOCK_SH);
+				$res=file_get_contents($file,false,$context);
+				flock ($fp, LOCK_UN);
+				fclose ($fp);
+			}
 			return ki::fromString($res);
 		}
 	}
