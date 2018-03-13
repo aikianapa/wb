@@ -136,7 +136,7 @@ print_r(wbRouter::getRoute());
   }
 	$_GET=array_merge($_GET,$_ENV["route"]);
 	if (isset($_GET["engine"]) && $_GET["engine"]=="true") {$_SERVER["SCRIPT_NAME"]="/engine".$_SERVER["SCRIPT_NAME"];}
-	if (isset($_SERVER["SCHEME"]) && $_SERVER["SCHEME"]>"") {$scheme=$_SERVER["SCHEME"];} else {$scheme="http";}
+	if (isset($_SERVER["REQUEST_SCHEME"]) && $_SERVER["REQUEST_SCHEME"]>"") {$scheme=$_SERVER["REQUEST_SCHEME"];} elseif (isset($_SERVER["SCHEME"]) && $_SERVER["SCHEME"]>"") {$scheme=$_SERVER["SCHEME"];} else {$scheme="http";}
 	$_ENV["route"]["scheme"]=$scheme;
     $_ENV["route"]["host"]=$_SERVER["HTTP_HOST"];
     $_ENV["route"]["port"]=$_SERVER["SERVER_PORT"];

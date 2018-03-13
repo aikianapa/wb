@@ -178,6 +178,8 @@ function wbFieldBuild($param,$data=array()) {
                     $flds->append($line);
                 }
                 $tpl->find("[data-wb-role=multiinput]")->html($flds);
+            $tpl->wbSetValues($param);
+            $tpl->wbSetData($data);
                 unset($flds);
             }
             break;

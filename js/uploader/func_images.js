@@ -11,7 +11,7 @@ function wbCommonUploader() {
 		var uid="upl-"+$(this).attr("id");
 		var store=$('#'+ id + ' > input[name]');
 		var path=$(this).attr("data-wb-path");
-		var max=store.attr("data-wb-max"); if (max==undefined) {max=10;}
+		var max=store.attr("data-wb-max"); if (max==undefined) {max=30;}
 		var ext=store.attr("data-wb-ext");
 		if (ext>"") {
 			var ext=explode(" ",ext);

@@ -65,7 +65,7 @@ $maxFileAge = 5 * 3600; // Temp file age in seconds
 
 // Create target dir
 if (!file_exists($targetDir)) {
-	@mkdir($targetDir, 0777, true);
+	@mkdir($targetDir, 0766, true);
 }
 
 // Get a file name
@@ -148,7 +148,7 @@ if (!$chunks || $chunk == $chunks - 1) {
 die('{"jsonrpc" : "2.0", "result" : null, "id" : "'.$fileName.'"}');
 
 function fileResize($path,$file) {
-	$W=1600; $Q=90;
+	$W=5000; $Q=90;
 	//if ($store["form"]=="page" && $store["item"]=="slideshow") {$W=2000; $Q=95;}
 	$thumb="http://{$_SERVER["HTTP_HOST"]}/engine/phpThumb/phpThumb.php?src=".urlencode($path. DIRECTORY_SEPARATOR .$file)."&w={$W};q={$Q}";
 	$save=$path. DIRECTORY_SEPARATOR .$file;

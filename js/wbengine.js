@@ -222,12 +222,11 @@ function wb_cart() {
 
 function wb_cart_item(item) {
         var arr={};
-        var fld = $(this).parents("[data-wb-role=cart]").attr("data-wb-update");
+        var fld = new Array("id","form","count", "price");
+        var add = $(this).parents("[data-wb-role=cart]").attr("data-wb-update");
         // можно передать список полей, участвующих в пересчёте
-        if (fld == undefined || fld == "") {
-            var fld = new Array("id","form","count", "price");
-        } else {
-            var fld = explode(",", fld);
+        if (add !== undefined && add !== "") {
+            fld=fld+explode(",", add);
         }
         for (var i in fld) {
             var fldname = (fld[i]).trim();
@@ -242,6 +241,9 @@ function wb_cart_item(item) {
             if (fldname=="id") fldname="item";
             arr[fldname]=value;
         };
+        $(item).find("[name]:input").each(function(){
+            arr[$(this).attr("name")]=$(this).val();
+        });
     return arr;
 }
 
@@ -394,6 +396,7 @@ function wb_tree() {
         data["_item"] = data["data"]["_item"] = formitem;
         data["_id"] = data["data"]["_id"] = formitem;
         var dataval = data["data"];
+        console.log(dataval);
         var tpl = wb_tree_data_fields(dict, dataval);
         //var tpl = $(wb_setdata(tpl, dataval, true));
         $(tpl).find(".wb-uploader").attr("data-wb-path", "/uploads/" + form + "/" + formitem);
@@ -432,6 +435,8 @@ function wb_tree() {
                 wb_plugins();
             }
         });
+
+        
         $(edid).off("multiinput");
         $(edid).on("multiinput", function (e, multi, trigger) {
             if ($(multi).attr("name") == "fields") {
@@ -439,6 +444,7 @@ function wb_tree() {
                 var tpl = wb_tree_dict_change(fields, tree);
                 tpl = $(wb_setdata(tpl, dataval, true));
                 $(edid).find("#treeData").children("form").html(tpl);
+                wb_multiinput();
                 wb_plugins();
             }
         });
@@ -456,7 +462,6 @@ function wb_tree() {
                     }
                 });
                 var cdata = JSON.stringify($(edid).find("#treeData > form").serializeArray());
-                            console.log(path);
                 wb_tree_data_set(that, path, cdata);
                 $(tree).find("input[name='" + name + "']").val(JSON.stringify(wb_tree_serialize($(tree).children(".dd-list"))));
             }
@@ -466,6 +471,7 @@ function wb_tree() {
                 $(edid).remove();
             }, 500)
         });
+        wb_multiinput();
         wb_plugins();
     });
     $(document).undelegate(".wb-tree-menu .dropdown-item", "click");
@@ -652,8 +658,27 @@ function wb_tree_data_set(that, path, values) {
                 fldval = wb_iconv(fldval, di["type"]);
                 values[fldname] = fldval;
             }
+            if (strpos(fldname,"[")) {
+                var pos=strpos(fldname,"[");
+                var sub=substr(fldname,pos);
+                var fldn="values['"+substr(fldname,0,pos)+"']";
+                
+                var myRe = /\[(.*?)\]/g;
+                var cur=1;
+                eval("if ("+fldn+"==undefined) {"+fldn+"={};};");
+                while ((myArray = myRe.exec(sub)) != null) {
+                    eval("fldn+=\"['"+myArray[1]+"']\";");
+                    if (cur<myArray.length) {
+                         eval("if ("+fldn+"==undefined) {"+fldn+"={};};");
+                    } else {
+                        eval(fldn+"=fldval;");
+                    }
+                    cur++;
+                }
+            }
         });
     });
+
     if (path == undefined) {
         var path = wb_tree_data_path(that);
     }
@@ -1182,10 +1207,10 @@ $(document).on("sourceChange", function (e, data) {
     var form = data.form;
     var field = data.field;
     var value = data.value;
-    if (CKEDITOR.instances[$("[name=" + field + "]").attr("id")] !== undefined) {
-        CKEDITOR.instances[$("[name=" + field + "]").attr("id")].setData(value);
+    if (CKEDITOR.instances[$("[name='" + field + "']").attr("id")] !== undefined) {
+        CKEDITOR.instances[$("[name='" + field + "']").attr("id")].setData(value);
     }
-    $("[name=" + field + "]").val(value);
+    $("[name='" + field + "']").val(value);
     setTimeout(function () {
         $(document).data("sourceChange", false);
     }, 250);
@@ -1954,8 +1979,8 @@ function wb_call_source(id) {
         var fsize = getcookie("sourceEditorFsize") * 1;
         var source = "&nbsp;";
         var fldname = $(eid).attr("name");
-        if ($("[name=" + fldname + "]").length) {
-            source = $("[name=" + fldname + "]").val();
+        if ($("[name='" + fldname + "']").length) {
+            source = $("[name='" + fldname + "']").val();
         }
         if (theme == undefined || theme == "") {
             var theme = "ace/theme/chrome";
