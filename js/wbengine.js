@@ -894,6 +894,7 @@ function wb_plugins() {
                 , captionAndToolbarAutoHideDelay: 0
                 , backButtonHideEnabled: false
                 , jQueryMobile: false
+                , zIndex: 10000
             });
         }
         if ($("script[src*=datetimepicker]").length) {
@@ -1763,7 +1764,7 @@ function wb_pagination(pid) {
         var slr = ".pagination";
     }
     else {
-        var slr = ".pagination[id=" + pid + "]";
+        var slr = ".pagination[id='" + pid + "']";
     }
     $.each($(document).find(slr), function (idx) {
         var that = this;
@@ -1772,9 +1773,9 @@ function wb_pagination(pid) {
         if ($(this).is(":not([data-idx])")) {
             $(this).attr("data-idx", idx);
         }
-        if ($("[data-wb-tpl=" + tplid + "]").data("variables") == undefined) {
+        if ($("[data-wb-tpl='" + tplid + "']").data("variables") == undefined) {
             $.get("/ajax/pagination_vars/" + id, function (data) {
-                $("[data-wb-tpl=" + tplid + "]").data("variables", data);
+                $("[data-wb-tpl='" + tplid + "']").data("variables", data);
             });
         }
         /*

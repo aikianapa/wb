@@ -488,7 +488,11 @@ class ki extends CLexer
 		$this->debug('Loading markup');
 
 		if (self::$charsetDetection) {
-			$tmp=substr($markup,0,1000);
+            if (is_array($markup)) {
+                $tmp=substr(implode(" ",$markup),0,1000); 
+            } else {
+                $tmp=substr($markup,0,1000);    
+            }
 			$this->detectCharset($tmp);
 		}
 
@@ -1232,17 +1236,14 @@ abstract class kiNode
 			foreach($nodes as $inc) {
 				if (!$inc->parents("[type=text/template]")->length) {
 				$inc->wbUserAllow();
-        $inc->wbWhere($Item);
+                $inc->wbWhere($Item);
 				$tag=$inc->wbCheckTag();
 				if (!$tag==FALSE && !$inc->hasClass("wb-done")) {
 					if ($inc->has("[data-wb-json]")) {$inc->json=wbSetValuesStr($inc->json,$Item);}
 					if ($inc->hasRole("variable")) {$Item=$inc->tagVariable($Item);} else {
 						if ($inc->is("[data-wb-tpl=true]")) {$inc->addTemplate();}
 						$inc->wbProcess($Item,$tag);
-                        if ($inc->is("[data-wb-hide=true]"))	{
-                            $tmp=$inc->innerHtml();
-                            $inc->replaceWith($tmp);
-                        }
+                        $inc->tagHideAttrs();
 						//if (isset($_SESSION["itemAfterWhere"])) {$Item=$_SESSION["itemAfterWhere"]; unset($_SESSION["itemAfterWhere"]);}
 					}
 				}
@@ -1654,21 +1655,25 @@ abstract class kiNode
 
 	public function wbSetAttributes($Item=array()) {
 		$attributes=$this->attributes();
-		if (is_object($attributes) && (strpos($attributes,"}}") OR strpos($attributes,"%"))) {
+		if (is_object($attributes)) {
 			foreach($attributes as $at) {
-				$atname=$at->name;
-				$atval=$this->attr($atname);
-				if ($atval>"" && strpos($atval,"}}")) {
-					$atval=wbSetValuesStr($atval,$Item);
-					$this->attr($atname,$atval);
-				};
-				if ($atval>"" && substr($atval,0,1)=="%") {
-					$ev=substr($atval,1);
-					eval('$tmp = '.$ev.';');
-					$this->attr($atname,$tmp);
-				}
-
-				unset($atname,$atval,$at);
+                    $atname=$at->name;
+                    $atval=$this->attr($atname);
+                    if (strpos($atname,"}}") OR strpos($atname,"%")) {
+                        $atname=wbSetValuesStr($atname,$Item);
+                    }
+                    if (strpos($atval,"}}") OR strpos($atval,"%")) {
+                        if ($atval>"" && strpos($atval,"}}")) {
+                            $atval=wbSetValuesStr($atval,$Item);
+                            $this->attr($atname,$atval);
+                        };
+                        if ($atval>"" && substr($atval,0,1)=="%") {
+                            $ev=substr($atval,1);
+                            eval('$tmp = '.$ev.';');
+                            $this->attr($atname,$tmp);
+                        }
+                        unset($atname,$atval,$at);
+                    }
 			}; unset($attributes);
 		}
 	}
@@ -2054,6 +2059,8 @@ public function tagInclude($Item=array()) {
                 $this_content=wbGetForm("common",$src);
                 break;
             case "imgviewer":
+                // устарело
+                // вызов через <script data-wb-src="imgviewer"></script>
                 $src="/engine/js/imgviewer.php";
                 break;
             case "uploader":
@@ -2066,6 +2073,20 @@ public function tagInclude($Item=array()) {
             case "source":
               if ($name=="") {$name="text";}
                 $this_content=wbGetForm("common",$src);
+                break;
+            case "gallery":
+                $this_content=wbGetForm("common",$src);
+                $attributes=$this->attributes();
+                if (is_object($attributes)) {
+                    foreach($attributes  as $at) {
+                        $atname=$at->name;
+                        $atval=$this->attr($atname);
+                        if ($atname!=="src" AND $atname!=="data-wb-role") {
+                            $this_content->find("div",0)->attr($atname,$atval);
+                            $this_content->find("div",0)->removeClass("wb-done");
+                        }
+                    }
+                }
                 break;
             case "seo":
                 $this_content=wbGetForm("common",$src);

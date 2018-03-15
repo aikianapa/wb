@@ -1175,7 +1175,7 @@ function wbSetValuesStr($tag="",$Item=array(), $limit=2)
 		$err = false;
 		$nIter = 0;
 		$_FUNC="";
-		$mask = '`(\{\{){1,1}(%*[\w\d]+|_form|_mode|_item|((_SETT|_SETTINGS|_SESS|_SESSION|_VAR|_SRV|_COOK|_COOKIE|_FUNC|_ENV|_REQ|_GET|_POST|%*[\w\d]+)?([\[]{1,1}(%*[\w\d]+|"%*[\w\d]+")[\]]{1,1})*))(\}\}){1,1}`u';
+		$mask = '`(\{\{){1,1}(%*[\w\d]+|_form|_mode|_item|((_SETT|_sett|_SETTINGS|_SESS|_sess|_SESSION|_VAR|_var|_SRV|_COOK|_COOKIE|_FUNC|_ENV|_env|_REQ|_GET|_POST|%*[\w\d]+)?([\[]{1,1}(%*[\w\d]+|"%*[\w\d]+")[\]]{1,1})*))(\}\}){1,1}`u';
 		while(!$exit) {
 			$nUndef = 0;
 			$nSub = preg_match_all($mask, $tag, $res, PREG_OFFSET_CAPTURE);				// найти все вставки, не содержащие в себе других вставок
@@ -1195,13 +1195,22 @@ function wbSetValuesStr($tag="",$Item=array(), $limit=2)
 							case '_SETT':
 								$sub = '$_ENV["settings"]';
 								break;
+							case '_sett':
+								$sub = '$_ENV["settings"]';
+								break;
 							case '_SETTINGS':
 								$sub = '$_ENV["settings"]';
 								break;
 							case '_VAR':
 								$sub = '$_ENV["variables"]';
 								break;
+							case '_var':
+								$sub = '$_ENV["variables"]';
+								break;
 							case '_SESS':
+								$sub = '$_SESSION';
+								break;
+							case '_sess':
 								$sub = '$_SESSION';
 								break;
 							case '_SESSION':
@@ -1220,6 +1229,9 @@ function wbSetValuesStr($tag="",$Item=array(), $limit=2)
 								$sub = '$_GET';
 								break;
 							case '_ENV':
+								$sub = '$_ENV';
+								break;
+							case '_env':
 								$sub = '$_ENV';
 								break;
 							case '_FUNC':

@@ -1,7 +1,7 @@
 	<div class="form-group row">
 	  <label class="col-sm-2 control-label">Галерея</label>
 	   <div class="col-sm-3">
-			<select name="images_position" class="form-control">
+			<select name="images_position[pos]" class="form-control">
 			<option value="">Нет</option>
 			<option value="top">Сверху</option>
 			<option value="bottom">Снизу</option>
