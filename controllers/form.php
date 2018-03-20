@@ -52,6 +52,10 @@ function form__controller__show() {
     if (is_callable("wbBeforeShowItem")) {$Item=$_ENV["ITEM"]=wbBeforeShowItem($Item);}
     $Item=$_ENV["ITEM"]=wbCallFormFunc("BeforeShowItem",$Item,$form,$mode);
 
+    if (is_callable("wbBeforeItemShow")) {$Item=$_ENV["ITEM"]=wbBeforeItemShow($Item);}
+    $Item=$_ENV["ITEM"]=wbCallFormFunc("BeforeItemShow",$Item,$form,$mode);
+
+    
     $aCall=$form."_".$mode; $eCall=$form."__".$mode;
 	if (is_callable($aCall)) {$out=$aCall($Item);} elseif (is_callable($eCall)) {$out=$eCall($Item);}
     if (!in_array($form,$_ENV["forms"]) OR $Item==false OR (isset($Item["active"]) AND $Item["active"]!=="on")) {

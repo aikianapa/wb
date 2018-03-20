@@ -151,7 +151,7 @@ print_r(wbRouter::getRoute());
         $_ENV["route"]["zone"]=$tmp[count($tmp)-1];
         if ($tmp>2) {unset($tmp[$count-1],$tmp[$count-2]); $_ENV["route"]["subdomain"]=implode(".",$tmp);}
     }
-    $_ENV["route"]["hostp"]=$_ENV["route"]["scheme"]."://".$_ENV["route"]["domain"];
+    $_ENV["route"]["hostp"]=$_ENV["route"]["scheme"]."://".$_ENV["route"]["host"];
     if ($_ENV["route"]["port"]!=="80") {$_ENV["route"]["hostp"].=":".$_ENV["route"]["port"];}
     if ($form=='default_form' && $mode='default_mode' && $_SERVER["QUERY_STRING"]>"") {
 		parse_str($_SERVER["QUERY_STRING"],$_GET);

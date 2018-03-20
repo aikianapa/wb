@@ -396,7 +396,7 @@ function wb_tree() {
         data["_item"] = data["data"]["_item"] = formitem;
         data["_id"] = data["data"]["_id"] = formitem;
         var dataval = data["data"];
-        console.log(dataval);
+
         var tpl = wb_tree_data_fields(dict, dataval);
         //var tpl = $(wb_setdata(tpl, dataval, true));
         $(tpl).find(".wb-uploader").attr("data-wb-path", "/uploads/" + form + "/" + formitem);
@@ -409,22 +409,29 @@ function wb_tree() {
         edit = $(wb_setdata(edit, data, true));
         edit.find(".modal").attr("id", "tree_" + form + "_" + name);
         edit.find(".modal .wb-uploader").attr("data-wb-path", "/uploads/" + form + "/" + formitem);
-        $(".content-box").append(edit);
-        $(".content-box").find(".modal #treeData form").html(tpl);
-        $(edid).after("<div class='modal-backdrop show fade'></div>");
-        var zi = 1050;
-        if ($(".modal:visible").length) {
-            $(".modal:visible").each(function () {
-                if (zi < $(this).css("z-index")) {
-                    zi = $(this).css("z-index");
-                }
-            });
-            zi += 2;
+        console.log(edid);
+        if ($("#tree_edit .tree-edit").length && $("#tree_edit .tree-edit").is(":visible")) {
+            edid="#tree_edit .tree-edit";
+            $("#tree_edit .tree-edit > div").html($(edit).find(".modal-body").html());
+            $("#tree_edit .tree-edit > div #treeData form").html(tpl);
+        } else {
+            $(".content-box").append(edit);
+            $(".content-box").find(".modal #treeData form").html(tpl);
+            $(edid).after("<div class='modal-backdrop show fade'></div>");
+            var zi = 1050;
+            if ($(".modal:visible").length) {
+                $(".modal:visible").each(function () {
+                    if (zi < $(this).css("z-index")) {
+                        zi = $(this).css("z-index");
+                    }
+                });
+                zi += 2;
+            }
+            $(edid).css("z-index", zi);
+            $(edid).next(".modal-backdrop").css("z-index", zi - 1);
+            $(edid).modal();
         }
-        $(edid).css("z-index", zi);
-        $(edid).next(".modal-backdrop").css("z-index", zi - 1);
         $(edid).data("path", path);
-        $(edid).modal();
         $(edid).undelegate("#treeDict *", "change");
         $(edid).delegate("#treeDict *", "change", function (e) {
             if ($(e.currentTarget).is("input,select,textarea")) {
@@ -448,22 +455,15 @@ function wb_tree() {
                 wb_plugins();
             }
         });
+        
+        
+        
+        
+        
         $(edid).find('.modal-footer button').off("click");
         $(edid).find('.modal-footer button').on("click", function (e) {
             if ($(this).hasClass("tree-close")) {
-                var data = $(edid).find(".modal-body > form").serializeArray();
-                $(data).each(function (i, d) {
-                    $(that).attr(d.name, d.value);
-                    if (d.name == "data-name") {
-                        $(that).children(".dd-content").val(d.value);
-                    }
-                    if (d.name == "data-id") {
-                        $(that).children(".dd3-btn").children("span").html(d.value);
-                    }
-                });
-                var cdata = JSON.stringify($(edid).find("#treeData > form").serializeArray());
-                wb_tree_data_set(that, path, cdata);
-                $(tree).find("input[name='" + name + "']").val(JSON.stringify(wb_tree_serialize($(tree).children(".dd-list"))));
+                tree_branch_change();
             }
             $(edid).modal("hide");
             $(edid).next(".modal-backdrop").remove();
@@ -471,9 +471,34 @@ function wb_tree() {
                 $(edid).remove();
             }, 500)
         });
+        
+        
+        function tree_branch_change() {
+            var data = $(edid).find("form:first").serializeArray();
+            $(data).each(function (i, d) {
+                $(that).attr(d.name, d.value);
+                if (d.name == "data-name") {
+                    $(that).children(".dd-content").val(d.value);
+                }
+                if (d.name == "data-id") {
+                    $(that).children(".dd3-btn").children("span").html(d.value);
+                }
+            });
+            var cdata = JSON.stringify($(edid).find("#treeData > form").serializeArray());
+            wb_tree_data_set(that, path, cdata);
+            $(tree).find("input[name='" + name + "']").val(JSON.stringify(wb_tree_serialize($(tree).children(".dd-list"))));
+        };
+
+        $(edid).undelegate("form *","change");
+        $(edid).delegate("form *","change",function(){
+            tree_branch_change();
+        });
+        
         wb_multiinput();
         wb_plugins();
     });
+    
+
     $(document).undelegate(".wb-tree-menu .dropdown-item", "click");
     $(document).delegate(".wb-tree-menu .dropdown-item", "click", function (e) {
         var tree = $(this).parents("[data-wb-role=tree]");
@@ -1101,44 +1126,6 @@ function wb_plugin_editor() {
             }
             var editor = $(this).ckeditor();
             CKEDITOR.config.extraPlugins = 'youtube';
-            /*CKEDITOR.config.toolbarGroups = [
-                {
-                    name: 'document'
-                    , groups: ['document', 'doctools']
-                }
-			, //    { name: 'editing',     groups: [ 'find', 'selection', 'spellchecker' ] },
-                {
-                    name: 'mode'
-                }
-                , {
-                    name: 'clipboard'
-                    , groups: ['clipboard', 'undo']
-                }
-                , {
-                    name: 'links'
-                }
-                , {
-                    name: 'insert'
-                }
-                , {
-                    name: 'others'
-                }
-				, '/'
-                , {
-                    name: 'basicstyles'
-                    , groups: ['basicstyles', 'cleanup']
-                }
-                , {
-                    name: 'paragraph'
-                    , groups: ['list', 'indent', 'blocks', 'align']
-                }
-                , {
-                    name: 'colors'
-                }
-                , {
-                    name: 'tools'
-                }
-			];*/
             //CKEDITOR.config.skin = 'bootstrapck';
             CKEDITOR.config.allowedContent = true;
             CKEDITOR.config.forceEnterMode = true;
@@ -1164,43 +1151,25 @@ function wb_plugin_editor() {
         });
         for (var i in CKEDITOR.instances) {
             // это работает
-            CKEDITOR.instances[i].on('change', function () {
+            CKEDITOR.instances[i].on('change', function (e) {
                 CKEDITOR.instances[i].updateElement();
                 var instance = CKEDITOR.instances[i].name;
                 var fldname = $("textarea#" + instance).attr("name");
                 var value = CKEDITOR.instances[i].getData();
-                if (fldname > "" && $("textarea#" + instance).parents("form").find("[name=" + fldname + "]").length) {
-                    $("textarea#" + instance).parents("form").find("[name=" + fldname + "]:not(.ace_editor,.editor)").val(value);
+                if (fldname > "" && $("textarea#" + instance).parents("form").find("[name='" + fldname + "']").length) {
+                    $("textarea#" + instance).parents("form").find("[name='" + fldname + "']:not(.ace_editor,.editor)").val(value);
                 }
                 else {
                     $("textarea#" + instance).val(value);
                 }
+                $("textarea#" + instance).html(value);
+                $("textarea#" + instance).trigger("change");
                 $(document).trigger("editorChange", {
-                    "value": value
-                    , "field": fldname
+                     "value": value
+                    ,"field": fldname
                 });
             });
         }
-        /*
-
-                			CKEDITOR.on('instanceReady', function(){
-                			   $.each( CKEDITOR.instances, function(instance) {
-                				CKEDITOR.instances[instance].on("change", function(e) {
-                							var fldname=$("textarea#"+instance).attr("name");
-                							if (fldname>"" && $("textarea#"+instance).parents("form").find("[name="+fldname+"]").length) {
-                								$("textarea#"+instance).parents("form").find("[name="+fldname+"]:not(.ace_editor)").val(CKEDITOR.instances[instance].getData());
-                							} else {
-                								$("textarea#"+instance).val(CKEDITOR.instances[instance].getData());
-                							}
-                	//						$(document).trigger("editorChange",{
-                		//						"value" : CKEDITOR.instances[instance].getData(),
-                			//					"field"	: fldname
-                		//					});
-                						//$("textarea#"+instance).trigger("change");
-                				});
-                			   });
-                			});
-        */
     }
 }
 $(document).on("sourceChange", function (e, data) {
@@ -1211,7 +1180,8 @@ $(document).on("sourceChange", function (e, data) {
     if (CKEDITOR.instances[$("[name='" + field + "']").attr("id")] !== undefined) {
         CKEDITOR.instances[$("[name='" + field + "']").attr("id")].setData(value);
     }
-    $("[name='" + field + "']").val(value);
+    if ($("[name='" + field + "']:not('.ace_editor')").is("textarea")) {$("[name='" + field + "']:not('.ace_editor')").html(value);} else {$("[name='" + field + "']:not('.ace_editor')").val(value);}
+    $("[name='" + field + "']:not('.ace_editor')").trigger("change");
     setTimeout(function () {
         $(document).data("sourceChange", false);
     }, 250);
@@ -2070,12 +2040,14 @@ function wb_call_source_events(srced, eid, fldname) {
     $(document).on("editorChange", function (e, data) {
         if ($(document).data("sourceChange") !== true) {
             $(document).data("editorChange", true);
-            var eid = "#" + $(".ace_editor[name=" + data.field + "]").attr("id");
-            var form = $(eid).parents("form");
-            srced.getSession().setValue(data.value);
-            setTimeout(function () {
-                $(document).data("editorChange", false);
-            }, 100);
+            var aeid = "#" + $(".ace_editor[name=" + data.field + "]").attr("id");
+            if (eid==aeid) {
+                var form = $(eid).parents("form");
+                srced.getSession().setValue(data.value);
+                setTimeout(function () {
+                    $(document).data("editorChange", false);
+                }, 100);
+            }
         }
     });
     $(document).undelegate(toolbar + " button", "click");

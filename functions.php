@@ -15,6 +15,7 @@ function wbInitEnviroment() {
   if (!isset($_SESSION["user"])) {$_SESSION["user"]="";}
   if (!isset($_SESSION["user_role"])) {$_SESSION["user_role"]="";}
   if (!isset($_SESSION["trigger"])) {$_SESSION["trigger"]=array();}
+  if (!isset($_SESSION["order_id"]) OR $_SESSION["order_id"]=="") {$_SESSION["order_id"]=wbNewId();$new=true;} else {$new=false;}
 	wbTrigger("func",__FUNCTION__,"before");
 	$_ENV["path_engine"]=__DIR__;
 	$_ENV["path_app"]=$_SERVER["DOCUMENT_ROOT"];

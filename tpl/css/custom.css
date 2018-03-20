@@ -232,6 +232,31 @@ label.switch-primary input:checked+span {
   width: auto;
 }
 
+#tree_edit.modal {
+  right: 0;
+  left: 0;
+  top: 0px;
+  border-radius: 0;
+  overflow-y: hidden !important;
+}
+
+#tree_edit.modal .modal-dialog {
+  margin: 0;
+  height: 100vh;
+}
+
+#tree_edit.modal .modal-body {
+  height: calc(100vh - 70px);
+  overflow-y: auto;
+}
+
+#tree_edit .tree-edit > div {
+    height:calc(100vh - 90px);
+    overflow-y:auto;
+    border-left: 1px rgba(0, 0, 0, 0.15) solid;
+}
+
+
 .tree-edit.modal {
   right: 0;
   left: auto;

@@ -17,7 +17,7 @@
                         <th class="text-right"> Действие </th>
                     </tr>
                 </thead>
-                <tbody data-wb-role="foreach" data-wb-table="{{_GET[form]}}" data-wb-add="true" data-wb-size="12" data-wb-sort="active:d date:d">
+                <tbody data-wb-role="foreach" data-wb-table="{{_GET[form]}}" data-wb-add="true" data-wb-size="12" data-wb-sort="date:d active:d">
                     <tr>
                         <td class="nowrap"> {{id}} </td>
                         <td class="nowrap"> {{date}} </td>
