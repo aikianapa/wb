@@ -211,7 +211,7 @@ function wbFlushDatabase() {
 
 function wbTable($table="data",$engine=false) {
   wbTrigger("func",__FUNCTION__,"before");
-  if ($engine==false) {$db=$_ENV["dba"];} else {$_ENV["dbe"];}
+  if ($engine==false) {$db=$_ENV["dba"];} else {$db=$_ENV["dbe"];}
     $tname=wbTableName($table);
     $table=wbTablePath($tname,$engine);
     if (!is_file($table)) {
@@ -280,7 +280,7 @@ function wbTableFlush($table) {
     $tname=wbTableName($table);
     $cache=$_ENV["cache"][$table];
     if (is_file($table) AND isset($_ENV["cache"][$table])) {
-            $fp = fopen ($file,"r");
+            $fp = fopen ($table,"r");
             flock ($fp, LOCK_SH);
             $data = json_decode(file_get_contents($table),true);
             $flag=false;
@@ -569,8 +569,10 @@ function wbTrigger($type,$name,$trigger,$args=null,$data=null) {
 	if (!isset($_ENV["error"][$type])) {$_ENV["error"][$type]=array();}
 	switch ($type) {
 		case "form":
-            $call=wbTableName($args[0]).$trigger;
-			if (is_callable($call)) {$data=$call($data);} else {$call="_".$call; if (is_callable($call)) {$data=$call($data);}}
+            if (is_string($args[0])) {
+				$call=wbTableName($args[0]).$trigger;
+				if (is_callable($call)) {$data=$call($data);} else {$call="_".$call; if (is_callable($call)) {$data=$call($data);}}
+			}
             if (isset($_SESSION["trigger"][$trigger])) {
                 foreach($_SESSION["trigger"][$trigger] as $module => $param) {
                     $ecall=$module."__".$trigger; $acall=$module."_".$trigger;
@@ -726,7 +728,7 @@ function wbErrorList() {
 	);
 }
 
-function wbLog($type,$name,$error,$args) {
+function wbLog($type,$name,$error,$args) {	
 	$log = fopen($_ENV["path_app"]."/wblog.txt", "a");
 	if (isset($_ENV["errors"][$error])) {
 		$error=array("errno"=>$error,"error"=>$_ENV["errors"][$error]);
@@ -1101,10 +1103,9 @@ function wbLoadController() {
 		$path="/controllers/".$_ENV["route"]["controller"].".php";
 		if (is_file($_ENV["path_engine"] . $path)) {include_once($_ENV["path_engine"] . $path);}
         if (is_file($_ENV["path_app"] . $path)) {include_once($_ENV["path_app"] . $path);}
-        
             $ecall=$_ENV["route"]["controller"]."__controller";
 			$acall=$_ENV["route"]["controller"]."_controller";
-            if (is_callable($acall)) return $acall(array($_ENV["DOM"],$_ENV["ITEM"]));
+            if (is_callable($acall)) return $acall(array($_ENV["DOM"],$_ENV["ITEM"])); 
             if (is_callable($ecall)) return $ecall(array($_ENV["DOM"],$_ENV["ITEM"]));
             echo "Ошибка загрузки контроллера: {$_ENV["route"]["controller"]}";
             die;

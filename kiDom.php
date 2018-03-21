@@ -527,21 +527,35 @@ class ki extends CLexer
 		if ($file=="") {
 			return ki::fromString("");
 		} else {
+			/* в этом Content-Type не передаётся сессия  
 			$context = stream_context_create(array(
 				'http' => array(
 					'method' => 'POST',
-					'header' => 'Content-Type: application/x-www-form-urlencoded' . PHP_EOL,
+					'header' => 'Content-Type: application/x-www-form-urlencoded' . PHP_EOL ,
 					'content' => http_build_query($_POST),
 				)
 			));
-            $url=parse_url($file);
-			if (is_file($file) OR (isset($url["scheme"])) ) {
-				$fp = fopen ($file,"r");
-				flock ($fp, LOCK_SH);
-				$res=file_get_contents($file,false,$context);
-				flock ($fp, LOCK_UN);
-				fclose ($fp);
-			}
+			*/
+				$context = stream_context_create(array(
+					'http'=>array( 
+						'method'=>"POST",
+						'header'=>	'Accept-language:' . " en\r\n" .
+									'Content-Type:' . " application/x-www-form-urlencoded\r\n" .
+									'Cookie: ' . session_name()."=".session_id()."\r\n" .
+									'Connection: ' . " Close\r\n\r\n",
+						'content' => http_build_query($_POST)
+				   )
+				));
+				session_write_close();
+				$url=parse_url($file);
+				if (is_file($file)) {$fp = fopen ($file,"r"); flock ($fp, LOCK_SH);} 
+				if (isset($url["scheme"])) {
+					$res=file_get_contents($file,false,$context);
+				} else {
+					$res=file_get_contents($file);
+				}
+				if (is_file($file)) {flock ($fp, LOCK_UN); fclose ($fp);}
+			
 			return ki::fromString($res);
 		}
 	}
@@ -1708,7 +1722,7 @@ abstract class kiNode
 			$tplid=uniqId();
 			$this->attr("data-template",$tplid);
 			$this->addTemplate($this->innerHtml());
-			$this->wbSetData($Item);
+			if (!$this->children("[data-wb-role=multiinput][name=items]")->length) $this->wbSetData($Item);
             $items=$this->find(".cart-item");
             $idx=0;
             foreach($items as $i) {
@@ -2121,7 +2135,7 @@ public function tagInclude($Item=array()) {
 			} else {
 				if (substr($src,0,7)!=="{$_ENV["route"]["scheme"]}://") { if (substr($src,0,1)!="/") {$src="/".$src;} $src=$_ENV["route"]["hostp"].$src;}
 			}
-			$this_content=ki::fromFile($src);
+			$this_content=wbFromFile($src);
 		}
     }
 		if ($did>"") {$this_content->find(":first")->attr("id",$did);}
@@ -2229,6 +2243,7 @@ public function tagThumbnail($Item=array()) {
             if (is_array($Item[$from])) {$images=$Item[$from];} else {$images=json_decode($Item[$from],true);}
         } else {$images="";}
 	}
+	if (!isset($idx)) {$idx=0;}
 	if (is_array($images) AND is_numeric($src)) {
 		if (isset($images[$idx])) {$img=$images[$idx]["img"];} else {$img="";}
 		$src=wbGetItemImg($Item,$idx,$noimg,$from,true);

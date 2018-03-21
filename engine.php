@@ -22,5 +22,6 @@ if ($_ENV["route"]["controller"]!=="module") {
 }
 $_ENV["DOM"]->wbTargeter();
 //echo $_ENV["DOM"]->beautyHtml();
+session_write_close();
 echo $_ENV["DOM"]->outerHtml();
 ?>

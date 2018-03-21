@@ -3,11 +3,11 @@ function ajax__pagination() {
 	$res=array();
 	foreach($_POST as $key =>$val) {$$key=$val;}
     $vars=wbItemToArray(json_decode($vars,true));
-    $tmp_a=$_ENV["DBA"];
-    $tmp_e=$_ENV["DBE"];
-    $_ENV=array_merge($_ENV,$vars);
-    $_ENV["DBA"]=$tmp_a;
-    $_ENV["DBE"]=$tmp_e;
+    $tmp_a=$_ENV["dba"];
+    $tmp_e=$_ENV["dbe"];
+    if (is_array($vars)) $_ENV=array_merge($_ENV,$vars);
+    $_ENV["dba"]=$tmp_a;
+    $_ENV["dbe"]=$tmp_e;
     unset($vars,$tmp_a,$tmp_e);
     if (!isset($page)) $page=1;
 	if (!isset($find)) $find="";
@@ -15,7 +15,7 @@ function ajax__pagination() {
 	//$fe->find("[data-wb-tpl={$tplid}]")->attr("data-find",$find);
 	$fe->find("[data-wb-tpl={$tplid}]")->attr("data-wb-cache",$cache);
 	$fe->find("[data-wb-tpl={$tplid}]")->attr("data-wb-page",$page);
-	$fe->find("[data-wb-tpl={$tplid}]")->removeClass("loaded");
+	$fe->find("[data-wb-tpl={$tplid}]")->removeClass("wb-done");
 	$fe->find("[data-wb-tpl={$tplid}]")->append($tpl);
 	$fe->find("[data-wb-tpl={$tplid}]",0)->tagForeach();
 	$form=$fe->find("[data-wb-tpl={$tplid}]")->attr("form");
@@ -38,7 +38,7 @@ function ajax__cart() {
     return wbCartAction();
 }
 
-function ajax_alive() {
+function ajax__alive() {
 	$ret=false;
 	if (isset($_SESSION["user_role"]) && $_SESSION["user_role"]>"") {
 		if ($_POST["data"]=="wb_get_user_role") {
