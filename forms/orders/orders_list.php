@@ -23,8 +23,12 @@
                         <td class="nowrap"> {{date}} </td>
                         <td class="nowrap"> {{name}} </td>
                         <td class="text-center">
-                            <div class="status-pill green" data-title="Активен" data-wb-role="where" data='active="on"' data-toggle="tooltip"></div>
-                            <div class="status-pill red" data-title="Активен" data-wb-role="where" data='active=""' data-toggle="tooltip"></div>
+                            <div class="status-pill green" data-title="Оформлен" data-wb-where='"{{active}}"="on"' data-toggle="tooltip"></div>
+                            <div class="status-pill red" data-title="Не оформлен" data-wb-where='"{{active}}"=""' data-toggle="tooltip"></div>
+                            <div class="status-pill green" data-title="Оплачен" data-wb-where='"{{payed}}"="on"' data-toggle="tooltip"></div>
+                            <div class="status-pill red" data-title="Не оплачен" data-wb-where='"{{payed}}"=""' data-toggle="tooltip"></div>
+                            <div class="status-pill green" data-title="Доставлен" data-wb-where='"{{shipped}}"="on"' data-toggle="tooltip"></div>
+                            <div class="status-pill red" data-title="Не доставлен" data-wb-where='"{{shipped}}"=""' data-toggle="tooltip"></div>
                         </td>
                         <td class="text-right" data-wb-role="include" src="/engine/forms/common/item_actions.php"> </td>
                     </tr>
