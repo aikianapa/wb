@@ -6,8 +6,9 @@ function _newsBeforeShowItem($Item) {
     $Item["month"]=date("M",strtotime($Item["date"]));
     $Item["datetime"]=date("d.m.Y H:i",strtotime($Item["date"]));
 	if ($_GET["mode"]=="list") {
-		$Item["images_count"]=count($Item["images"]);
-		unset($Item["text"]);
+        if (!is_array($Item["images"])) {$tmp=json_decode($Item["images"],true);} else {$tmp=$Item["images"];}
+        if (is_array($tmp) AND count($tmp)) {$Item["images_count"]=count($tmp);} else {$Item["images_count"]=0;}
+        unset($Item["text"]);
 	}
     return $Item;
 }

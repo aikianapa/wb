@@ -19,7 +19,9 @@
                           </thead>
                           <tbody data-wb-role="foreach" data-wb-table="pages" data-wb-add="true" data-wb-size="20" data-wb-sort="id">
                             <tr>
-                              <td class="nowrap">{{_SRV[HTTP_HOST]}}/{{id}}</td>
+                              <td class="nowrap">{{_SRV[HTTP_HOST]}}/{{id}}
+                                <br><small data-wb-where='template!=""'>/tpl/{{template}}</small>
+                                </td>
                               <td>{{header}}<br><small>{{techdescr}}</small></td>
                               <td class="text-center">
                                 <div class="status-pill green" data-title="Активен" data-wb-role="where" data='active="on"' data-toggle="tooltip"></div>

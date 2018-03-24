@@ -23,7 +23,8 @@ function _pagesAfterItemRead($Item=null) {
             if ($Item["title"]=="") {$Item["title"]=$_ENV["settings"]["header"];}
         }
         if ($_ENV["route"]["mode"]=="list") {
-            $Item["images_count"]=count(json_decode($Item["images"],true));
+            if (!is_array($Item["images"])) {$tmp=json_decode($Item["images"],true);} else {$tmp=$Item["images"];}
+			if (is_array($tmp) AND count($tmp)) {$Item["images_count"]=count($tmp);} else {$Item["images_count"]=0;}
             unset($Item["text"]);
         }
     }

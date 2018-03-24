@@ -4,7 +4,7 @@
         <div class="row">
 			<div class="col-12 col-xs-12 col-sm-6">
 				<input type="hidden" name="receiver" value="{{receiver}}"> 
-				<input type="hidden" name="short-dest" value="Проект «Железный человек»: реактор холодного ядерного синтеза"> 
+				<input type="hidden" name="short-dest" value="Оплата заказа {{_ENV[host]}} № {{id}}"> 
 				<input type="hidden" name="label" value="{{id}}"> 
 				<input type="hidden" name="quickpay-form" value="shop">
 				<input type="hidden" name="successURL" value="{{_ENV[route][hostp]}}/module/yapay/success/{{id}}/{{apikey}}">

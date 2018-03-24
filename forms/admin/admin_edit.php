@@ -25,6 +25,21 @@
                         <label for="">Электронная почта</label>
                         <input class="form-control" placeholder="Электронная почта" type="text" name="email" required> </div>
                 </div>
+                <div class="col-sm-12">
+                    <div class="row form-group">
+                        <div class="col-3">
+                        <label for="">Платёжная система</label>
+                            <select class="form-control" name="merchant" data-wb-role="foreach" data-wb-from="merchants" value="{{merchant}}" data-wb-hide="wb"> 
+                                <option value="{{name}}">{{name}} [{{type}}]</option>
+                            </select>
+                        </div>
+                        <div class="col-2">
+                            <label>&nbsp;</label>
+                            <a href="#" data-wb-ajax="/module/{{merchant}}/settings" data-wb-html="#adminMain .merchant-settings" class="btn btn-secondary form-control"><i class="fa fa-gear"></i> Настройки</a>
+                            <div class="merchant-settings"></div>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-sm-12" data-wb-role="multiinput" name="variables">
                     <div class="col-sm-3 col-xs-12">
                         <input class="form-control" placeholder="Переменная" type="text" name="var"> </div>
@@ -203,6 +218,13 @@
                 // если хоть один чек включен, то разрешаем кнопку
             });
         });
+        
+        $(document).undelegate("#adminMain select[name=merchant]","change");
+        $(document).delegate("#adminMain select[name=merchant]","click", function () {
+            $(this).parents(".form-group").find("a[data-wb-ajax]").attr("data-wb-ajax","/module/"+$(this).val()+"/settings");
+        });
+        
+        
     });
 
     function wb_backup_process(step,count) {

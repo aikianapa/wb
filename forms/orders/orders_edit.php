@@ -39,6 +39,23 @@
                         </div>
                     </div>
 
+					<div class="form-group row">
+						<div class="col-2">
+						<label class="form-control-label">Активен</label>
+						</div>
+						<div class="col-2"><label class="switch switch-success"><input type="checkbox" name="active"><span></span></label></div>
+
+						<div class="col-2">
+						<label class="form-control-label">Оплачен</label>
+						</div>
+						<div class="col-2"><label class="switch switch-success"><input type="checkbox" name="payed"><span></span></label></div>
+
+						<div class="col-2">
+						<label class="form-control-label">Доставлен</label>
+						</div>
+						<div class="col-2"><label class="switch switch-success"><input type="checkbox" name="shipped"><span></span></label></div>
+					</div>	
+
                     <div class="nav-active-primary">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item"><a class="nav-link active" href="#{{_form}}Descr" data-toggle="tab">Характеристики</a></li>
@@ -48,6 +65,7 @@
                     <div class="tab-content  p-a m-b-md">
                         <br />
                         <div id="{{_form}}Descr" class="tab-pane fade show active" role="tabpanel">
+							
                             <div class="wb-cart" data-wb-role="cart">
 
                             <div data-wb-role="multiinput" name="items">

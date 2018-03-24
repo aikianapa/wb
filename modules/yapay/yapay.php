@@ -5,23 +5,27 @@ function yapay__init()
         $mode=$_ENV["route"]["params"][0];
         $call="yapay__{$mode}";
         if (is_callable($call)) {
-            $out=@$call();
+            echo @$call();
         }
         die;
     } else {
+        return yapay__checkout();
+    }
+}
+
+function yapay__checkout() {
         $order=wbItemRead("orders",$_SESSION["order_id"]);
         $order["apikey"]=yapay__apikey($order);
         $order["user_id"]=$_SESSION["user_id"];
         $order["name"]=$_SESSION["user"];
         if (count($order["items"]) AND $order["total"]>0) wbItemSave("orders",$order);
-        $order["receiver"]="410013422291697"; //4100162513440
+        $order["receiver"]=$_ENV["settings"]["yapay"]["id"];
         $out=wbFromFile(__DIR__ ."/yapay_ui.php");
         foreach($order as $key => $val) {
             $out->find("[name='{$key}']")->attr("value",$val);
         }
         $out->wbSetData($order);
-        return $out->outerHtml();
-    }
+        return $out->outerHtml(); 
 }
 
 function yapay__success() {
@@ -41,6 +45,14 @@ function yapay__success() {
 		header('Location: /fail');
 		die;
 	}
+}
+
+function yapay__settings() {
+    if (wbRole("admin")) {
+        $form=wbFromFile(__DIR__."/yapay_settings.php");
+        $form->wbSetData($_ENV["settings"]);  // проставляем значения
+        return $form->outerHtml();
+    }
 }
 
 function yapay__apikey($order) {

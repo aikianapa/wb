@@ -126,6 +126,38 @@ function wbGetDataWbFrom($Item,$str) {
     }
 }
 
+
+function wbMerchantList($type="both") {
+	$res=array();
+    if ($type=="both") {
+        $res_e=wbMerchantList("engine");
+        $res_a=wbMerchantList("app");
+        return array_merge($res_e,$res_a);
+    } 
+    $dir=$_ENV["path_{$type}"]."/modules";
+	exec("ls {$dir} -R --ignore'=*_*.php' -D -1 ",$list);
+
+	foreach($list as $val) {
+		if (substr($val,-1)==":") {$dir=substr($val,0,-1);}
+		$file="{$dir}/{$val}";
+		if (is_file($file)) {
+			$php=strtolower(trim(file_get_contents($file)));
+			$form=explode(".php",$val); $form=$form[0];
+			if ( ( strpos($php,"function {$form}_checkout") AND strpos($php,"function {$form}_success") )
+			OR   ( strpos($php,"function {$form}__checkout") AND strpos($php,"function {$form}__success") ) ) {
+				$arr=array();
+				$arr["name"]=$form;
+				$arr["dir"]=$dir;
+                $arr["type"]=$type;
+				$res[]=$arr;
+			}
+		}
+	}
+	unset($dir,$list,$val,$form,$php,$file,$arr);
+	return $res;
+}
+
+
 function wbFieldBuild($param,$data=array()) {
 	$set=wbGetForm("common","tree_fldset");
 	$tpl=wbGetForm("snippets",$param["type"]);
@@ -1633,8 +1665,8 @@ function wbListTpl() {
 			}
 		}
 	}
-	$list=wbArraySort($result);
-	return $list;
+	sort($result);
+	return $result;
 }
 
 function wbListFilesRecursive($dir,$path=false) {
