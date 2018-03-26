@@ -494,6 +494,11 @@ function wb_tree() {
             tree_branch_change();
         });
         
+        
+        $(document).on("wb_before_formsave",function(){
+            if ($(edid).length) {tree_branch_change();}
+        });
+        
         wb_multiinput();
         wb_plugins();
     });
