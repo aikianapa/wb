@@ -917,14 +917,21 @@ function wb_plugins() {
         if (wb_plugins_loaded()) {
             autosize($('textarea[rows=auto]'));
         }
-        if ($("script[src*=photoswipe]").length && $("a[href$='.jpeg'],a[href$='.jpg'],a[href$='.png'],a[href$='.gif']").length) {
-            var myPhotoSwipe = $("a[href$='.jpeg'],a[href$='.jpg'],a[href$='.png'],a[href$='.gif']").photoSwipe({
-                allowUserZoom: true
-                , captionAndToolbarFlipPosition: true
-                , captionAndToolbarAutoHideDelay: 0
-                , backButtonHideEnabled: false
-                , jQueryMobile: false
-                , zIndex: 10000
+        if ($("script[src*=fancybox]").length && $("a[href$='.jpeg'],a[href$='.jpg'],a[href$='.png'],a[href$='.gif']").length) {
+            $("a[href$='.jpeg'],a[href$='.jpg'],a[href$='.png'],a[href$='.gif']").each(function(){
+                if ($(this).attr("data-fancybox")==undefined) {
+                    if ($(this).parents("[data-wb-tpl]").length) {
+                        if ($(this).parents("[data-wb-tpl]").attr("data-wb-tpl")!=="false") {
+                            $(this).attr("data-fancybox",$(this).parents("[data-wb-tpl]").attr("data-wb-tpl"));
+                        } 
+                    } else {
+                        $(this).attr("data-fancybox","gallery");
+                    }
+                }
+                if ($(this).parents(".modal").length) {
+                    $(this).attr("data-fancybox",$(this).parents(".modal").attr("id")+"-"+$(this).attr("data-fancybox"));
+                    
+                }
             });
         }
         if ($("script[src*=datetimepicker]").length) {

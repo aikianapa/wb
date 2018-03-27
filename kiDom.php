@@ -1331,7 +1331,7 @@ abstract class kiNode
 		}
 
     if ($sc->attr("data-wb-src")=="imgviewer") {
-					$sc->after(wb_file_get_contents(__DIR__ ."/js/photoswipe/photoswipe.php"));
+					$sc->after(wb_file_get_contents(__DIR__ ."/js/fancybox/fancybox.php"));
           $sc->remove();
 		}
 
