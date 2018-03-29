@@ -368,6 +368,8 @@ function wb_tree() {
         var that = $(e.target).parent(".wb-tree-item");
         var item = $(this).parents(".wb-tree-item").attr("data-id");
         var form = $(tree).parents("[data-wb-form]").attr("data-wb-form");
+        $(tree).find(".wb-tree-item").removeClass("wb-tree-current");
+        $(that).addClass("wb-tree-current");
         if (form == undefined) {
             form = "tree";
         }
@@ -383,6 +385,7 @@ function wb_tree() {
         var data = wb_tree_data_get(that, path);
         var orig = data;
         var dict = $(tree).children("[data-name=dict]").val();
+        $(that).data("path",path);
         if (dict == undefined || dict == "" || trim(dict) == " ") {
             var dict = [];
         }
@@ -485,7 +488,7 @@ function wb_tree() {
                 }
             });
             var cdata = JSON.stringify($(edid).find("#treeData > form").serializeArray());
-            wb_tree_data_set(that, path, cdata);
+            wb_tree_data_set(that, $(that).data("path"), cdata);
             $(tree).find("input[name='" + name + "']").val(JSON.stringify(wb_tree_serialize($(tree).children(".dd-list"))));
         };
 
@@ -496,7 +499,10 @@ function wb_tree() {
         
         
         $(document).on("wb_before_formsave",function(){
-            if ($(edid).length) {tree_branch_change();}
+            if ($(edid).length) {
+                that=$(tree).find(".wb-tree-current");
+                tree_branch_change();
+            }
         });
         
         wb_multiinput();
