@@ -18,7 +18,12 @@ function engine__controller_login()
 {
     //$user=array("id"=>"admin","password"=>md5("admin"),"role"=>"admin","point"=>"/admin/","active"=>"on");
     //wbItemSave("users",$user);
-    if (isset($_POST["l"]) and $_POST["l"]>"") {
+    if (isset($_POST["l"]) AND $_POST["l"]>"") {
+        if (strpos($_POST["l"],"@")) {
+            $users=wbItemList("users",'email="'.$_POST["l"].'"');
+            foreach($users as $key => $item) { $_POST["l"]=$item["id"]; break;}
+        }
+        
         if ($user=wbItemRead("users", $_POST["l"])) {
             if ($user["password"]==md5($_POST["p"]) AND $user["active"]=="on") {
                 wbLog("func",__FUNCTION__,100,$_POST);
@@ -65,9 +70,63 @@ function engine__controller_login_success($user) {
         die;
 }
 
-function engine__controller_register()
-{
-    $_ENV["DOM"]=wbGetTpl("register.htm");
+function engine__controller_signup()
+{   
+    $res=false;
+    $out=wbGetTpl("signup.htm");
+    
+    $exist=false;
+    if (isset($_POST["email"])) {
+        $users=wbItemList("users",'email="'.$_POST["email"].'"');
+        foreach($users as $key => $item) { $exist=true; break; }
+    }
+    
+    
+    if (isset($_ENV["route"]["active"]) AND $_ENV["route"]["active"]>"") {
+        $user=wbItemRead("users",$_ENV["route"]["active"]);
+        if (isset($user["email"]) AND isset($user["password"])) {
+            $user["active"]="on";
+            wbItemSave("users",$user);
+            $out->find(".signpanel-wrapper")->html($out->find(".signbox.success"));
+            $out->find(".signbox.success")->removeClass("d-none");
+        }
+        
+    } elseif ($exist==true) {
+            $out->find(".signpanel-wrapper")->html($out->find(".signbox.exist"));
+            $out->find(".signbox.exist")->removeClass("d-none");
+    
+    } elseif (isset($_POST["password"]) AND isset($_POST["conpassword"])) {
+        if ($_POST["password"]==$_POST["conpassword"] ) {
+            $nick=$_POST["firstname"]." ".$_POST["lastname"];
+            $user=array(
+                 "id"               => wbNewId()
+                ,"active"           => ""
+                ,"role"             => "user"
+                ,"first_name"       => $_POST["firstname"]
+                ,"last_name"        => $_POST["lastname"]
+                ,"name"             => $nick
+                ,"password"         => md5($_POST["password"])
+                ,"email"            => $_POST["email"]
+            );
+            wbItemSave("users",$user);
+            
+            
+            $msg=$out->find(".signbox.mail",0);
+            $msg->wbSetData($user);
+            $subj=$msg->find(".subject",0);
+            wbMail(array($_ENV["settings"]["email"],$_ENV["settings"]["header"]),array($_POST["email"],$nick),$subj->html(),$msg->html());
+            unset($msg,$subj);
+            $out->find(".signpanel-wrapper")->html($out->find(".signbox.check"));
+            $out->find(".signbox.check")->removeClass("d-none");
+        } else {
+            $out->find("[name=password]",0)->prev("label",0)->addClass("text-danger");
+            $out->find("[name=conpassword]",0)->prev("label",0)->addClass("text-danger");
+        }        
+    }
+    $out->find(".signbox.d-none")->remove();
+    $out->wbSetData($_POST);
+    $_ENV["DOM"]=$out; 
+    unset($out);
     return $_ENV["DOM"];
 }
 

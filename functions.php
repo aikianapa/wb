@@ -42,6 +42,33 @@ function wbInitEnviroment() {
 	$_ENV["settings"]=$settings;
 }
 
+function wbMail(
+         $from=null
+        ,$sent=null
+        ,$subject=null
+        ,$message=null
+        ,$attach=null
+    ) {
+
+    if (!is_array($from)) {$from=array($from);}
+    if (!is_array($sent)) {$from=array($sent);}
+    if (!is_array($attach) AND $attach!==null) {$from=array($from);}
+    if (!isset($from[1])) {$from[1]=strip_tags($_ENV["settings"]["header"]);}
+    if (!isset($sent[1])) {$sent[1]=$sent[0];}
+
+    $headers=array();
+    $headers[] = 'MIME-Version: 1.0';
+    $headers[] = 'Content-type: text/html; charset=UTF-8';
+    $headers[] = "To: {$sent[1]} <{$sent[0]}>";
+    $headers[] = "Reply-To: {$from[1]} <{$from[0]}>";
+    
+
+     $res= mail($sent[0], $subject, $message, implode("\r\n", $headers)); 
+
+    return $res;
+}
+
+
 function wbCheckWorkspace() {
      if (!is_readable($_ENV["path_app"]) OR !is_writable($_ENV["path_app"])) {
         $out=wbGetTpl("setup.htm");
