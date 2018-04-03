@@ -409,10 +409,10 @@ function wb_tree() {
         data["form"] = form;
         data["data-id"] = item;
         $(".content-box .tree-edit.modal").remove();
+        $("tester").remove();
         edit = $(wb_setdata(edit, data, true));
         edit.find(".modal").attr("id", "tree_" + form + "_" + name);
         edit.find(".modal .wb-uploader").attr("data-wb-path", "/uploads/" + form + "/" + formitem);
-        console.log(edid);
         if ($("#tree_edit .tree-edit").length && $("#tree_edit .tree-edit").is(":visible")) {
             edid="#tree_edit .tree-edit";
             $("#tree_edit .tree-edit > div").html($(edit).find(".modal-body").html());
@@ -420,7 +420,7 @@ function wb_tree() {
         } else {
             $(".content-box").append(edit);
             $(".content-box").find(".modal #treeData form").html(tpl);
-            $(edid).after("<div class='modal-backdrop show fade'></div>");
+            //$(edid).after("<div class='modal-backdrop show fade'></div>");
             var zi = 1050;
             if ($(".modal:visible").length) {
                 $(".modal:visible").each(function () {
@@ -431,10 +431,18 @@ function wb_tree() {
                 zi += 2;
             }
             $(edid).css("z-index", zi);
-            $(edid).next(".modal-backdrop").css("z-index", zi - 1);
+            //$(edid).next(".modal-backdrop").css("z-index", zi - 1);
             $(edid).modal();
+            
+            $(document).click(function(e){
+               if (!$(e.target).parents(".tree-edit").length && !$(e.target).parents(".wb-tree").length && !$(e.target).parents(".dropdown-item").length)  {
+                    $(edid).modal("hide");
+               }
+            });
+            
         }
         $(edid).data("path", path);
+        $(edid).data("tree", tree);
         $(edid).undelegate("#treeDict *", "change");
         $(edid).delegate("#treeDict *", "change", function (e) {
             if ($(e.currentTarget).is("input,select,textarea")) {
@@ -451,6 +459,7 @@ function wb_tree() {
         $(edid).on("multiinput", function (e, multi, trigger) {
             if ($(multi).attr("name") == "fields") {
                 var fields = multi;
+                var tree=$(edid).data("tree");
                 var tpl = wb_tree_dict_change(fields, tree);
                 tpl = $(wb_setdata(tpl, dataval, true));
                 $(edid).find("#treeData").children("form").html(tpl);
@@ -459,10 +468,7 @@ function wb_tree() {
             }
         });
         
-        
-        
-        
-        
+
         $(edid).find('.modal-footer button').off("click");
         $(edid).find('.modal-footer button').on("click", function (e) {
             if ($(this).hasClass("tree-close")) {
@@ -568,7 +574,7 @@ function wb_tree_dict_change(fields, tree) {
         });
         dict.push(fld);
     });
-    var trid = json_decode($(tree).children("[name=tree]").val(), true);
+    var trid = json_decode($(tree).children("[name]").val(), true);
     var trid = trid[0]["id"];
     $(tree).children("[data-name=dict]").val(JSON.stringify(dict));
     var res = wb_tree_data_fields(dict, {

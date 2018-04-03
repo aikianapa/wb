@@ -1,4 +1,4 @@
-<div class="modal fadeLeft tree-edit" id="tree_{{form}}_{{name}}" data-keyboard="false" data-backdrop="true" role="dialog" aria-hidden="true">
+<div class="modal tree-edit" id="tree_{{form}}_{{name}}" data-keyboard="false" data-backdrop="false" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
 	<div class="modal-content">
       <div class="modal-body">
@@ -17,12 +17,12 @@
 </form>
 	
 <div class="tab-content  p-a m-b-md">
-<div id="treeData" class="tab-pane fade show active" role="tabpanel">
+<div id="treeData" class="tab-pane show active" role="tabpanel">
 	<form class="form-horizontal" role="form">
 	</form>
 </div>
 
-<div id="treeDict" class="tab-pane fade" data-wb-role="include" src="/engine/forms/common/common_tree_dict.php" role="tabpanel"></div>
+<div id="treeDict" class="tab-pane" data-wb-role="include" src="/engine/forms/common/common_tree_dict.php" role="tabpanel"></div>
 </div>
 
     </div>
@@ -31,8 +31,7 @@
 				<li class="nav-item"><a class="nav-link active" href="#treeData" data-toggle="tab">Данные</a></li>
 				<li class="nav-item"><a class="nav-link" href="#treeDict" data-toggle="tab" >Словарь</a></li>
 			</ul>
-			<button type="button" class="btn btn-decondary" data-dismiss="modal" ><span class="fa fa-close"></span> Отмена</button>
-			<button type="button" class="btn btn-primary tree-close" ><span class="fa fa-arrow-circle-left"></span> Изменить</button>
+			<button type="button" class="btn btn-success" data-dismiss="modal" ><span class="fa fa-close"></span> Закрыть</button>
 		  </div>
 
 		</div>
