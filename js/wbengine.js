@@ -1,14 +1,22 @@
-wb_include("/engine/js/php.js");
-wb_include("/engine/js/jquery.redirect.js");
-var $=jQuery.noConflict();
-$(document).ready(function() {
-    if ($("link[rel$=less],style[rel$=less]").length) wb_include("/engine/js/less.min.js");
-    wb_alive();
-    wb_delegates();
-    $("body").removeClass("cursor-wait");
-});
+"use strict";
+jQuery.fn.outerHTML = function (s) {
+    return s ? this.before(s).remove() : jQuery("<p>").append(this.eq(0).clone()).html();
+};
+
+var $ = jQuery.noConflict();
+
+function wb_include(url) {
+    "use strict";
+    if (!$(document).find("script[src='" + url + "']").length) {
+        var s = document.createElement('script');
+        s.src = url;
+        s.type = "text/javascript";
+        document.body.appendChild(s);
+    }
+}
 
 function wb_delegates() {
+    "use strict";
     wb_ajax();
     wb_pagination();
     wb_formsave();
@@ -20,6 +28,7 @@ function wb_delegates() {
 }
 
 function wb_cart() {
+    "use strict";
     $(document).unbind("cart-recalc");
     $(document).unbind("cart-clear");
     $(document).unbind("cart-item-recalc");
@@ -248,6 +257,7 @@ function wb_cart_item(item) {
 }
 
 function wb_alive() {
+    "use strict";
     if ($("body").attr("data-wb-alive") == "true") {
         var post = "wb_get_user_role";
         setInterval(function () {
@@ -275,18 +285,13 @@ function wb_alive() {
     }
 }
 
-function wb_include(url) {
-    if (!$(document).find("script[src='" + url + "']").length) {
-        document.write('<script src="' + url + '" type="text/javascript" ></script>\n');
-    }
-}
-
 function wb_get_cdata(text) {
     text = text.replace("<![CDATA[", "").replace("]]>", "");
     return text;
 }
 
 function wb_tree() {
+    "use strict";
     if ($(document).data("wb-tree-rowmenu") == undefined && $(".wb-tree").length) {
         $.get("/ajax/getform/common/tree_rowmenu/", function (data) {
             $(document).data("wb-tree-rowmenu", data);
@@ -408,7 +413,7 @@ function wb_tree() {
         data["data-name"] = text;
         data["form"] = form;
         data["data-id"] = item;
-        $(".content-box .tree-edit.modal").remove();
+        //$(".content-box .tree-edit.modal").remove();
         $("tester").remove();
         edit = $(wb_setdata(edit, data, true));
         edit.find(".modal").attr("id", "tree_" + form + "_" + name);
@@ -435,7 +440,14 @@ function wb_tree() {
             $(edid).modal();
             
             $(document).click(function(e){
-               if (!$(e.target).parents(".tree-edit").length && !$(e.target).parents(".wb-tree").length && !$(e.target).parents(".dropdown-item").length)  {
+               if (!$(e.target).parents(".tree-edit").length 
+                   && !$(e.target).parents(".wb-tree").length 
+                   && !$(e.target).parents(".dropdown-item").length
+                   && !$(e.target).is(".dropdown-item")
+                   && !$(e.target).parents(".cke_reset_all").length
+                   && !$(e.target).parents(".cke_screen_reader_only").length
+                   && !$(e.target).is(".cke_dialog_background_cover")
+                  )  {
                     $(edid).modal("hide");
                }
             });
@@ -825,6 +837,7 @@ function wb_newid() {
 }
 
 function wb_multiinput() {
+    "use strict";
     if ($("[data-wb-role=multiinput]").length && $(document).data("wb-multiinput-menu") == undefined) {
         $.get("/ajax/getform/common/multiinput_menu/", function (data) {
             $(document).data("wb-multiinput-menu", data);
@@ -925,6 +938,7 @@ function wb_base_fix() {
 }
 
 function wb_plugins() {
+    "use strict";
     $(document).ready(function () {
         if (wb_plugins_loaded()) {
             autosize($('textarea[rows=auto]'));
@@ -1544,6 +1558,7 @@ function wb_check_required(form) {
 }
 
 function wb_ajax() {
+    "use strict";
     $(document).undelegate("[data-wb-ajax]", "click");
     $(document).delegate("[data-wb-ajax]", "click", function () {
         wb_ajax_loader();
@@ -2224,6 +2239,14 @@ function getcookie(cookie_name) {
         return null;
     }
 }
-jQuery.fn.outerHTML = function (s) {
-    return s ? this.before(s).remove() : jQuery("<p>").append(this.eq(0).clone()).html();
-};
+
+    wb_include("/engine/js/php.js");
+    wb_include("/engine/js/jquery.redirect.js");
+
+    $(document).ready(function() {
+        "use strict";
+        if ($("link[rel$=less],style[rel$=less]").length) wb_include("/engine/js/less.min.js");
+        wb_alive();
+        wb_delegates();
+        $("body").removeClass("cursor-wait");
+    });

@@ -159,6 +159,10 @@ label.switch-primary input:checked+span {
     right:0;
 }
 
+.tree-edit.modal {
+    box-shadow: -5px 20px 2px #00000066;
+}
+
 .dd-item>button {
   margin: 5px 0px 5px 0px;
   position: absolute;
