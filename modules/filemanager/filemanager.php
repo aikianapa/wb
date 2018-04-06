@@ -156,6 +156,26 @@ function filemanager__action_paste($out=null)
 		die;
 }
 
+function filemanager__action_remove($out=null)
+{
+        $_POST["list"]=json_decode($_POST["list"],true);
+        foreach($_POST["list"] as $i => $item) {
+                $dst=$_ENV["path_app"].$_POST["path"]."/".$item["name"];
+                $engine=filemanager__check_engine($dst); // если дирректория движка, то не даём удалять
+                if (!$engine AND is_dir($dst)) {wbRecurseDelete($dst);}
+                if (!$engine AND is_file($dst)) {wbFileRemove($dst);}
+        }
+        echo json_encode(array("res"=>$_POST["method"],"action"=>"reload_list"));
+		die;
+}
+
+function filemanager__check_engine($path) {
+    $res=false;
+    $check=strpos("#".$path."/",$_ENV["path_app"]."/engine/");
+    if ($check) {$res=true;}
+    return $res;
+}
+
 function filemanager__action()
 {
     if (!filemanager__allow()) {

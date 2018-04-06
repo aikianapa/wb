@@ -338,6 +338,14 @@
     #filemanager #list .fa.z:before {
         content: "\f1c6";
     }
+    
+    #filemanager .content-left {
+        position:fixed;
+        top:inherit;
+        left:inherit;
+        height: calc( 100vh - 200px );
+        overflow-y:auto;
+    }
 
 </style>
 

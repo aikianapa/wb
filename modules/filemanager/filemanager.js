@@ -11,6 +11,21 @@
 
     
     function filemanagerListEvents() {
+        
+    $('#filemanager').undelegate('#filemanagerModalDialog','shown.bs.modal');    
+    $('#filemanager').delegate('#filemanagerModalDialog','shown.bs.modal', function () {
+      $('#filemanagerModalDialog input:visible:first').focus();
+    });
+        
+        
+    $("#filemanager").undelegate("#filemanagerModalDialog","keydown");
+    $("#filemanager").delegate("#filemanagerModalDialog","keydown",function(e){
+        if (e.keyCode == 13) {
+            $("#filemanagerModalDialog .btn-primary").trigger("click");
+            return false;
+        }
+    });
+        
 
     $("#filemanager").off("checkbox");
     $("#filemanager").on("checkbox", function() {
@@ -117,14 +132,11 @@
                 var ext = $(check).parents("tr").attr("data-ext");
                 if ($(check).parents("tr.dir").length) {
                     type = "dir";
-                }
-                if ($(check).parents("tr.file").length) {
+                } else if ($(check).parents("tr.file").length) {
                     type = "file";
-                }
-                if ($(check).parents("tr.dir1").length) {
+                } else if ($(check).parents("tr.dir1").length) {
                     type = "dir1";
-                }
-                if ($(check).parents("tr.file1").length) {
+                } else if ($(check).parents("tr.file1").length) {
                     type = "file1";
                 }
                 $(menu).find(".nav-item.allow-single.allow-" + type).show();
@@ -172,14 +184,11 @@
             if (count == 1) {
                 if ($(check).parents("tr.dir").length) {
                     type = "dir";
-                }
-                if ($(check).parents("tr.file").length) {
+                } else if ($(check).parents("tr.file").length) {
                     type = "file";
-                }
-                if ($(check).parents("tr.dir1").length) {
+                } else if ($(check).parents("tr.dir1").length) {
                     type = "dir1";
-                }
-                if ($(check).parents("tr.file1").length) {
+                } else if ($(check).parents("tr.file1").length) {
                     type = "file1";
                 }
             }
@@ -197,6 +206,16 @@
                     if (count == 1) {
                         $(check).parents("tr").find("a[href='#rm" + type + "']").trigger("click");
                     } else {
+                         var list={};
+                         $("#filemanager #list").find("tr:not(.back) [type=checkbox]:checked").parents("tr").each(function(i){
+                            var item = {name: $(this).attr("data-name")};
+                            list[i]=item; 
+                         });
+                        var post={
+                            path : $("#filemanager #list").data("path"),
+                            list : json_encode(list)
+                        };
+                         $("#filemanager").data("post",post);
                         filemanagerDialogMulti(href);
                     }
                     break
@@ -239,7 +258,7 @@
         $("#filemanager").delegate("#filemanagerModalDialog .btn-primary", "click", function() {
             var action = $(this).attr("data-action");
             var post, data;
-            if (action == "paste") {
+            if (action == "paste" || action == "remove") {
                 post = $("#filemanager").data("post");
             } else {
                 post = $("#filemanager #filemanagerModalDialog .modal-body form").serialize();
