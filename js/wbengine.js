@@ -448,6 +448,7 @@ function wb_tree() {
                    && !$(e.target).parents(".cke_screen_reader_only").length
                    && !$(e.target).is(".cke_dialog_background_cover")
                   )  {
+                    tree_branch_change();
                     $(edid).modal("hide");
                }
             });
@@ -719,6 +720,7 @@ function wb_tree_data_set(that, path, values) {
                 
                 var myRe = /\[(.*?)\]/g;
                 var cur=1;
+                var myArray=[];
                 eval("if ("+fldn+"==undefined) {"+fldn+"={};};");
                 while ((myArray = myRe.exec(sub)) != null) {
                     eval("fldn+=\"['"+myArray[1]+"']\";");
