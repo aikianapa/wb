@@ -496,19 +496,21 @@ function wb_tree() {
         
         
         function tree_branch_change() {
-            var data = $(edid).find("form:first").serializeArray();
-            $(data).each(function (i, d) {
-                $(that).attr(d.name, d.value);
-                if (d.name == "data-name") {
-                    $(that).children(".dd-content").val(d.value);
-                }
-                if (d.name == "data-id") {
-                    $(that).children(".dd3-btn").children("span").html(d.value);
-                }
-            });
-            var cdata = JSON.stringify($(edid).find("#treeData > form").serializeArray());
-            wb_tree_data_set(that, $(that).data("path"), cdata);
-            $(tree).find("input[name='" + name + "']").val(JSON.stringify(wb_tree_serialize($(tree).children(".dd-list"))));
+            if ($(edid).find("form:first").length) {
+                var data = $(edid).find("form:first").serializeArray();
+                $(data).each(function (i, d) {
+                    $(that).attr(d.name, d.value);
+                    if (d.name == "data-name") {
+                        $(that).children(".dd-content").val(d.value);
+                    }
+                    if (d.name == "data-id") {
+                        $(that).children(".dd3-btn").children("span").html(d.value);
+                    }
+                });
+                var cdata = JSON.stringify($(edid).find("#treeData > form").serializeArray());
+                wb_tree_data_set(that, $(that).data("path"), cdata);
+                $(tree).find("input[name='" + name + "']").val(JSON.stringify(wb_tree_serialize($(tree).children(".dd-list"))));
+            }
         };
 
         $(edid).undelegate("form *","change");
@@ -734,7 +736,6 @@ function wb_tree_data_set(that, path, values) {
             }
         });
     });
-
     if (path == undefined) {
         var path = wb_tree_data_path(that);
     }
