@@ -144,12 +144,14 @@ function filemanager__action_paste($out=null)
 				foreach($_POST["list"] as $i => $item) {
 						$dst=$_ENV["path_app"].$_POST["path"]."/".$item["name"];
 						$src=$_ENV["path_app"].$item["path"]."/".$item["name"];
-						wbRecurseCopy($src,$dst);
-						if 				($item["type"]=="dir") {
+                        if ($_POST["method"]=="cut") {
+                          rename($src,$dst);
+                        }
+                    
+                        if ($_POST["method"]=="copy") {
+						  wbRecurseCopy($src,$dst);                            
+                        }
 
-						} elseif 	($item["type"]=="file") {
-
-						}
 				}
 				echo json_encode(array("res"=>$_POST["method"],"action"=>"reload_list"));
 		}
@@ -179,17 +181,19 @@ function filemanager__check_engine($path) {
 function filemanager__action()
 {
     if (!filemanager__allow()) {
-        return;
+        return json_encode(false);
     }
     $call="filemanager__action_".$_ENV["route"]["params"][1];
     if (is_callable($call)) {
-        echo $call();
+        $res=$call();
+        if (is_array($res)) {echo json_encode($res);} else {echo json_encode(false);}
     }
+    die;
 }
 
 function filemanager__action_multi() {
     
-    return json_encode(null);
+    return null;
 }
 
 
@@ -197,7 +201,7 @@ function filemanager__action_newdir()
 {
     $res=false;
     if (!filemanager__allow()) {
-        return json_encode($res);
+        return $res;
     }
     $action=$_ENV["route"]["params"][1];
     $dir=$_ENV["path_app"].$_POST["path"];
@@ -209,19 +213,19 @@ function filemanager__action_newdir()
     if (!$res) {
         return $res;
     }
-    return json_encode(array(
+    return array(
         "res"=>$res,
         "name"=>$newname,
         "type"=>"dir",
         "action"=>"reload_list"
-    ));
+    );
 }
 
 function filemanager__action_newfile()
 {
     $res=false;
     if (!filemanager__allow()) {
-        return json_encode($res);
+        return $res;
     }
     $action=$_ENV["route"]["params"][1];
     $dir=$_ENV["path_app"].$_POST["path"];
@@ -231,13 +235,13 @@ function filemanager__action_newfile()
         $res=file_put_contents($path, "");
     }
     if (is_file($path)) {
-		    return json_encode(array(
+		    return array(
 		        "res"=>$res,
 		        "name"=>$newname,
 		        "type"=>"file",
 		        "ext"=> pathinfo($path, PATHINFO_EXTENSION),
 		        "action"=>"reload_list"
-		    ));
+		    );
 		}
 }
 
@@ -245,7 +249,7 @@ function filemanager__action_rmdir()
 {
     $res=false;
     if (!filemanager__allow()) {
-        return json_encode($res);
+        return $res;
     }
     $action=$_ENV["route"]["params"][1];
     $dir=$_ENV["path_app"].$_POST["path"]."/".$_POST["dirname"];
@@ -253,14 +257,14 @@ function filemanager__action_rmdir()
         $res=wbRecurseDelete($dir);
     }
     if (is_dir($dir) && $res!==false) {
-        return json_encode($res);
+        return $res;
     } else {
-        return json_encode(array(
+        return array(
             "res"=>$res,
             "name"=>$_POST["dirname"],
             "type"=>"dir",
             "action"=>"reload_list"
-        ));
+        );
     }
 }
 
@@ -268,7 +272,7 @@ function filemanager__action_rmfile()
 {
     $res=false;
     if (!filemanager__allow()) {
-        return json_encode($res);
+        return $res;
     }
     $action=$_ENV["route"]["params"][1];
     $file=$_ENV["path_app"].$_POST["path"]."/".$_POST["filename"];
@@ -276,14 +280,14 @@ function filemanager__action_rmfile()
         $res=wbFileRemove($file);
     }
     if (is_file($file) and $res!==false) {
-        return json_encode($res);
+        return $res;
     } else {
-        return json_encode(array(
+        return array(
             "res"=>$res,
             "name"=>$_POST["filename"],
             "type"=>"dir",
             "action"=>"reload_list"
-        ));
+        );
     }
 }
 
@@ -291,7 +295,7 @@ function filemanager__action_renfile()
 {
     $res=false;
     if (!filemanager__allow()) {
-        return json_encode($res);
+        return $res;
     }
     $action=$_ENV["route"]["params"][1];
     $oldfile=$_ENV["path_app"].$_POST["path"]."/".$_POST["oldname"];
@@ -300,15 +304,15 @@ function filemanager__action_renfile()
         $res=rename($oldfile, $newfile);
     }
     if (!is_file($newfile) or $res==false) {
-        return json_encode($res);
+        return $res;
     } else {
-        return json_encode(array(
+        return array(
             "res"=>$res,
             "name"=>$_POST["filename"],
             "type"=>"file",
             "ext"=> pathinfo($newfile, PATHINFO_EXTENSION),
             "action"=>"change_name"
-        ));
+        );
     }
 }
 
@@ -316,7 +320,7 @@ function filemanager__action_rendir()
 {
     $res=false;
     if (!filemanager__allow()) {
-        return json_encode($res);
+        return $res;
     }
     $action=$_ENV["route"]["params"][1];
     $olddir=$_ENV["path_app"].$_POST["path"]."/".$_POST["oldname"];
@@ -325,14 +329,14 @@ function filemanager__action_rendir()
         $res=rename($olddir, $newdir);
     }
     if (!is_dir($newdir) or $res==false) {
-        return json_encode($res);
+        return $res;
     } else {
-        return json_encode(array(
+        return array(
             "res"=>$res,
             "name"=>$_POST["dirname"],
             "type"=>"dir",
             "action"=>"change_name"
-        ));
+        );
     }
 }
 

@@ -240,6 +240,14 @@
                     $("#filemanager").data("buffertype", "copy");
                     $("#filemanager .allow-buffer").show();
                     break
+                    
+                case '#cut':
+                    $("#filemanager").data("buffer", $("#filemanager #list").find("tr:not(.back) [type=checkbox]:checked").parents("tr"));
+                    $("#filemanager").data("bufferpath", $("#filemanager #list").data("path"));
+                    $("#filemanager").data("buffertype", "cut");
+                    $("#filemanager .allow-buffer").show();
+                    break
+                    
                 case '#paste':
                     if ($("#filemanager").data("bufferpath") !== $("#filemanager #list").data("path")) {
                         filemanagerPaste();
