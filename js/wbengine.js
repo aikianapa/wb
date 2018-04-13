@@ -1269,10 +1269,10 @@ function wb_iconv_object(obj) {
 function wb_iconv(value, type) {
     if (substr(type, 0, 4) == "date") {
         if (type == "date" || type == "datepicker") {
-            mask = "Y-m-d";
+            var mask = "Y-m-d";
         }
         if (type == "datetime" || type == "datetimepicker") {
-            mask = "Y-m-d H:i";
+            var mask = "Y-m-d H:i";
         }
         value = date(mask, strtotime(value));
     }

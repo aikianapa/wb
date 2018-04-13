@@ -7,7 +7,14 @@
 <div class="col-12" id="filemanager">
     <div class="content-wrapper">
         <div class="content-left">
-            <button class="btn btn-default btn-block mg-b-20">Загрузить файл</button>
+
+        <div id="filemanagerUploader">
+            <div class="uploader">
+                <button id="pickfiles" class="btn btn-default btn-block mg-b-20">Загрузить файлы</button>
+            </div>
+        </div>
+            
+            
             <label class="content-left-label">Действия</label>
             <ul class="nav mg-t-1-force">
                 <li class="nav-item">
