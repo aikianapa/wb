@@ -80,7 +80,7 @@
             if (count == 0) {
                 $("#filemanager").data("buffer", undefined);
                 $("#filemanager").data("bufferpath", undefined);
-                $("#filemanager .allow-buffer").hide();
+                $("#filemanager").find(".allow-buffer, .allow-single, .allow-all").hide();
             }
     });
         
@@ -215,6 +215,22 @@
     }
 
 
+    function filemanagerSetPostChecked() {
+         var list = {};
+         $("#filemanager #list").find("tr:not(.back) [type=checkbox]:checked").parents("tr").each(function (i) {
+             var item = {
+                 name: $(this).attr("data-name")
+             };
+             list[i] = item;
+         });
+         var post = {
+             path: $("#filemanager #list").data("path")
+             , list: json_encode(list)
+         };
+         $("#filemanager").data("post", post);
+    }
+
+
     function filemanagerSideMenu() {
 
         $("#filemanager").undelegate(".content-left .nav a.nav-link", "click");
@@ -236,6 +252,10 @@
             }
 
             switch (href) {
+                case '#zip':
+                    filemanagerSetPostChecked();
+                    filemanagerDialogMulti(href);
+                    break;
                 case '#rename':
                     if (count == 1) {
                         $(check).parents("tr").find("a[href='#ren" + type + "']").trigger("click");
@@ -248,16 +268,7 @@
                     if (count == 1) {
                         $(check).parents("tr").find("a[href='#rm" + type + "']").trigger("click");
                     } else {
-                         var list={};
-                         $("#filemanager #list").find("tr:not(.back) [type=checkbox]:checked").parents("tr").each(function(i){
-                            var item = {name: $(this).attr("data-name")};
-                            list[i]=item; 
-                         });
-                        var post={
-                            path : $("#filemanager #list").data("path"),
-                            list : json_encode(list)
-                        };
-                         $("#filemanager").data("post",post);
+                        filemanagerSetPostChecked();
                         filemanagerDialogMulti(href);
                     }
                     break
@@ -310,6 +321,12 @@
             var post, data;
             if (action == "paste" || action == "remove") {
                 post = $("#filemanager").data("post");
+            } else if (action=="zip") {
+                post = $("#filemanager #filemanagerModalDialog .modal-body form").serialize();
+                post += "&path=" + $("#filemanager #list").data("path");
+                $("#filemanager #list").find("tr:not(.back) [type=checkbox]:checked").parents("tr").each(function(){
+                    post+="&list[]="+$(this).attr("data-name");
+                });
             } else {
                 post = $("#filemanager #filemanagerModalDialog .modal-body form").serialize();
                 data = $("#filemanager").data("post");
@@ -366,6 +383,7 @@
             $("#filemanager #list").data("path", dir);
             $("#filemanager #panel").noSelect();
             d.resolve();
+            $("#filemanager").trigger("checkbox");
             wb_ajax_loader_done();
         });
         return d;
@@ -431,10 +449,8 @@
 
     }
 
-    function filemanagerPaste() {
+    function filemanageListBuffer() {
         var spath = $("#filemanager").data("bufferpath");
-        var dpath = $("#filemanager #list").data("path");
-        var method = $("#filemanager").data("buffertype");
         var list = [];
         $($("#filemanager").data("buffer")).each(function() {
             var type = "file";
@@ -457,13 +473,18 @@
             };
             list.push(item);
         });
+        return list;
+    }
+
+    function filemanagerPaste() {
+        var dpath = $("#filemanager #list").data("path");
+        var method = $("#filemanager").data("buffertype");
         $.post("/module/filemanager/dialog/paste", {
-            list: list,
+            list: filemanageListBuffer(),
             method: method,
             path: dpath
         }, function(data) {
             data = json_decode(data);
-            console.log(data);
             $("#filemanager").data("post", data.post);
             if (data.res == "dialog") {
                 $("#filemanager #filemanagerModalDialog").remove();

@@ -118,10 +118,32 @@ function filemanager__dialog()
         $out->wbSetValues($fields);
         if ($action=="paste") {
             filemanager__action_paste($out);
+        } elseif ($action=="zip") {
+            filemanager__action_zip($out);
         } else {
             echo $out;
         }
     }
+}
+
+function filemanager__action_zip($out=null)
+{
+		$flag=true;
+		if ($out!==null) {
+            $out->find("[name=filename]")->attr("value","archive.zip");
+            echo $out->outerHtml();
+        } else {
+            $path=$_ENV["path_app"].$_POST["path"];
+            $zipname=$_POST["filename"];
+            $src="";
+            foreach($_POST["list"] as $item) {
+                $src.=" ".$item;
+            }
+            if (is_file($path."/".$zipname)) {unlink($path."/".$zipname);}
+            exec("cd {$path} && zip -o -D -r {$zipname} ".$src);
+            echo json_encode(array("res"=>$_POST["method"],"action"=>"reload_list"));
+        }
+        die;
 }
 
 function filemanager__action_paste($out=null)

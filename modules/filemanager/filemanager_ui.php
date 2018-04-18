@@ -188,6 +188,7 @@
         <meta name="rendir" title="Переименование директории" content="Переименовать директорию <b>{{_POST[name]}}</b> в: {{dirname}} {{oldname}}" visible="dirname" invisible="oldname">
         <meta name="renfile" title="Переименование файла" content="Переименовать файл <b>{{_POST[name]}}</b> в: {{filename}} {{oldname}}" visible="filename" invisible="oldname">
         <meta name="paste" title="Вставка" content="Некоторые объекты уже существуют в этой директории.<br> Выполнить перезапись существующих объектов?">
+        <meta name="zip" title="Архивация" content="Сжать выбранные объекты в архив? {{filename}}" visible="filename">
         <input type="text" class="form-control" name="newname">
         <input type="hidden" class="form-control" name="dirname" value="{{_POST[name]}}">
         <input type="hidden" class="form-control" name="filename" value="{{_POST[name]}}">
