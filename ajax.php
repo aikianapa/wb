@@ -12,13 +12,13 @@ function ajax__pagination() {
     if (!isset($page)) $page=1;
 	if (!isset($find)) $find="";
 	$fe=wbFromString("<div>".$foreach."</div>");
-	//$fe->find("[data-wb-tpl={$tplid}]")->attr("data-find",$find);
+	$fe->find("[data-wb-tpl={$tplid}]")->attr("data-wb-find",$find);
 	$fe->find("[data-wb-tpl={$tplid}]")->attr("data-wb-cache",$cache);
 	$fe->find("[data-wb-tpl={$tplid}]")->attr("data-wb-page",$page);
 	$fe->find("[data-wb-tpl={$tplid}]")->removeClass("wb-done");
 	$fe->find("[data-wb-tpl={$tplid}]")->append($tpl);
-	$fe->find("[data-wb-tpl={$tplid}]",0)->tagForeach();
-	$form=$fe->find("[data-wb-tpl={$tplid}]")->attr("form");
+    $fe->find("[data-wb-tpl={$tplid}]",0)->tagForeach();
+	//$form=$fe->find("[data-wb-tpl={$tplid}]")->attr("form");
 	//$call=$form."BeforePaginationShow";
 	//if (is_callable($call)) {$call($fe->find("[data-wb-tpl={$tplid}]",0) );}
 	$res["data"]=$fe->find("[data-wb-tpl={$tplid}]")->html();

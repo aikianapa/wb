@@ -874,7 +874,7 @@ function wb_multiinput() {
     $(document).delegate(".wb-multiinput-menu .dropdown-item", "click", function (e) {
         var line = $(document).data("wb-multiinput");
         var multi = $(line).parents("[data-wb-role=multiinput]");
-        var tpl = $($(multi).attr("data-tpl")).html();
+        var tpl = $($(multi).attr("data-wb-tpl")).html();
         var row = $(document).data("wb-multiinput-row");
         var name = $(multi).attr("name");
         row = str_replace("{{template}}", tpl, row);
@@ -1022,33 +1022,33 @@ function wb_plugins() {
             });
         }
         if (wb_plugins_loaded() && $('.select2:not(.wb-plugin)').length) {
-            $('.select2:not(.wb-plugin').each(function () {
+            $('.select2:not(.wb-plugin').each(function() {
                 var that = this;
                 if ($(this).is("[data-wb-ajax]")) {
                     var url = $(this).attr("data-wb-ajax");
-                    var tpl = $(this).attr("data-wb-tpl");
+                    var tpl = $("#" + $(this).attr("data-wb-tpl")).html();
                     var where = $(this).attr("data-wb-where");
                     var val = $(this).attr("value");
                     var plh = $(this).attr("placeholder");
+                    var min = $(this).attr("min"); if (min==undefined) {min=1;}
                     if (plh == undefined) {
                         plh = "Поиск...";
                     }
                     $(this).select2({
                         language: "ru"
                         , placeholder: plh
-                        , minimumInputLength: 2
+                        , minimumInputLength: min
                         , ajax: {
                             url: url
+                            , async: true
                             , method: "post"
                             , dataType: 'json'
-                            , delay: 200
-                            , cache: true
                             , data: function (term, page) {
                                 return {
                                     value: term.term
                                     , page: page
                                     , where: where
-                                    , tpl: $("#" + tpl).html()
+                                    , tpl: tpl
                                 };
                             }
                             , processResults: function (data) {
@@ -1063,22 +1063,23 @@ function wb_plugins() {
                     , });
                     $.ajax({
                         url: url
+                        , async: true
                         , method: "post"
-                        , dataType: 'json'
                         , data: {
                             id: val
-                            , tpl: $("#" + tpl).html()
+                            , tpl: tpl
                         }
-                    }).then(function (data) {
-                        var option = new Option(data.text, data.id, true, true);
-                        $(that).append(option).trigger('change');
-                        $(document).data("item", data.item);
-                        $(that).trigger({
-                            type: 'select2:select'
-                            , params: {
-                                data: data
-                            }
-                        });
+                        , success: function (data) {
+                            var option = new Option(data.text, data.id, true, true);
+                            $(that).append(option).trigger('change');
+                            $(document).data("item", data.item);
+                            $(that).trigger({
+                                type: 'select2:select'
+                                , params: {
+                                    data: data
+                                }
+                            });
+                        }
                     });
                     $(that).off("change");
                     $(that).on("change", function () {
@@ -1575,11 +1576,15 @@ function wb_ajax() {
             if ($(link).attr("data-wb-tpl") !== undefined) {
                 ajax.tpl = $($(link).attr("data-wb-tpl")).html();
             }
-            if ($(this).is("button,[type=button],[type=submit]") && ($(this).parents("form").length)) {
-                var form = $(this).parents("form");
-                flag = wb_check_required(form);
-                ajax = $(form).serialize();
-            }
+            if ($(this).is("button,[type=button],[type=submit]") ) {
+                if ($(this).parents("form").length)
+                    var form = $(this).parents("form");
+                    flag = wb_check_required(form);
+                    ajax = $(form).serialize();
+                }
+                if ($(this).attr("data-wb-json") !== undefined && $(this).attr("data-wb-json")>"") {
+                    ajax = $.parseJSON($(this).attr("data-wb-json"));
+                }
             if (flag == true) {
                 $(that).attr("disabled", true);
                 $.post(src, ajax, function (data) {
@@ -1632,8 +1637,7 @@ function wb_ajax() {
                     $(that).removeAttr("disabled");
                 });
             }
-        }
-        else {
+        } else {
             if ($(this).attr("data-wb-href") > "") {
                 document.location.href = $(this).attr("data-wb-href");
             }

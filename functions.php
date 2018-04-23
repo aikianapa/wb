@@ -337,8 +337,8 @@ function wbTableFlush($table) {
     $res=false;
     $table=wbTable($table);
     $tname=wbTableName($table);
-    $cache=$_ENV["cache"][$table];
-    if (is_file($table) AND isset($_ENV["cache"][$table])) {
+    $cache=$_ENV["cache"][md5($table)];
+    if (is_file($table) AND isset($_ENV["cache"][md5($table)])) {
             $fp = fopen ($table,"r");
             flock ($fp, LOCK_SH);
             $data = json_decode(file_get_contents($table),true);
@@ -357,7 +357,7 @@ function wbTableFlush($table) {
                 $res=file_put_contents($table,$data, LOCK_EX);
                 wbLog("func",__FUNCTION__,1009,func_get_args());
             } else {$res=null;}
-        unset($_ENV["cache"][$table]);
+        unset($_ENV["cache"][md5($table)]);
   }
   return $res;
 }
@@ -399,8 +399,8 @@ function wbTableList($engine=false) {
 	return $list;
 }
 
-function wbListItems($table="pages",$where="",$sort="id") {return wbItemList($table,$where,$sort);}
-function wbItemList($table="pages",$where="",$sort="id") {
+function wbListItems($table="pages",$where="",$sort=null) {return wbItemList($table="pages",$where="",$sort=null);}
+function wbItemList($table="pages",$where="",$sort=null) {
     $args=func_get_args();
     $list=array();
     $tname=wbTableName($table);
@@ -409,23 +409,30 @@ function wbItemList($table="pages",$where="",$sort="id") {
         wbError("func",__FUNCTION__,1001,func_get_args());
         return array();
     } else {
-         wbTrigger("form",__FUNCTION__,"BeforeItemList",func_get_args(),array());
-        $list=$_ENV["cache"][$table]=json_decode(wb_file_get_contents($table),true);
+        wbTrigger("form",__FUNCTION__,"BeforeItemList",func_get_args(),array());
+        if (isset($_ENV["cache"][md5($table.$where.$sort)])) {
+            $list=$_ENV["cache"][md5($table.$where.$sort)];
+        } else {
+            $list=json_decode(wb_file_get_contents($table),true);
+            if (is_array($list)) {
+                foreach($list as $key => $item) {
+                        $item["_table"]=$tname;
+                        $item=wbTrigger("form",__FUNCTION__,"AfterItemRead",$args,$item);
+                        if   (
+                            (substr($item["id"],0,1)=="_" AND $_SESSION["user_role"]!=="admin")
+                        OR
+                            ($item==null)
+
+                        OR  (isset($item["_removed"]) AND $item["_removed"]==true)
+
+                        ) {unset($list[$key]);} elseif ($where>"" AND !wbWhereItem($item,$where)) {unset($list[$key]);} else {$list[$key]=$item;}
+                  }
+              }
+        }
         if (!is_array($list)) {$list=array();}
-        $object = new ArrayObject($list);
-        foreach($object as $key => $item) {
-                $item["_table"]=$tname;
-                $item=wbTrigger("form",__FUNCTION__,"AfterItemRead",$args,$item);
-                if   (
-                    (substr($item["id"],0,1)=="_" AND $_SESSION["user_role"]!=="admin")
-                OR
-                    ($item==null)
-
-                OR  (isset($item["_removed"]) AND $item["_removed"]==true)
-
-                ) {unset($list[$key]);} elseif (!wbWhereItem($item,$where)) {unset($list[$key]);}
-          }
   }
+    if ($sort!==null) {$list=wbArraySortMulti($list,$sort);}
+  $_ENV["cache"][md5($table.$where.$sort)]=$list;
   $list=wbTrigger("form",__FUNCTION__,"AfterItemList",func_get_args(),$list);
   $list=wbTrigger("func",__FUNCTION__,"after",func_get_args(),$list);
   return $list;
@@ -521,8 +528,8 @@ function wbItemRead($table=null,$id=null) {
   if ($id==null) {$id=$_ENV["route"]["item"];}
     wbTrigger("form",__FUNCTION__,"BeforeItemRead",func_get_args(),array());
     $table=wbTable($table);
-    if (isset($_ENV["cache"][$table][$id])) {
-        $item=$_ENV["cache"][$table][$id];
+    if (isset($_ENV["cache"][md5($table)][$id])) {
+        $item=$_ENV["cache"][md5($table)][$id];
     } else {
             $list=wbItemList($table);
             if (isset($list[$id])) {
@@ -563,7 +570,7 @@ function wbItemRemove($table=null,$id=null,$flush=true) {
         wbTrigger("form",__FUNCTION__,"BeforeItemRemove",func_get_args(),$item);
         if (is_array($item)) {
             $item["_removed"]=true;
-            $_ENV["cache"][$table][$id]=$item;
+            $_ENV["cache"][md5($table)][$id]=$item;
         }
         $res=wbItemSave($table,$item);
     }
@@ -590,15 +597,15 @@ function wbItemSave($table,$item=null,$flush=true) {
     wbError("func",__FUNCTION__,1001,func_get_args());
     return null;
   } else {
-        if (!isset($_ENV["cache"][$table])) {$_ENV["cache"][$table]=wbItemList($table);}
+        if (!isset($_ENV["cache"][md5($table)])) {$_ENV["cache"][md5($table)]=wbItemList($table);}
         if (!isset($item["id"]) OR $item["id"]=="_new") {$item["id"]=wbNewId();} else {
-            if (isset($_ENV["cache"][$table][$item["id"]])) {
-                $item=array_merge($_ENV["cache"][$table][$item["id"]],$item);
+            if (isset($_ENV["cache"][md5($table)][$item["id"]])) {
+                $item=array_merge($_ENV["cache"][md5($table)][$item["id"]],$item);
             }
         }
         $item=wbItemSetTable($table,$item);
         $item=wbTrigger("form",__FUNCTION__,"BeforeItemSave",func_get_args(),$item);
-        $_ENV["cache"][$table][$item["id"]]=$item;
+        $_ENV["cache"][md5($table)][$item["id"]]=$item;
         wbTrigger("form",__FUNCTION__,"AfterItemSave",func_get_args(),$item);
         $res=true;
     }
@@ -960,7 +967,7 @@ function wbWhereItem($item,$where=NULL) {
 	$res=true;
 	if (!$where==NULL) {
 		if (substr($where,0,1)=="%") {$phpif=substr($where,1);} else {$phpif=wbWherePhp($where,$item);}
-    if ($phpif>"") @eval('if ( '.$phpif.' ) { $res=1; } else { $res=0; } ;');
+        if ($phpif>"") @eval('if ( '.$phpif.' ) { $res=1; } else { $res=0; } ;');
 	};
 	return $res;
 }
@@ -987,13 +994,14 @@ function wbWherePhp($str="",$item=array()) {
 		$flag=true;
     foreach($arr[0] as $a => $fld) {
         if (!in_array(strtoupper($fld),$exclude)) {
-            if (isset($item[$fld]) AND $flag==true) {
+            //if (isset($item[$fld]) AND $flag==true) {
+            if ($flag==true) {
                 $str=str_replace(" {$fld} ",' $item["'.$fld.'"] ',$str);
-								$flag=false;
+					$flag=false;
             }
         } else {
 					$flag=true;
-				}
+		}
     }
 
 	preg_match_all('/in_array\s\(\s(.*),array \(/',$str,$arr);
@@ -1215,12 +1223,14 @@ function wbSetValuesStr($tag="",$Item=array(), $limit=2)
     foreach($arr as $key => $item) {
         if (!is_array($item) AND (substr(trim($item),0,1)=="[" OR substr(trim($item),0,1)=="{")) {
             $item=json_decode($item,true);
+            if (is_array($item)) {
                 foreach($item as $k => $a) {
-                    if (isset($a["id"]) AND $a["id"]>"" AND $key!==$a["id"]) {
-                        $flag=true;
-                        $Item[$key][$a["id"]]=$a;
-                    }
+                        if (isset($a["id"]) AND $a["id"]>"" AND $key!==$a["id"]) {
+                            $flag=true;
+                            $Item[$key][$a["id"]]=$a;
+                        }
                 }
+            }
         } else {$Item[$key]=$item;}
     }
     
@@ -1757,6 +1767,13 @@ function wbArraySortMulti( $array=array(), $args = array('votes' => 'd') ){
 		return $res;
 	} );
 	return $array;
+}
+
+function wbArrayWhere($arr,$where) {
+    foreach($arr as $key => $val) {
+        if (!wbWhereItem($val,$where)) {unset($arr[$key]);}
+    }
+    return $arr;
 }
 
 function wbCallFormFunc($name,$Item,$form=null,$mode=null) {

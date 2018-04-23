@@ -1254,12 +1254,12 @@ abstract class kiNode
 				$tag=$inc->wbCheckTag();
 				if (!$tag==FALSE && !$inc->hasClass("wb-done")) {
 					if ($inc->has("[data-wb-json]")) {$inc->json=wbSetValuesStr($inc->json,$Item);}
-					if ($inc->hasRole("variable")) {$Item=$inc->tagVariable($Item);} else {
+					//if ($inc->hasRole("variable")) {$Item=$inc->tagVariable($Item);} else {
 						if ($inc->is("[data-wb-tpl=true]")) {$inc->addTemplate();}
 						$inc->wbProcess($Item,$tag);
                         $inc->tagHideAttrs();
 						//if (isset($_SESSION["itemAfterWhere"])) {$Item=$_SESSION["itemAfterWhere"]; unset($_SESSION["itemAfterWhere"]);}
-					}
+					//}
 				}
 				}
 			}; unset($inc);
@@ -1576,18 +1576,120 @@ abstract class kiNode
 		}
 	}
 
+    
+
+    public function wbTableProcessor() {
+        $data=array(); $grps=array(); $total=array(); $grand=array();
+        $tmp=$this->attr("data-wb-group"); if ($tmp>"") {$groups=wbAttrToArray($tmp);} else {$groups=array(null);}
+        $tmp=$this->attr("data-wb-total"); if ($tmp>"") {$totals=wbAttrToArray($tmp); $total=array();}
+        if ($this->is("[data-wb-suppress]")) {$sup=true;} else {$sup=false;}
+        $lines=$this->find("tr");
+        $index=0;
+        foreach ($lines as $tr) {
+            unset($grp_id,$grpidx);
+            $fields=$tr->find("td[data-wb-fld]:not([data-wb-eval])"); $Item=array();
+            foreach($fields as $field) {$Item[$field->attr("data-wb-fld")]=$field->text();}
+            $fields=$tr->find("[data-wb-eval]");
+            foreach($fields as $field) {
+                $evalStr=contentSetValuesStr($field,$Item);
+                eval ("\$tmp = ".$field->text().";"); 	$field->text($tmp);
+            }
+            foreach($groups as $group) {
+                $grp_text=$tr->find("[data-wb-fld={$group}]")->text();
+                if (!isset($grp_id)) {$grp_id=$grp_text;} else {$grp_id.="|".$grp_text;}
+                if (!isset($grpidx)) {$grpidx=$group;} else {$grpidx.="|".$group;}
+                if (!isset($grps[$grp_id])) {$grps[$grp_id]=array("data"=>array(),"total"=>array());}
+                $grps[$grp_id]["grpidx"]=$grpidx;
+                $grps[$grp_id]["data"][]=$index;
+                if (isset($totals)) {foreach($totals as $totfld) {
+                    $totval=$tr->find("[data-wb-fld={$totfld}]")->text()*1;
+                    if (!isset($grps[$grp_id]["total"][$totfld])) {$grps[$grp_id]["total"][$totfld]=0;}
+                    $grps[$grp_id]["total"][$totfld]+=$totval;
+                    if (!isset($grand[$totfld])) {$grand[$totfld]=0;}
+                    if ($group==$groups[0]) $grand[$totfld]+=$totval;
+                }}
+            }
+            $index++;
+        }
+        ksort($grps);
+        $grps=array_reverse($grps,true);
+        $tbody=wbFromString("<tbody type='result'></tbody>");
+        $ready=array();
+        foreach($grps as $grpid => $grp) {
+            $inner="";
+            $count=count($grp["data"])-1;
+            foreach($grp["data"] as $key => $idx) {
+                if (!in_array($idx,$ready)) {
+                    $tpl=$this->find("tr:eq({$idx})")->outerHtml();
+                    if ($sup==false) $tbody->append($tpl);
+                }
+                if ($key==$count AND count($grp["total"])>0) {
+                    // выводим тоталы группы
+                    $trtot=wbFromString("<tr>".$this->find("tr:eq({$idx})")->html()."</tr>");
+                    $totchk=array();
+                    foreach($grp["total"] as $fld => $total) {
+                        $trtot->find("td[data-wb-fld={$fld}]")->html($total);
+                        $totchk[]=$fld;
+                    }
+                    $trtot->find("tr")->attr("data-wb-group",$grp["grpidx"]);
+                    $trtot->find("tr")->attr("data-wb-group-value",$grpid);
+                    $trtot->find("tr")->addClass("data-wb-total success");
+                    $grpchk=explode("|",$grp["grpidx"]);
+                    $tmp=$trtot->find("td:not([data-wb-fld])"); foreach($tmp as $temp) {$temp->html("");}
+                    $tdflds=$trtot->find("td[data-wb-fld]");
+                    foreach($tdflds as $tdfld) {
+                        $data_fld=$tdfld->attr("data-wb-fld");
+                        if (!in_array($data_fld,$grpchk) && !in_array($data_fld,$totchk)) {$tdfld->html("");}
+                        if (in_array($data_fld,$grpchk)) {$tdfld->addClass("data-wb-group");}
+                        if (in_array($data_fld,$totchk)) {$tdfld->addClass("data-wb-total");}
+                    }
+                    $inner.=$trtot->outerHtml();
+
+                }
+                $ready[]=$idx;
+            }
+            $tbody->append($inner);
+        }
+        // выводим общий итог
+        if (isset($grp["total"]) && count($grp["total"])>0) {
+            $grtot=wbFromString("<tr>".$this->find("tr:eq({$idx})")->html()."</tr>");
+            $grtot->find("tr")->addClass("data-wb-grand-total info");
+            $tmp=$grtot->find("td"); foreach($tmp as $temp) {$temp->html("");}
+            $grflds=$grtot->find("td[data-wb-fld]");
+            foreach($grflds as $grfld) {
+                $data_fld=$grfld->attr("data-wb-fld");
+                if (in_array($data_fld,$totchk)) {
+                    $grfld->html($grand[$data_fld]);
+                    $grfld->addClass("data-wb-total");
+                }
+            }
+            $tbody->append($grtot);
+        }
+        $this->html($tbody->innerHtml());
+    }
+    
+    
+    
 	public function tagVariable($Item) {
-		include("wbattributes.php");
-		if (!isset($_ENV["var"])) {$_ENV["var"]=array();}
-		$this->wbSetAttributes($Item);
+        include("wbattributes.php");
+		if (!isset($_ENV["variables"])) {$_ENV["varriables"]=array();}
 		$var=$this->attr("var");
-        if (strtoupper(substr($var,0,5))=="_SESS") {
-            $var=str_replace(array('[',']','_SESS'),array('["','"]','_SESSION'),$var);
-            eval('$'.$var.' = "'.$this->attr("value").'";');
-        } else {
-            if (!isset($where)) $where=$this->attr("where");
-            if (($where>"" AND wbWhereItem($Item,$where)) OR $where=="") {
-                if ($var>"") $_ENV["variables"]["{$var}"]=wbSetValuesStr($this->attr("value"),$Item);
+        if ($var>"") {
+            if (strtoupper(substr($var,0,5))=="_SESS") {
+                $var=str_replace(array('[',']','_SESS'),array('["','"]','_SESSION'),$var);
+                eval('$'.$var.' = "'.$this->attr("value").'";');
+            } else {
+                $_ENV["variables"][$var]="";
+                if (!isset($where)) $where=$this->attr("if");
+                if ($where=="") {
+                    $_ENV["variables"][$var]=wbSetValuesStr($this->attr("value"),$Item);
+                } else {
+                    if (wbWhereItem($Item,$where)) {
+                        $_ENV["variables"][$var]=wbSetValuesStr($this->attr("value"),$Item);
+                    } else {
+                        $_ENV["variables"][$var]=wbSetValuesStr($this->attr("else"),$Item);
+                    }
+                }
             }
         }
         if ($this->attr("data-wb-hide")!=="false") {$this->remove();}
@@ -1634,7 +1736,7 @@ abstract class kiNode
 
 		$tplId=wbNewId();
 		$this->after("<script type='text/template' id='{$tplId}'>".$template."</script>");
-		$this->attr("data-tpl","#".$tplId);
+		$this->attr("data-wb-tpl","#".$tplId);
 		if (isset($Item[$name]) AND is_array($Item[$name])) {
 			$this->tagMultiInputSetData($Item[$name]);
 		} else {
@@ -1645,6 +1747,7 @@ abstract class kiNode
 
 	function tagMultiInputSetData($Data=array(0=>array())) {
 		$tpl=$this->html();
+        $mtplid=$this->attr("data-wb-tpl");
 		$this->html("");
 		$name=$this->attr("name");
 		foreach($Data as $i => $item) {
@@ -1653,6 +1756,17 @@ abstract class kiNode
 			$inp=$line->find("input,select,textarea");
 			foreach($inp as $tag) {
 				$tname=$tag->attr("name");
+                $tplid=$tag->attr("data-wb-tpl");
+                $newid=str_replace("#","",$mtplid."_".$tname);
+                if ($tplid>"" AND $mtplid>"") {
+                    if (!$this->find("script[id={$newid}]")->length) {
+                        $line->find("script[id={$tplid}]")->attr("id",$newid);
+                        $this->append($line->find("script[id={$newid}]"));
+                    } else {
+                        $line->find("script[id={$tplid}]")->remove();
+                    }
+                    $tag->attr("data-wb-tpl",$newid);
+                }
 				if ($tag->attr("name")>"") {$tag->attr("name",$name."[{$i}][".$tname."]");}
 				$tag->attr("data-wb-field",$tname);
 			}
@@ -1732,6 +1846,7 @@ abstract class kiNode
 	}
 
 	public function tagTree($Item=array()) {
+        $srcVal=array(); foreach($Item as $k => $v) {$srcVal["%{$k}"]=$v;}; unset($v);
 		include("wbattributes.php");
 		$this->wbSetAttributes($Item);
 		$name=$this->attr("name"); if (isset($from)) {$name=$from;}
@@ -1749,12 +1864,12 @@ abstract class kiNode
 			if (isset($Item[$name]) && $Item[$name]!=="[]" && $Item[$name]!=="") {$tree->tagTreeData($Item[$name]);} else {$tree->find("ol")->append(wbGetForm("common","tree_row"));}
 			$this->prepend($tree);
 			$this->addClass("wb-tree dd");
-      $this->wbSetData($Item);
+            $this->wbSetData($Item);
 		} elseif ($type=="select") {
-				$this->tagTreeUl($Item);
+				$this->tagTreeUl($Item,null,$srcVal);
 		} else {
 			if ($item>"") {$tree=wbTreeRead($item); $Item[$name]=$tree["tree"]; $Item["_{$name}"]=$tree["dict"];}
-			$this->tagTreeUl($Item);
+			$this->tagTreeUl($Item,null,$srcVal);
 		}
     }
 
@@ -1777,7 +1892,7 @@ abstract class kiNode
 		}
 	}
 
-	public function tagTreeUl($Item=array(),$param=null) {
+	public function tagTreeUl($Item=array(),$param=null,$srcVal=array()) {
 		$limit=-1; $lvl=0; $idx=0; $tree=$Item; $branch=0; $parent=1; $pardis=0; $children=1;
 		if ($param==null) {
 			include("wbattributes.php");
@@ -1795,7 +1910,7 @@ abstract class kiNode
 			$tree=$Item;
 		}
     if (!isset($level)) {$level="";}
-    $tpl=$this->html();
+        $tpl=$this->html();
 		$this->html("");
 		if ($branch!==0) {
             $br=explode("->",$branch);
@@ -1807,16 +1922,16 @@ abstract class kiNode
     			$this->prepend("<option value='' class='placeholder'>".$this->attr("placeholder")."</option>");
     		}
         foreach($tree as $i => $item) {
-
                   $lvl++;
-                  $item["_idx"]=$idx; $idx++;
+                  $item=(array)$srcVal + (array)$item;
+                  $item["_idx"]=$idx; 
                   $line=wbFromString($tpl);
                   $line->wbSetData($item);
 
                   if (isset($item["children"]) AND is_array($item["children"]) AND count($item["children"])  AND $children!==0) {
                     if ($pardis==1 AND ($limit!==$lvl-1)) {$line->children()->attr("disabled",true);}
                     $child=wbFromString($tpl);
-                    $child->tagTreeUl($item["children"],array("name"=>$name,"tag"=>$tag,"lvl"=>$lvl,"idx"=>$idx,"level"=>$level,"pardis"=>$pardis,"parent"=>$parent,"children"=>$children,"limit"=>$limit));
+                    $child->tagTreeUl($item["children"],array("name"=>$name,"tag"=>$tag,"lvl"=>$lvl,"idx"=>$idx,"level"=>$level,"pardis"=>$pardis,"parent"=>$parent,"children"=>$children,"limit"=>$limit),$srcVal);
                     if (($limit==-1 OR $lvl<=$limit)) {
               	          if ($tag=="select") {
                                  if ($parent!==1) {$lvl--;}
@@ -1837,6 +1952,7 @@ abstract class kiNode
                           }
                     }
                 }
+                $idx++;
                 $lvl--;
 
             if (isset($line)) $this->append($line);
@@ -1897,8 +2013,10 @@ abstract class kiNode
 				if (isset($Item["id"])) {$item=$Item["id"];} else {$item="";}
 				$Item=$Item[$from];
 				if (!is_array($Item)) {$Item=json_decode($Item,true);}
-				if ($field>"") {$Item=$Item[$field];}
-				if (!is_array($Item)) {$Item=json_decode($Item,true);}
+				if ($field>"") {
+                    $Item=$Item[$field];
+                    if (!is_array($Item)) {$Item=json_decode($Item,true);}
+                }
 			} else {
                 $Item=wbGetDataWbFrom($Item,$from);
             }
@@ -1913,9 +2031,11 @@ abstract class kiNode
             $count=$count*1;
             for($i=1;$i<=$count;$i++){$Item[$i]=$srcItem;};
         }
-
+        
+        if (isset($form) AND !isset($table)) {$table=$form;}
 		if ($table > "") {
             $table=wbTable($table);
+            $itemform=wbTableName($table);
 			if (isset($item) AND $item>"") {
 				$Item[0]=wbItemRead($table,$item);
                 if ($field>"") {
@@ -1942,7 +2062,7 @@ abstract class kiNode
 		$ndx=0; $fdx=0; $n=0; $stp=0;
 		$count=count($Item);
 		$inner="";
-		$srcVal=array(); foreach($srcItem as $k => $v) {$srcVal["%{$k}"]=$v;}; unset($v); $srcVal["_parent"]=$srcItem;
+		$srcVal=array(); foreach($srcItem as $k => $v) {$srcVal["%{$k}"]=$v;}; unset($v); //$srcVal["_parent"]=$srcItem;
 
 		$ndx=0; $n=0; $f=0;
 		$tmptpl=wbFromString($tpl);
@@ -1956,7 +2076,7 @@ abstract class kiNode
 				$n++;
 				if ($size!==false) $minpos=$size*$page-($size*1)+1; $maxpos=($size*$page);
 				if ($size==false OR ($n<=$maxpos AND $n>=$minpos)) {
-					$itemform=""; if (isset($val["_table"])) {$itemform=$val["_table"];}
+					if (!isset($itemform)) { if (isset($val["_table"])) {$itemform=$val["_table"];} else {$itemform=$_ENV["route"]["form"]; }}
 					$text=$tmptpl->clone();
 					$val=(array)$srcVal + (array)$val; // сливаем массивы
                     $text->find(":first")->attr("idx",$key);
@@ -1964,13 +2084,13 @@ abstract class kiNode
 					$val["_idx"]=$ndx;
 					$val["_ndx"]=$ndx+1;
                     $val["_step"]=$stp;
-                    $val=wbCallFormFunc("BeforeShowItem",$val,$itemform);
-                    $val=wbCallFormFunc("BeforeItemShow",$val,$itemform);
 					$flag=true;
 					if ($flag==true AND isset($where)) {$flag=wbWhereItem($val,$where);}
 					if ($flag==true AND $limit>"" AND $ndx>=$limit) {$flag=false;}
 						if ($flag==true) {
 							$ndx++;
+                            $val=wbCallFormFunc("BeforeShowItem",$val,$itemform);
+                            $val=wbCallFormFunc("BeforeItemShow",$val,$itemform);
                             $text->wbSetData($val);
 							if ($step>0) { // если степ, то работаем с объектом
 								if ($stepcount==0) {
@@ -1994,7 +2114,7 @@ abstract class kiNode
 		$count=$n;
 
 			if ($step>0) {
-        $this->replaceWith($steps->html());
+                $this->replaceWith($steps->html());
 				foreach ($this->find(".{$tplid}") as $tid) {$tid->removeClass($tplid);}; unset($tid);
 			} else {
 				$this->html($inner);
@@ -2007,6 +2127,10 @@ abstract class kiNode
 			$plhr=$this->attr("placeholder");
 			if ($plhr>"") {$this->prepend("<option value=''>$plhr</option>");}
 		} else {
+			
+
+            if ($this->attr("data-wb-group")>"" OR $this->attr("data-wb-total")>"") {$this->wbTableProcessor(); $size=false;}
+            
 			if ($size!==false AND !$this->hasClass("pagination")) {
 				$cahceId=null; $find=null;
 				$pages=ceil($count/$size);
