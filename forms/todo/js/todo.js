@@ -49,12 +49,12 @@ var CompTodo = function() {
 				/* Toggle todo state */
 				$('.todo-list').off('click', 'input:checkbox');
 				$('.todo-list').on('click', 'input:checkbox', function(){
-						$(this).parents('[data-id]').toggleClass('todo-done');
+						$(this).parents('[data-id]').toggleClass('muted');
 						var data={};
 						data.done="";
 						data.id=$(this).parents('[data-id]').attr("data-id");
 						var status=$(".nav .dropdown-menu.status a:last").attr("data-status");
-						if ($(this).parents('[data-id]').hasClass('todo-done')) {
+						if ($(this).parents('[data-id]').hasClass('muted')) {
 							data.done=1;
 							data.status=status;
 							$(this).parents('[data-id]').find('.list-body div, input').addClass("text-"+status);
@@ -197,6 +197,7 @@ var CompTodo = function() {
               }
 
     					eventsTodo();
+                        wb_plugins();
 			}
 
 
