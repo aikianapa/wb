@@ -2498,10 +2498,10 @@ public function tagThumbnail($Item=array()) {
 		if ($pages>0) {
 			$find=urlencode($find);
 			$pag=wbGetForm("common","pagination");
-			$pag->wrapInner("<div></div>");
+			//$pag->wrapInner("<div></div>");
 			$step=1;
 			$flag=floor($page/10); if ($flag<=1) {$flag=0;} else {$flag*=10;}
-			$inner="";
+			//$inner="";
 			$pagination=array("id"=>$class,"size"=>$size,"count"=>$count,"cache"=>$cacheId,"find"=>$find,"pages"=>array());
             if (!isset($_ENV["route"]["params"]["form"]) OR $_ENV["route"]["params"]["form"]=="") {$form=$tplId;} else {$form=$_ENV["route"]["params"]["form"];}
 			for($i=1; $i<=$pages; $i+=$step) {
@@ -2512,7 +2512,7 @@ public function tagThumbnail($Item=array()) {
 					"flag"=>$flag,
 					"data"=>"{$class}-{$i}"
 				);
-				$inner.="<li data-page='{$i}'><a flag='{$flag}' data-wb-ajaxpage='/{$href}/' data='{$class}-{$i}'>{$i}</a></li>";
+				//$inner.="<li data-page='{$i}'><a flag='{$flag}' data-wb-ajaxpage='/{$href}/' data='{$class}-{$i}'>{$i}</a></li>";
 				if ($i>=10 ) {$step=10;}
 				if ($page>=10 && $i<10) {$i=10-1; $step=1;}
 				if ($flag>0 && $i>=$flag && $i<=$flag+9) {$step=1;}
