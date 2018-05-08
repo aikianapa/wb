@@ -1,5 +1,6 @@
 <?php
 function ajax__pagination() {
+	if (isset($_REQUEST["route"])) {$_ENV["route"]=json_decode($_REQUEST["route"],true);}
 	$res=array();
 	foreach($_POST as $key =>$val) {$$key=$val;}
     $vars=wbItemToArray(json_decode($vars,true));

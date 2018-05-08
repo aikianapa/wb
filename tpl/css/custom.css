@@ -370,6 +370,16 @@ select.form-control+.select2-container {
   z-index: 2;
 }
 
+
+
+.select2-container--default .select2-selection--single {
+    border-color: #d4d5d6!important;
+    border-radius: 0!important;
+    padding: 5px!important;
+    height:38px!important;
+}
+
+
 @media screen {
   .wb-print-box {
     display: none;

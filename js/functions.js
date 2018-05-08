@@ -926,6 +926,7 @@ function wb_base_fix() {
 function wb_plugins() {
     "use strict";
     $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
         if (wb_plugins_loaded()) {
             autosize($('textarea[rows=auto]'));
         }
@@ -1545,29 +1546,29 @@ function wb_check_required(form) {
 }
 
 function wb_ajax() {
-    "use strict";
-    $(document).undelegate("[data-wb-ajax]", "click");
-    $(document).delegate("[data-wb-ajax]", "click", function () {
+	
+	
+	var wb_ajax_process = function(that) {
         wb_ajax_loader();
-        var link = this;
-        var src = $(this).attr("data-wb-ajax");
-        var call = $(this).attr("data-wb-ajax-done");
+        var link = that;
+        var src = $(that).attr("data-wb-ajax");
+        var call = $(that).attr("data-wb-ajax-done");
         var flag = true;
-        var that = this;
         if (src > "") {
             var ajax = {};
-            if ($(link).attr("data-wb-tpl") !== undefined) {
-                ajax.tpl = $($(link).attr("data-wb-tpl")).html();
+            if ($(that).attr("data-wb-tpl") !== undefined) {
+                ajax.tpl = $($(that).attr("data-wb-tpl")).html();
             }
-            if ($(this).is("button,[type=button],[type=submit]") ) {
-                if ($(this).parents("form").length)
-                    var form = $(this).parents("form");
+            if ($(that).is("button,:input") ) {
+                if ($(that).parents("form").length) {
+                    var form = $(that).parents("form");
                     flag = wb_check_required(form);
                     ajax = $(form).serialize();
                 }
-                if ($(this).attr("data-wb-json") !== undefined && $(this).attr("data-wb-json")>"") {
-                    ajax = $.parseJSON($(this).attr("data-wb-json"));
+                if ($(that).attr("data-wb-json") !== undefined && $(that).attr("data-wb-json")>"") {
+                    ajax = $.parseJSON($(that).attr("data-wb-json"));
                 }
+            }
             if (flag == true) {
                 $(that).attr("disabled", true);
                 $.post(src, ajax, function (data) {
@@ -1621,18 +1622,32 @@ function wb_ajax() {
                 });
             }
         } else {
-            if ($(this).attr("data-wb-href") > "") {
-                document.location.href = $(this).attr("data-wb-href");
+            if ($(that).attr("data-wb-href") > "") {
+                document.location.href = $(that).attr("data-wb-href");
             }
         }
+	}
+	
+	
+    $(document).undelegate("[data-wb-ajax]", "click");
+    $(document).delegate("[data-wb-ajax]", "click", function () {
+		if ($(this).is(":not(:input)") || $(this).is("button")) {
+			wb_ajax_process(this);
+		}
     });
+
+    $(document).undelegate("[data-wb-ajax]:input", "change");
+    $(document).delegate("[data-wb-ajax]:input", "change", function () {
+		wb_ajax_process(this);
+    });
+    
     $("[data-wb-ajax]").each(function () {
         $(this).attr("data-wb-href", $(this).attr("href"));
         $(this).removeAttr("href");
-    });
-    $("[data-wb-ajax][data-wb-autoload=true]").each(function () {
-        $(this).trigger("click");
-        $(this).removeAttr("data-wb-autoload")
+        if ($(this).attr("data-wb-autoload")==true) {
+			$(this).trigger("click");
+			$(this).removeAttr("data-wb-autoload");	
+		}
     });
 }
 $(document).unbind("wb_required_false");
@@ -1769,6 +1784,7 @@ function wb_pagination(pid) {
         var that = this;
         var id = $(this).attr("id");
         var tplid = substr(id, 5);
+        $(this).data("route",$(this).attr("data-wb-route")).removeAttr("data-wb-route");
         if ($(this).is(":not([data-idx])")) {
             $(this).attr("data-idx", idx);
         }
@@ -1883,13 +1899,14 @@ function wb_pagination(pid) {
                         , cache: cache
                         , vars: $("[data-wb-tpl=" + tid + "]").data("variables")
                         , foreach: foreach
+                        , route: $source.data("route")
                     };
                     var url = "/ajax/pagination/";
                     if ($("#" + id).data("find") !== undefined) {
                         var find = $("#" + id).data("find");
                     }
                     else {
-                        var find = $source.attr("data-find");
+                        var find = $source.attr("data-wb-find");
                     }
                     if (find > "") {
                         find = urldecode(find);

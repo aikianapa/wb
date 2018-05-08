@@ -1690,6 +1690,9 @@ abstract class kiNode
                         $_ENV["variables"][$var]=wbSetValuesStr($this->attr("else"),$Item);
                     }
                 }
+                if (isset($oconv) AND $oconv>"") {
+                    $_ENV["variables"][$var]=wbOconv($_ENV["variables"][$var],$oconv);
+                }
             }
         }
         if ($this->attr("data-wb-hide")!=="false") {$this->remove();}
@@ -2009,9 +2012,9 @@ abstract class kiNode
 		} else {$page=$page*1;}
 		if ( isset($from) AND $from > "") {
 			if (isset($Item[$from]) AND !strpos("[",$from)) {
-				if (isset($Item["form"])) {$table=$Item["form"];} else {$table="";}
-				if (isset($Item["id"])) {$item=$Item["id"];} else {$item="";}
-				$Item=$Item[$from];
+				//if (isset($Item["form"])) {$table=$Item["form"];} else {$table="";}
+				//if (isset($Item["id"])) {$item=$Item["id"];} else {$item="";}
+				$Item=wbItemToArray($Item[$from]);
 				if (!is_array($Item)) {$Item=json_decode($Item,true);}
 				if ($field>"") {
                     $Item=$Item[$field];
@@ -2021,6 +2024,7 @@ abstract class kiNode
                 $Item=wbGetDataWbFrom($Item,$from);
             }
 		}
+        
         if (isset($json) AND $json> "") {
             $Item=json_decode($json,true);
         }
@@ -2049,6 +2053,7 @@ abstract class kiNode
                 $Item=wbItemList($table,$where);
 			}
 		}
+
 		if (is_string($Item)) $Item=json_decode($Item,true);
 		if (!is_array($Item)) $Item=array($Item);
 		if ($sort>"") {$Item=wbArraySort($Item,$sort);}
@@ -2067,6 +2072,7 @@ abstract class kiNode
 		$ndx=0; $n=0; $f=0;
 		$tmptpl=wbFromString($tpl);
         if (isset($rand) AND $rand=="true") {shuffle($Item);}
+
         $object = new ArrayObject($Item);
 		$iterator = new tagForeachFilter($object->getIterator(),array(
 			"id"=>$id,
@@ -2520,6 +2526,7 @@ public function tagThumbnail($Item=array()) {
 			}
 			$pag->wbSetData($pagination);
 			$pag->find("[data-page={$page}]")->addClass("active");
+			$pag->find("ul")->attr("data-wb-route",json_encode($_ENV["route"]));
 			if ($pages==1) {
 				$style=$pag->find("ul")->attr("style");
 				$pag->find("ul")->attr("style",$style.";display:none;");

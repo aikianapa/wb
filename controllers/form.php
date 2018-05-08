@@ -15,12 +15,15 @@ function form__controller() {
             $out=$aCall();
         } elseif (is_callable($eCall)) {
             $out=$eCall();
-        } elseif (form__controller__common__controller()==false) {
-		  echo __FUNCTION__ .": отсутствует функция ".$call."()";
-		  die;
+        } elseif (form__controller__common__controller()==true) {
+            $out=$_ENV["DOM"];
+        } else {
+              echo __FUNCTION__ .": отсутствует функция ".$call."()";
+              die;            
         }
         if (!is_object($out)) {$_ENV["DOM"]=wbFromString($out);} else {$_ENV["DOM"]=$out;}
 	}
+    unset($out);
 	wbTrigger("func",__FUNCTION__,"after");
 return $_ENV["DOM"];
 }
@@ -32,10 +35,17 @@ function form__controller__common__controller() {
 	$aCall=$form."_".$mode; $eCall=$form."__".$mode;
     $out=false;
 	if (is_callable($aCall)) {$out=$aCall($item);} elseif (is_callable($eCall)) {$out=$eCall($item);}
-    if ($out==false) {return false;} else {
-        if (!is_object($out)) {$out=wbFromString($out);}
+    if ($out==false) {
+        if ($item>"") {$mode.="_".$item;}
+        $out=wbGetForm($form,$mode);
+        if ($out=="") return false; 
+        $out=wbFromString($out);
         $_ENV["DOM"]=$out;
+        
     }
+    if (!is_object($out)) {$out=wbFromString($out);}
+    $_ENV["DOM"]=$out;
+    unset($out);
     return true;
 }
 

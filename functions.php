@@ -1,6 +1,7 @@
 <?php
 include_once (__DIR__."/kiDom.php");
 function wbInit() {
+    error_reporting( error_reporting() & ~E_NOTICE );
 	wbErrorList();
 	wbTrigger("func",__FUNCTION__,"before");
 	wbInitEnviroment();
@@ -401,7 +402,6 @@ function wbTableList($engine=false) {
 
 function wbListItems($table="pages",$where="",$sort=null) {return wbItemList($table="pages",$where="",$sort=null);}
 function wbItemList($table="pages",$where="",$sort=null) {
-    $args=func_get_args();
     $list=array();
     $tname=wbTableName($table);
     $table=wbTable($table);
@@ -417,7 +417,7 @@ function wbItemList($table="pages",$where="",$sort=null) {
             if (is_array($list)) {
                 foreach($list as $key => $item) {
                         $item["_table"]=$tname;
-                        $item=wbTrigger("form",__FUNCTION__,"AfterItemRead",$args,$item);
+                        $item=wbTrigger("form",__FUNCTION__,"AfterItemRead",func_get_args(),$item);
                         if   (
                             (substr($item["id"],0,1)=="_" AND $_SESSION["user_role"]!=="admin")
                         OR
@@ -736,6 +736,12 @@ function wbGetTpl($tpl=null,$path=false) {
 function wbLoopProtect($func) {
     if (!isset($_ENV["wbGetFormStack"])) {$_ENV["wbGetFormStack"]=array();}
     $_ENV["wbGetFormStack"][]=$func;
+}
+
+function wbOconv($value,$oconv) {
+        $oconv='$result = '.htmlspecialchars_decode($oconv,ENT_QUOTES).';';
+        eval ($oconv);
+        return $result;
 }
 
 function wbGetForm($form=NULL,$mode=NULL,$engine=null) {
