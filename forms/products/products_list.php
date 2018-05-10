@@ -14,7 +14,7 @@
 						data-toggle="modal" data-target="#treeEdit" >
 						<span class="fa fa-gear"></span></a>
           </label>
-					<ul id="{{_form}}Catalog" data-wb-role="tree" data-wb-item="{{_form}}_category" data-wb-add="true" class="nav mg-t-1-force">
+					<ul id="{{_form}}Catalog" data-wb-role="tree" data-wb-item="{{_form}}_category" data-wb-add="true"  class="nav mg-t-1-force">
 						<li class="nav-item">
 							<a class="nav-link" data-wb-ajax="/form/list/products/{{id}}/" title="{{name}}" data-wb-html=".content-box">{{name}}</a>
 						</li>

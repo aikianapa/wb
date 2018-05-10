@@ -232,7 +232,6 @@
 
 
     function filemanagerSideMenu() {
-
         $("#filemanager").undelegate(".content-left .nav a.nav-link", "click");
         $("#filemanager").delegate(".content-left .nav a.nav-link", "click", function() {
             var check = $("#filemanager #list").find("tr:not(.back) [type=checkbox]:checked");
@@ -253,6 +252,10 @@
 
             switch (href) {
                 case '#zip':
+                    filemanagerSetPostChecked();
+                    filemanagerDialogMulti(href);
+                    break;
+                case '#unzip':
                     filemanagerSetPostChecked();
                     filemanagerDialogMulti(href);
                     break;
@@ -321,7 +324,7 @@
             var post, data;
             if (action == "paste" || action == "remove") {
                 post = $("#filemanager").data("post");
-            } else if (action=="zip") {
+            } else if (action=="zip" || action=="unzip") {
                 post = $("#filemanager #filemanagerModalDialog .modal-body form").serialize();
                 post += "&path=" + $("#filemanager #list").data("path");
                 $("#filemanager #list").find("tr:not(.back) [type=checkbox]:checked").parents("tr").each(function(){
@@ -384,6 +387,9 @@
             $("#filemanager #panel").noSelect();
             d.resolve();
             $("#filemanager").trigger("checkbox");
+            if ($("#filemanager").data("buffer")!==undefined) {
+                $("#filemanager .content-left .allow-buffer").show();
+            };
             wb_ajax_loader_done();
         });
         return d;

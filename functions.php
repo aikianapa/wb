@@ -487,7 +487,8 @@ function wbTreeWhere($tree,$id,$field,$inc=true) {
 
 function wbTreeIdList($tree,$list=array()) {
 		if (isset($tree["id"])) {$list[]=$tree["id"];}
-		if (isset($tree["children"])) {
+        $tree=wbItemToArray($tree);
+		if (isset($tree["children"]) AND is_array($tree["children"])) {
 			foreach($tree["children"] as $key =>  $child) {
 				$list=wbTreeIdList($child,$list);
 			}
@@ -995,18 +996,19 @@ function wbWherePhp($str="",$item=array()) {
                     "=="=>" == ",
 	)))." ";
 	$exclude=array("AND","OR","LIKE","NOT_LIKE","IN_ARRAY");
-	  $str=wbSetValuesStr($str,$item);
+	$str=wbSetValuesStr($str,$item);
+    $context="";
     preg_match_all('/\w+(?!\")\b/iu',$str,$arr); // возникают ошибки если в тексте пробел
-		$flag=true;
+	$flag=true;
     foreach($arr[0] as $a => $fld) {
         if (!in_array(strtoupper($fld),$exclude)) {
-            //if (isset($item[$fld]) AND $flag==true) {
-            if ($flag==true) {
+            if (isset($item[$fld]) AND $flag==true) {
+            //if ($flag==true) {
                 $str=str_replace(" {$fld} ",' $item["'.$fld.'"] ',$str);
-					$flag=false;
+				$flag=false;
             }
         } else {
-					$flag=true;
+				$flag=true;
 		}
     }
 

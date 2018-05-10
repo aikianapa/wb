@@ -317,10 +317,11 @@ function wb_tree() {
     $(document).undelegate(".wb-tree .wb-tree-item", "contextmenu");
     $(document).delegate(".wb-tree .wb-tree-item", "contextmenu", function (e) {
         $(e.target).parent(".wb-tree-item").append("<div class='wb-tree-menu'>" + $(document).data("wb-tree-rowmenu") + "</div>");
-        var relativeX = (e.clientX - 10);
-        var relativeY = (e.clientY - 10);
-        $(e.target).parent(".wb-tree-item").find(".wb-tree-menu").css("margin-left", relativeX + "px").css("margin-top", relativeY + "px");
-        $(e.target).parent(".wb-tree-item").find(".wb-tree-menu [data-toggle=dropdown]").trigger("click");
+        var w = window.event;
+        var relativeX = (w.clientX - 10);
+        var relativeY = (w.clientY - 10);
+        $(".wb-tree-item").find(".wb-tree-menu").css("left", relativeX + "px").css("top", relativeY + "px");
+        $(".wb-tree-item").find(".wb-tree-menu [data-toggle=dropdown]").trigger("click");
         e.preventDefault();
     });
     $(document).undelegate(".wb-tree .wb-tree-item", "mouseleave");

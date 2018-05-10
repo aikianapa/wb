@@ -38,6 +38,13 @@
                 </a>
                 </li>
                 <!-- nav-item -->
+                <li class="nav-item hidden allow-single allow-file allow-file1" data-no-ext="zip tar arj rar gzip jpg jpeg png gif tif tiff">
+                    <a href="#edit" class="nav-link">
+                  <i class="fa fa-edit"></i>
+                  <span>Редактировать</span>
+                </a>
+                </li>
+                <!-- nav-item -->
                 <li class="nav-item hidden allow-single allow-dir allow-file allow-dir1 allow-file1">
                     <a href="#rename" class="nav-link">
                   <i class="fa fa-i-cursor"></i>
@@ -49,13 +56,6 @@
                     <a href="#remove" class="nav-link">
                   <i class="fa fa-trash-o"></i>
                   <span>Удалить</span>
-                </a>
-                </li>
-                <!-- nav-item -->
-                <li class="nav-item hidden allow-single allow-file allow-file1">
-                    <a href="#edit" class="nav-link">
-                  <i class="fa fa-edit"></i>
-                  <span>Редактировать</span>
                 </a>
                 </li>
                 <!-- nav-item -->
@@ -189,6 +189,7 @@
         <meta name="renfile" title="Переименование файла" content="Переименовать файл <b>{{_POST[name]}}</b> в: {{filename}} {{oldname}}" visible="filename" invisible="oldname">
         <meta name="paste" title="Вставка" content="Некоторые объекты уже существуют в этой директории.<br> Выполнить перезапись существующих объектов?">
         <meta name="zip" title="Архивация" content="Сжать выбранные объекты в архив? {{filename}}" visible="filename">
+        <meta name="unzip" title="Распаковка архива" content="Извлечь файлы и папки из архива?<br>Существующие объекты будут перезаписаны.">
         <input type="text" class="form-control" name="newname">
         <input type="hidden" class="form-control" name="dirname" value="{{_POST[name]}}">
         <input type="hidden" class="form-control" name="filename" value="{{_POST[name]}}">

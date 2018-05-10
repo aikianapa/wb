@@ -146,6 +146,22 @@ function filemanager__action_zip($out=null)
         die;
 }
 
+
+function filemanager__action_unzip($out=null)
+{
+		$flag=true;
+		if ($out!==null) {
+            echo $out->outerHtml();
+        } else {
+            $path=$_ENV["path_app"].$_POST["path"];
+            foreach($_POST["list"] as $zipname) {
+                exec("cd {$path} && unzip -q -o {$zipname} ");
+            }
+            echo json_encode(array("res"=>$_POST["method"],"action"=>"reload_list"));
+        }
+        die;
+}
+
 function filemanager__action_paste($out=null)
 {
 		$flag=true;
@@ -171,13 +187,23 @@ function filemanager__action_paste($out=null)
                         }
                     
                         if ($_POST["method"]=="copy") {
-						  wbRecurseCopy($src,$dst);                            
+                            if (file_exists($dst)) {$dst=filemanager__copyname($dst);}
+						      wbRecurseCopy($src,$dst);                            
                         }
 
 				}
 				echo json_encode(array("res"=>$_POST["method"],"action"=>"reload_list"));
 		}
 		die;
+}
+
+function filemanager__copyname($name) {
+    // тут нужно не просто конкатенировать, а вставить перез расширением
+    for($i=0 ; $i<100 ; $i++) {
+        $name.="_copy";
+        if (!file_exists($name)) {return $name;}
+    }
+    return $name;
 }
 
 function filemanager__action_remove($out=null)
