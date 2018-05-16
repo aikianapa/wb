@@ -29,18 +29,22 @@
         <div class="signbox-body">
             <form action="" method="post">
           <div class="form-group">
-            <label class="form-control-label">Логин:</label>
-            <input class="form-control" placeholder="Ваш логин" name="l" type="text">
+              <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                    <input class="form-control" placeholder="Логин" name="l" type="text">
+              </div>
           </div><!-- form-group -->
           <div class="form-group">
-            <label class="form-control-label">Пароль:</label>
-            <input class="form-control" placeholder="Ваш пароль" name="p" type="password">
+              <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                  <input class="form-control" placeholder="Пароль" name="p" type="password">
+              </div>
           </div><!-- form-group -->
-          <div class="form-group">
+          <button class="btn btn-dark btn-block">Войти &nbsp; <i class="fa fa-sign-in"></i></button>
+          <div class="tx-center bd pd-10 mg-t-20">Вы не зарегистрированы? <a href="/signup">Создать аккаунт</a></div>
+          <div class="form-group mg-t-20">
             <div data-wb-role="module" src="ulogin"></div>
           </div><!-- form-group -->
-          <button class="btn btn-dark btn-block">Войти</button>
-          <div class="tx-center bd pd-10 mg-t-40">Вы не зарегистрированы? <a href="/signup">Создать аккаунт</a></div>
             </form>
         </div><!-- signbox-body -->
       </div><!-- signbox -->
