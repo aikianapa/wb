@@ -1280,6 +1280,7 @@ abstract class kiNode
         } elseif ($where>"" AND !wbWhereItem($Item,$where)) {
 			       $this->remove();
         }
+        if ($this->attr("data-wb-hide")!=="false") {$this->removeAttr("data-wb-where");}
     }
 
 
@@ -1992,6 +1993,7 @@ abstract class kiNode
 			$vars=$this->find("[data-wb-role=variable]");
 			foreach($vars as $v => $var) {$Item=$var->tagVariable($Item);}
 			$this->wbSetData($Item);
+            $this->tagHideAttrs();
 		}
 	}
 
