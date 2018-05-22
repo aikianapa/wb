@@ -33,6 +33,7 @@ function robokassa__checkout() {
 	$mrh["url"]=$SETT["url"]; // url мерчанта
 	$mrh["inv_id"] = 0; // номер заказа системный (не принимает шестнатиричные)
 	$mrh["Shp_orderId"] = $order["id"];
+    $mrh["ResultURL"]=$result_url;
 	$mrh["inv_desc"] = "Кафе Купон - заказ № {$order['id']}"; // описание заказа
 	$mrh["summ"] = $order["total"]; // сумма заказа
 	$mrh["currency"] = ""; // предлагаемая валюта платежа
@@ -68,16 +69,34 @@ function robokassa__success() {
 	$crc = $_REQUEST["SignatureValue"];
 	$crc = strtoupper($crc);  // force uppercase
 
-	if (strtoupper($my_crc) != strtoupper($crc)) {  robokassa_fail();  exit();	}
+    if (isset($_ENV["settings"]["robokassa"]["success"]) AND $_ENV["settings"]["robokassa"]["success"]>"") {
+        $success=$_ENV["settings"]["robokassa"]["success"];
+    } else {$success="/success";}
+    if (isset($_ENV["settings"]["robokassa"]["fail"]) AND $_ENV["settings"]["robokassa"]["fail"]>"") {
+        $fail=$_ENV["settings"]["robokassa"]["fail"];
+    } else {$fail="/fail";}
+    
+	if (strtoupper($my_crc) == strtoupper($crc)) {
+		$order["active"]="on";
+		$order["payed"]="on";
+		unset($order["apikey"]);
+		wbItemSave("orders",$order);
+		$_SESSION["order_id"]=wbNewId();
+        setcookie("order_id","",time()-3600,"/"); unset($_COOKIE["order_id"]);
+		header('Location: '.$success);
+		die;
+	} else {
+		header('Location: '.$fail);
+		die;
+	}
+}
 
-		if (!is_callable("users_cabinet")) {include_once($_SESSION["root_path"]."/forms/users/users.php");}
-		$out=users_cabinet();
-		$_SESSION["order_id"]=newIdRnd();
-		setcookie("order_id","",time()-3600,"/"); unset($_COOKIE["order_id"]);
-
-		//Lpay2pay_order_success($inv_id);
-	return $out;
-
+function robokassa__fail() {
+    if (isset($_ENV["settings"]["robokassa"]["fail"]) AND $_ENV["settings"]["robokassa"]["fail"]>"") {
+        $fail=$_ENV["settings"]["robokassa"]["fail"];
+    } else {$fail="/fail";}
+    header('Location: '.$fail);
+	die;
 }
 
 function robokassa__result() {
@@ -90,7 +109,7 @@ function robokassa__result() {
 	$mrh["summ"] = $order["total"];
 	$mrh["inv_id"] = $_REQUEST["InvId"];
 	$mrh["Shp_orderId"]=$order["id"];
-	if ($test_mode=="on") {$mrh["pass"] = $SETT['test2'];} else {$mrh["pass"] = $SETT['key2'];}
+	if ($test_mode=="on") {$mrh["pass"] = $SETT['test1'];} else {$mrh["pass"] = $SETT['key1'];}
 
 	// build own CRC
 	$my_crc="{$mrh['summ']}:{$mrh['inv_id']}:{$mrh['pass']}:Shp_orderId={$mrh['Shp_orderId']}";
@@ -100,19 +119,16 @@ function robokassa__result() {
 	$crc = strtoupper($crc);  // force uppercase
 
 
-	if (strtoupper($my_crc) !== strtoupper($crc)) {    echo "bad sign\n"; exit();	}
-
+	if (strtoupper($my_crc) !== strtoupper($crc)) {    echo "bad sign\n"; exit();	} else {
+		$order["active"]="on";
+		$order["payed"]="on";
+		unset($order["apikey"]);
+		wbItemSave("orders",$order);
+		$_SESSION["order_id"]=wbNewId();
+        setcookie("order_id","",time()-3600,"/"); unset($_COOKIE["order_id"]);
+    }
 	
 	echo "OK{$mrh['inv_id']}\n";
-}
-
-function robokassa__fail() {
-	$out=getTemplate("/tpl/kupon/cart.php",true);
-	$out->find("#page")->prepend("<br /><div class='container bg-danger'>
-	<h4><i class='ti-alert'></i> Не удалось выполнить оплату заказа!</h4>
-	</div>");
-	return $out->outerHtml();
-	die;
 }
 
 function robokassa__settings() {

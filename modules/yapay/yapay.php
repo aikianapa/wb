@@ -19,8 +19,13 @@ function yapay__checkout() {
         $order["user_id"]=$_SESSION["user_id"];
         $order["name"]=$_SESSION["user"];
         if (count($order["items"]) AND $order["total"]>0) wbItemSave("orders",$order);
-        $order["receiver"]=$_ENV["settings"]["yapay"]["id"];
         $out=wbFromFile(__DIR__ ."/yapay_ui.php");
+        if (isset($_ENV["settings"]["yapay"]["test"]) AND $_ENV["settings"]["yapay"]["test"]=="on") {
+            $order["receiver"]=$_ENV["settings"]["yapay"]["test_id"];
+            $out->find("form")->attr("action","https://demomoney.yandex.ru/quickpay/confirm.xml");
+        } else {
+            $order["receiver"]=$_ENV["settings"]["yapay"]["id"];            
+        }
         foreach($order as $key => $val) {
             $out->find("[name='{$key}']")->attr("value",$val);
         }
@@ -33,16 +38,23 @@ function yapay__success() {
 	$apicheck=$_ENV["route"]["params"][2];
 	$order=wbItemToArray(wbItemRead("orders",$_SESSION["order_id"]));
 	$apikey=yapay__apikey($order);
+    if (isset($_ENV["settings"]["yapay"]["success"]) AND $_ENV["settings"]["yapay"]["success"]>"") {
+        $success=$_ENV["settings"]["yapay"]["success"];
+    } else {$success="/success";}
+    if (isset($_ENV["settings"]["yapay"]["fail"]) AND $_ENV["settings"]["yapay"]["fail"]>"") {
+        $fail=$_ENV["settings"]["yapay"]["fail"];
+    } else {$fail="/fail";}
+    
 	if ($apikey==$apicheck) {
 		$order["active"]="on";
 		$order["payed"]="on";
 		unset($order["apikey"]);
 		wbItemSave("orders",$order);
 		$_SESSION["order_id"]=wbNewId();
-		header('Location: /cabinet');
+		header('Location: '.$success);
 		die;
 	} else {
-		header('Location: /fail');
+		header('Location: '.$fail);
 		die;
 	}
 }

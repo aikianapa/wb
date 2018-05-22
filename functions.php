@@ -1648,6 +1648,8 @@ function wbListFormsFull() {
 	return $list;
 }
 
+
+function wbArraySortMulti( $array=array(), $args = array('votes' => 'd') ){	return wbArraySort( $array, $args);}
 function wbArraySort( $array=array(), $args = array('votes' => 'd') ){
 	// если передан атрибут, то предварительно готовим массив параметров
 	if (is_string($args) && $args>"") {
@@ -1662,7 +1664,7 @@ function wbArraySort( $array=array(), $args = array('votes' => 'd') ){
 			unset($param,$tmp,$ds);
 	}
 	// сортировка массива по нескольким полям
-	usort( $array, function( $a, $b ) use ( $args ){
+	uasort( $array, function( $a, $b ) use ( $args ){
 		$res = 0;
 		$a = (object) $a;
 		$b = (object) $b;
@@ -1743,38 +1745,6 @@ function wbListFilesRecursive($dir,$path=false) {
        }
    }
    return $list;
-}
-
-function wbArraySortMulti( $array=array(), $args = array('votes' => 'd') ){
-	// если передан атрибут, то предварительно готовим массив параметров
-	if (is_string($args) && $args>"") {
-			$args=wbAttrToArray($args);
-			$param=array();
-			foreach($args as $ds) {
-				$tmp=explode(":",$ds);
-				if (!isset($tmp[1])) {$tmp[1]="a";}
-				$param[$tmp[0]]=$tmp[1];
-			}
-			$args=$param;
-			unset($param,$tmp,$ds);
-	}
-	// сортировка массива по нескольким полям
-	usort( $array, function( $a, $b ) use ( $args ){
-		$res = 0;
-		$a = (object) $a;
-		$b = (object) $b;
-		foreach( $args as $k => $v ){
-			if (isset($a->$k) && isset($b->$k)) {
-				if( $a->$k == $b->$k ) continue;
-
-				$res = ( $a->$k < $b->$k ) ? -1 : 1;
-				if( $v=='d' ) $res= -$res;
-				break;
-			}
-		}
-		return $res;
-	} );
-	return $array;
 }
 
 function wbArrayWhere($arr,$where) {

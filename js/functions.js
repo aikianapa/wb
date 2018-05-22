@@ -1,5 +1,8 @@
+"use strict";
+var wbapp= new Object();
+wbapp.settings = wb_settings();
+
 function wb_delegates() {
-    "use strict";
     wb_ajax();
     wb_pagination();
     wb_formsave();
@@ -10,8 +13,39 @@ function wb_delegates() {
     wb_cart();
 }
 
+function wb_settings() {
+    var settings = null;
+    var defer = $.ajax({
+        async: false
+        , type: 'GET'
+        , url: "/ajax/settings/"
+        , success: function (data) {
+            settings = $.parseJSON(base64_decode(data));
+            return data;
+        }
+    });
+    return settings;
+    
+}
+
+function wb_merchant_modal() {        
+        var merchant = wbapp.settings.merchant;
+        $.ajax({
+            async: false
+            , type: "POST"
+            , url: "/module/"+merchant
+            , success: function(data) {
+                if ( $(document).find("#"+merchant+"Modal").length) {
+                    $(document).find("#"+merchant+"Modal").replaceWith($(data).find("#"+merchant+"Modal"));
+                } else {
+                    $(document).find("body").append($(data).find("#"+merchant+"Modal"));
+                }
+            }
+        });
+        $("#"+merchant+"Modal").modal("show");
+}
+
 function wb_cart() {
-    "use strict";
     $(document).unbind("cart-recalc");
     $(document).unbind("cart-clear");
     $(document).unbind("cart-item-recalc");
@@ -240,7 +274,6 @@ function wb_cart_item(item) {
 }
 
 function wb_alive() {
-    "use strict";
     if ($("body").attr("data-wb-alive") == "true") {
         var post = "wb_get_user_role";
         setInterval(function () {
@@ -274,7 +307,6 @@ function wb_get_cdata(text) {
 }
 
 function wb_tree() {
-    "use strict";
     if ($(document).data("wb-tree-rowmenu") == undefined && $(".wb-tree").length) {
         $.get("/ajax/getform/common/tree_rowmenu/", function (data) {
             $(document).data("wb-tree-rowmenu", data);
@@ -824,7 +856,6 @@ function wb_newid() {
 }
 
 function wb_multiinput() {
-    "use strict";
     if ($("[data-wb-role=multiinput]").length && $(document).data("wb-multiinput-menu") == undefined) {
         $.get("/ajax/getform/common/multiinput_menu/", function (data) {
             $(document).data("wb-multiinput-menu", data);
@@ -925,7 +956,6 @@ function wb_base_fix() {
 }
 
 function wb_plugins() {
-    "use strict";
     $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip();
         if (wb_plugins_loaded()) {
@@ -2255,3 +2285,30 @@ function getcookie(cookie_name) {
         wb_delegates();
         $("body").removeClass("cursor-wait");
     });
+function base64_decode( data ) {	// Decodes data encoded with MIME base64
+	// 
+	// +   original by: Tyler Akins (http://rumkin.com)
+
+
+	var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+	var o1, o2, o3, h1, h2, h3, h4, bits, i=0, enc='';
+
+	do {  // unpack four hexets into three octets using index points in b64
+		h1 = b64.indexOf(data.charAt(i++));
+		h2 = b64.indexOf(data.charAt(i++));
+		h3 = b64.indexOf(data.charAt(i++));
+		h4 = b64.indexOf(data.charAt(i++));
+
+		bits = h1<<18 | h2<<12 | h3<<6 | h4;
+
+		o1 = bits>>16 & 0xff;
+		o2 = bits>>8 & 0xff;
+		o3 = bits & 0xff;
+
+		if (h3 == 64)	  enc += String.fromCharCode(o1);
+		else if (h4 == 64) enc += String.fromCharCode(o1, o2);
+		else			   enc += String.fromCharCode(o1, o2, o3);
+	} while (i < data.length);
+
+	return enc;
+}

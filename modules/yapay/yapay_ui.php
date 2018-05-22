@@ -9,7 +9,7 @@
 				<input type="hidden" name="quickpay-form" value="shop">
 				<input type="hidden" name="successURL" value="{{_ENV[route][hostp]}}/module/yapay/success/{{id}}/{{apikey}}">
 				<input type="hidden" name="targets" value="Заказ {{id}}"> 
-				<input type="hidden" name="sum" value="0.03" data-type="number"> 
+				<input type="hidden" name="sum" value="{{total}}" data-type="number"> 
 				<input type="hidden" name="comment" value=""> 
 				<input type="hidden" name="need-fio" value="false"> 
 				<input type="hidden" name="need-email" value="false"> 

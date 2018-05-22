@@ -35,6 +35,16 @@ function ajax__pagination_vars() {
     return wbJsonEncode($res);
 }
 
+function ajax__settings() {
+    $sett=$_ENV["settings"];
+    $mrch=wbMerchantList();
+    foreach($mrch as $k => $m) {
+        unset($sett[$m["name"]]);
+    }
+    return base64_encode(json_encode($sett));
+}
+
+
 function ajax__cart() {
     return wbCartAction();
 }
