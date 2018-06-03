@@ -44,7 +44,6 @@ function ajax__settings() {
     return base64_encode(json_encode($sett));
 }
 
-
 function ajax__cart() {
     return wbCartAction();
 }

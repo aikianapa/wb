@@ -5,16 +5,14 @@ $.fn.outerHTML = function (s) {
 };
 
 function wb_include(url) {
- /*   if (!$(document).find("script[src='" + url + "']").length) {
-        var s = document.createElement('script');
-        s.src = url;
-        s.type = "text/javascript";
-        document.body.appendChild(s);
-    }
-    */
-    $.getScript(url);
+    var js_script = document.createElement('script');
+    js_script.type = "text/javascript";
+    js_script.src = url;
+    js_script.async = false;
+    document.getElementsByTagName('head')[0].appendChild(js_script);
+    return;
 }
 
-wb_include("/engine/js/php.js");
-wb_include("/engine/js/jquery.redirect.js");
-wb_include("/engine/js/functions.js");
+var defer = wb_include("/engine/js/php.js");
+var defer = wb_include("/engine/js/jquery.redirect.js");
+var defer = wb_include("/engine/js/functions.js");

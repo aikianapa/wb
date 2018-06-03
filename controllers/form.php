@@ -201,8 +201,8 @@ function form__controller__select2() {
 }
 
 function form__controller__setup_engine() {
-	if (is_dir($_ENV["dba"]) AND is_dir($_ENV["path_app"]."/tpl")) {
-        $out=wbGetTpl("/engine/tpl/setup.htm",true);
+    $out=wbGetTpl("/engine/tpl/setup.htm",true);
+    if (is_dir($_ENV["dba"]) AND is_dir($_ENV["path_app"]."/tpl")) {
         $out->find("#setup")->remove();
         $out->wbSetData();
         echo $out;
@@ -223,7 +223,6 @@ function form__controller__setup_engine() {
 		header('Location: '.'/');
 		die;
 	}
-    $out=wbGetTpl("/engine/tpl/setup.htm",true);
     $out->find("#error")->remove();
     $out->wbSetData();
     echo $out;

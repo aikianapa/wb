@@ -1681,7 +1681,7 @@ abstract class kiNode
                 eval('$'.$var.' = "'.$this->attr("value").'";');
             } else {
                 $_ENV["variables"][$var]="";
-                if (!isset($where)) $where=$this->attr("if");
+                if (!isset($where)) $where=$if;
                 if ($where=="") {
                     $_ENV["variables"][$var]=wbSetValuesStr($this->attr("value"),$Item);
                 } else {
@@ -1917,6 +1917,7 @@ abstract class kiNode
         $tpl=$this->html();
 		$this->html("");
 		if ($branch!==0) {
+            $branch=html_entity_decode($branch);
             $br=explode("->",$branch);
             foreach($br as $b) {
                 $tree=array(wbTreeFindBranchById($tree,trim($b)));
