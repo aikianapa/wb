@@ -2032,10 +2032,19 @@ abstract class kiNode
         }
 
         if (isset($count) AND $count>"") {
-            $fcount=$count;
+            $fcount=wbArrayAttr($count);
             $Item=array();
-            $count=$count*1;
-            for($i=1;$i<=$count;$i++){$Item[$i]=$srcItem;};
+            if (count($fcount)==1) {
+                for($i=1;$i<=$count*1;$i++){$srcItem["_ndx"]=$i;$Item[$i]=$srcItem;};
+            } elseif (count($fcount)==2) {
+                if ($fcount[0]<=$fcount[1]) {
+                    for($i=$fcount[0];$i<=$fcount[1];$i++){$srcItem["_ndx"]=$i;$Item[$i]=$srcItem;};
+                } else {
+                    for($i=$fcount[0];$i>=$fcount[1];$i--){$srcItem["_ndx"]=$i;$Item[$i]=$srcItem;};
+                }
+            } elseif (count($fcount)>2) {
+                foreach($fcount as $i) {if (is_numeric($i)) {$srcItem["_ndx"]=$i;$Item[$i]=$srcItem;}}
+            }
         }
         
         if (isset($form) AND !isset($table)) {$table=$form;}
@@ -2079,6 +2088,7 @@ abstract class kiNode
 		$iterator = new tagForeachFilter($object->getIterator(),array(
 			"id"=>$id,
 		));
+        $oddeven="even";
 		foreach($object as $key => $val) {
             $val=wbItemToArray($val);
 				$n++;
@@ -2088,9 +2098,11 @@ abstract class kiNode
 					$text=$tmptpl->clone();
 					$val=(array)$srcVal + (array)$val; // сливаем массивы
                     $text->find(":first")->attr("idx",$key);
+                    if ($oddeven=="even") {$oddeven="odd";} else {$oddeven="even";}
+                    $val["_odd"]=$oddeven;
 					$val["_key"]=$key;
 					$val["_idx"]=$ndx;
-					$val["_ndx"]=$ndx+1;
+					if (!isset($val["_ndx"])) $val["_ndx"]=$ndx+1;
                     $val["_step"]=$stp;
 					$flag=true;
 					if ($flag==true AND isset($where)) {$flag=wbWhereItem($val,$where);}
@@ -2343,13 +2355,14 @@ public function tagInclude($Item=array()) {
 		}
 		if (isset($field) AND $field>"") {
             $Item=wbGetDataWbFrom($Item,$field);
+            $Item=wbItemToArray($Item);
 		}
         if (isset($vars) AND $vars>"") {$Item=wbAttrAddData($vars,$Item);}
 		if (isset($call) AND is_callable($call)) {$Item=$call($Item);}
 		if (is_array($srcItem)) {foreach($srcItem as $k => $v) {$Item["%{$k}"]=$v;}; unset($v);}
-    $this->includeTag($Item);
+        //$this->includeTag($Item);
 		$Item=wbCallFormFunc("BeforeShowItem",$Item,$table,$mode);
-    $Item=wbCallFormFunc("BeforeItemShow",$Item,$table,$mode);
+        $Item=wbCallFormFunc("BeforeItemShow",$Item,$table,$mode);
 		$this->wbSetData($Item);
 		//$this->html(clearValueTags($this->html()));
     }
