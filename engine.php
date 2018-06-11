@@ -4,10 +4,11 @@ require_once __DIR__."/functions.php";
 wbInit();
 $_ENV["ITEM"]=array();
 if (!isset($_ENV["route"]["form"]) OR $_ENV["route"]["form"]!=="default_form") {
+    $exclude=in_array($_ENV["route"]["controller"],array("module","ajax","thumbnails"));
 	$_ENV["DOM"]=wbFromString(""); $_ENV["ITEM"]=array();
-	if (is_callable("wbBeforeEngine")) {$_ENV["ITEM"] = wbBeforeEngine();}
-	if (is_callable("wbCustomEngine")) {$_ENV["DOM"]  = wbCustomEngine();} else {wbLoadController();}
-	if (is_callable("wbAfterEngine"))  {$_ENV["ITEM"] = wbAfterEngine();}
+	if (is_callable("wbBeforeEngine") AND !$exclude) {$_ENV["ITEM"] = wbBeforeEngine();}
+	if (is_callable("wbCustomEngine") AND !$exclude) {$_ENV["DOM"]  = wbCustomEngine();} else {wbLoadController();}
+	if (is_callable("wbAfterEngine") AND !$exclude)  {$_ENV["ITEM"] = wbAfterEngine();}
 } else {
 	if (!is_dir($_ENV["path_app"]."/form")) {wbLoadController();} else {
 		$_ENV["DOM"]=wbFromString(wbErrorOut(404));

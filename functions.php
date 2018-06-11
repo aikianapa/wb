@@ -1,5 +1,7 @@
 <?php
-include_once (__DIR__."/kiDom.php");
+require_once (__DIR__."/kiDom.php");
+require_once (__DIR__."/wbapp.php");
+
 function wbInit() {
     error_reporting( error_reporting() & ~E_NOTICE );
 	wbErrorList();
@@ -784,25 +786,24 @@ function wbGetForm($form=NULL,$mode=NULL,$engine=null) {
 
 function wbErrorList() {
 	$_ENV["errors"]=array(
-		100=>"Успешный вход в систему {{l}}",
-		101=>"Не удачный вход в систему {{l}}",
-		404=>"Страница не существует",
-		1001=>"Таблица {{0}} не существует",
-		1002=>"Таблица {{0}} уже существует",
+		100=>"Login succeessful {{l}}",
+		101=>"Login incorrect {{l}}",
+		404=>"Page not found",
+		1001=>"Table {{0}} not exists",
+		1002=>"Table {{0}} already exixts",
 		1003=>"Не удалось удалить {{0}}",
-		1004=>"He удалось заблокировать файл {{0}}",
-		1005=>"Не удалось записать таблицу {{0}}",
-		1006=>"Запись {{1}} в таблице {{0}} не существует",
-		1007=>"Не удалось сохранить запись в таблицу {{0}}",
-		1008=>"Удаление записи {{1}} в таблице {{0}}",
-		1009=>"Сброс данных из кэша таблицы {{0}}",
-        1010=>"Не удалось создать таблицу {{0}}",
-        1010=>"Создание таблицы {{0}}",
+		1004=>"Failed to remove file {{0}}",
+		1005=>"Failed to remove table {{0}}",
+		1006=>"Item {{1}} in table {{0}} not exists",
+		1007=>"Failed to save record to table {{0}}",
+		1008=>"Delete item {{1}} in table {{0}}",
+		1009=>"Flush data from cache table {{0}}",
+        1010=>"Failed to create table {{0}}",
+        1010=>"Create a table {{0}}",
 	);
 }
 
 function wbLog($type,$name,$error,$args) {	
-	$log = fopen($_ENV["path_app"]."/wblog.txt", "a");
 	if (isset($_ENV["errors"][$error])) {
 		$error=array("errno"=>$error,"error"=>$_ENV["errors"][$error]);
 	} else {
@@ -814,7 +815,7 @@ function wbLog($type,$name,$error,$args) {
 			$error["error"]=str_replace("{{".$key."}}",$arg,$error["error"]);
 		}
 	}
-	fwrite($log, date("d-m-Y H:i:s")." {$type} {$name} [{$error["errno"]}]: {$error["error"]} [{$_SERVER["REMOTE_ADDR"]} : {$_SERVER["REQUEST_URI"]}]\n");
+	error_log(" {$type} {$name} [{$error["errno"]}]: {$error["error"]} [{$_SERVER["REQUEST_URI"]}]");
 }
 
 function wbNewId($separator="") {
@@ -1786,4 +1787,6 @@ function wbTranslit($textcyr = null, $textlat = null) {
 
 function wbBr2nl($str) {
 $str = preg_replace("/(rn|n|r)/", "", $str);
-return preg_replace("=<br */?>=i", "n", $str); } ?>
+return preg_replace("=<br */?>=i", "n", $str); } 
+
+?>
