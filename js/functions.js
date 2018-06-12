@@ -1298,6 +1298,23 @@ function wb_formsave() {
         }
         return false;
     });
+    
+    $(document).undelegate("form[data-wb-form] [name=id]","change");
+    $(document).delegate("form[data-wb-form] [name=id]","change", function(){
+        var value=$(this).val();
+        var form=$(this).parents("form[data-wb-form]");
+        var name=$(form).attr("data-wb-form");
+        var path="/uploads/"+name+"/"+value;
+        if (!$(form).parents("script").length) {
+            if ($(form).attr("data-wb-item")!==undefined) {$(form).attr("data-wb-item",value);}
+            if ($(form).attr("data-wb-item")!==undefined) {$(form).attr("data-wb-item",value);}
+            $(form).find(".wb-uploader").each(function(){
+                $(this).attr("data-wb-path",path);
+                $(this).attr("data-wb-item",value);
+                $(this).wbUploaderInit();
+            });
+        }
+    });
 }
 
 function wb_iconv_object(obj) {

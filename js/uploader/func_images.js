@@ -7,6 +7,11 @@ $(document).ready(function(){
 
 function wbCommonUploader() {
 	$(document).find(".wb-uploader:not(wb-done)").each(function(){
+        $(this).wbUploaderInit();
+	});
+}
+
+jQuery.fn.wbUploaderInit = function() {
 		var id=$(this).attr("id");
 		var uid="upl-"+$(this).attr("id");
 		var store=$('#'+ id + ' > input[name]');
@@ -74,8 +79,7 @@ function wbCommonUploader() {
 			}
 		}
 		});
-		uploader.init();
-	});
+		uploader.init(); 
 }
 
 
