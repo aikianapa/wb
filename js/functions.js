@@ -1299,6 +1299,12 @@ function wb_formsave() {
         return false;
     });
     
+    $(document).undelegate("form[data-wb-form] [name=id]","keyup input click");
+    $(document).delegate("form[data-wb-form] [name=id]","keyup input click", function(){
+        $(this).val(wb_prepareId($(this).val()))
+        
+    });
+    
     $(document).undelegate("form[data-wb-form] [name=id]","change");
     $(document).delegate("form[data-wb-form] [name=id]","change", function(){
         var value=$(this).val();
@@ -1315,6 +1321,22 @@ function wb_formsave() {
             });
         }
     });
+}
+
+
+function wb_prepareId(id) {
+    var tr='a b v g d e ["zh","j"] z i y k l m n o p r s t u f h c ch sh ["shh","shch"] ~ y ~ e yu ya ~ ["jo","e"]'.split(' ');
+    var ww=''; id=id.toLowerCase();
+    var i=0;
+    for (i=0; i<id.length; ++i) {
+    var cc=id.charCodeAt(i); 
+    var ch=(cc>=1072?tr[cc-1072]:id [i]);
+    if(ch.length<3) ww+=ch; else ww+=eval(ch)[0];}  
+    return ww
+    .replace(/[^a-z\d\-\s_\s]/gi,'') // удаляем весь мусор, который нам нахрен не сдался
+    .replace(/[\s\-]+/ig, '-') // Удаляем всё дубяжи и пробелы на "-"
+    //.replace(/^[^a-z\d]+/i, '') // Удаляем всё лишнее в начала
+    //.replace(/[^a-z\d]+$/i, '') // Удаляем всё лишнее с конца*/
 }
 
 function wb_iconv_object(obj) {
