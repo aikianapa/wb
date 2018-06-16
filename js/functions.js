@@ -360,6 +360,7 @@ function wb_tree() {
         var w = e;
         var relativeX = (w.clientX - 10);
         var relativeY = (w.clientY - 10);
+        if ($(e.target).parents("#adminTree.tab-pane").length) {relativeY-=($(".kt-pagetitle").offset().top+$(".kt-pagetitle").height());}
         $(".wb-tree-item").find(".wb-tree-menu").css("left", relativeX + "px").css("top", relativeY + "px");
         $(".wb-tree-item").find(".wb-tree-menu [data-toggle=dropdown]").trigger("click");
         e.preventDefault();
