@@ -156,7 +156,7 @@ print_r(wbRouter::getRoute());
 		parse_str($_SERVER["QUERY_STRING"],$_GET);
 		$_ENV["route"]=array("scheme"=>$scheme,"host"=>$_SERVER["HTTP_HOST"],"controller"=>$controller,$controller=>$_GET["form"], $action=>$_GET["mode"] , "params"=>$_GET);
 	}
-
+	$_ENV["server"]=$_ENV["route"]["hostp"];
     return $_ENV["route"];
   }
 
@@ -1897,18 +1897,18 @@ abstract class kiNode
 	}
 
 	public function tagTreeUl($Item=array(),$param=null,$srcVal=array()) {
-		$limit=-1; $lvl=0; $idx=0; $tree=$Item; $branch=0; $parent=1; $pardis=0; $children=1;
+		$limit=-1; $lvl=0; $level=-1; $idx=0; $tree=$Item; $branch=0; $parent=1; $pardis=0; $children=1;
 		if ($param==null) {
-			include("wbattributes.php");
-			$name=$this->attr("name");
-      if (isset($from)) {$name=$from;}
-			if ($name=="" AND isset($item)) {$name=$item;}
-			if (!is_array($Item[$name])) {$tree=json_decode($Item[$name],true);} else {$tree=$Item[$name];}
-			$tag=$this->tag();
-			if (!isset($limit) OR $limit=="false" OR $limit*1<0) {$limit=-1;} else {$limit=$limit*1;}
-      if ($parent=="disabled") {$pardis=1;$parent=1;} else {$pardis=0;}
-      if ($parent=="false" OR $parent=="0") {$parent=0;} elseif ($parent=="true") {$parent=1;}
-      if ($children=="false" OR $children*1==0) {$children=0;} elseif ($children=="true" OR $children=="1") {$children=1;}
+            include("wbattributes.php");
+            $name=$this->attr("name");
+              if (isset($from)) {$name=$from;}
+                    if ($name=="" AND isset($item)) {$name=$item;}
+                    if (!is_array($Item[$name])) {$tree=json_decode($Item[$name],true);} else {$tree=$Item[$name];}
+                    $tag=$this->tag();
+                    if (!isset($limit) OR $limit=="false" OR $limit*1<0) {$limit=-1;} else {$limit=$limit*1;}
+              if ($parent=="disabled") {$pardis=1;$parent=1;} else {$pardis=0;}
+              if ($parent=="false" OR $parent=="0") {$parent=0;} elseif ($parent=="true") {$parent=1;}
+              if ($children=="false" OR $children=="0") {$children=0;} elseif ($children=="true" OR $children=="1") {$children=1;}
 		} else {
 			foreach($param as $k =>$val) {$$k=$val;}
 			$tree=$Item;
@@ -1926,16 +1926,19 @@ abstract class kiNode
     		if ($this->hasAttr("placeholder") AND $this->is("select")) {
     			$this->prepend("<option value='' class='placeholder'>".$this->attr("placeholder")."</option>");
     		}
+        $idx=0;
         foreach($tree as $i => $item) {
                   $lvl++;
                   $item=(array)$srcVal + (array)$item;
                   $item["_idx"]=$idx; 
+                  $item["_lvl"]=$lvl-1;
                   $line=wbFromString($tpl);
                   $line->wbSetData($item);
 
-                  if (isset($item["children"]) AND is_array($item["children"]) AND count($item["children"])  AND $children!==0) {
+                  if ($parent==0 OR (isset($item["children"]) AND is_array($item["children"]) AND count($item["children"]) AND $children==1)) {
                     if ($pardis==1 AND ($limit!==$lvl-1)) {$line->children()->attr("disabled",true);}
                     $child=wbFromString($tpl);
+                    if ($lvl>1) $parent=1;
                     $child->tagTreeUl($item["children"],array("name"=>$name,"tag"=>$tag,"lvl"=>$lvl,"idx"=>$idx,"level"=>$level,"pardis"=>$pardis,"parent"=>$parent,"children"=>$children,"limit"=>$limit),$srcVal);
                     if (($limit==-1 OR $lvl<=$limit)) {
               	          if ($tag=="select") {
@@ -1943,17 +1946,19 @@ abstract class kiNode
                                  $child->children("option")->prepend(str_repeat("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>",$lvl));
                                  $child->wbSetValues($item);
                                  if ($parent!==1) {
-                                   $line->html($child);
+                                   $line->replaceWith($child); 
                                  } else {
                                    $line->append($child);
                                  }
                           } else {
+                               if ($parent!==1) {$lvl--;}
                                if ($parent!==1) {
                                    $line->html($child);
                                } else {
                                    if ($children==1) $line->children()->append("<{$tag}>".$child->outerHtml()."</{$tag}>");
                                }
                           }
+                          
                     }
                 }
                 $idx++;

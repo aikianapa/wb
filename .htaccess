@@ -5,6 +5,8 @@ RewriteBase /
 RewriteEngine On
 RewriteRule ^database(.*)$ index.php [L,QSA]
 
+RewriteRule ^(.*)\/$ /$1 [R=301,L]
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
