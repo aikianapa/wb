@@ -2053,7 +2053,7 @@ function wb_pagination(pid) {
                                 var funcCall = loader + "(false);";
                                 eval(funcCall);
                             }
-                            (document).trigger("after-pagination-error", [id, page, arr[2]]);
+                            $(document).trigger("after-pagination-error", [id, page, arr[2]]);
                         }
                     });
                 }

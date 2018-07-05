@@ -1691,6 +1691,13 @@ abstract class kiNode
                         $_ENV["variables"][$var]=wbSetValuesStr($this->attr("else"),$Item);
                     }
                 }
+                $tmp=substr($_ENV["variables"][$var],0,1);
+                if ($tmp=="{" OR $tmp=="]") {
+                    $array=json_decode($_ENV["variables"][$var],true);
+                    if (is_array($array)) {$_ENV["variables"][$var]=$array;}
+                }
+                unset($array,$tmp);
+                
                 if (isset($oconv) AND $oconv>"") {
                     $_ENV["variables"][$var]=wbOconv($_ENV["variables"][$var],$oconv);
                 }
@@ -1811,22 +1818,21 @@ abstract class kiNode
 	}
 
 	public function tagHideAttrs() {
-		$hide=trim($this->attr("data-wb-hide"));
-		$hide=trim(str_replace(","," ",$hide));
-        if ($hide=="wb") {
-            $list=$this->attributes(); $hide="";
-            foreach($list as $attr) {
+		$list=wbAttrToArray($this->attr("data-wb-hide"));
+        $hide="";
+        if (in_array("wb",$list)) {
+            $attrs=$this->attributes();
+            foreach($attrs as $attr) {
                 if (substr($attr->name,0,8)=="data-wb-") {
-                    $hide.=" ".$attr->name;
-                    if (!$this->hasAttr("role")) {$this->removeClass("wb-done");}
+                    $this->removeAttr($attr->name);
+                    if (!$this->hasAttr("role") AND !$this->hasAttr("data-wb-role")) {$this->removeClass("wb-done");}
                 }
             }
             $this->removeAttr("data-wb-hide");
             $this->removeAttr("data-wb-done");
-        } elseif ($hide=="*" AND $this->hasClass("wb-done")) {
+        } elseif (in_array("*",$list) AND $this->hasClass("wb-done")) {
             $this->after($this->innerHtml()); $this->remove();
         }
-        $list=explode(" ",trim($hide));
 		foreach($list as $attr) {
 			$this->removeAttr($attr);
 		}
@@ -1946,7 +1952,7 @@ abstract class kiNode
                                  $child->children("option")->prepend(str_repeat("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>",$lvl));
                                  $child->wbSetValues($item);
                                  if ($parent!==1) {
-                                   $line->replaceWith($child); 
+                                   $line->html($child); 
                                  } else {
                                    $line->append($child);
                                  }
@@ -2327,10 +2333,17 @@ public function tagInclude($Item=array()) {
             $Item=wbItemToArray($Item);
              foreach($this->find("include") as $inc) {
                 $inc->wbSetAttributes($Item);
+                $data=$inc->attr("data");
                 $from=$inc->attr("data-wb-from");
-                if ($from=="") {$from="text";}
-                $this->find("#___include___")->html(wbGetDataWbFrom($Item,$from));
-				$attr=array("html","outer","htmlOuter","outerHtml","innerHtml","htmlInner","text","value");
+                if (data>"") {
+                    $this->find("#___include___")->html($data);
+                } else if ($from>"") {
+                    if ($from=="") {$from="text";}
+                    $this->find("#___include___")->html(wbGetDataWbFrom($Item,$from));
+                }
+                 
+                
+                 $attr=array("html","outer","htmlOuter","outerHtml","innerHtml","htmlInner","text","value");
 				foreach ($attr as $key => $attribute) {
 					$find=$inc->attr($attribute);
 					if ($attribute=="outer" OR $attribute=="htmlOuter") {$attribute="outerHtml";}
@@ -2393,7 +2406,7 @@ public function tagThumbnail($Item=array()) {
             if (is_array($Item[$from])) {$images=$Item[$from];} else {$images=json_decode($Item[$from],true);}
         } else {$images="";}
 	}
-	if (!isset($idx)) {$idx=0;}
+	if (!isset($idx) AND is_numeric($src)) {$idx=$src;} else {$idx=0;}
 	if (is_array($images) AND is_numeric($src)) {
 		if (isset($images[$idx])) {$img=$images[$idx]["img"];} else {$img="";}
 		$src=wbGetItemImg($Item,$idx,$noimg,$from,true);
@@ -2496,7 +2509,8 @@ public function tagThumbnail($Item=array()) {
 			$this->attr("src",$src);
 		}
 	}
-
+    $this->removeAttr("data-wb-size");
+    $this->removeAttr("size");
 	$this->attr("data-src",$srcSrc);
 	$this->attr("data-ext",$srcExt);
 	$this->attr("class",$class);
