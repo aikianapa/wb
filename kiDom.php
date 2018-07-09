@@ -1818,27 +1818,29 @@ abstract class kiNode
 	}
 
 	public function tagHideAttrs() {
+        if ((!$this->hasClass("wb-done") AND !$this->is("[data-wb-done=true]")) OR $this->attr("data-wb-hide")=="") return;
 		$list=wbAttrToArray($this->attr("data-wb-hide"));
         $hide="";
         if (in_array("wb",$list)) {
             $attrs=$this->attributes();
             foreach($attrs as $attr) {
                 if (substr($attr->name,0,8)=="data-wb-") {
-                    $this->removeAttr($attr->name);
-                    if (!$this->hasAttr("role") AND !$this->hasAttr("data-wb-role")) {$this->removeClass("wb-done");}
+                    $hide.=" ".$attr->name;
                 }
             }
-            $this->removeAttr("data-wb-hide");
-            $this->removeAttr("data-wb-done");
-        } elseif (in_array("*",$list) AND $this->hasClass("wb-done")) {
+            $hide.=" data-wb-hide data-wb-done";
+        } 
+        if (in_array("*",$list)) {
             $this->after($this->innerHtml()); $this->remove();
         }
+        $list=explode(" ",trim($hide));
 		foreach($list as $attr) {
 			$this->removeAttr($attr);
 		}
         if (!$this->is("[data-wb-role]") AND !$this->is("[role]") AND $this->is("[data-wb-done=true]")) {$this->removeAttr("data-wb-done");}
         $this->removeAttr("data-wb-hide");
 	}
+
 
 	public function tagCart() {
 		if ($this->find(".cart-item")->length) {
@@ -1962,7 +1964,8 @@ abstract class kiNode
                                    if ($parent!==1) {
                                        $line->html($child);
                                    } else {
-                                       if ($children==1) $line->children()->append("<{$tag}>".$child->outerHtml()."</{$tag}>");
+                                       //if ($children==1) $line->children()->append("<{$tag}>".$child->outerHtml()."</{$tag}>");
+                                       if ($children==1) $line->children(":first-child")->append("<{$tag}>".$child->outerHtml()."</{$tag}>"); 
                                    }
                               }
 
@@ -2337,15 +2340,15 @@ public function tagInclude($Item=array()) {
                 $inc->wbSetAttributes($Item);
                 $data=$inc->attr("data");
                 $from=$inc->attr("data-wb-from");
-                if (data>"") {
+                if ($data>"") {
                     $this->find("#___include___")->html($data);
-                } else if ($from>"") {
+                } else {
                     if ($from=="") {$from="text";}
                     $this->find("#___include___")->html(wbGetDataWbFrom($Item,$from));
                 }
                  
                 
-                 $attr=array("html","outer","htmlOuter","outerHtml","innerHtml","htmlInner","text","value");
+                $attr=array("html","outer","htmlOuter","outerHtml","innerHtml","htmlInner","text","value");
 				foreach ($attr as $key => $attribute) {
 					$find=$inc->attr($attribute);
 					if ($attribute=="outer" OR $attribute=="htmlOuter") {$attribute="outerHtml";}
@@ -2362,6 +2365,7 @@ public function tagInclude($Item=array()) {
          }
     }
 
+    
 	public function tagFormData($Item=array()) {
 		$srcItem=$Item;
 		include("wbattributes.php");

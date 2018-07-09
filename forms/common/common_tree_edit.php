@@ -12,7 +12,7 @@
 
 	<div class="form-group row">
 	  <label class="col-sm-3 form-control-label">Наименование</label>
-	   <div class="col-sm-9"><input type="text" class="form-control" name="data-name" placeholder="Наименование" required ></div>
+	   <div class="col-sm-9"><input type="text" class="form-control" name="data-name" placeholder="Наименование"></div>
 	</div>
 </form>
 	
