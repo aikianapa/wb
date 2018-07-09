@@ -32,6 +32,10 @@ function wbInitEnviroment() {
 	$_ENV["forms"]=wbListForms(false);
     $_ENV["modules"]=wbListModules();
     $_ENV["tables"]=wbTableList();
+    $_ENV["thumb_width"]=200;
+    $_ENV["thumb_height"]=160;
+    $_ENV["intext_width"]=320;
+    $_ENV["intext_height"]=240;
     wbCheckWorkspace();
 	$variables=array();
 	$settings=wbItemRead("admin","settings");
@@ -542,6 +546,7 @@ function wbItemRead($table=null,$id=null) {
               $item=null;
             }
       }
+      $item=wbImagesToText($item);
       if (is_array($item) AND isset($item["_removed"])) { // если стоит флаг удаления, то возвращаем null
         if ($item["_removed"]=="remove") {$item=null;}
       } else {
@@ -853,6 +858,38 @@ function wbGetItemImg($Item=null,$idx=0,$noimg="",$imgfld="images",$visible=true
 		}; unset($img);
 	}
 	return urldecode($image);
+}
+
+function wbImagesToText($Item,$fld="text") {
+    if (isset($Item[$fld])) {
+        $image=wbGetItemImg($Item);
+        if (isset($Item["intext_position"]) AND $Item["intext_position"]["pos"]>"") {
+            $image=wbGetItemImg($Item);
+            $image=substr($image,strlen($_ENV["path_app"]));
+            if ($Item["intext_width"]=="") {$width=$_ENV["intext_width"];} else {$width=$Item["intext_width"];}
+            if ($Item["intext_height"]=="") {$height=$_ENV["intext_height"];} else {$height=$Item["intext_height"];}
+            $img="
+            <a href='{$image}' data-fancybox='gallery' class='wb_intext'>
+            <img data-wb-role='thumbnail' data-wb-size='{$width};{$height};src' src='{$image}' style='float:{$Item["intext_position"]["pos"]};' data-wb-hide='wb'>
+            </a>
+            ";
+            $Item[$fld]=$img.$Item[$fld];
+        }
+        if (isset($Item["images_position"]) AND $Item["images_position"]["pos"]>"") {
+            $gal=wbGetForm("common","gallery");
+            $gal=wbFromString("<div class='wb_gallery'>".$gal->outerHtml()."</div>");
+            $gal->wbSetData($Item);
+            if ($image>"") {$gal->find("a[href='{$image}']")->remove();}
+            if (!$gal->find("a")->length) {$gal->find(".wb_gallery")->remove();}
+            if      ($Item["images_position"]["pos"]=="top") {
+                $Item[$fld]=$gal->outerHtml().$Item[$fld];
+            } elseif ($Item["images_position"]["pos"]=="bottom") {
+                $Item[$fld]=$Item[$fld].$gal->outerHtml();
+            }
+            unset($gal);
+        }
+    }
+    return $Item;
 }
 
 function wbListFiles($dir) {
@@ -1462,7 +1499,7 @@ function wbRole($role,$userId=null) {
 		$res="*";
 		$controls="[data-wb-role]";
 		$allow="[data-wb-allow],[data-wb-disallow],[data-wb-disabled],[data-wb-enabled],[data-wb-readonly],[data-wb-writable]";
-		$target="[data-wb-prepend],[data-wb-append],[data-wb-before],[data-wb-after],[data-wb-html],[data-wb-replace]";
+		$target="[data-wb-prepend],[data-wb-append],[data-wb-remove],[data-wb-before],[data-wb-after],[data-wb-html],[data-wb-replace]";
 		$tags=array("module","formdata","foreach", "dict", "tree","gallery",
 					"include","imageloader","thumbnail","uploader",
 					"multiinput","where","cart","variable"

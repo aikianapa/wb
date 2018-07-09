@@ -8,8 +8,8 @@
 			</select>
 	   </div>
 		<label class="col-sm-2 control-label">Размер (Ш/В)</label>
-		<div class="col-sm-2"><input type="number" class="form-control" placeholder="200" name="images_position[width]"></div>
-		<div class="col-sm-2"><input type="number" class="form-control" placeholder="160" name="images_position[height]"></div>
+		<div class="col-sm-2"><input type="number" class="form-control" placeholder="{{_ENV[thumb_width]}}" name="images_position[width]"></div>
+		<div class="col-sm-2"><input type="number" class="form-control" placeholder="{{_ENV[thumb_height]}}" name="images_position[height]"></div>
 	</div>
 
 	<div class="form-group row">
@@ -22,8 +22,8 @@
 			</select>
 		</div>
 		<label class="col-sm-2 control-label">Размер (Ш/В)</label>
-		<div class="col-sm-2"><input type="number" class="form-control" placeholder="200" name="intext_position[width]"></div>
-		<div class="col-sm-2"><input type="number" class="form-control" placeholder="160" name="intext_position[height]"></div>
+		<div class="col-sm-2"><input type="number" class="form-control" placeholder="{{_ENV[intext_width]}}" name="intext_position[width]"></div>
+		<div class="col-sm-2"><input type="number" class="form-control" placeholder="{{_ENV[intext_height]}}" name="intext_position[height]"></div>
 	</div>
 
 <div id="comImagesUpl" data-role="tabpanel">

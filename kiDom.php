@@ -1933,44 +1933,46 @@ abstract class kiNode
     			$this->prepend("<option value='' class='placeholder'>".$this->attr("placeholder")."</option>");
     		}
         $idx=0;
-        foreach($tree as $i => $item) {
-                  $lvl++;
-                  $item=(array)$srcVal + (array)$item;
-                  $item["_idx"]=$idx; 
-                  $item["_lvl"]=$lvl-1;
-                  $line=wbFromString($tpl);
-                  $line->wbSetData($item);
+        if (is_array($tree)) {
+            foreach($tree as $i => $item) {
+                      $lvl++;
+                      $item=(array)$srcVal + (array)$item;
+                      $item["_idx"]=$idx; 
+                      $item["_lvl"]=$lvl-1;
+                      $line=wbFromString($tpl);
+                      $line->wbSetData($item);
 
-                  if ($parent==0 OR (isset($item["children"]) AND is_array($item["children"]) AND count($item["children"]) AND $children==1)) {
-                    if ($pardis==1 AND ($limit!==$lvl-1)) {$line->children()->attr("disabled",true);}
-                    $child=wbFromString($tpl);
-                    if ($lvl>1) $parent=1;
-                    $child->tagTreeUl($item["children"],array("name"=>$name,"tag"=>$tag,"lvl"=>$lvl,"idx"=>$idx,"level"=>$level,"pardis"=>$pardis,"parent"=>$parent,"children"=>$children,"limit"=>$limit),$srcVal);
-                    if (($limit==-1 OR $lvl<=$limit)) {
-              	          if ($tag=="select") {
-                                 if ($parent!==1) {$lvl--;}
-                                 $child->children("option")->prepend(str_repeat("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>",$lvl));
-                                 $child->wbSetValues($item);
-                                 if ($parent!==1) {
-                                   $line->html($child); 
-                                 } else {
-                                   $line->append($child);
-                                 }
-                          } else {
-                               if ($parent!==1) {$lvl--;}
-                               if ($parent!==1) {
-                                   $line->html($child);
-                               } else {
-                                   if ($children==1) $line->children()->append("<{$tag}>".$child->outerHtml()."</{$tag}>");
-                               }
-                          }
-                          
+                      if ($parent==0 OR (isset($item["children"]) AND is_array($item["children"]) AND count($item["children"]) AND $children==1)) {
+                        if ($pardis==1 AND ($limit!==$lvl-1)) {$line->children()->attr("disabled",true);}
+                        $child=wbFromString($tpl);
+                        if ($lvl>1) $parent=1;
+                        $child->tagTreeUl($item["children"],array("name"=>$name,"tag"=>$tag,"lvl"=>$lvl,"idx"=>$idx,"level"=>$level,"pardis"=>$pardis,"parent"=>$parent,"children"=>$children,"limit"=>$limit),$srcVal);
+                        if (($limit==-1 OR $lvl<=$limit)) {
+                              if ($tag=="select") {
+                                     if ($parent!==1) {$lvl--;}
+                                     $child->children("option")->prepend(str_repeat("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>",$lvl));
+                                     $child->wbSetValues($item);
+                                     if ($parent!==1) {
+                                       $line->html($child); 
+                                     } else {
+                                       $line->append($child);
+                                     }
+                              } else {
+                                   if ($parent!==1) {$lvl--;}
+                                   if ($parent!==1) {
+                                       $line->html($child);
+                                   } else {
+                                       if ($children==1) $line->children()->append("<{$tag}>".$child->outerHtml()."</{$tag}>");
+                                   }
+                              }
+
+                        }
                     }
-                }
-                $idx++;
-                $lvl--;
+                    $idx++;
+                    $lvl--;
 
-            if (isset($line)) $this->append($line);
+                if (isset($line)) $this->append($line);
+            }
         }
     }
 
@@ -2430,8 +2432,8 @@ public function tagThumbnail($Item=array()) {
     if ($this->attr("data-wb-size")>"") {$size=$this->attr("data-wb-size");}
     if (!isset($size) OR $size=="") {$size=$this->attr("size");}
     if ($size=="" AND isset($Item["intext_position"])) {
-        if (isset($Item["intext_position"]["width"]) AND $Item["intext_position"]["width"]>"") {$width=$Item["intext_position"]["width"];} else {$width="200";}
-        if (isset($Item["intext_position"]["height"]) AND $Item["intext_position"]["height"]>"") {$height=$Item["intext_position"]["height"];} else {$height="160";}
+        if (isset($Item["intext_position"]["width"]) AND $Item["intext_position"]["width"]>"") {$width=$Item["intext_position"]["width"];} else {$width=$_ENV["thumb_width"];}
+        if (isset($Item["intext_position"]["height"]) AND $Item["intext_position"]["height"]>"") {$height=$Item["intext_position"]["height"];} else {$height=$_ENV["thumb_height"];}
         $size="{$width}px;{$height}px;src";
     }
 			if ($size>"") {
