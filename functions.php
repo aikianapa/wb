@@ -1733,7 +1733,13 @@ function wbNormalizePath( $path ) {
 }
 
 function wbClearValues($out) {
-	$out=preg_replace("|\{\{([^\}]+?)\}\}|","",$out);
+    $Item=array();
+    $out=wbFromString($out);
+    $out->excludeTextarea($Item);
+	$out=preg_replace("|\{\{([^\}]+?)\}\}|","",$out->outerHtml());
+    $out=wbFromString($out);
+    $out->includeTextarea($Item);
+    $out=$out->outerHtml();
 	return $out;
 }
 
