@@ -1548,7 +1548,7 @@ abstract class kiNode
 		foreach($arr as $t => $val) {
 			if ($type==$t) {$oconv=$val;}
 		}
-		if ($this->attr("date-oconv")>"") {$oconv=$this->attr("date-oconv");}
+		if ($this->attr("date-wb-oconv")>"") {$oconv=$this->attr("date-wb-oconv");}
 		if ($oconv>"" && $this->attr("value")>"") $this->attr("value",date($oconv,strtotime($this->attr("value"))));
 	}
 
@@ -1740,17 +1740,17 @@ abstract class kiNode
 		if ($len==0) {$len=1;}
 		include("wbattributes.php");
 		if ($this->attr("name") AND !isset($name)) {$name=$this->attr("name");} else {$this->attr("name");}
-		$tags=array("input","select","textarea");
-
 		$tpl=wbFromString($this->html());
 		$template=$this->innerHtml();
-
 		$tplId=wbNewId();
 		$this->after("<script type='text/template' id='{$tplId}'>".$template."</script>");
 		$this->attr("data-wb-tpl","#".$tplId);
 		if (isset($Item[$name]) AND is_array($Item[$name])) {
 			$this->tagMultiInputSetData($Item[$name]);
-		} else {
+        } elseif (isset($Item["%".$name]) AND is_array($Item["%".$name])) {
+            // грязная заплатка если мультиинпут в цикле
+            $this->tagMultiInputSetData($Item["%".$name]);
+        } else {
 			$this->tagMultiInputSetData();
 		}
 

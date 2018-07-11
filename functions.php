@@ -747,7 +747,9 @@ function wbLoopProtect($func) {
 }
 
 function wbOconv($value,$oconv) {
-        $oconv='$result = '.htmlspecialchars_decode($oconv,ENT_QUOTES).';';
+        $oconv=htmlspecialchars_decode($oconv,ENT_QUOTES);
+        $value=htmlspecialchars_decode($value,ENT_QUOTES);
+        $oconv='$result = '.$oconv.'("'.$value.'");';
         eval ($oconv);
         return $result;
 }
@@ -1733,13 +1735,7 @@ function wbNormalizePath( $path ) {
 }
 
 function wbClearValues($out) {
-    $Item=array();
-    $out=wbFromString($out);
-    $out->excludeTextarea($Item);
-	$out=preg_replace("|\{\{([^\}]+?)\}\}|","",$out->outerHtml());
-    $out=wbFromString($out);
-    $out->includeTextarea($Item);
-    $out=$out->outerHtml();
+	$out=preg_replace('/\{\{([^\}]+?)\}\}+|<script.*text\/template.*?>.*?<\/script>(*SKIP)(*F)/isumx',"",$out);
 	return $out;
 }
 

@@ -1051,6 +1051,30 @@ function wb_plugins() {
                     $(this).attr("value", wb_iconv_object(this));
                 });
             });
+            $("[type=timepicker]:not(.wb-plugin)").each(function () {
+                if ($(this).attr("data-date-format") == undefined) {
+                    $(this).attr("data-date-format", "hh:ii"); // Plugin Format
+                }
+                else {
+                    $(this).attr("data-date-format", "hh:ii");
+                }
+                if ($(this).val() > "") {
+                    $(this).val(wb_oconv_object(this));
+                }
+                $(this).addClass("wb-plugin");
+                var lang = "ru";
+                if ($(this).attr("data-wb-lang") !== undefined) {
+                    lang = $(this).attr("data-wb-lang");
+                }
+                $(this).datetimepicker({
+                    language: lang
+                    , startView: 1
+                    , autoclose: true
+                    , todayBtn: true
+                }).on('changeDate', function (ev) {
+                    $(this).attr("value", wb_iconv_object(this));
+                });
+            });
         }
         if ($(".dd[data-wb-role=tree]").length) {
             $(".dd[data-wb-role=tree]").each(function (e) {
