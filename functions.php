@@ -58,7 +58,7 @@ function wbMail(
     ) {
 
     if (!is_array($from)) {$from=array($from);}
-    if (!is_array($sent)) {$from=array($sent);}
+    if (!is_array($sent)) {$sent=array($sent);}
     if (!is_array($attach) AND $attach!==null) {$from=array($from);}
     if (!isset($from[1])) {$from[1]=strip_tags($_ENV["settings"]["header"]);}
     if (!isset($sent[1])) {$sent[1]=$sent[0];}

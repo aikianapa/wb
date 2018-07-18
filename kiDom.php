@@ -1426,7 +1426,7 @@ abstract class kiNode
 							//if ($this->find($$attribute)->hasAttribute("data-role") AND !$this->find($$attribute)->hasClass("wb-done")) {} else {
 								$inc->removeAttr($attribute);
 								$com=str_replace("data-wb-","",$attribute);
-								if ($com=="replace") {$attribute="replaceWidth";}
+								if ($com=="replace") {$attribute="replaceWith";}
 								$this->find($$attribute)->$com($inc);
 							//}
 						}
@@ -1818,7 +1818,7 @@ abstract class kiNode
 	}
 
 	public function tagHideAttrs() {
-        if ((!$this->hasClass("wb-done") AND !$this->is("[data-wb-done=true]")) OR $this->attr("data-wb-hide")=="") return;
+        if (($this->is("[data-wb-role]") AND !$this->hasClass("wb-done") AND !$this->is("[data-wb-done=true]")) OR $this->attr("data-wb-hide")=="") return;
 		$list=wbAttrToArray($this->attr("data-wb-hide"));
         $hide="";
         if (in_array("wb",$list)) {
@@ -1831,7 +1831,7 @@ abstract class kiNode
             $hide.=" data-wb-hide data-wb-done";
         } 
         if (in_array("*",$list)) {
-            $this->after($this->innerHtml()); $this->remove();
+            $this->replaceWith($this->innerHtml());
         }
         $list=explode(" ",trim($hide));
 		foreach($list as $attr) {
@@ -2414,17 +2414,16 @@ public function tagThumbnail($Item=array()) {
 	}
 	if (!isset($idx) AND is_numeric($src)) {$idx=$src;} else {$idx=0;}
 	if (is_array($images) AND is_numeric($src)) {
-		if (isset($images[$idx])) {$img=$images[$idx]["img"];} else {$img="";}
-		$src=wbGetItemImg($Item,$idx,$noimg,$from,true);
+		if (isset($images[$idx])) {$img=trim($images[$idx]["img"]);} else {$img="";}
+        if (substr($img,0,1)=="/") {$src=$img;} else {$src=wbGetItemImg($Item,$idx,$noimg,$from,true);}
         $src=str_replace($_ENV["path_app"],"",$src);
 		$img=explode($src,"/"); $img=$img[count($img)-1];
 		$this->attr("src",$src);
 	}
-
 	$srcSrc=$src;
 	$srcImg=explode("/",trim($src)); $srcImg=$srcImg[count($srcImg)-1];
 	$srcExt=explode(".",strtolower(trim($srcImg))); $srcExt=$srcExt[count($srcExt)-1];
-	$exts=array("jpg","gif","png","svg","pdf");
+	$exts=array("jpg","jpeg","gif","png","svg","pdf");
 
 	if (!in_array($srcExt,$exts)) {$src="/engine/uploads/__system/filetypes/{$srcExt}.png"; $img="{$srcExt}.png"; $ext="png";}
 
