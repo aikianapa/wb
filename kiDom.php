@@ -1268,6 +1268,11 @@ abstract class kiNode
 			$this->contentLoop($Item);
 			$this->wbPlugins($Item);
 			$this->wbTargeter($Item);
+        
+            $hide=$this->find(".wb-done[data-wb-hide]");
+            foreach($hide as $h) {$h->tagHideAttrs();}
+            unset($hide);
+            
       gc_collect_cycles();
 	}
 
@@ -1419,6 +1424,7 @@ abstract class kiNode
 		$attr=(explode(",",str_replace(array("[","]"," "),array("","",""),wbControls("target"))));
 		foreach($tar as $inc) {
 			if (!$inc->hasAttribute("data-wb-ajax")) {
+                $res=false;
 				foreach ($attr as $key => $attribute) {
 					$$attribute=$inc->attr($attribute);
 					if ($$attribute>"" ) {
@@ -1427,16 +1433,18 @@ abstract class kiNode
 								$inc->removeAttr($attribute);
 								$com=str_replace("data-wb-","",$attribute);
 								if ($com=="replace") {$attribute="replaceWith";}
-								$this->find($$attribute)->$com($inc);
+								$res=$this->find($$attribute)->$com($inc);
 							//}
 						}
 					}
 				}; unset($attribute);
-			}
-		}; unset($inc);
+                if ($res) {
+                    $inc->addClass("wb-done");
+                    $inc->attr("data-wb-done",true);
+                }
+            }
+        }; unset($inc);
 		$this->find("[data-wb-remove]")->remove();
-        $hide=$this->find(".wb-done[data-wb-hide],[data-wb-done=true]");
-        foreach($hide as $h) {$h->tagHideAttrs();}
 	}
 
 	public function excludeTextarea($Item=array()) {
@@ -1831,13 +1839,15 @@ abstract class kiNode
             $hide.=" data-wb-hide data-wb-done";
         } 
         if (in_array("*",$list)) {
-            $this->replaceWith($this->innerHtml());
+            $this->after($this->innerHtml());
+            $this->remove();
         }
         $list=explode(" ",trim($hide));
 		foreach($list as $attr) {
 			$this->removeAttr($attr);
 		}
         if (!$this->is("[data-wb-role]") AND !$this->is("[role]") AND $this->is("[data-wb-done=true]")) {$this->removeAttr("data-wb-done");}
+        $this->removeClass("wb-done");
         $this->removeAttr("data-wb-hide");
 	}
 
@@ -1925,11 +1935,7 @@ abstract class kiNode
         $tpl=$this->html();
 		$this->html("");
 		if ($branch!==0) {
-            $branch=html_entity_decode($branch);
-            $br=explode("->",$branch);
-            foreach($br as $b) {
-                $tree=array(wbTreeFindBranchById($tree,trim($b)));
-            }
+            $tree=wbTreeFindBranch($tree,$branch);
         }
     		if ($this->hasAttr("placeholder") AND $this->is("select")) {
     			$this->prepend("<option value='' class='placeholder'>".$this->attr("placeholder")."</option>");

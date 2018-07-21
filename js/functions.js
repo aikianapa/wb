@@ -1,7 +1,11 @@
 "use strict";
 var wbapp= new Object();
 wbapp.settings = wb_settings();
+wbapp.getCart = wb_getcart();
+wbapp.getTree = function (tree,branch,parent,childrens) {return wb_gettree(tree,branch,parent,childrens);}
+wbapp.getTreeDict = function (tree,branch,parent,childrens) {return wb_gettreedict(tree);}
 if ($("[data-wb-role=cart]").length) {wbapp.cart = wb_getcart();}
+$(document).trigger("wbapp");
 
 function wb_delegates() {
     wb_ajax();
@@ -22,11 +26,40 @@ function wb_settings() {
         , url: "/ajax/settings/"
         , success: function (data) {
             settings = $.parseJSON(base64_decode(data));
-            return data;
         }
     });
     return settings;
-    
+}
+
+function wb_gettree(tree,branch,parent,childrens) {
+    if (branch==undefined) {var branch="";}
+    if (parent==undefined) {var parent=true;}
+    if (childrens==undefined) {var childrens=true;}
+    if (tree==undefined) return;
+    var defer = $.ajax({
+        async: false
+        , type: 'POST'
+        , data: {tree,branch,parent,childrens}
+        , url: "/ajax/gettree/"
+        , success: function (data) {
+            tree = $.parseJSON(base64_decode(data));
+        }
+    });
+    return tree;
+}
+
+function wb_gettreedict(tree) {
+    if (tree==undefined) return;
+    var defer = $.ajax({
+        async: false
+        , type: 'POST'
+        , data: {tree}
+        , url: "/ajax/gettreedict/"
+        , success: function (data) {
+            tree = $.parseJSON(base64_decode(data));
+        }
+    });
+    return tree;
 }
 
 function wb_getcart() {

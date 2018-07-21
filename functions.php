@@ -339,36 +339,6 @@ function wbTableRemove($table=null,$engine=false) {
 }
 
 
-function wbTableFlush($table) {
-  // Сброс кэша в общий файл
-    $res=false;
-    $table=wbTable($table);
-    $tname=wbTableName($table);
-    $cache=$_ENV["cache"][md5($table)];
-    if (is_file($table) AND isset($_ENV["cache"][md5($table)])) {
-            $fp = fopen ($table,"r");
-            flock ($fp, LOCK_SH);
-            $data = json_decode(file_get_contents($table),true);
-            $flag=false;
-            foreach($cache as $key => $item) {
-                $item["_table"]=$tname;
-                if (!isset($data[$key]) OR json_encode($data[$key]) !== json_encode($item)) {$data[$key]=$item; $flag=true;}
-                if (isset($item["_removed"]) AND $item["_removed"]==true) {
-                    if (wbRole("admin")) {unset($data[$key]);}
-                }
-            }
-            $data=wbJsonEncode($data);
-            flock ($fp, LOCK_UN);
-            fclose ($fp);
-            if ($flag) {
-                $res=file_put_contents($table,$data, LOCK_EX);
-                wbLog("func",__FUNCTION__,1009,func_get_args());
-            } else {$res=null;}
-        unset($_ENV["cache"][md5($table)]);
-  }
-  return $res;
-}
-
 function wbTableExist($table) {
     if (is_file($_ENV["dba"]."/".$table.".json")) {
         return true;
@@ -472,6 +442,18 @@ function wbTreeFindBranchById($Item,$id) {
 		return $res;
 }
 
+function wbTreeFindBranch($tree,$branch="",$parent="true",$childrens="true") {
+		if ($branch>"") {
+            $branch=html_entity_decode($branch);
+            $br=explode("->",$branch);
+            foreach($br as $b) {
+                $tree=array(wbTreeFindBranchById($tree,trim($b)));
+            }
+            if ($childrens=="false") {unset($tree["children"]);}
+            if ($parent=="false") {$tree=$tree[0]["children"];}
+        }
+    return $tree;
+}
 
 function wbTreeWhere($tree,$id,$field,$inc=true) {
 	if (!is_array($tree)) {$tree=wbTreeRead($tree); $tree_id=$tree["id"]; $tree=$tree["tree"];} else {$tree_id=$tree["id"];}
@@ -605,10 +587,13 @@ function wbItemSave($table,$item=null,$flush=true) {
     wbError("func",__FUNCTION__,1001,func_get_args());
     return null;
   } else {
-        if (!isset($_ENV["cache"][md5($table)])) {$_ENV["cache"][md5($table)]=wbItemList($table);}
+        if (!isset($_ENV["cache"][md5($table)])) {
+            //$_ENV["cache"][md5($table)]=wbItemList($table);
+            $_ENV["cache"][md5($table)]=array();
+        }
         if (!isset($item["id"]) OR $item["id"]=="_new") {$item["id"]=wbNewId();} else {
             if (isset($_ENV["cache"][md5($table)][$item["id"]])) {
-                $item=array_merge($_ENV["cache"][md5($table)][$item["id"]],$item);
+                //$item=array_merge($_ENV["cache"][md5($table)][$item["id"]],$item);
             }
         }
         $item=wbItemSetTable($table,$item);
@@ -618,6 +603,36 @@ function wbItemSave($table,$item=null,$flush=true) {
         $res=true;
     }
     if ($flush==true) {$res=wbTableFlush($table);}
+  return $res;
+}
+
+function wbTableFlush($table) {
+  // Сброс кэша в общий файл
+    $res=false;
+    $table=wbTable($table);
+    $tname=wbTableName($table);
+    $cache=$_ENV["cache"][md5($table)];
+    if (is_file($table) AND isset($_ENV["cache"][md5($table)])) {
+            $fp = fopen ($table,"r");
+            flock ($fp, LOCK_SH);
+            $data = json_decode(file_get_contents($table),true);
+            $flag=false;
+            foreach($cache as $key => $item) {
+                $item["_table"]=$tname;
+                $data[$key]=$item; $flag=true;
+                if (isset($item["_removed"]) AND $item["_removed"]==true) {
+                    if (wbRole("admin")) {unset($data[$key]);}
+                }
+            }
+            $data=wbJsonEncode($data);
+            flock ($fp, LOCK_UN);
+            fclose ($fp);
+            if ($flag) {
+                $res=file_put_contents($table,$data, LOCK_EX);
+                wbLog("func",__FUNCTION__,1009,func_get_args());
+            } else {$res=null;}
+        unset($_ENV["cache"][md5($table)]);
+  }
   return $res;
 }
 

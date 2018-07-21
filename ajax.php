@@ -69,6 +69,20 @@ function ajax__alive() {
 	return json_encode($ret);
 }
 
+function ajax__gettree() {
+    foreach($_POST as $k => $v) {$$k=$v;}
+    $tree=wbTreeRead($tree);
+    $tree=wbTreeFindBranch($tree["tree"],$branch,$parent,$childrens);
+    return base64_encode(json_encode($tree));
+}
+
+function ajax__gettreedict() {
+    foreach($_POST as $k => $v) {$$k=$v;}
+    $tree=wbTreeRead($tree);
+    $tree=$tree["dict"];
+    return base64_encode(json_encode($tree));
+}
+
 
 function ajax__save($form=null) {
 	if ($form==null) {$form=$_ENV["route"]["form"];}
