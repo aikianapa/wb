@@ -457,7 +457,12 @@ function wbTreeFindBranch($tree,$branch="",$parent="true",$childrens="true") {
 
 function wbTreeWhere($tree,$id,$field,$inc=true) {
 	if (!is_array($tree)) {$tree=wbTreeRead($tree); $tree_id=$tree["id"]; $tree=$tree["tree"];} else {$tree_id=$tree["id"];}
-	$tree=wbTreeFindBranchById($tree,$id);
+    if (strpos($id,"->")) {
+        $tree=wbTreeFindBranch($tree,$id);
+        $tree=$tree[0];
+    } else {
+	   $tree=wbTreeFindBranchById($tree,$id);
+    }
 	$cache_id=md5($tree_id.$id.$field.$inc);
 	if (isset($_ENV["cache"][__FUNCTION__][$cache_id])) {
 		return $_ENV["cache"][__FUNCTION__][$cache_id];
@@ -528,11 +533,13 @@ function wbItemRead($table=null,$id=null) {
               $item=null;
             }
       }
-      $item=wbImagesToText($item);
-      if (is_array($item) AND isset($item["_removed"])) { // если стоит флаг удаления, то возвращаем null
-        if ($item["_removed"]=="remove") {$item=null;}
-      } else {
-        $item=wbTrigger("form",__FUNCTION__,"AfterItemRead",func_get_args(),$item);
+      if ($item!==null) {
+          $item=wbImagesToText($item);
+          if (is_array($item) AND isset($item["_removed"])) { // если стоит флаг удаления, то возвращаем null
+            if ($item["_removed"]=="remove") {$item=null;}
+          } else {
+            $item=wbTrigger("form",__FUNCTION__,"AfterItemRead",func_get_args(),$item);
+          }
       }
   return $item;
 }

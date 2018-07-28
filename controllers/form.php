@@ -56,7 +56,7 @@ function form__controller__show() {
     $Item=$_ENV["ITEM"]=wbItemRead($form,$item);
     if (!$Item) {
         $fid=wbFurlGet($form,$item);
-        if ($fid) {$item=$fid;} else {form__controller__error_404();}
+        if ($fid) {$item=$fid;} else {return form__controller__error_404();}
         $Item=$_ENV["ITEM"]=wbItemRead($form,$item);
     }
     if (is_callable("wbBeforeShowItem")) {$Item=$_ENV["ITEM"]=wbBeforeShowItem($Item);}
@@ -125,10 +125,10 @@ function form__controller__remove() {
 function form__controller__error_404($id=null) {
 	header("HTTP/1.0 404 Not Found");
     $_ENV["route"]["error"]="404";
-		$out=wbGetTpl("404.php");
-    if (is_object($out)) $out->wbSetData();
-		wbLog("func",__FUNCTION__,404,$_ENV["route"]);
-    return $out;
+    $_ENV["DOM"]=wbGetTpl("404.php");
+    if (is_object($_ENV["DOM"])) $_ENV["DOM"]->wbSetData();
+	wbLog("func",__FUNCTION__,404,$_ENV["route"]);
+    return $_ENV["DOM"];
 }
 
 function form__controller__error_301() {
