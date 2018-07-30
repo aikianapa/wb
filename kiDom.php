@@ -1271,7 +1271,7 @@ abstract class kiNode
         
             $hide=$this->find(".wb-done[data-wb-hide]");
             foreach($hide as $h) {$h->tagHideAttrs();}
-            unset($hide);
+            unset($hide,$h);
             
       gc_collect_cycles();
 	}
@@ -1420,30 +1420,50 @@ abstract class kiNode
 	}
 
 	function wbTargeter($Item=array()) {
-		$tar=$this->find(wbControls("target"));
-		$attr=(explode(",",str_replace(array("[","]"," "),array("","",""),wbControls("target"))));
+        $controls=wbControls("target");
+		$tar=$this->find($controls);
+		$attr=(explode(",",str_replace(array("[","]"," "),array("","",""),$controls)));
 		foreach($tar as $inc) {
-			if (!$inc->hasAttribute("data-wb-ajax")) {
-                $res=false;
-				foreach ($attr as $key => $attribute) {
-					$$attribute=$inc->attr($attribute);
-					if ($$attribute>"" ) {
-						if ($this->find($$attribute)->length) {
-							//if ($this->find($$attribute)->hasAttribute("data-role") AND !$this->find($$attribute)->hasClass("wb-done")) {} else {
-								$inc->removeAttr($attribute);
-								$com=str_replace("data-wb-","",$attribute);
-								if ($com=="replace") {$attribute="replaceWith";}
-								$res=$this->find($$attribute)->$com($inc);
-							//}
-						}
-					}
-				}; unset($attribute);
-                if ($res) {
-                    $inc->addClass("wb-done");
-                    $inc->attr("data-wb-done",true);
+			if (!$inc->is("[data-wb-ajax]")) {
+                if (!$inc->is("[data-wb-selector]")) {
+                    $res=false;
+                    foreach ($attr as $key => $attribute) {
+                        $$attribute=$inc->attr($attribute);
+                        $com=str_replace("data-wb-","",$attribute);
+                        if ($$attribute>"" ) {
+                            if ($this->find($$attribute)) {
+                                $inc->removeAttr($attribute);
+                                if ($com=="replace") {$com="replaceWith";}
+                                if ($com>"") {
+                                    $this->find($$attribute)->$com($inc);
+                                    $res=true;
+                                }
+                            }
+                        }
+                    };
+                    if ($res) {
+                        $inc->addClass("wb-done");
+                        $inc->attr("data-wb-done",true);
+                    }
+                } else if ($inc->is("[data-wb-selector]")) {
+                    $selector=$inc->attr("data-wb-selector");
+                    foreach ($attr as $key => $attribute) {
+                        $$attribute=$inc->attr($attribute);
+                        $com=str_replace("data-wb-","",$attribute);
+                        if ($$attribute>""  AND $com>"" AND $com!=="selector") {
+                            $res=$this->find($selector);
+                            if ($res->length) {
+                                foreach($res as $s) {
+                                    $s->$com($$attribute);
+                                }
+                            }
+                        }
+                    }
+                    $inc->remove();
                 }
             }
-        }; unset($inc);
+        }; 
+        unset($inc,$attribute,$$attribute,$selector);
 		$this->find("[data-wb-remove]")->remove();
 	}
 
@@ -2595,7 +2615,7 @@ public function tagThumbnail($Item=array()) {
 	public function tagGallery($Item) {
 		$vars=$this->attr("vars");	$src=$this->attr("src"); 	$id=$this->attr("id");
 		if ($vars>"") {$Item=wbAttrAddData($vars,$Item);}
-		$inner=ki::fromFile($_SESSION['engine_path']."/tpl/gallery.php");
+		$inner=wbFromFile($_SESSION['engine_path']."/tpl/gallery.php");
 		if ($src=="") {
 			if (trim($this->html())>"<p>&nbsp;</p>") {
 				$inner->find(".comGallery")->html($this->html());

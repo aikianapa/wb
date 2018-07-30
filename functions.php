@@ -47,6 +47,10 @@ function wbInitEnviroment() {
 	$_ENV["variables"]=$variables;
 	$settings=array_merge($settings,$variables);
 	$_ENV["settings"]=$settings;
+    if (isset($_ENV["settings"]["thumb_width"]) AND $_ENV["settings"]["thumb_width"]>"0") $_ENV["thumb_width"]=$_ENV["settings"]["thumb_width"];
+    if (isset($_ENV["settings"]["thumb_height"]) AND $_ENV["settings"]["thumb_height"]>"0") $_ENV["thumb_height"]=$_ENV["settings"]["thumb_height"];
+    if (isset($_ENV["settings"]["intext_width"]) AND $_ENV["settings"]["intext_width"]>"0") $_ENV["intext_width"]=$_ENV["settings"]["intext_width"];
+    if (isset($_ENV["settings"]["intext_height"]) AND $_ENV["settings"]["intext_height"]>"0") $_ENV["intext_height"]=$_ENV["settings"]["intext_height"];
 }
 
 function wbMail(
@@ -534,7 +538,9 @@ function wbItemRead($table=null,$id=null) {
             }
       }
       if ($item!==null) {
-          $item=wbImagesToText($item);
+          if (isset($item["images"])) {
+              $item=wbImagesToText($item);
+          }
           if (is_array($item) AND isset($item["_removed"])) { // если стоит флаг удаления, то возвращаем null
             if ($item["_removed"]=="remove") {$item=null;}
           } else {
@@ -885,32 +891,39 @@ function wbGetItemImg($Item=null,$idx=0,$noimg="",$imgfld="images",$visible=true
 }
 
 function wbImagesToText($Item,$fld="text") {
-    if (isset($Item[$fld])) {
+    if (isset($Item["images"])) {
         $image=wbGetItemImg($Item);
-        if (isset($Item["intext_position"]) AND $Item["intext_position"]["pos"]>"") {
-            $image=wbGetItemImg($Item);
-            $image=substr($image,strlen($_ENV["path_app"]));
-            if ($Item["intext_width"]=="") {$width=$_ENV["intext_width"];} else {$width=$Item["intext_width"];}
-            if ($Item["intext_height"]=="") {$height=$_ENV["intext_height"];} else {$height=$Item["intext_height"];}
-            $img="
-            <a href='{$image}' data-fancybox='gallery' class='wb_intext'>
-            <img data-wb-role='thumbnail' data-wb-size='{$width};{$height};src' src='{$image}' style='float:{$Item["intext_position"]["pos"]};' data-wb-hide='wb'>
-            </a>
-            ";
-            $Item[$fld]=$img.$Item[$fld];
-        }
-        if (isset($Item["images_position"]) AND $Item["images_position"]["pos"]>"") {
-            $gal=wbGetForm("common","gallery");
-            $gal=wbFromString("<div class='wb_gallery'>".$gal->outerHtml()."</div>");
-            $gal->wbSetData($Item);
-            if ($image>"") {$gal->find("a[href='{$image}']")->remove();}
-            if (!$gal->find("a")->length) {$gal->find(".wb_gallery")->remove();}
-            if      ($Item["images_position"]["pos"]=="top") {
-                $Item[$fld]=$gal->outerHtml().$Item[$fld];
-            } elseif ($Item["images_position"]["pos"]=="bottom") {
-                $Item[$fld]=$Item[$fld].$gal->outerHtml();
+        $image=substr($image,strlen($_ENV["path_app"]));
+        $Item["_image"]=$image;
+        if (isset($Item[$fld])) {
+            if (isset($Item["intext_position"]) AND $Item["intext_position"]["pos"]>"") {
+                if ($Item["intext_width"]=="") {$width=$_ENV["intext_width"];} else {$width=$Item["intext_width"];}
+                if ($Item["intext_height"]=="") {$height=$_ENV["intext_height"];} else {$height=$Item["intext_height"];}
+                $img="
+                <a href='{$image}' data-fancybox='gallery' class='wb-intext'>
+                <img data-wb-role='thumbnail' data-wb-size='{$width};{$height};src' src='{$image}' style='float:{$Item["intext_position"]["pos"]};' data-wb-hide='wb'>
+                </a>
+                ";
+                $Item[$fld]=$img.$Item[$fld];
             }
-            unset($gal);
+            if (isset($Item["images_position"]) AND $Item["images_position"]["pos"]>"") {
+                $gal=wbGetForm("common","gallery");
+                $gal->wbSetData($Item);
+                if ($image>"" AND $Item["intext_position"]["pos"]>"") {
+                    if ($gal->find("a[href='{$image}'][idx]")->length) {
+                        $gal->find("a[href='{$image}']")->remove();                        
+                    } else {
+                        $gal->find("a[href='{$image}']")->parents("[idx]")->remove();                        
+                    }
+                }
+                if (!$gal->find("a")->length) {$gal->find(".wb-gallery")->remove();}
+                if      ($Item["images_position"]["pos"]=="top") {
+                    $Item[$fld]=$gal->outerHtml().$Item[$fld];
+                } elseif ($Item["images_position"]["pos"]=="bottom") {
+                    $Item[$fld]=$Item[$fld].$gal->outerHtml();
+                }
+                unset($gal);
+            }
         }
     }
     return $Item;
@@ -1523,7 +1536,7 @@ function wbRole($role,$userId=null) {
 		$res="*";
 		$controls="[data-wb-role]";
 		$allow="[data-wb-allow],[data-wb-disallow],[data-wb-disabled],[data-wb-enabled],[data-wb-readonly],[data-wb-writable]";
-		$target="[data-wb-prepend],[data-wb-append],[data-wb-remove],[data-wb-before],[data-wb-after],[data-wb-html],[data-wb-replace]";
+		$target="[data-wb-prepend],[data-wb-append],[data-wb-remove],[data-wb-before],[data-wb-after],[data-wb-html],[data-wb-replace],[data-wb-selector],[data-wb-addclass],[data-wb-removeclass]";
 		$tags=array("module","formdata","foreach", "dict", "tree","gallery",
 					"include","imageloader","thumbnail","uploader",
 					"multiinput","where","cart","variable"
