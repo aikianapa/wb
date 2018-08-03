@@ -249,8 +249,8 @@ function wbFieldBuild($param,$data=array()) {
                     $flds->append($line);
                 }
                 $tpl->find("[data-wb-role=multiinput]")->html($flds);
-            $tpl->wbSetValues($param);
-            $tpl->wbSetData($data);
+                $tpl->wbSetValues($param);
+                $tpl->wbSetData($data);
                 unset($flds);
             }
             break;
@@ -259,6 +259,7 @@ function wbFieldBuild($param,$data=array()) {
 	$set->find(".form-group > div")->html($tpl->outerHtml());
 	$set->wbSetData($param);
     $set->wbSetValues($data);
+    $set->includeTextarea(); /// почему-то остаются taid
     return $set->outerHtml();
 }
 
