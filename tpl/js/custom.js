@@ -1,4 +1,5 @@
 $(document).ready(function(){
+    $(".kt-loading").css("opacity","0").css("z-index","-1");
     $(document).on("wb_ajax_done",function(a,b,c,d){
         var ajax=$(b).attr("data-wb-ajax");
         var menu=".nav.kt-sideleft-menu";

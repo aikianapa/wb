@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <base href="/engine/tpl/">
-    <title>Установка</title>
+    <title>Web Basic Installation</title>
     <!-- vendor css -->
     <link href="./lib/font-awesome/css/font-awesome.css" rel="stylesheet">
     <link href="./lib/Ionicons/css/ionicons.css" rel="stylesheet">
@@ -14,87 +14,110 @@
     <link href="./lib/highlightjs/github.css" rel="stylesheet">
     <link href="./lib/jquery.steps/jquery.steps.css" rel="stylesheet">
     <!-- Katniss CSS -->
-    <link rel="stylesheet" href="./css/katniss.css"> </head>
+    <link rel="stylesheet" href="./css/katniss.min.css">
+    <link href="./lib/SpinKit/spinkit.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/custom.css">
+</head>
 
 <body>
+    <div class="kt-loading">
+        <div class="sk-cube-grid">
+                        <div class="sk-cube sk-cube1"></div>
+                        <div class="sk-cube sk-cube2"></div>
+                        <div class="sk-cube sk-cube3"></div>
+                        <div class="sk-cube sk-cube4"></div>
+                        <div class="sk-cube sk-cube5"></div>
+                        <div class="sk-cube sk-cube6"></div>
+                        <div class="sk-cube sk-cube7"></div>
+                        <div class="sk-cube sk-cube8"></div>
+                        <div class="sk-cube sk-cube9"></div>
+        </div>
+    </div>
     <div class="kt-pagebody">
         <div class="row">
             <div class="col-12 col-lg-10 ml-lg-auto mr-lg-auto col-xl-8">
                 <div class="card col-12 pd-20 pd-sm-40">
                     <div id="setup">
-                        <h6 class="card-body-title">Установка системы</h6>
-                        <p class="mg-b-20 mg-sm-b-30">Мастер установки поможет вам настроить систему.</p>
+                        <h6 class="card-body-title">Web Basic Installation</h6>
+                        <p class="mg-b-20 mg-sm-b-30">Use installation wizard to setup engine.</p>
                         <form id="setup" method="post">
                             <input type="hidden" name="setup" value="done" />
                             <div id="wizard">
-                                <h3>Персонализация</h3>
+                                <h3>Personalisation</h3>
                                 <section>
                                     <div class="row success">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <label for="">Заголовок сайта</label>
-                                                <input class="form-control" placeholder="Заголовок сайта" type="text" name="header" required> </div>
+                                                <label for="">Header</label>
+                                                <input class="form-control" placeholder="Header" type="text" name="header" required> </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group">
-                                                <label for="">Электронная почта</label>
-                                                <input class="form-control" placeholder="Электронная почта" type="email" name="email" required> </div>
+                                                <label for="">Email</label>
+                                                <input class="form-control" placeholder="Email	" type="email" name="email" required> </div>
                                         </div>
                                     </div>
                                 </section>
-                                <h3>Безопасность</h3>
+                                <h3>Security</h3>
                                 <section>
                                     <div class="form-group">
-                                        <label for="">Логин</label>
-                                        <input class="form-control" placeholder="Логин суперпользователя" type="text" value="admin" name="login" required> </div>
+                                        <label for="">Login</label>
+                                        <input class="form-control" placeholder="Superuser Login" type="text" value="admin" name="login" required> </div>
                                     <div class="row">
                                         <div class="col-sm-6">
                                             <div class="form-group">
-                                                <label for="">Пароль</label>
-                                                <input class="form-control" placeholder="Пароль" type="password" name="password" required> </div>
+                                                <label for="">Password</label>
+                                                <input class="form-control" placeholder="Superuser password" type="password" name="password" required> </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group">
-                                                <label for="">Проверка пароля</label>
-                                                <input class="form-control" placeholder="Проверка пароля" type="password" name="password_check" required> </div>
+                                                <label for="">Check password</label>
+                                                <input class="form-control" placeholder="Check password" type="password" name="password_check" required> </div>
                                         </div>
                                     </div>
                                 </section>
-                                <h3>Шаблон</h3>
+                                <h3>Template</h3>
                                 <section>
                                     <div class="form-group">
-                                        <label>Базовый шаблон</label>
-                                        <select class="form-control" placeholder="Базовый шаблон" required>
-                                            <option value=""> Выберите базовый шаблон </option>
-                                            <option value="single"> Одностраничный сайт </option>
-                                            <option value="multi"> Многостраничный сайт </option>
+                                        <label>Base template</label>
+                                        <select class="form-control" placeholder="Base template" required>
+                                            <option value=""> Select Base template </option>
+                                            <option value="single"> Landing page </option>
+                                            <option value="multi"> Traditional site </option>
                                         </select>
                                     </div>
                                 </section>
-                                <h3>Установка</h3>
+                                <h3>Installation</h3>
                                 <section>
-                                    <p>Всё готово к установке системы. Нажмите кнопку Установить для продолжения.</p>
+                                    <p>Ready to installation. Click Install button to Start.</p>
                                 </section>
                             </div>
                         </form>
                     </div>
                     <div id="error" class="alert alert-warning">
-                        <h4 class="text-secondary">ВНИМАНИЕ!</h4>
-                        <p>Установка невозможна, так как в директории
-                        <i>{{_ENV[path_app]}}</i> обнаружены файлы предыдущей установки.
+                        <h4 class="text-secondary">Installation Error!</h4>
+                        <p>
+                        Work directory <i>{{_ENV[path_app]}}</i> include files of previous installation.
                         </p>
                         <p>
-                            Если вам необходимо повторно выполнить установку, пожалуйста, удалите содержимое директории, кроме директории <i>/engine</i> и повторите снова.
+                            For new installation, please, remove all files and directories except <i>/engine</i> and try again.
                         </p>
-                        <a class="btn btn-warning" href="/">Готово</a>
+                        <a class="btn btn-warning" href="/engine">Ready</a>
                     </div>
+                    <div id="errors" class="d-none">
+						<div id="rights">
+							<p><h4>Installation Error!</h4>
+							Dirrectory <i>{{_ENV[path_app]}}</i> do not have access rights.
+							Please, set access rights to 766 and try again.</p>
+						</div>
+					</div>
                 </div>
             </div>
             <!-- card -->
         </div>
     </div>
     <!-- kt-pagebody -->
-    <script src="./lib/jquery/jquery.js"></script>
+    <script data-wb-src="jquery"></script>
     <script src="./lib/popper.js/popper.js"></script>
     <script src="./lib/bootstrap/bootstrap.js"></script>
     <script src="./lib/jquery.steps/jquery.steps.js"></script>
@@ -104,14 +127,15 @@
     <script>
         $(document).ready(function () {
             'use strict';
+            $(".kt-loading").css("opacity","0").css("z-index","-1");
             $('#wizard').steps({
                 headerTag: 'h3'
                 , bodyTag: 'section'
                 , autoFocus: true
                 , labels: {
-                    next: "Дальше"
-                    , previous: "Назад"
-                    , finish: "Установить"
+                    next: "Next"
+                    , previous: "Prev"
+                    , finish: "Install"
                 }
                 , titleTemplate: '<span class="number">#index#</span> <span class="title">#title#</span>'
                 , onStepChanging: function (event, currentIndex, newIndex) {

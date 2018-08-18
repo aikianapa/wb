@@ -11,7 +11,7 @@ function ajax__controller() {
         $_ENV["DOM"]=$aecall();
     } else {
 		$call=__FUNCTION__ ."__common";
-		echo @$call();
+		$_ENV["DOM"]=$call();
 	}
 	wbTrigger("func",__FUNCTION__,"after");
 return $_ENV["DOM"];

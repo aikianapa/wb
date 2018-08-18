@@ -18,7 +18,7 @@
                         <th class="text-right"> Действие </th>
                     </tr>
                 </thead>
-                <tbody data-wb-role="foreach" data-wb-table="{{_form}}" data-wb-add="true" data-wb-size="12" data-wb-sort="date:d">
+                <tbody data-wb-role="foreach" data-wb-table="{{_form}}" data-wb-add="true" data-wb-size="{{_ENV[page_size]}}" data-wb-sort="date:d">
                     <tr>
                         <td class="{{class}}">{{dateshow}}</td>
                         <td class="{{class}}">{{name}}</td>

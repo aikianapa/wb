@@ -17,7 +17,7 @@
                               <th class="text-right">Действие</th>
                             </tr>
                           </thead>
-                          <tbody data-wb-role="foreach" data-wb-table="pages" data-wb-add="true" data-wb-size="20" data-wb-sort="id">
+                          <tbody data-wb-role="foreach" data-wb-table="pages" data-wb-add="true" data-wb-size="{{_ENV[page_size]}}" data-wb-sort="id">
                             <tr>
                               <td class="nowrap">{{_SRV[HTTP_HOST]}}/{{id}}
                                 <br><small data-wb-where='template!=""'>/tpl/{{template}}</small>

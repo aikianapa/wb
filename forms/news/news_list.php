@@ -17,7 +17,7 @@
                         <th class="text-right">Действие</th>
                     </tr>
                 </thead>
-                <tbody data-wb-role="foreach" data-wb-table="{{_GET[form]}}" data-wb-add="true" data-wb-size="12" data-wb-sort="date:d">
+                <tbody data-wb-role="foreach" data-wb-table="{{_GET[form]}}" data-wb-add="true" data-wb-size="{{_ENV[page_size]}}" data-wb-sort="date:d">
                     <tr>
                         <td class="nowrap"> {{datetime}} </td>
                         <td class="nowrap"> {{header}} </td>

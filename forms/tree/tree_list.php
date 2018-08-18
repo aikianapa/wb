@@ -16,7 +16,7 @@
 			  <th class="text-right">Действие</th>
 			</tr>
 		  </thead>
-		  <tbody data-wb-role="foreach" data-wb-table="tree" data-wb-add="true" data-wb-size="20" data-wb-sort="id">
+		  <tbody data-wb-role="foreach" data-wb-table="tree" data-wb-add="true" data-wb-size="{{_ENV[page_size]}}" data-wb-sort="id">
 			<tr>
 			  <td class="nowrap">{{id}}</td>
 			  <td>{{header}}<br><small>{{techdescr}}</small></td>

@@ -458,7 +458,7 @@ $(function () {
     $('.all-wrapper').toggleClass('content-panel-active');
   });
 
-  // #13. EMAIL APP 
+  // #13. EMAIL APP
 
   $('.more-messages').on('click', function () {
     $(this).hide();

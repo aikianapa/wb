@@ -1,11 +1,12 @@
 "use strict";
-var wbapp= new Object();
-wbapp.settings = wb_settings();
-wbapp.getCart = wb_getcart();
-wbapp.getTree = function (tree,branch,parent,childrens) {return wb_gettree(tree,branch,parent,childrens);}
-wbapp.getTreeDict = function (tree,branch,parent,childrens) {return wb_gettreedict(tree);}
-if ($("[data-wb-role=cart]").length) {wbapp.cart = wb_getcart();}
-$(document).trigger("wbapp");
+	var wbapp= new Object();
+	wbapp.settings = wb_settings();
+	wbapp.getTree = function (tree,branch,parent,childrens) {return wb_gettree(tree,branch,parent,childrens);}
+	wbapp.getTreeDict = function (tree,branch,parent,childrens) {return wb_gettreedict(tree);}
+	wbapp.merchantModal = function(mode) {return wb_merchant_modal(mode);}
+	wbapp.newId = function(separator,prefix) {return wb_newid(separator,prefix);}
+	if ($("[data-wb-role=cart]").length) {wbapp.cart = wb_getcart();}
+	$(document).trigger("wbapp");
 
 function wb_delegates() {
     wb_ajax();
@@ -19,16 +20,20 @@ function wb_delegates() {
 }
 
 function wb_settings() {
-    var settings = null;
-    var defer = $.ajax({
-        async: false
-        , type: 'GET'
-        , url: "/ajax/settings/"
-        , success: function (data) {
-            settings = $.parseJSON(base64_decode(data));
-        }
-    });
-    return settings;
+	if ($(document).data("settings")!==undefined) {return $(document).data("settings");}
+	var settings=null;
+	wb_ajaxWait([{
+			async: false
+			, type: 'GET'
+			, url: "/ajax/settings/"
+			, success: function (data) {
+					settings = $.parseJSON(base64_decode(data));
+					$(document).data("settings",settings);
+			}
+   }], function() {
+		 // без functions результат не возвращается
+	 });
+	 return settings;
 }
 
 function wb_gettree(tree,branch,parent,childrens) {
@@ -73,24 +78,49 @@ function wb_getcart() {
             return data;
         }
     });
-    return cart;   
+    return cart;
 }
 
-function wb_merchant_modal() {        
-        var merchant = wbapp.settings.merchant;
-        $.ajax({
-            async: false
-            , type: "POST"
-            , url: "/module/"+merchant
-            , success: function(data) {
-                if ( $(document).find("#"+merchant+"Modal").length) {
-                    $(document).find("#"+merchant+"Modal").replaceWith($(data).find("#"+merchant+"Modal"));
-                } else {
-                    $(document).find("body").append($(data).find("#"+merchant+"Modal"));
-                }
-            }
-        });
-        $("#"+merchant+"Modal").modal("show");
+function wb_ajaxWait(ajaxObjs, fn) {
+	if (!ajaxObjs || !fn) {
+		return;
+	}
+	var ajaxCount = ajaxObjs.length,
+	succ = null;
+	for (var i = 0; i < ajaxObjs.length; i++) { //append logic to invoke callback function once all the ajax calls are completed, in success handler.
+		succ = ajaxObjs[i]['success'];
+		ajaxObjs[i]['success'] = function(data) { //modified success handler
+			if (succ) {
+				succ(data);
+			}
+			ajaxCount--;
+			if (ajaxCount == 0) {
+				fn(); //modify statement suitably if you want 'this' keyword to refer to another object
+			}
+		};
+		$.ajax(ajaxObjs[i]); //make ajax call
+		succ = null;
+	};
+}
+
+function wb_merchant_modal(mode) {
+        var merchant = wbapp.settings().merchant;
+        if (mode==undefined) {mode="show";}
+        if (mode=="show") {
+          $.ajax({
+              async: false
+              , type: "POST"
+              , url: "/module/"+merchant
+              , success: function(data) {
+                  if ( $(document).find("#"+merchant+"Modal").length) {
+                      $(document).find("#"+merchant+"Modal").replaceWith($(data).find("#"+merchant+"Modal"));
+                  } else {
+                      $(document).find("body").append($(data).find("#"+merchant+"Modal"));
+                  }
+              }
+          });
+        }
+        return $("#"+merchant+"Modal").modal(mode);
 }
 
 function wb_cart() {
@@ -127,7 +157,7 @@ function wb_cart() {
         });
         return false;
     });
-    
+
     $(document).undelegate(".cart-clear", "click");
     $(document).delegate(".cart-clear", "click", function () {
         $(this).trigger("cart-clear", [this]);
@@ -256,7 +286,7 @@ function wb_cart() {
         var form={};
         $(cart).find(".cart-item").each(function(i){
             form[i]=wb_cart_item(this);
-             
+
         });
         if (ajax == undefined || ajax == "") {
             var ajax = "/ajax/cart/cart-update";
@@ -264,7 +294,7 @@ function wb_cart() {
         var diff = $.post(ajax, form);
         $(document).trigger("cart-update-done");
     });
-    
+
     $("[data-wb-role=cart]").find("input,select,textarea").off("change");
     $("[data-wb-role=cart]").find("input,select,textarea").on("change", function () {
         var item = $(this).parents(".cart-item");
@@ -321,7 +351,7 @@ function wb_alive() {
             $.post("/ajax/alive", {
                 data: post
             }, function (ret) {
-                ret = json_decode(ret, true);
+                ret = JSON.safeParse(ret);
                 if (ret == false) {
                     post = "wb_session_die";
                 }
@@ -338,13 +368,24 @@ function wb_alive() {
                 }
                 //if (ret==false && document.location.pathname=="/admin") {document.location.href="/login";}
             });
+            wb_cache_clear();
         }, 60000);
     }
 }
 
-function wb_get_cdata(text) {
-    text = text.replace("<![CDATA[", "").replace("]]>", "");
-    return text;
+function wb_cache_clear() {
+    var list = [];
+    $("[data-wb-cache]").each(function(i){
+       list.push($(this).attr("data-wb-cache"));
+    });
+    $.post("/ajax/cache_clear", {
+        data: list
+    });
+}
+
+
+function wb_get_cdata(cdata) {
+    return cdata.replace("<![CDATA[", "").replace("]]>", "");
 }
 
 function wb_tree() {
@@ -373,117 +414,223 @@ function wb_tree() {
     }, 10);
     $(document).off("wb-tree-init");
     $(document).on("wb-tree-init", function (e, tree) {
-        var data = wb_tree_serialize(tree);
-        data = JSON.stringify(data);
-        var name = $(tree).attr("name");
-        $(tree).children("input[name=" + name + "]").val(data);
+        $(tree).treeEvents();
     });
-    $(document).undelegate(".wb-tree .wb-tree-item button[data-action]", "click");
-    $(document).delegate(".wb-tree .wb-tree-item button[data-action]", "click", function () {
-        var tree = $(this).parents(".wb-tree");
-        var name = $(tree).attr("name");
-        setTimeout(function () {
-            var data = JSON.stringify(wb_tree_serialize(tree));
-            $(tree).children("input[name='" + name + "']").val(data);
-        }, 200);
+
+    $(document).off("tree_before_formsave");
+    $(document).on("tree_before_formsave", function (event,formname,itemname) {
+        var form=$(event.delegateTarget).find("form")[0];
+        $(form).find("[data-wb-role=tree]").each(function(i,tree){
+            $(this).treeStore();
+        });
     });
-    $(document).undelegate(".wb-tree .wb-tree-item", "contextmenu");
-    $(document).delegate(".wb-tree .wb-tree-item", "contextmenu", function (e) {
-        $(e.target).parent(".wb-tree-item").append("<div class='wb-tree-menu'>" + $(document).data("wb-tree-rowmenu") + "</div>");
-        var w = e;
-        var relativeX = (w.clientX - 10);
-        var relativeY = (w.clientY - 10);
-        if ($(e.target).parents("#adminTree.tab-pane").length) {relativeY-=($(".kt-pagetitle").offset().top+$(".kt-pagetitle").height());}
-        $(".wb-tree-item").find(".wb-tree-menu").css("left", relativeX + "px").css("top", relativeY + "px");
-        $(".wb-tree-item").find(".wb-tree-menu [data-toggle=dropdown]").trigger("click");
-        e.preventDefault();
-    });
-    $(document).undelegate(".wb-tree .wb-tree-item", "mouseleave");
-    $(document).delegate(".wb-tree .wb-tree-item", "mouseleave", function (e) {
-        $(this).find(".wb-tree-menu").remove();
-        e.preventDefault();
-    });
-    $(document).undelegate(".wb-tree-item .dd-content", "focusout");
-    $(document).delegate(".wb-tree-item .dd-content", "focusout", function (e) {
-        $(this).parent(".wb-tree-item").attr("data-name", $(this).text());
-        var tree = $(this).parents(".wb-tree");
-        var name = $(tree).attr("name");
-        var data = JSON.stringify(wb_tree_serialize(tree));
-        $(tree).children("input[name='" + name + "']").val(data);
-    });
-    $(document).undelegate(".wb-tree-item .dd3-btn", "click");
-    $(document).delegate(".wb-tree-item .dd3-btn", "click", function (e) {
-        $(this).parent(".wb-tree-item").children(".dd-content").trigger("dblclick");
-    });
-    $('.wb-tree').on('change', function (e) {
-        var that = e.target;
-        var name = $(that).attr("name");
-        setTimeout(function () {
-            var data = wb_tree_serialize(that);
-            data = JSON.stringify(data);
-            $(that).children("input[name=" + name + "]").val(data);
-        }, 200);
-    });
-    $(document).undelegate(".wb-tree-item > .dd-content", "dblclick");
-    $(document).delegate(".wb-tree-item > .dd-content", "dblclick", function (e) {
-        var cont = this;
-        var tree = $(this).parents("[data-wb-role=tree]");
-        var that = $(e.target).parent(".wb-tree-item");
-        var item = $(this).parents(".wb-tree-item").attr("data-id");
+
+    $.fn.treeStore = function() {
+      var name=$(this).attr("name");
+      var store=$(this).find("input[name='"+name+"']");
+      $(store).val(JSON.stringify($(this).treeBranchStore()));
+    };
+
+    $.fn.treeBranchStore = function() {
+      var store=[];
+      $(this).children("ol").each(function(){
+          $(this).children("li").each(function(){
+            if ($(this).hasClass("dd-collapsed")) {$(this).attr("data-open",false);} else {$(this).attr("data-open",true);}
+            var branch = {
+                 id       : $(this).attr("data-id")
+                ,name     : $(this).attr("data-name")
+                ,data     : $(this).treeBranchData()
+                ,children : $(this).treeBranchStore()
+                ,open     : $(this).attr("data-open")
+            }
+            if (branch.children.length==0) {branch.children=false;}
+            if (branch.open=="true") {branch.open=true;} else {branch.open=false;}
+            store.push(branch);
+          });
+
+        });
+        return store;
+    }
+
+    $.fn.treeBranchData = function() {
+      return JSON.safeParse($(this).children("input[data]").attr("data"));
+    }
+
+    $.fn.treeBranchChange = function(edid) {
+      // edid - id редактора
+        if ($(edid).find("form:first").length) {
+            var dict = $(this).treeDict();
+            var that = $(this).find(".wb-tree-item.wb-tree-current");
+            var data = $(edid).find("form:first").serializeArray();
+            $(data).each(function (i, d) {
+                $(that).attr(d.name, d.value);
+                if (d.name == "data-name") {
+                    $(that).children(".dd-content").val(d.value);
+                    $(that).children("input").val(d.value);
+                }
+                if (d.name == "data-id") {
+                    $(that).children(".dd3-btn").children("span").html(d.value);
+                }
+            });
+
+            var data = wb_tree_json_prep(JSON.stringify($(edid).find(".treeData > form").serializeArray()),dict);
+            $(that).children("input").attr("data",JSON.stringify(data));
+        }
+    };
+
+    $.fn.treeDict = function() {
+      return JSON.safeParse($(this).children("[data-name=dict]").val());
+    }
+
+    $.fn.treeEvents = function() {
+        var tree = this;
+        // collapse
+        $(this).undelegate(".wb-tree-item button[data-action]", "click");
+        $(this).delegate(".wb-tree-item button[data-action]", "click",function(){
+              //setTimeout(function () {$(tree).treeStore();}, 200);
+              $(tree).treeStore();
+        });
+        // contextmenu
+        $(this).undelegate(".wb-tree-item", "contextmenu");
+        $(this).delegate(".wb-tree-item", "contextmenu", function (e) {
+            $(".wb-tree-menu").remove();
+            $(e.target).parent(".wb-tree-item").append($(document).data("wb-tree-rowmenu"));
+            var w = e;
+            var relativeX = (w.clientX - 10);
+            var relativeY = (w.clientY - 10);
+            relativeY -= $(e.target).parents(".modal-content").children(".modal-header").height();
+            if ($(e.target).parents("#adminTree.tab-pane").length) {relativeY-=($(".kt-pagetitle").offset().top+$(".kt-pagetitle").height());}
+            $(".wb-tree-item").find(".wb-tree-menu").css("left", relativeX + "px").css("top", relativeY + "px");
+            $(".wb-tree-item").find(".wb-tree-menu [data-toggle=dropdown]").trigger("click");
+            e.preventDefault();
+        });
+
+
+        $(this).undelegate(".wb-tree-add", "click");
+        $(this).delegate(".wb-tree-add", "click", function (e) {
+            var row = $(document).data("wb-tree-row");
+            var form = $(this).parents("[data-wb-form]").attr("data-wb-form");
+            row = wb_setdata(row, {"name": "", "form": form, "id": wb_newid()}, true);
+            $(this).parent(".wb-tree-item").after(row);
+						$(tree).treeStore();
+        });
+
+        $(this).undelegate(".wb-tree-del", "click");
+        $(this).delegate(".wb-tree-del", "click", function (e) {
+            $(this).parent(".wb-tree-item").remove();
+						$(tree).treeStore();
+        });
+
+        // contextmenu Click
+        $(this).undelegate(".wb-tree-menu .dropdown-item", "click");
+        $(this).delegate(".wb-tree-menu .dropdown-item", "click", function (e) {
+            var name = $(tree).attr("name");
+            var tpl = $($(tree).attr("data-tpl")).html();
+            var row = $(document).data("wb-tree-row");
+            var form = $(this).parents("[data-wb-form]").attr("data-wb-form");
+            row = wb_setdata(row, {
+                "name": ""
+                , "form": form
+                , "id": wb_newid()
+            }, true);
+            if ($(this).attr("href") == "#edit") {
+                $(this).parents(".wb-tree-menu").parent(".wb-tree-item").children(".dd3-btn").trigger("click");
+            }
+            if ($(this).attr("href") == "#after") {
+                $(this).parents(".wb-tree-menu").parent(".wb-tree-item").after(row);
+            }
+            if ($(this).attr("href") == "#before") {
+                $(this).parents(".wb-tree-menu").parent(".wb-tree-item").before(row);
+            }
+            if ($(this).attr("href") == "#clone") {
+                var copy = $(this).parents(".wb-tree-menu").parent(".wb-tree-item").clone();
+                var newid = wb_newid();
+                copy.attr("data-id", newid);
+                copy.attr("title", newid);
+                copy.find(".dd3-btn > span").html(newid);
+                $(this).parents(".wb-tree-menu").parent(".wb-tree-item").after(copy);
+            }
+            if ($(this).attr("href") == "#remove") {
+                $(this).parents(".wb-tree-menu").parent(".wb-tree-item").remove();
+            }
+            if (!$(tree).find(".wb-tree-item").length) {
+                $(tree).children(".dd-list").append(row);
+            }
+            $(this).parents(".wb-tree-menu").remove();
+            $(tree).treeStore();
+        });
+
+        // item button click
+        $(this).undelegate(".wb-tree-item .dd3-btn", "click");
+        $(this).delegate(".wb-tree-item .dd3-btn", "click", function (e) {
+            $(this).parent(".wb-tree-item").children(".dd-content").treeContentEdit();
+        });
+
+        // item line click
+        $(this).undelegate(".wb-tree-item > .dd-content", "dblclick");
+        $(this).delegate(".wb-tree-item > .dd-content", "dblclick", function (e) {
+            $(this).parent(".wb-tree-item").children(".dd-content").treeContentEdit();
+        });
+
+        // tree change
+        $(this).on('change', function (e) {
+            $(tree).treeStore();
+        });
+    }
+
+    $.fn.treeEditModal = function(data) {
+          var defer = $.ajax({
+                  async: false
+                  , type: 'POST'
+                  , url: "/ajax/treeedit/"
+                  , data: data
+                  , success: function (data) {
+                      return data;
+                  }
+                  , error: function (data) {
+                      return "Ошибка!";
+                  }
+              });
+          return defer.responseText;
+    }
+
+    $.fn.treeContentEdit = function() {
+        if ($(this).is("[data-wb-role=tree]")) {
+          var tree = this;
+        } else {
+          var tree = $(this).parents("[data-wb-role=tree]");
+        }
+        var dict = $(tree).treeDict();
+        var that = $(this).parent(".wb-tree-item");
+        var item = $(that).attr("data-id");
         var form = $(tree).parents("[data-wb-form]").attr("data-wb-form");
+        var formitem = $(tree).parents("[data-wb-form]").attr("data-wb-item");
         $(tree).find(".wb-tree-item").removeClass("wb-tree-current");
         $(that).addClass("wb-tree-current");
-        if (form == undefined) {
-            form = "tree";
-        }
-        var formitem = $(tree).parents("[data-wb-form]").attr("data-wb-item");
+        if (form == undefined) {form = "tree";}
         var text = $(this).val();
         var name = $(tree).attr("name");
         var edid = "#tree_" + form + "_" + name;
-        if ($(document).find(edid).length) {
-            $(document).find(edid).remove();
-        }
-        var edit = $($(document).data("wb-tree-edit"));
-        var path = wb_tree_data_path(that);
-        var data = wb_tree_data_get(that, path);
-        var orig = data;
-        var dict = $(tree).children("[data-name=dict]").val();
-        $(that).data("path",path);
-        if (dict == undefined || dict == "" || trim(dict) == " ") {
-            var dict = [];
-        }
-        else {
-            var dict = $.parseJSON(dict);
-        }
-        if (trim(data["data"]) == "") {
-            data["data"] = {};
-        }
-        data["_form"] = data["data"]["_form"] = form;
-        data["_item"] = data["data"]["_item"] = formitem;
-        data["_id"] = data["data"]["_id"] = formitem;
-        var dataval = data["data"];
+        if ($(edid).length) {$(edid).remove();}
 
-        var tpl = wb_tree_data_fields(dict, dataval);
-        //var tpl = $(wb_setdata(tpl, dataval, true));
-        $(tpl).find(".wb-uploader").attr("data-wb-path", "/uploads/" + form + "/" + formitem);
-        data["fields"] = dict;
+        var data={};
+        data["data"]=$($(this).parents(".wb-tree-item")).treeBranchData();
+        data["fields"]=$(tree).treeDict();
+        data["form"] = data["_form"] = data["data"]["_form"] = form;
+        data["item"] = data["_item"] = data["data"]["_item"] = formitem;
         data["name"] = name;
-        data["data-name"] = text;
-        data["form"] = form;
+        data["_id"] = data["data"]["_id"] = formitem;
         data["data-id"] = item;
-        //$(".content-box .tree-edit.modal").remove();
-        $("tester").remove();
-        edit = $(wb_setdata(edit, data, true));
-        edit.find(".modal").attr("id", "tree_" + form + "_" + name);
-        edit.find(".modal .wb-uploader").attr("data-wb-path", "/uploads/" + form + "/" + formitem);
+        data["data-name"] = text;
+
+        var tpl = $(tree).treeEditModal(data);
+        $(tpl).find(".wb-uploader").attr("data-wb-path", "/uploads/" + form + "/" + formitem);
         if ($("#tree_edit .tree-edit").length && $("#tree_edit .tree-edit").is(":visible")) {
             edid="#tree_edit .tree-edit";
-            $("#tree_edit .tree-edit > div").html($(edit).find(".modal-body").html());
-            $("#tree_edit .tree-edit > div #treeData form").html(tpl);
+            $(edid + " > div").html($(tpl).find(".modal-body").html());
+            $("#tree_edit .modal-header").html($(tpl).find(".modal-header").html());
         } else {
-            $(".content-box").append(edit);
-            $(".content-box").find(".modal #treeData form").html(tpl);
-            //$(edid).after("<div class='modal-backdrop show fade'></div>");
+            $("body").append(tpl);
             var zi = 1050;
             if ($(".modal:visible").length) {
                 $(".modal:visible").each(function () {
@@ -494,145 +641,75 @@ function wb_tree() {
                 zi += 2;
             }
             $(edid).css("z-index", zi);
-            //$(edid).next(".modal-backdrop").css("z-index", zi - 1);
             $(edid).modal();
-            
             $(document).click(function(e){
-               if (!$(e.target).parents(".tree-edit").length 
-                   && !$(e.target).parents(".wb-tree").length 
+               if (!$(e.target).parents(".tree-edit").length
+                   && !$(e.target).parents(".wb-tree").length
                    && !$(e.target).parents(".dropdown-item").length
                    && !$(e.target).is(".dropdown-item")
                    && !$(e.target).parents(".cke_reset_all").length
                    && !$(e.target).parents(".cke_screen_reader_only").length
                    && !$(e.target).is(".cke_dialog_background_cover")
                   )  {
-                    tree_branch_change();
+                    $(tree).treeBranchChange(edid);
                     $(edid).modal("hide");
                }
             });
-            
-        }
-        $(edid).data("path", path);
-        $(edid).data("tree", tree);
-        $(edid).undelegate("#treeDict *", "change");
-        $(edid).delegate("#treeDict *", "change", function (e) {
-            if ($(e.currentTarget).is("input,select,textarea")) {
-                var fields = $(edid).find("#treeDict [data-wb-role=multiinput][name=fields]");
-                var tpl = wb_tree_dict_change(fields, tree);
-                tpl = $(wb_setdata(tpl, dataval, true));
-                $(this).parents("#treeDict").prev("#treeData").children("form").html(tpl);
-                wb_plugins();
-            }
-        });
 
-        
-        $(edid).off("multiinput");
-        $(edid).on("multiinput", function (e, multi, trigger) {
-            if ($(multi).attr("name") == "fields") {
-                var fields = multi;
-                var tree=$(edid).data("tree");
-                var tpl = wb_tree_dict_change(fields, tree);
-                tpl = $(wb_setdata(tpl, dataval, true));
-                $(edid).find("#treeData").children("form").html(tpl);
-                wb_multiinput();
-                wb_plugins();
-            }
+        }
+        $(edid).data("tree", tree);
+        $(edid).data("that", that);
+        $(edid).data("dict", dict);
+        $(edid).data("data", data);
+        $(edid).treeContentEditEvents();
+
+        wb_multiinput();
+        wb_plugins();
+    };
+
+    $.fn.treeContentEditEvents = function() {
+        var tree = $(this).data("tree");
+        var edid = this;
+
+        $(edid).find("form").off("change");
+        $(edid).find("form").on("change",function(){
+            $(tree).treeBranchChange(edid);
+            $(tree).treeStore();
         });
-        
 
         $(edid).find('.modal-footer button').off("click");
         $(edid).find('.modal-footer button').on("click", function (e) {
-            if ($(this).hasClass("tree-close")) {
-                tree_branch_change();
-            }
+            $(tree).treeStore();
             $(edid).modal("hide");
             $(edid).next(".modal-backdrop").remove();
             setTimeout(function () {
                 $(edid).remove();
             }, 500)
         });
-        
-        
-        function tree_branch_change() {
-            if ($(edid).find("form:first").length) {
-                var data = $(edid).find("form:first").serializeArray();
-                $(data).each(function (i, d) {
-                    $(that).attr(d.name, d.value);
-                    if (d.name == "data-name") {
-                        $(that).children(".dd-content").val(d.value);
-                    }
-                    if (d.name == "data-id") {
-                        $(that).children(".dd3-btn").children("span").html(d.value);
-                    }
-                });
-                var cdata = JSON.stringify($(edid).find("#treeData > form").serializeArray());
-                wb_tree_data_set(that, $(that).data("path"), cdata);
-                $(tree).find("input[name='" + name + "']").val(JSON.stringify(wb_tree_serialize($(tree).children(".dd-list"))));
-            }
-        };
 
-        $(edid).undelegate("form *","change");
-        $(edid).delegate("form *","change",function(){
-            tree_branch_change();
-        });
-        
-        
-        $(document).on("wb_before_formsave",function(){
-            if ($(edid).length) {
-                that=$(tree).find(".wb-tree-current");
-                tree_branch_change();
+        $(edid).off("multiinput");
+        $(edid).on("multiinput", function (e, multi, trigger) {
+            if ($(multi).attr("name") == "fields") {
+              console.log("multiinput");
+                  var tree=$(edid).data("tree");
+                  $(edid).treeDictChange();
             }
         });
-        
-        wb_multiinput();
-        wb_plugins();
-    });
-    
 
-    $(document).undelegate(".wb-tree-menu .dropdown-item", "click");
-    $(document).delegate(".wb-tree-menu .dropdown-item", "click", function (e) {
-        var tree = $(this).parents("[data-wb-role=tree]");
-        var name = $(tree).attr("name");
-        var tpl = $($(tree).attr("data-tpl")).html();
-        var row = $(document).data("wb-tree-row");
-        var form = $(this).parents("[data-wb-form]").attr("data-wb-form");
-        row = wb_setdata(row, {
-            "name": ""
-            , "form": form
-            , "id": wb_newid()
-        }, true);
-        var name = $(tree).attr("name");
-        if ($(this).attr("href") == "#after") {
-            $(this).parents(".wb-tree-menu").parent(".wb-tree-item").after(row);
-        }
-        if ($(this).attr("href") == "#before") {
-            $(this).parents(".wb-tree-menu").parent(".wb-tree-item").before(row);
-        }
-        if ($(this).attr("href") == "#clone") {
-            var copy = $(this).parents(".wb-tree-menu").parent(".wb-tree-item").clone();
-            var newid = wb_newid();
-            copy.attr("data-id", newid);
-            copy.attr("title", newid);
-            copy.find(".dd3-btn > span").html(newid);
-            $(this).parents(".wb-tree-menu").parent(".wb-tree-item").after(copy);
-        }
-        if ($(this).attr("href") == "#remove") {
-            $(this).parents(".wb-tree-menu").parent(".wb-tree-item").remove();
-        }
-        if (!$(tree).find(".wb-tree-item").length) {
-            $(tree).children(".dd-list").append(row);
-        }
-        $(this).parents(".wb-tree-menu").remove();
-        setTimeout(function () {
-            var data = JSON.stringify(wb_tree_serialize($(tree).children(".dd-list")));
-            $(tree).find("input[name='" + name + "']").val(data);
-        }, 200);
-    });
+        $(edid).undelegate(".treeDict *", "change");
+        $(edid).delegate(".treeDict *", "change", function (e) {
+            if ($(e.currentTarget).is("input,select,textarea")) {
+                $(edid).treeDictChange();
+            }
+        });
+
+    }
 }
 
-function wb_tree_dict_change(fields, tree) {
+$.fn.treeDictChange = function() {
     var dict = [];
-    $(fields).find(".wb-multiinput").each(function (i) {
+    var tree = $(this).data("tree");
+    $(this).find(".treeDict .wb-multiinput").each(function (i) {
         var fld = {};
         $(this).find("input,select,textarea").each(function () {
             if ($(this).is("input")) {
@@ -647,44 +724,51 @@ function wb_tree_dict_change(fields, tree) {
         });
         dict.push(fld);
     });
-    var trid = json_decode($(tree).children("[name]").val(), true);
-    var trid = trid[0]["id"];
+
+    $(this).data("dict",dict);
     $(tree).children("[data-name=dict]").val(JSON.stringify(dict));
-    var res = wb_tree_data_fields(dict, {
-        _form: "tree"
-        , _item: trid
-    });
-    return res;
+    $(this).data("data")["data"]=JSON.safeParse($(this).data("that").children("input").attr("data"));
+    $(this).data("data")["fields"]=$(tree).treeDict();
+    var tpl = $(tree).treeEditModal($(this).data("data"));
+    $(this).find(".treeData").children("form").html($(tpl).find(".treeData form").html());
+    $(this).treeContentEditEvents();
+    wb_plugins();
+    wb_multiinput();
 }
 
-function wb_tree_data_fields(dictdata, datadata) {
-    var res = false;
-    var dict = {};
-    if (datadata == undefined) {
-        var data = [];
-    }
-    else {
-        var data = datadata;
-    }
-    $(dictdata).each(function (i) {
-        dict[i] = dictdata[i];
+function wb_tree_json_prep(data,dict) {
+	var data = JSON.safeParse(data);
+	var values = {};
+    $(data).each(function (j, d) {
+        var fldname = d["name"];
+        var fldval = d["value"];
+        $(dict).each(function (z, di) {
+            if (di["name"] == fldname) {
+                fldval = wb_iconv(fldval, di["type"]);
+                values[fldname] = fldval;
+            }
+            if (strpos(fldname,"[")) {
+                var pos=strpos(fldname,"[");
+                var sub=substr(fldname,pos);
+                var fldn="values['"+substr(fldname,0,pos)+"']";
+
+                var myRe = /\[(.*?)\]/g;
+                var cur=1;
+                var myArray=[];
+                eval("if ("+fldn+"==undefined) {"+fldn+"={};};");
+                while ((myArray = myRe.exec(sub)) != null) {
+                    eval("fldn+=\"['"+myArray[1]+"']\";");
+                    if (cur<myArray.length) {
+                         eval("if ("+fldn+"==undefined) {"+fldn+"={};};");
+                    } else {
+                        eval(fldn+"=fldval;");
+                    }
+                    cur++;
+                }
+            }
+        });
     });
-    $.ajax({
-        async: false
-        , type: 'POST'
-        , url: "/ajax/buildfields/"
-        , data: {
-            dict: dict
-            , data: data
-        }
-        , success: function (data) {
-            res = data;
-        }
-        , error: function (data) {
-            res = "Ошибка!";
-        }
-    });
-    return res;
+    return values;
 }
 
 function wb_ajax_loader() {
@@ -705,37 +789,6 @@ function wb_ajax_loader_done() {
     }
 }
 
-function wb_tree_data_get(that, path) {
-    var tree = $(that).parents("[data-wb-role=tree]");
-    var name = $(tree).attr("name");
-    var data = $(tree).children("input[name=" + name + "]").val();
-    if (data == "" || data == undefined) {
-        data = "[]";
-    }
-    data = JSON.safeParse(data);
-    data["data"] = wb_get_cdata($(that).children(".data").html());
-    if (trim(data["data"]) > " ") {
-        data["data"] = JSON.parse(data["data"]);
-    }
-    else {
-        data["data"] = [];
-    }
-    if (path == undefined) {
-        var path = wb_tree_data_path(that);
-    }
-    $(path).each(function (i, j) {
-        if (i == 0) {
-            data = data[j];
-        }
-        else {
-            data = data["children"][j];
-        }
-    });
-    if (data == undefined) {
-        data = "[]";
-    }
-    return data;
-}
 JSON.safeParse = function (input, def) {
     // Convert null to empty object
     if (!input) {
@@ -752,149 +805,20 @@ JSON.safeParse = function (input, def) {
     }
 };
 
-function wb_tree_data_set(that, path, values) {
-    var tree = $(that).parents(".wb-tree");
-    var name = $(tree).attr("name");
-    var data = JSON.parse($(tree).children("input[name=" + name + "]").val());
-    var dict = $(tree).children("[data-name=dict]").val();
-    if (dict > "") {
-        var dict = JSON.parse($(tree).children("[data-name=dict]").val());
-    }
-    else {
-        var dict = [];
-    }
-    var fields = JSON.parse(values);
-    var values = {};
-    $(fields).each(function (j, d) {
-        var fldname = d["name"];
-        var fldval = d["value"];
-        $(dict).each(function (z, di) {
-            if (di["name"] == fldname) {
-                fldval = wb_iconv(fldval, di["type"]);
-                values[fldname] = fldval;
-            }
-            if (strpos(fldname,"[")) {
-                var pos=strpos(fldname,"[");
-                var sub=substr(fldname,pos);
-                var fldn="values['"+substr(fldname,0,pos)+"']";
-                
-                var myRe = /\[(.*?)\]/g;
-                var cur=1;
-                var myArray=[];
-                eval("if ("+fldn+"==undefined) {"+fldn+"={};};");
-                while ((myArray = myRe.exec(sub)) != null) {
-                    eval("fldn+=\"['"+myArray[1]+"']\";");
-                    if (cur<myArray.length) {
-                         eval("if ("+fldn+"==undefined) {"+fldn+"={};};");
-                    } else {
-                        eval(fldn+"=fldval;");
-                    }
-                    cur++;
-                }
-            }
-        });
-    });
-    if (path == undefined) {
-        var path = wb_tree_data_path(that);
-    }
-    var p = "";
-    $(path).each(function (i, j) {
-        if (i == 0) {
-            p = "[" + j + "]";
-        }
-        else {
-            p += "['children'][" + j + "]";
-        }
-    });
-    eval("data" + p + "['data']=values;");
-    $(that).children(".data").html("<![CDATA[" + JSON.stringify(values) + "]]>");
-    data = JSON.stringify(data);
-    $(tree).children("input[name=" + name + "]").val(data);
-    $(tree).find("textarea.source:not(.wb-done)").each(function () {
-        wb_call_source($(this).attr("id"));
-    });
-    return data;
-}
 
-function wb_tree_data_path(that, path) {
-    if (path == undefined) {
-        var path = [];
-    }
-    path.unshift($(that).index());
-    if ($(that).parents(".dd-list").index() !== 0) {
-        path = wb_tree_data_path($(that).parents(".dd-list").parents(".wb-tree-item"), path);
-    }
-    return path;
-}
 
-function wb_tree_serialize(that, branch) {
-    var flag = false;
-    if ($(that).is(".wb-tree")) {
-        var tree = that;
-    }
-    else {
-        var tree = $(that).parents(".wb-tree");
-    }
-    if (branch == undefined) {
-        branch = $(tree).children(".dd-list");
-        flag = true;
-    }
-    var tree_data = [];
-    $(branch).children(".wb-tree-item").each(function () {
-        var name = $(this).attr("data-name");
-        var open = $(this).attr("data-open");
-        var id = $(this).attr("data-id");
-        if (id == undefined || id == "") {
-            id = wb_newid();
-        }
-        if ($(this).hasClass("dd-collapsed")) {
-            open = false;
-        }
-        else {
-            open = true;
-        }
-        $(this).attr("data-open", open);
-        var flds = wb_get_cdata($(this).children(".data").html());
-        if (trim(flds) > " ") {
-            flds = JSON.parse(flds);
-        }
-        var path = wb_tree_data_path(this);
-        if ($(this).children(".dd-list").length) {
-            var child = wb_tree_serialize(tree, $(this).children(".dd-list"));
-        }
-        else {
-            var child = false;
-            var open = false;
-        }
-        if (count(child) == 0) {
-            child = false;
-            open = false;
-        }
-        tree_data.push({
-            id: id
-            , name: name
-            , open: open
-            , data: flds
-            , children: child
-        });
-    });
-    return tree_data;
-}
+function wb_newid(separator,prefix) {
+	if (separator==undefined) {separator="";}
+	var mt=explode(" ",microtime());
+	var md=substr(str_repeat("0",2)+dechex(ceil(mt[0]*10000)),-4);
+	var id=dechex(time()+rand(100,999));
+	if (prefix!==undefined && prefix>"") {
+		id=prefix+separator+id+md;
+	} else {
+		id=id+separator+md;
+	}
+	return id;
 
-function wb_newid() {
-    var newid = "";
-    $.ajax({
-        async: false
-        , type: 'GET'
-        , url: "/ajax/newid/"
-        , success: function (data) {
-            newid = JSON.parse(data);
-        }
-        , error: function (data) {
-            newid = $(document).uniqueId();
-        }
-    });
-    return newid;
 }
 
 function wb_multiinput() {
@@ -1011,7 +935,7 @@ function wb_plugins() {
                         $(this).popover({
                           html: true,
                           content: content
-                        });                    
+                        });
                     } else {
                         $(this).popover();
                     }
@@ -1025,14 +949,14 @@ function wb_plugins() {
                     if ($(this).parents("[data-wb-tpl]").length) {
                         if ($(this).parents("[data-wb-tpl]").attr("data-wb-tpl")!=="false") {
                             $(this).attr("data-fancybox",$(this).parents("[data-wb-tpl]").attr("data-wb-tpl"));
-                        } 
+                        }
                     } else {
                         $(this).attr("data-fancybox","gallery");
                     }
                 }
                 if ($(this).parents(".modal").length) {
                     $(this).attr("data-fancybox",$(this).parents(".modal").attr("id")+"-"+$(this).attr("data-fancybox"));
-                    
+
                 }
             });
         }
@@ -1356,13 +1280,13 @@ function wb_formsave() {
         }
         return false;
     });
-    
+
     $(document).undelegate("form[data-wb-form] [name=id]","keyup input click");
     $(document).delegate("form[data-wb-form] [name=id]","keyup input click", function(){
         $(this).val(wb_prepareId($(this).val()))
-        
+
     });
-    
+
     $(document).undelegate("form[data-wb-form] [name=id]","change");
     $(document).delegate("form[data-wb-form] [name=id]","change", function(){
         var value=$(this).val();
@@ -1387,9 +1311,9 @@ function wb_prepareId(id) {
     var ww=''; id=id.toLowerCase();
     var i=0;
     for (i=0; i<id.length; ++i) {
-    var cc=id.charCodeAt(i); 
+    var cc=id.charCodeAt(i);
     var ch=(cc>=1072?tr[cc-1072]:id [i]);
-    if(ch.length<3) ww+=ch; else ww+=eval(ch)[0];}  
+    if(ch.length<3) ww+=ch; else ww+=eval(ch)[0];}
     return ww
     .replace(/[^a-z\d\-\s_\s]/gi,'') // удаляем весь мусор, который нам нахрен не сдался
     .replace(/[\s\-]+/ig, '-') // Удаляем всё дубяжи и пробелы на "-"
@@ -1567,14 +1491,13 @@ function wb_formsave_obj(formObj) {
                         var ret = false;
                         if (list.attr("data-wb-add") + "" !== "false") {
                             $.post("/ajax/setdata/" + name + "/" + item_id, post, function (ret) {
-                                if (list.find("[item=" + item_id + "]").length) {
-                                    list.find("[item=" + item_id + "]").after(ret);
-                                    list.find("[item=" + item_id + "]:first").remove();
-                                }
-                                else {
+                                if (list.find("[idx=" + item_id + "]").length) {
+                                    list.find("[idx=" + item_id + "]").after(ret);
+                                    list.find("[idx=" + item_id + "]:first").remove();
+                                } else {
                                     list.prepend(ret);
                                 }
-                                list.find("[item=" + item + "]").each(function () {
+                                list.find("[item=" + item_id + "]").each(function () {
                                     if ($(this).attr("idx") == undefined) {
                                         $(this).attr("idx", $(this).attr("item"));
                                     }
@@ -1698,8 +1621,8 @@ function wb_check_required(form) {
 }
 
 function wb_ajax() {
-	
-	
+
+
 	var wb_ajax_process = function(that) {
         wb_ajax_loader();
         var link = that;
@@ -1779,8 +1702,8 @@ function wb_ajax() {
             }
         }
 	}
-	
-	
+
+
     $(document).undelegate("[data-wb-ajax]", "click");
     $(document).delegate("[data-wb-ajax]", "click", function () {
 		if ($(this).is(":not(:input)") || $(this).is("button")) {
@@ -1792,13 +1715,13 @@ function wb_ajax() {
     $(document).delegate("[data-wb-ajax]:input", "change", function () {
 		wb_ajax_process(this);
     });
-    
+
     $("[data-wb-ajax]").each(function () {
         $(this).attr("data-wb-href", $(this).attr("href"));
         $(this).removeAttr("href");
         if ($(this).attr("data-wb-autoload")==true) {
 			$(this).trigger("click");
-			$(this).removeAttr("data-wb-autoload");	
+			$(this).removeAttr("data-wb-autoload");
 		}
     });
 }
@@ -1940,11 +1863,13 @@ function wb_pagination(pid) {
         if ($(this).is(":not([data-idx])")) {
             $(this).attr("data-idx", idx);
         }
+        /*
         if ($("[data-wb-tpl='" + tplid + "']").data("variables") == undefined) {
             $.get("/ajax/pagination_vars/" + id, function (data) {
                 $("[data-wb-tpl='" + tplid + "']").data("variables", data);
             });
         }
+        */
         /*
         		$("thead[data='"+id+"']").attr("data-idx",idx);
         		$("thead[data='"+id+"'] th[data-sort]").each(function(){
@@ -2049,7 +1974,7 @@ function wb_pagination(pid) {
                         , page: arr[2]
                         , size: size
                         , cache: cache
-                        , vars: $("[data-wb-tpl=" + tid + "]").data("variables")
+                        //, vars: $("[data-wb-tpl=" + tid + "]").data("variables")
                         , foreach: foreach
                         , route: $source.data("route")
                     };
@@ -2079,6 +2004,7 @@ function wb_pagination(pid) {
                         , type: 'POST'
                         , data: param
                         , url: url
+                        , cache: false
                         , success: function (data) {
                             var data = JSON.parse(data);
                             $("[data-wb-tpl=" + tid + "]").html(data.data);
@@ -2407,7 +2333,7 @@ function getcookie(cookie_name) {
         $("body").removeClass("cursor-wait");
     });
 function base64_decode( data ) {	// Decodes data encoded with MIME base64
-	// 
+	//
 	// +   original by: Tyler Akins (http://rumkin.com)
 
 

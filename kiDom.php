@@ -1243,39 +1243,35 @@ abstract class kiNode
 
 
 	public function wbSetData($Item=array()) {
-			if (!isset($_ENV["ta_save"])) {$_ENV["ta_save"]=array();}
             $this->excludeTextarea($Item);
 			$this->wbSetAttributes($Item);
 			$this->wbUserAllow();
 			$nodes=new IteratorIterator($this->find("*"));
 			foreach($nodes as $inc) {
 				if (!$inc->parents("[type=text/template]")->length) {
-				$inc->wbUserAllow();
-                $inc->wbWhere($Item);
-				$tag=$inc->wbCheckTag();
-				if (!$tag==FALSE && !$inc->hasClass("wb-done")) {
-					if ($inc->has("[data-wb-json]")) {$inc->json=wbSetValuesStr($inc->json,$Item);}
-					//if ($inc->hasRole("variable")) {$Item=$inc->tagVariable($Item);} else {
-						if ($inc->is("[data-wb-tpl=true]")) {$inc->addTemplate();}
-						$inc->wbProcess($Item,$tag);
-                        $inc->tagHideAttrs();
-						//if (isset($_SESSION["itemAfterWhere"])) {$Item=$_SESSION["itemAfterWhere"]; unset($_SESSION["itemAfterWhere"]);}
-					//}
-				}
-				}
+                    $inc->wbUserAllow();
+                    $inc->wbWhere($Item);
+                    $tag=$inc->wbCheckTag();
+                    if (!$tag==FALSE && !$inc->hasClass("wb-done")) {
+                        if ($inc->has("[data-wb-json]")) {$inc->attr("data-wb-json",wbSetValuesStr($inc->attr("data-wb-json"),$Item));}
+                            if ($inc->is("[data-wb-tpl=true]")) {$inc->addTemplate();}
+                            $inc->wbProcess($Item,$tag);
+                            $inc->tagHideAttrs();
+                        }
+                    }
 			}; unset($inc);
             $this->includeTag($Item);
 			$this->wbSetValues($Item);
-
-			$this->contentLoop($Item);
+			//$this->contentLoop($Item);
 			$this->wbPlugins($Item);
 			$this->wbTargeter($Item);
-
-            $hide=$this->find(".wb-done[data-wb-hide]");
-            foreach($hide as $h) {$h->tagHideAttrs();}
-            unset($hide,$h);
+            if ($this->find("data-wb-role:not(.wb-done)")->length) {
+                $this->wbSetData($Item);
+            }
             $this->includeTextarea($Item);
-      gc_collect_cycles();
+        
+            $this->find(".wb-value")->removeClass("wb-value");
+            gc_collect_cycles();
 	}
 
     public function wbWhere($Item){
@@ -1311,7 +1307,7 @@ abstract class kiNode
 
 
 			if ($sc->attr("data-wb-src")=="datepicker") {
-          $lang="ru"; if ($sc->attr("data-wb-lang")>"") {$lang=$sc->attr("data-wb-lang");}
+                    $lang="ru"; if ($sc->attr("data-wb-lang")>"") {$lang=$sc->attr("data-wb-lang");}
 					$sc->before('<link href="/engine/js/datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet">');
 					if ($lang>"") $sc->after("<script src='/engine/js/datetimepicker/locales/bootstrap-datetimepicker.{$lang}.js' type='text/javascript' charset='UTF-8'></script>");
 					$sc->after('<script src="/engine/js/datetimepicker/bootstrap-datetimepicker.min.js" ></script>');
@@ -1458,36 +1454,15 @@ abstract class kiNode
                                 foreach($res as $s) {
                                     $s->$com($$attribute);
                                 }
+                                $inc->remove();
                             }
                         }
                     }
-                    $inc->remove();
                 }
             }
         };
         unset($inc,$attribute,$$attribute,$selector);
 		$this->find("[data-wb-remove]")->remove();
-	}
-
-	public function excludeTextarea($Item=array()) {
-		$list=$this->find("textarea,[type=text/template],.wb-value,pre,.nowb,[data-role=module]"); 
-		$_ENV["ta_save"]=array();
-		foreach ($list as $ta) {
-            if (!$ta->is(".wb-value")) $ta->wbSetAttributes($Item);
-			$id=wbNewId();
-			$ta->attr("taid",$id);
-            $_ENV["ta_save"][$id]=$ta->outerHtml();
-			$ta->html("");
-		}; unset($ta,$list);
-	}
-	function includeTextarea($Item=array()) {
-		$list=$this->find("[taid]");
-		foreach ($list as $ta) {
-			$id=$ta->attr("taid"); $name=$ta->attr("name");
-			$ta->replaceWith($_ENV["ta_save"][$id]);
-            $ta->removeAttr("taid");
-			unset($_ENV["ta_save"][$id]);
-		}; unset($ta,$list);
 	}
 
 	public function contentLoop($Item) {
@@ -1498,57 +1473,90 @@ abstract class kiNode
 		}; unset($inc,$list);
 	}
 
-	public function wbSetValues($Item=array(),$obj=TRUE) {
+	public function excludeTextarea($Item=array()) {
+        if (!isset($_ENV["ta_save"])) {$_ENV["ta_save"]=array();}
+		$list=$this->find("textarea,[type=text/template],.wb-value,pre,.nowb,[data-role=module]");
+		$_ENV["ta_save"]=array();
+		foreach ($list as $ta) {
+            $id=wbNewId();
+            if (!$ta->is(".wb-attrs")) $ta->wbSetAttributes($Item);
+            $_ENV["ta_save"][$id]=$ta->outerHtml();
+            $ta->attr("taid",$id);
+		}; unset($ta,$list);
+	}
+	function includeTextarea($Item=array()) {
+		$list=$this->find("[taid]");
+		foreach ($list as $ta) {
+			$id=$ta->attr("taid");
+			if (isset($_ENV["ta_save"][$id])) $ta->replaceWith($_ENV["ta_save"][$id]);
+            $ta->removeAttr("taid");
+			unset($_ENV["ta_save"][$id]);
+		}; unset($ta,$list);
+	}
+
+    public function wbClearClass() {
+        $clear=$this->find(".wb-attrs, .wb-value, .wb-done, .wb-plugins");
+        foreach($clear as $c) {
+                $c->removeClass("wb-attrs");
+                $c->removeClass("wb-value");
+                $c->removeClass("wb-done");
+                $c->removeClass("wb-plugin");
+        }
+    }
+
+    public function wbSetValues($Item=array(),$obj=TRUE) {
 		$this->wbSetAttributes($Item);
-		$text=$this->html();
 			if (isset($Item["form"])) {
                 $Item=wbTrigger("form",__FUNCTION__,"BeforeSetValues",func_get_args(),$Item);
 			}
-			$list=$this->find("input:not(.wb-value),select:not(.wb-value),textarea:not(.wb-value),[type=text/json]:not(.wb-value)");
+			$list=$this->find("input,select,textarea");
 			foreach($list as $inp) {
-                $inp->wbSetAttributes($Item);
-                $from=$inp->attr("data-wb-from");
-                $name=$inp->attr("name");	$def=$inp->attr("value");
-                if ($inp->is("textarea")) {
-                    if (isset($Item[$name])) {$inp->html(htmlspecialchars($Item[$name]));} else {$inp->html(htmlspecialchars($def));} 
-                } else if ($inp->is("[type=text/json]")) {
-                    $inp->html(wbSetValuesStr($this->html(),$Item));
-                } else {
-                    if (substr($name,-2)=="[]") {$name=substr($name,0,-2);}
-                    if (substr($def,0,3)=="{{_") {$def="";}
-                    if (isset($Item[$name]) AND $inp->attr("value")=="") {
-                        if (is_array($Item[$name])) {$Item[$name]=wbJsonEncode($Item[$name]);}
-                        $value=$Item[$name];
-                    } else {$value=$def;}
+                if (!$inp->hasClass("wb-value")) {
+                    $inp->wbSetAttributes($Item);
+                    $from=$inp->attr("data-wb-from");
+                    $name=$inp->attr("name");	$def=$inp->attr("value");
+                        if ($inp->is("textarea")) {
+                            if (isset($Item[$name])) {$inp->html(htmlspecialchars($Item[$name]));} else {$inp->html(htmlspecialchars($def));}
+                            $inp->addClass("wb-value");
+                          } else {
+                            if (substr($name,-2)=="[]") {$name=substr($name,0,-2);}
+                            if (substr($def,0,3)=="{{_") {$def="";}
+                            if (isset($Item[$name]) AND $inp->attr("value")=="") {
+                                if (is_array($Item[$name])) {$Item[$name]=wbJsonEncode($Item[$name]);}
+                                $value=$Item[$name];
+                            } else {$value=$def;}
 
-                    if ($value!=="") {$inp->attr("value",$value);} else {
-                        if (!$inp->hasAttr("value") AND isset($Item[$name])) {
-                            if (is_array($Item[$name])) {$Item[$name]=wbJsonEncode($Item[$name]);}
-                            $inp->attr("value",$Item[$name]);
-                        }
-                    }
-
-                    if ($inp->attr("type")=="checkbox") {
-                        if ($inp->attr("value")=="on" OR $inp->attr("value")=="1") {$inp->checked="checked";}
-                    }
-
-                    if ($inp->is("select") AND $inp->attr("value")>"") {
-                        $value=$inp->attr("value");
-                        if (is_array($value)) {
-                            foreach($value as $val) {
-                                $inp->find("option[value=".$val."]")->selected="selected";
+                            if ($value!=="") {$inp->attr("value",$value);} else {
+                                if (!$inp->hasAttr("value") AND isset($Item[$name])) {
+                                    if (is_array($Item[$name])) {$Item[$name]=wbJsonEncode($Item[$name]);}
+                                    $inp->attr("value",$Item[$name]);
+                                    $inp->addClass("wb-value");
+                                }
                             }
-                            $value=$value[0];
-                        } else {
-                            $inp->find("option[value=".$value."]")->selected="selected";
-                        }
-                    }
-                    $inp->wbSetMultiValue($Item);
-                    $inp->addClass("wb-value");
-			};
 
-			}
-			unset($inp,$list);
+                            if ($inp->attr("type")=="checkbox") {
+                                if ($inp->attr("value")=="on" OR $inp->attr("value")=="1") {$inp->checked="checked";}
+                                $inp->addClass("wb-value");
+                            }
+
+                            if ($inp->is("select") AND $inp->attr("value")>"") {
+                                $value=$inp->attr("value");
+                                if (is_array($value)) {
+                                    foreach($value as $val) {
+                                        $inp->find("option[value=".$val."]")->selected="selected";
+                                    }
+                                    $value=$value[0];
+                                } else {
+                                    $inp->find("option[value=".$value."]")->selected="selected";
+                                }
+                                $inp->addClass("wb-value");
+                            }
+                    };
+                    $inp->wbSetMultiValue($Item);
+                
+                }
+            }
+			unset($list);
 			if (!is_array($Item)) {$Item=array($Item);}
             $this->excludeTextarea($Item);
 			$this->html(wbSetValuesStr($this->html(),$Item));
@@ -1578,6 +1586,7 @@ abstract class kiNode
 
 	public function wbSetMultiValue($Item) {
 		$name=$this->attr("name");
+        if (!strpos($name,"]")) return;
 		preg_match_all('/(.*)\[.*\]/',$name,$fld);
 		if (isset($fld[1][0])) {
 			$fldname=$fld[1][0];
@@ -1817,7 +1826,7 @@ abstract class kiNode
 
 	public function wbSetAttributes($Item=array()) {
 		$attributes=$this->attributes();
-		if (is_object($attributes)) {
+		if (is_object($attributes) AND !$this->hasClass("wb-attrs")) {
 			foreach($attributes as $at) {
                     $atname=$at->name;
                     $atval=$this->attr($atname);
@@ -1826,7 +1835,13 @@ abstract class kiNode
                     }
                     if (strpos($atval,"}}") OR strpos($atval,"%")) {
                         if ($atval>"" && strpos($atval,"}}")) {
-                            $atval=wbSetValuesStr($atval,$Item);
+							$fld=str_replace(array("{{","}}"),array("",""),$atval);
+							if (isset($Item[$fld]) AND $this->is(":input")) {
+								$atval=$Item[$fld];
+								if (is_array($atval)) {$atval=wbJsonEncode($atval);}
+							} else {
+								$atval=wbSetValuesStr($atval,$Item);
+							}
                             $this->attr($atname,$atval);
                         };
                         if ($atval>"" && substr($atval,0,1)=="%") {
@@ -1836,7 +1851,9 @@ abstract class kiNode
                         }
                         unset($atname,$atval,$at);
                     }
-			}; unset($attributes);
+			};
+			unset($attributes);
+			$this->addClass("wb-attrs");
 		}
 	}
 
@@ -1918,6 +1935,7 @@ abstract class kiNode
 		if (!is_array($data)) {$data=json_decode($data,true);}
 		foreach($data as $item) {
 			$tpl=$rowtpl->clone();
+			$tpl->wbSetAttributes($item);
 			$tpl->wbSetData($item);
 			if (isset($item["children"]) AND $item["children"]!==false AND $item["children"]!==array()) {
 				if (isset($item["open"]) AND $item["open"]==false) {$tpl->find(".wb-tree-item")->addClass("dd-collapsed");}
@@ -1961,6 +1979,7 @@ abstract class kiNode
                       $lvl++;
                       $item=(array)$srcVal + (array)$item;
                       $item["_idx"]=$idx;
+                      $item["_ndx"]=$idx+1;
                       $item["_lvl"]=$lvl-1;
                       $line=wbFromString($tpl);
                       $line->wbSetData($item);
@@ -2039,17 +2058,18 @@ abstract class kiNode
 
 	public function tagForeach($Item=array()) {
 		$srcItem=$Item;
-		$field=""; $sort=""; $add=""; $step=""; $id=""; $limit=""; $table=""; $cacheId=0;
+		$field=""; $sort=""; $add=""; $step=""; $id=""; $limit=""; $table=""; $cacheId=0; $form=""; $where="";
 		include("wbattributes.php");
-        if (!isset($where)) {$where="";}
-		if (!isset($tpl) OR $tpl!=="false") {
-			$tplid=$this->attr("data-wb-tpl");
-			if ($tplid=="") {$this->addTemplate();}
-		} else {$tplid=false;}
-		if (!isset($size) OR $size=="false") {$size=false;}
-		if (!isset($page) OR 1*$page<=0) {
-			if (!isset($_GET["page"]) OR $_GET["page"]=="") {$page=1;} else {$page=$_GET["page"]*1;}
-		} else {$page=$page*1;}
+    if ($form>"" AND $table=="") {$table=$form;}
+    if (isset($cache)) {$cacheId=$cache;}
+    if (isset($tpl) AND $tpl=="flase") {$tplid=false;} else {
+		    if ($tpl=="") {$this->addTemplate();}
+            $tplid=$this->attr("data-wb-tpl");
+		}
+		      if (!isset($size) OR $size=="false") {$size=false;}
+		        if (!isset($page) OR 1*$page<=0) {
+			         if (!isset($_GET["page"]) OR $_GET["page"]=="") {$page=1;} else {$page=$_GET["page"]*1;}
+		        } else {$page=$page*1;}
 		if ( isset($from) AND $from > "") {
 			if (isset($Item[$from]) AND !strpos("[",$from)) {
 				//if (isset($Item["form"])) {$table=$Item["form"];} else {$table="";}
@@ -2089,18 +2109,18 @@ abstract class kiNode
 		if ($table > "") {
             $table=wbTable($table);
             $itemform=wbTableName($table);
-			if (isset($item) AND $item>"") {
-				$Item[0]=wbItemRead($table,$item);
-                if ($field>"") {
-					$Item=$Item[0][$field];
-					if (is_string($Item)) { $Item=json_decode($Item,true); }
-					if (isset($Item[0]["img"]) && isset($Item[0]["visible"])) {
-						$Item=array_filter_value($Item,"visible","1");
-					}
-				}
-			}  else {
+      			if (isset($item) AND $item>"") {
+      				$Item[0]=wbItemRead($table,$item);
+              if ($field>"") {
+      					$Item=$Item[0][$field];
+      					if (is_string($Item)) { $Item=json_decode($Item,true); }
+      					if (isset($Item[0]["img"]) && isset($Item[0]["visible"])) {
+      						$Item=array_filter_value($Item,"visible","1");
+      					}
+      				}
+      			}  else {
                 $Item=wbItemList($table,$where);
-			}
+      			}
 		}
 
 		if (is_string($Item)) $Item=json_decode($Item,true);
@@ -2109,7 +2129,7 @@ abstract class kiNode
 		if (isset($rand) AND $rand!=="false") {shuffle($Item);}
 		if (isset($call) AND is_callable($call)) {$Item=$call($Item);}
 
-		if ($add=="true") {$this->find(":first-child",0)->attr("item","{{id}}");}
+		if ($add=="true" AND $this->find(":first-child",0)->length) {$this->find(":first-child",0)->attr("item","{{id}}");}
 		$tpl=$this->innerHtml(); $inner=""; $this->html("");
 		if ($step>0) {$steptpl=$this->clone(); $stepcount=0; $steps=wbFromString("");}
 		if ($tplid=="") $tplid="tpl".wbNewId();
@@ -2121,7 +2141,15 @@ abstract class kiNode
 		$ndx=0; $n=0; $f=0;
 		$tmptpl=wbFromString($tpl);
         if (isset($rand) AND $rand=="true") {shuffle($Item);}
-
+        if (!$this->hasClass("pagination") AND $form=="" AND $table=="" AND $from!=="") {
+            // если список формируется функцией, то используем кэш
+            if ($cacheId==0) {
+                $cacheId=md5($_SESSION["user_id"]).md5($_ENV["route"]["uri"].$find);
+                file_put_contents($_ENV["dba"]."/_cache/".$cacheId,base64_encode(wbJsonEncode($Item)));
+            } else {
+                $Item=json_decode(base64_decode(file_get_contents($_ENV["dba"]."/_cache/".$cacheId)),true);
+            }
+        }
         $object = new ArrayObject($Item);
 		$iterator = new tagForeachFilter($object->getIterator(),array(
 			"id"=>$id,
@@ -2168,7 +2196,6 @@ abstract class kiNode
 				}
 				unset($Item[$key]);
 		};
-
 		$count=$n;
 
 			if ($step>0) {
@@ -2185,15 +2212,11 @@ abstract class kiNode
 			$plhr=$this->attr("placeholder");
 			if ($plhr>"") {$this->prepend("<option value=''>$plhr</option>");}
 		} else {
-
-
             if ($this->attr("data-wb-group")>"" OR $this->attr("data-wb-total")>"") {$this->wbTableProcessor(); $size=false;}
-
 			if ($size!==false AND !$this->hasClass("pagination")) {
 				$cahceId=null; $find=null;
 				$pages=ceil($count/$size);
-				$this->attr("data-wb-pages",$pages);
-				$this->tagPagination($size,$page,$pages,$cacheId,$count,$find);
+                $this->tagPagination($size,$page,$pages,$cacheId,$count,$find);
 			}
 		}
 		gc_collect_cycles();
@@ -2548,6 +2571,7 @@ public function tagThumbnail($Item=array()) {
 
 	public function tagPagination($size=10,$page=1,$pages=1,$cacheId,$count=0,$find="") {
 		$this->attr("data-wb-pages",$pages);
+        $this->attr("data-wb-cache",$cacheId);
 		$tplId=$this->attr("data-wb-tpl");
 		$class="ajax-".$tplId;
         if (!isset($_SESSION["temp"])) {$_SESSION["temp"]=array();}
@@ -2558,7 +2582,6 @@ public function tagThumbnail($Item=array()) {
               $_SESSION["temp"][$class]["errors"]
              );
 		if (is_object($this->parent("table")) && $this->parent("table")->find("thead th[data-wb-sort]")->length) {
-			$this->parent("table")->find("thead")->attr("data-wb-cache",$cacheId);
 			$this->parent("table")->find("thead")->attr("data-wb-size",$size);
 			$this->parent("table")->find("thead")->attr("data-wb",$class);
 		}
@@ -2571,7 +2594,7 @@ public function tagThumbnail($Item=array()) {
 			//$inner="";
 			$pagination=array("id"=>$class,"size"=>$size,"count"=>$count,"cache"=>$cacheId,"find"=>$find,"pages"=>array());
             if (!isset($_ENV["route"]["params"]["form"]) OR $_ENV["route"]["params"]["form"]=="") {$form=$tplId;} else {$form=$_ENV["route"]["params"]["form"];}
-			for($i=1; $i<=$pages; $i+=$step) {
+            for($i=1; $i<=$pages; $i+=$step) {
 				$href=$_ENV["route"]["controller"]."/".$_ENV["route"]["mode"]."/".$form."/".$i;
                 $pagination["pages"][$i]=array(
 					"page"=>$i,

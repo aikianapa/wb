@@ -7,6 +7,7 @@
 		</h3>
 	<div class="row">
 		<div class="col-sm-3">
+			<div class="row">
 				<div class="content-left">
           <label class="content-left-label">
           Категории
@@ -20,8 +21,9 @@
 						</li>
 					</ul>
 				</div>
+			</div>
 		</div>
-		<div class="col-sm-9 list">
+		<div class="col-12 col-sm-9 list">
 
 			  <div class="table-responsive">
 				<table class="table table-striped formlist">
@@ -32,7 +34,7 @@
 					  <th>Действие</th>
 					</tr>
 				  </thead>
-				  <tbody  data-wb-role="foreach" data-wb-from="result" data-wb-add="true" data-wb-sort="name" data-wb-size="15">
+				  <tbody  data-wb-role="foreach" data-wb-from="result" data-wb-add="true" data-wb-sort="name" data-wb-size="{{_ENV[page_size]}}">
 					<tr item="{{id}}">
 					  <td>{{name}}</td>
 					  <td align="right">{{price}}</td>

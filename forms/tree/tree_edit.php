@@ -1,6 +1,9 @@
 <div class="modal fade" id="{{_GET[form]}}_{{_GET[mode]}}" data-keyboard="false" data-backdrop="static" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
+          <div class="modal-header pb-0 pt-1" data-wb-role="include" src="/engine/forms/common/common_tree_edit_nav.php">
+    		  </div>
+
             <!--div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
@@ -40,10 +43,6 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <ul class="nav nav-tabs" role="tablist">
-                    <li class="nav-item"><a class="nav-link active" href="#treeData" data-toggle="tab">Данные</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#treeDict" data-toggle="tab">Словарь</a></li>
-                </ul>
                 <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-close"></span> Закрыть</button>
                 <button type="button" class="btn btn-primary" data-wb-formsave="#{{_GET[form]}}EditForm"><span class="fa fa-save"></span> Сохранить изменения</button>
             </div>

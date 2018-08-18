@@ -1,8 +1,8 @@
 /**
  * jquery.plupload.queue.js
  *
- * Copyright 2009, Moxiecode Systems AB
- * Released under GPL License.
+ * Copyright 2017, Ephox
+ * Released under AGPLv3 License.
  *
  * License: http://www.plupload.com/license
  * Contributing: http://www.plupload.com/contributing
@@ -39,7 +39,7 @@ used as it is.
 	var uploader = $('#uploader').pluploadQueue();
 
 	uploader.bind('FilesAdded', function() {
-		
+
 		// Autostart
 		setTimeout(uploader.start, 1); // "detach" from the main thread
 	});
@@ -73,7 +73,7 @@ used as it is.
 	@param {Boolean} [settings.rename=false] Enable ability to rename files in the queue.
 	@param {Boolean} [settings.multiple_queues=true] Re-activate the widget after each upload procedure.
 */
-(function($) {
+;(function($) {
 	var uploaders = {};
 
 	function _(str) {
@@ -94,7 +94,12 @@ used as it is.
 			'<div class="plupload_wrapper plupload_scroll">' +
 				'<div id="' + id + '_container" class="plupload_container">' +
 					'<div class="plupload">' +
-
+						'<div class="plupload_header">' +
+							'<div class="plupload_header_content">' +
+								'<div class="plupload_header_title">' + _('Select files') + '</div>' +
+								'<div class="plupload_header_text">' + _('Add files to the upload queue and click the start button.') + '</div>' +
+							'</div>' +
+						'</div>' +
 
 						'<div class="plupload_content">' +
 							'<div class="plupload_filelist_header">' +
@@ -105,7 +110,7 @@ used as it is.
 								'<div class="plupload_clearer">&nbsp;</div>' +
 							'</div>' +
 
-							'<ul id="' + id + '_filelist" data-role="listview" class="plupload_filelist"></ul>' +
+							'<ul id="' + id + '_filelist" class="plupload_filelist"></ul>' +
 
 							'<div class="plupload_filelist_footer">' +
 								'<div class="plupload_file_name">' +
@@ -149,11 +154,18 @@ used as it is.
 				contents_bak = target.html();
 				renderUI(id, target);
 
-				uploader = new plupload.Uploader($.extend({
+				settings = $.extend({
 					dragdrop : true,
 					browse_button : id + '_browse',
 					container : id
-				}, settings));
+				}, settings);
+
+				// Enable drag/drop (see PostInit handler as well)
+				if (settings.dragdrop) {
+					settings.drop_element = id + '_filelist';
+				}
+
+				uploader = new plupload.Uploader(settings);
 
 				uploaders[id] = uploader;
 
@@ -161,11 +173,11 @@ used as it is.
 					var actionClass;
 
 					if (file.status == plupload.DONE) {
-						actionClass = 'plupload_done  ui-btn ui-btn-icon-right ui-li ui-btn-hover-c ui-icon-check';
+						actionClass = 'plupload_done';
 					}
 
 					if (file.status == plupload.FAILED) {
-						actionClass = 'plupload_failed ';
+						actionClass = 'plupload_failed';
 					}
 
 					if (file.status == plupload.QUEUED) {
@@ -173,25 +185,20 @@ used as it is.
 					}
 
 					if (file.status == plupload.UPLOADING) {
-						actionClass = 'plupload_uploading ui-btn-active';
+						actionClass = 'plupload_uploading';
 					}
 
-					var icon = $('#' + file.id).attr('class', actionClass).find('a').css('display', 'inline');
-					if (actionClass=="plupload_delete") {
-						$('#' + file.id).find('a').css('display', 'inline');
-					} else {
-						$('#' + file.id).attr('class', actionClass).find('a').css('display', 'hide');
-					}
+					var icon = $('#' + file.id).attr('class', actionClass).find('a').css('display', 'block');
 					if (file.hint) {
-						icon.attr('title', file.hint);	
+						icon.attr('title', file.hint);
 					}
 				}
 
 				function updateTotalProgress() {
-					$('span.plupload_total_status', target).html(uploader.total.percent + '%');	
+					$('span.plupload_total_status', target).html(uploader.total.percent + '%');
 					$('div.plupload_progress_bar', target).css('width', uploader.total.percent + '%');
 					$('span.plupload_upload_status', target).html(
-						_('Uploaded %d/%d files').replace(/%d\/%d/, uploader.total.uploaded+'/'+uploader.files.length)
+						plupload.sprintf(_('Uploaded %d/%d files'), uploader.total.uploaded, uploader.files.length)
 					);
 				}
 
@@ -208,23 +215,23 @@ used as it is.
 
 							inputHTML += '<input type="hidden" name="' + id + '_' + inputCount + '_name" value="' + plupload.xmlEncode(file.name) + '" />';
 							inputHTML += '<input type="hidden" name="' + id + '_' + inputCount + '_status" value="' + (file.status == plupload.DONE ? 'done' : 'failed') + '" />';
-	
+
 							inputCount++;
 
 							$('#' + id + '_count').val(inputCount);
 						}
 
 						fileList.append(
-							'<li  id="' + file.id + '">' +
+							'<li id="' + file.id + '">' +
 								'<div class="plupload_file_name"><span>' + file.name + '</span></div>' +
-								'<div class="plupload_file_action"><a href="#" class="ui-btn ui-shadow ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline"></a></div>' +
+								'<div class="plupload_file_action"><a href="#"></a></div>' +
 								'<div class="plupload_file_status">' + file.percent + '%</div>' +
 								'<div class="plupload_file_size">' + plupload.formatSize(file.size) + '</div>' +
 								'<div class="plupload_clearer">&nbsp;</div>' +
 								inputHTML +
 							'</li>'
 						);
-						
+
 						handleStatus(file);
 
 						$('#' + file.id + '.plupload_delete a').click(function(e) {
@@ -240,7 +247,7 @@ used as it is.
 					if (uploader.total.queued === 0) {
 						$('span.plupload_add_text', target).html(_('Add Files'));
 					} else {
-						$('span.plupload_add_text', target).html(_('%d files queued').replace(/%d/, uploader.total.queued));
+						$('span.plupload_add_text', target).html(plupload.sprintf(_('%d files queued'), uploader.total.queued));
 					}
 
 					$('a.plupload_start', target).toggleClass('plupload_disabled', uploader.files.length == (uploader.total.uploaded + uploader.total.failed));
@@ -301,12 +308,6 @@ used as it is.
 						});
 					}
 
-
-					// Enable drag/drop (see PostInit handler as well)
-					if (up.settings.dragdrop) {
-						up.settings.drop_element = id + '_filelist';
-					}
-
 					$('#' + id + '_container').attr('title', 'Using runtime: ' + res.runtime);
 
 					$('a.plupload_start', target).click(function(e) {
@@ -342,7 +343,7 @@ used as it is.
 						if (err.code == plupload.FILE_EXTENSION_ERROR) {
 							alert(_("Error: Invalid file extension:") + " " + file.name);
 						}
-						
+
 						file.hint = message;
 						$('#' + file.id).attr('class', 'plupload_failed').find('a').css('display', 'block').attr('title', message);
 					}
@@ -365,7 +366,9 @@ used as it is.
 
 				uploader.bind('StateChanged', function() {
 					if (uploader.state === plupload.STARTED) {
-						//$('li.plupload_delete a,div.plupload_buttons', target).hide();
+						$('li.plupload_delete a,div.plupload_buttons', target).hide();
+						uploader.disableBrowse(true);
+
 						$('span.plupload_upload_status,div.plupload_progress,a.plupload_stop', target).css('display', 'block');
 						$('span.plupload_upload_status', target).html('Uploaded ' + uploader.total.uploaded + '/' + uploader.files.length + ' files');
 
@@ -379,13 +382,24 @@ used as it is.
 
 						if (settings.multiple_queues && uploader.total.uploaded + uploader.total.failed == uploader.files.length) {
 							$(".plupload_buttons,.plupload_upload_status", target).css("display", "inline");
+							uploader.disableBrowse(false);
+
 							$(".plupload_start", target).addClass("plupload_disabled");
 							$('span.plupload_total_status,span.plupload_total_file_size', target).hide();
 						}
 					}
 				});
 
-				uploader.bind('QueueChanged', updateList);
+				uploader.bind('FilesAdded', updateList);
+
+				uploader.bind('FilesRemoved', function() {
+					// since the whole file list is redrawn for every change in the queue
+					// we need to scroll back to the file removal point to avoid annoying
+					// scrolling to the bottom bug (see #926)
+					var scrollTop = $('#' + id + '_filelist').scrollTop();
+					updateList();
+					$('#' + id + '_filelist').scrollTop(scrollTop);
+				});
 
 				uploader.bind('FileUploaded', function(up, file) {
 					handleStatus(file);

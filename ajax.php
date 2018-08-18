@@ -29,10 +29,10 @@ function ajax__pagination() {
 }
 
 function ajax__pagination_vars() {
-    $tplid=$_ENV["route"]["params"][0];
-    $res=$_SESSION["temp"][$tplid];
-    unset($_SESSION["temp"][$tplid]);
-    return wbJsonEncode($res);
+   // $tplid=$_ENV["route"]["params"][0];
+   // $res=$_SESSION["temp"][$tplid];
+   // unset($_SESSION["temp"][$tplid]);
+   // return wbJsonEncode($res);
 }
 
 function ajax__settings() {
@@ -43,6 +43,27 @@ function ajax__settings() {
     }
     return base64_encode(json_encode($sett));
 }
+
+function ajax__cache_clear() {
+    $path=$_ENV["dba"]."/_cache";
+    $files=wbListFiles($path);
+    print_r($_POST["data"]);
+    foreach($files as $file) {
+        $user=md5($_SESSION["user_id"]);
+        if (substr($file,0,strlen($user))==$user) {
+            if (!in_array($file,$_POST["data"])) {
+                // если файл не в списке присутствующих на эеране списков, то удаляем
+                unlink($path."/".$file);
+            } 
+        } else {
+            if (filemtime($path."/".$file)+86400 < time()) {
+                // если файл не принадлежит юзеру, но ему больше суток, то удаляем
+                unlink($path."/".$file);
+            }
+        }
+    }
+}
+
 
 function ajax__cart() {
     return wbCartAction();
@@ -116,7 +137,7 @@ function ajax__setdata() {
 	$Item=wbItemRead($table,$item);
     if (!is_array($Item)) {$Item=array($Item);}
     if (!is_array($_REQUEST["data"])) {$_REQUEST["data"]=array($_REQUEST["data"]);}
-	$Item=wbItemToArray(array_merge($Item,$_REQUEST["data"]));
+	$Item=array_merge(wbItemToArray($Item),$_REQUEST["data"]);
     if (isset($Item["_form"])) {$_ENV["route"]["form"]=$_GET["form"]=$Item["_form"]; $_ENV["route"]["controller"]="form";}
     if (isset($Item["_item"])) {$_ENV["route"]["item"]=$_GET["item"]=$Item["_item"];}
     $Item=wbCallFormFunc("BeforeShowItem",$Item,$form,$_REQUEST["mode"]);
@@ -169,10 +190,27 @@ function ajax__buildfields() {
 	foreach($_POST["dict"] as $dict) {
 		$dict["value"]=htmlspecialchars($dict["value"]);
 		$res=wbFieldBuild($dict,$data);
-		echo $res;
+		return $res;
 	}
 	die;
 }
+
+
+function ajax__treeedit() {
+    $out=wbGetForm("common","tree_edit");
+    $out->wbSetData($_POST);
+		$arr=array();
+		foreach($_POST["fields"] as $dict) {
+			if (isset($dict["name"]) AND !in_array($dict["name"],$arr)) {
+					$dict["value"]=htmlspecialchars($dict["value"]);
+					$res=wbFieldBuild($dict,$_POST["data"]);
+		            $out->find(".treeData form")->append($res);
+					$arr[]=$dict["name"];
+			}
+		}
+    return $out->outerHtml();
+}
+
 
 function ajax__mailer() {
 	ajax__mail();
@@ -210,7 +248,7 @@ if ($_ENV["route"]["mode"]=="mailer") {
 	//Set an alternative reply-to address
 	$mail->addReplyTo($_POST["email"], $_POST["name"]);
 	//Set who the message is to be sent to
-	$mail->addAddress("oleg_frolov@mail.ru", $_ENV["settings"]["header"]);
+	$mail->addAddress($_SESSION["settings"]["email"], $_ENV["settings"]["header"]);
 	//Set the subject line
 	$mail->Subject = $_POST["subject"];
 	//Read an HTML message body from an external file, convert referenced images to embedded,
