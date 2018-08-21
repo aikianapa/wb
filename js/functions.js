@@ -704,9 +704,8 @@ function wb_tree() {
         });
 
     }
-}
-
-$.fn.treeDictChange = function() {
+    
+    $.fn.treeDictChange = function() {
     var dict = [];
     var tree = $(this).data("tree");
     $(this).find(".treeDict .wb-multiinput").each(function (i) {
@@ -736,7 +735,7 @@ $.fn.treeDictChange = function() {
     wb_multiinput();
 }
 
-function wb_tree_json_prep(data,dict) {
+    function wb_tree_json_prep(data,dict) {
 	var data = JSON.safeParse(data);
 	var values = {};
     $(data).each(function (j, d) {
@@ -769,6 +768,8 @@ function wb_tree_json_prep(data,dict) {
         });
     });
     return values;
+}
+
 }
 
 function wb_ajax_loader() {
@@ -851,6 +852,31 @@ function wb_multiinput() {
         $("body").find(".wb-multiinput-menu [data-toggle=dropdown]").trigger("click");
         return false;
     });
+    
+    $(document).undelegate(".wb-multiinput .wb-multiinput-del", "click");
+    $(document).delegate(".wb-multiinput .wb-multiinput-del", "click", function (e) {
+            var line = $(document).data("wb-multiinput");
+            var multi = $(line).parents("[data-wb-role=multiinput]");
+            console.log("Trigger: before_remove");
+            $(multi).trigger("before_remove", line);
+            $(line).remove();
+    });
+
+    $(document).undelegate(".wb-multiinput .wb-multiinput-add", "click");
+    $(document).delegate(".wb-multiinput .wb-multiinput-add", "click", function (e) {
+        var line = $(document).data("wb-multiinput");
+        var multi = $(line).parents("[data-wb-role=multiinput]");
+        var tpl = $($(multi).attr("data-wb-tpl")).html();
+        var row = $(document).data("wb-multiinput-row");
+        var name = $(multi).attr("name");
+        row = str_replace("{{template}}", tpl, row);
+        row = wb_setdata(row, {
+            "form": "procucts"
+            , "id": "_new"
+        }, true);
+        $(line).after(row);
+    });
+    
     $(document).undelegate(".wb-multiinput-menu .dropdown-item", "click");
     $(document).delegate(".wb-multiinput-menu .dropdown-item", "click", function (e) {
         var line = $(document).data("wb-multiinput");
