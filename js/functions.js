@@ -832,7 +832,11 @@ function wb_multiinput() {
         });
     }
     if ($("[data-wb-role=multiinput]").length) {
-        $("[data-wb-role=multiinput]").sortable();
+        $("[data-wb-role=multiinput]").sortable({
+            update: function(e) {
+                wb_multiinput_sort(e.target);
+            }
+        });
     }
     $(document).undelegate(".wb-multiinput", "mouseenter");
     $(document).delegate(".wb-multiinput", "mouseenter", function () {
@@ -912,6 +916,7 @@ function wb_multiinput() {
 
 function wb_multiinput_sort(mi) {
     var name = $(mi).attr("name");
+    var last = null;
     $(mi).find(".wb-multiinput").each(function (i) {
         $(this).find("input,select,textarea").each(function () {
             if ($(this).attr("data-wb-field") > "") {
@@ -924,8 +929,10 @@ function wb_multiinput_sort(mi) {
                 $(this).attr("name", name + "[" + i + "][" + field + "]");
                 $(this).attr("data-wb-field", field);
             }
+            last = this;
         });
     });
+    if (last!==null) {$(last).trigger("change");}
 }
 
 function wb_base_fix() {
