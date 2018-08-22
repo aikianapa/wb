@@ -13,7 +13,7 @@
             <div class="modal-body">
                 <form id="{{_GET[form]}}EditForm" data-wb-form="{{_GET[form]}}" data-wb-item="{{_GET[item]}}" class="form-horizontal" role="form">
                     <div class="row">
-                        <div class="col-md-5 col-12">
+                        <div class="col-md-5 col-12 tree-view">
                             <div class="form-group row">
                                 <label class="col-sm-3 form-control-label">Имя записи</label>
                                 <div class="col-sm-9">

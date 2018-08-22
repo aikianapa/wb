@@ -1,5 +1,5 @@
 	<div class="col-sm-12" data-wb-role="multiinput" name="fields">
-		<div class="row">
+
 			<div class="col-sm-3 col-xs-12">
 				<input class="form-control" placeholder="Имя поля" type="text" name="name">
 			</div>
@@ -48,5 +48,5 @@
 			<div class="col-sm-5 col-xs-12">
 				<input class="form-control" placeholder="Стиль CSS" type="text" name="style">
 			</div>
-		</div>
+
 	</div>

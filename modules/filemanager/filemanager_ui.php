@@ -13,8 +13,8 @@
                 <button id="pickfiles" class="btn btn-default btn-block mg-b-20">Загрузить файлы</button>
             </div>
         </div>
-            
-            
+
+
             <label class="content-left-label">Действия</label>
             <ul class="nav mg-t-1-force">
                 <li class="nav-item">
@@ -347,7 +347,7 @@
     #filemanager #list .fa.z:before {
         content: "\f1c6";
     }
-    
+
     #filemanager .content-left {
         position:fixed;
         top:inherit;

@@ -47,11 +47,10 @@ function ajax__settings() {
 function ajax__cache_clear() {
     $path=$_ENV["dba"]."/_cache";
     $files=wbListFiles($path);
-    print_r($_POST["data"]);
     foreach($files as $file) {
         $user=md5($_SESSION["user_id"]);
         if (substr($file,0,strlen($user))==$user) {
-            if (!in_array($file,$_POST["data"])) {
+            if (isset($_POST["data"]) && is_array($_POST["data"]) && !in_array($file,$_POST["data"])) {
                 // если файл не в списке присутствующих на эеране списков, то удаляем
                 unlink($path."/".$file);
             } 
@@ -213,17 +212,20 @@ function ajax__treeedit() {
 
 
 function ajax__mailer() {
-	ajax__mail();
+	return ajax__mail();
 }
 
 function ajax__mail() {
-if (!isset($_POST["subject"])) {$_POST["subject"]="Письмо с сайта";}
+if (!isset($_POST["_subject"])) {$_POST["_subject"]="Письмо с сайта";}
 if (isset($_POST["_tpl"])) {$out=wbGetTpl($_POST["_tpl"]);}
 		elseif (isset($_POST["_form"])) {$out=wbGetTpl($_POST["_form"]);}
+        elseif (isset($_POST["_message"])) {$out=wbFromString($_POST["_message"]);}
 		else {$out=wbGetTpl("mail.php");}
 if (!isset($_POST["email"])) {$_POST["email"]=$_ENV["route"]["mode"]."@".$_ENV["route"]["host"];}
 if (!isset($_POST["name"])) {$_POST["name"]="Site Mailer";}
 
+if (isset($_POST["_mailto"])) {$mailto=$_POST["_mailto"];} else {$mailto = $_ENV["settings"]["email"];}
+    
 $out->wbSetData($_POST);
 $out=$out->outerHtml();
 
@@ -248,9 +250,9 @@ if ($_ENV["route"]["mode"]=="mailer") {
 	//Set an alternative reply-to address
 	$mail->addReplyTo($_POST["email"], $_POST["name"]);
 	//Set who the message is to be sent to
-	$mail->addAddress($_SESSION["settings"]["email"], $_ENV["settings"]["header"]);
+	$mail->addAddress($mailto, $_ENV["settings"]["header"]);
 	//Set the subject line
-	$mail->Subject = $_POST["subject"];
+	$mail->Subject = $_POST["_subject"];
 	//Read an HTML message body from an external file, convert referenced images to embedded,
 	//convert HTML into a basic plain-text alternative body
 	$mail->msgHTML($out, dirname(__FILE__));
@@ -260,21 +262,23 @@ if ($_ENV["route"]["mode"]=="mailer") {
 	//Attach an image file
 	//$mail->addAttachment('images/phpmailer_mini.png');
 	//send the message, check for errors
-	$res=$mail->send();
+	$mail->send();
 	$error=$mail->ErrorInfo;
+    if ($error>"") {$res=false;} else {$res=true;}
 } else {
 	$headers  = 'MIME-Version: 1.0' . "\r\n";
 	$headers .= 'Content-type: text/html; charset=utf-8' . "\r\n";
-	$res=mail($_ENV["settings"]["email"], $_POST["subject"], $out,$headers);
-	$error="unknown";
+	$res=mail($mailto, $_POST["subject"], $out,$headers);
+	$error=error_get_last()['message'];
 }
 if (!$res) {
-    echo "Ошибка отправки: " . $error;
+    $result=json_encode(array("error"=>true,"msg"=>"Ошибка отправки сообщения: ".$error));
 } else {
-    echo "Сообщение отрпавлено!";
+    $result=json_encode(array("error"=>false,"msg"=>"Сообщение отправлено!"));
 }
 if (isset($_POST["callback"]) AND is_callable($_POST["_callback"])) {
-	@$_POST["_callback"]($res);
+	@$_POST["_callback"]($result);
 }
+    return $result;
 }
 ?>

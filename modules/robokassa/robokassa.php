@@ -1,4 +1,4 @@
-<?
+<?php
 
 function robokassa__init()
 {
@@ -23,7 +23,7 @@ function robokassa__checkout() {
     if (count($order["items"]) AND $order["total"]>0) wbItemSave("orders",$order);
     //$SETT=$_SESSION["settings"]["robokassa"];
     $SETT=robokassa__getsett();
-	$test_mode = $SETT['test']; 
+	$test_mode = $SETT['test'];
 	$success_url = "http://{$_SERVER['HTTP_HOST']}/{$_GET["form"]}/success/{$order['id']}.htm";
 	$fail_url = "http://{$_SERVER['HTTP_HOST']}/{$_GET["form"]}/fail/{$order['id']}.htm";
 	$result_url = $_ENV["route"]["hostp"]."/module/robokassa/result/{$order['id']}";
@@ -75,7 +75,7 @@ function robokassa__success() {
     if (isset($_ENV["settings"]["robokassa"]["fail"]) AND $_ENV["settings"]["robokassa"]["fail"]>"") {
         $fail=$_ENV["settings"]["robokassa"]["fail"];
     } else {$fail="/fail";}
-    
+
 	if (strtoupper($my_crc) == strtoupper($crc)) {
 		$order["active"]="on";
 		$order["payed"]="on";
@@ -127,7 +127,7 @@ function robokassa__result() {
 		$_SESSION["order_id"]=wbNewId();
         setcookie("order_id","",time()-3600,"/"); unset($_COOKIE["order_id"]);
     }
-	
+
 	echo "OK{$mrh['inv_id']}\n";
 }
 

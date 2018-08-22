@@ -3,7 +3,7 @@ require_once (__DIR__."/kiDom.php");
 require_once (__DIR__."/wbapp.php");
 
 function wbInit() {
-    error_reporting( error_reporting() & ~E_NOTICE );
+  error_reporting( error_reporting() & ~E_NOTICE );
 	wbErrorList();
 	wbTrigger("func",__FUNCTION__,"before");
 	wbInitEnviroment();
@@ -11,7 +11,7 @@ function wbInit() {
 	wbInitFunctions();
 	wbRouterAdd();
 	wbRouterGet();
-    wbTableList();
+  wbTableList();
 }
 
 function wbInitEnviroment() {
@@ -327,7 +327,6 @@ function wbTableCreate($table="data",$engine=false) {
   return $table;
 }
 
-
 function wbTableRemove($table=null,$engine=false) {
   $res=false;
   if (wbRole("admin")) {
@@ -347,7 +346,6 @@ function wbTableRemove($table=null,$engine=false) {
   }
   return $res;
 }
-
 
 function wbTableExist($table) {
     if (is_file($_ENV["dba"]."/".$table.".json")) {

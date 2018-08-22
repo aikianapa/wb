@@ -1261,15 +1261,14 @@ abstract class kiNode
                     }
 			}; unset($inc);
             $this->includeTag($Item);
-			$this->wbSetValues($Item);
-			//$this->contentLoop($Item);
-			$this->wbPlugins($Item);
-			$this->wbTargeter($Item);
+      			$this->wbSetValues($Item);
+      			$this->contentLoop($Item);
+      			$this->wbPlugins($Item);
             if ($this->find("data-wb-role:not(.wb-done)")->length) {
                 $this->wbSetData($Item);
             }
             $this->includeTextarea($Item);
-        
+            $this->wbTargeter($Item);
             $this->find(".wb-value")->removeClass("wb-value");
             gc_collect_cycles();
 	}
@@ -1400,7 +1399,7 @@ abstract class kiNode
 		$res=FALSE;
 		$tags=wbControls("tags");
 		foreach($tags as $tag) {
-			if ($this->hasRole($tag)) {$res=$tag; return $res;}
+			if ($this->hasRole($tag) AND !$this->hasClass("wb-done")) {$res=$tag; return $res;}
 		}; unset($tag);
 		return $res;
 	}
@@ -1418,7 +1417,7 @@ abstract class kiNode
 	}
 
 	function wbTargeter($Item=array()) {
-        $controls=wbControls("target");
+    $controls=wbControls("target");
 		$tar=$this->find($controls);
 		$attr=(explode(",",str_replace(array("[","]"," "),array("","",""),$controls)));
 		foreach($tar as $inc) {
@@ -1429,7 +1428,7 @@ abstract class kiNode
                         $$attribute=$inc->attr($attribute);
                         $com=str_replace("data-wb-","",$attribute);
                         if ($$attribute>"" ) {
-                            if ($this->find($$attribute)) {
+                            if ($this->find($$attribute)->length) {
                                 $inc->removeAttr($attribute);
                                 if ($com=="replace") {$com="replaceWith";}
                                 if ($com>"") {
@@ -1466,7 +1465,7 @@ abstract class kiNode
 	}
 
 	public function contentLoop($Item) {
-		$res=0; $list=new IteratorIterator($this->find("*"));
+		$res=0; $list=new IteratorIterator($this->find("[role],[data-wb-role]"));
 		foreach($list as $inc) {
 			$tag=$inc->wbCheckTag();
 			if (!$tag==FALSE && !$inc->hasClass("wb-done")) {$inc->wbProcess($Item,$tag); }
@@ -1511,7 +1510,7 @@ abstract class kiNode
 			}
 			$list=$this->find("input,select,textarea");
 			foreach($list as $inp) {
-                if (!$inp->hasClass("wb-value")) {
+                if (!$inp->hasClass("wb-value") AND !$inp->parents("script[type='text/template']")->length) {
                     $inp->wbSetAttributes($Item);
                     $from=$inp->attr("data-wb-from");
                     $name=$inp->attr("name");	$def=$inp->attr("value");
@@ -1553,7 +1552,7 @@ abstract class kiNode
                             }
                     };
                     $inp->wbSetMultiValue($Item);
-                
+
                 }
             }
 			unset($list);

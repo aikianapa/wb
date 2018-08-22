@@ -135,7 +135,7 @@ label.switch-primary input:checked+span {
     padding: 2px 60px 2px 30px;
 }
 
-.wb-multiinput [class^='col-'] {
+.wb-multiinput [class^='col-'], .wb-multiinput .col {
     padding: 0 5px;
 }
 
@@ -193,6 +193,11 @@ font-family: FontAwesome;
     right:0;
 }
 
+#tree_edit .tree-view {
+    height: calc(100vh - 140px);
+    overflow: auto;
+}
+    
 .tree-edit.modal {
     box-shadow: -5px 0px 2px #00000066;
 }

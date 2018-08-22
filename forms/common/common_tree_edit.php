@@ -1,4 +1,3 @@
-
 <div class="modal tree-edit" id="tree_{{form}}_{{name}}" data-keyboard="false" data-backdrop="false" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
 	<div class="modal-content">

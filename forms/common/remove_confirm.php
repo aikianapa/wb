@@ -25,8 +25,8 @@
 </div>
 <script data-wb-tag="success" language="javascript">
 	if ($("[data-wb-table='{{_GET[form]}}']").length) {
-		$("[data-wb-table='{{_GET[form]}}'] [item='{{_GET[item]}}']").remove();
+		$("[data-wb-table='{{_GET[form]}}'] [idx='{{_GET[item]}}']").remove();
 	} else {
-		$(document).find("[item='{{_GET[item]}}']").remove();	
+		$(document).find("[idx='{{_GET[item]}}']").remove();	
 	}
 </script>

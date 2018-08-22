@@ -63,7 +63,7 @@
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 form-control-label">Аватар</label>
-                                <div class="col-sm-3">
+                                <div class="col-auto">
                                     <input type="hidden" name="avatar" data-wb-role="uploader"> </div>
                             </div>
                         </div>

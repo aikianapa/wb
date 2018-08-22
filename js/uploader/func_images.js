@@ -80,24 +80,24 @@ jQuery.fn.wbUploaderInit = function() {
 			}
 		}
 		});
-		uploader.init(); 
+		uploader.init();
 }
 
 
 jQuery.fn.wbUploaderResizer = function() {
    if ($(this).hasClass("single")) {
         var img=$(this).find(".gallery > li:first-child > img");
+				var that = this;
         if ($(img).length) {
-            var height=$(img).attr("height");
-            var width=$(img).attr("width");
-            $(img).css("height",height).css("width",width);
-            $(this).find(".moxie-shim").css({"height":height,"width":width,"background":"transparent"});
-            $(this).find(".gallery").css({"height":"auto","width":"auto"});
-        } else {
-            $(this).find(".moxie-shim").css({"height":"120px","width":"160px"});
-            $(this).find(".gallery").css({"height":"120px","width":"160px"});
-
+						setTimeout(function(){
+								var width=$(img).width();
+		            var height=$(img).height();
+		            $(that).find(".moxie-shim").css({"height":height,"width":width,"background":"transparent"});
+		            $(that).find(".gallery").css({"height":"auto","width":"auto"});
+						},500);
         }
+   } else {
+       $(this).find(".moxie-shim").css({"width":"100%"});
    }
 }
 

@@ -1,10 +1,21 @@
 "use strict";
 	var wbapp= new Object();
+    wbapp.ajaxWait = function (options) {wb_ajaxWait([options],function(){return true;});}
+    wbapp.getWait = function (url,data,func) {wb_ajaxWait([{
+			async: false, type: 'GET', data: data, url: url
+			,success: function(data) {if (func!==undefined) {func(data);}}
+    }],function(){return true;});}
+    wbapp.postWait = function (url,data,func) {wb_ajaxWait([{
+			async: false, type: 'POST', data: data, url: url
+			,success: function(data) {if (func!==undefined) {func(data);}}
+    }],function(){return true;});}
+
 	wbapp.settings = wb_settings();
 	wbapp.getTree = function (tree,branch,parent,childrens) {return wb_gettree(tree,branch,parent,childrens);}
 	wbapp.getTreeDict = function (tree,branch,parent,childrens) {return wb_gettreedict(tree);}
 	wbapp.merchantModal = function(mode) {return wb_merchant_modal(mode);}
 	wbapp.newId = function(separator,prefix) {return wb_newid(separator,prefix);}
+
 	if ($("[data-wb-role=cart]").length) {wbapp.cart = wb_getcart();}
 	$(document).trigger("wbapp");
 
@@ -22,18 +33,11 @@ function wb_delegates() {
 function wb_settings() {
 	if ($(document).data("settings")!==undefined) {return $(document).data("settings");}
 	var settings=null;
-	wb_ajaxWait([{
-			async: false
-			, type: 'GET'
-			, url: "/ajax/settings/"
-			, success: function (data) {
+	wbapp.getWait("/ajax/settings/", {}, function (data) {
 					settings = $.parseJSON(base64_decode(data));
 					$(document).data("settings",settings);
-			}
-   }], function() {
-		 // без functions результат не возвращается
-	 });
-	 return settings;
+	});
+    return settings;
 }
 
 function wb_gettree(tree,branch,parent,childrens) {
@@ -41,30 +45,18 @@ function wb_gettree(tree,branch,parent,childrens) {
     if (parent==undefined) {var parent=true;}
     if (childrens==undefined) {var childrens=true;}
     if (tree==undefined) return;
-    var defer = $.ajax({
-        async: false
-        , type: 'POST'
-        , data: {tree,branch,parent,childrens}
-        , url: "/ajax/gettree/"
-        , success: function (data) {
-            tree = $.parseJSON(base64_decode(data));
-        }
-    });
-    return tree;
+	wbapp.postWait("/ajax/settings/", {tree,branch,parent,childrens}, function (data) {
+        tree = $.parseJSON(base64_decode(data));
+        return tree;
+	});
 }
 
 function wb_gettreedict(tree) {
     if (tree==undefined) return;
-    var defer = $.ajax({
-        async: false
-        , type: 'POST'
-        , data: {tree}
-        , url: "/ajax/gettreedict/"
-        , success: function (data) {
-            tree = $.parseJSON(base64_decode(data));
-        }
-    });
-    return tree;
+	wbapp.postWait("/ajax/gettreedict/", {tree}, function (data) {
+        dict = $.parseJSON(base64_decode(data));
+        return dict;
+	});
 }
 
 function wb_getcart() {
@@ -390,19 +382,19 @@ function wb_get_cdata(cdata) {
 
 function wb_tree() {
     if ($(document).data("wb-tree-rowmenu") == undefined && $(".wb-tree").length) {
-        $.get("/ajax/getform/common/tree_rowmenu/", function (data) {
+        wbapp.getWait("/ajax/getform/common/tree_rowmenu/", {}, function (data) {
             $(document).data("wb-tree-rowmenu", data);
         });
-        $.get("/ajax/getform/common/tree_row/", function (data) {
+        wbapp.getWait("/ajax/getform/common/tree_row/", {}, function (data) {
             $(document).data("wb-tree-row", data);
         });
-        $.get("/ajax/getform/common/tree_ol/", function (data) {
+        wbapp.getWait("/ajax/getform/common/tree_ol/", {}, function (data) {
             $(document).data("wb-tree-ol", data);
         });
-        $.get("/ajax/getform/common/tree_edit/", function (data) {
+        wbapp.getWait("/ajax/getform/common/tree_edit/", {}, function (data) {
             $(document).data("wb-tree-edit", data);
         });
-        $.get("/ajax/getform/common/tree_dict/", function (data) {
+        wbapp.getWait("/ajax/getform/common/tree_dict/", {}, function (data) {
             $(document).data("wb-tree-dict", data);
         });
     }
@@ -498,7 +490,9 @@ function wb_tree() {
             var w = e;
             var relativeX = (w.clientX - 10);
             var relativeY = (w.clientY - 10);
-            relativeY -= $(e.target).parents(".modal-content").children(".modal-header").height();
+            if ($(e.target).parents(".modal-content").children(".modal-header").length) {
+                relativeY -= $(e.target).parents(".modal-content").children(".modal-header").height();
+            }
             if ($(e.target).parents("#adminTree.tab-pane").length) {relativeY-=($(".kt-pagetitle").offset().top+$(".kt-pagetitle").height());}
             $(".wb-tree-item").find(".wb-tree-menu").css("left", relativeX + "px").css("top", relativeY + "px");
             $(".wb-tree-item").find(".wb-tree-menu [data-toggle=dropdown]").trigger("click");
@@ -704,7 +698,7 @@ function wb_tree() {
         });
 
     }
-    
+
     $.fn.treeDictChange = function() {
     var dict = [];
     var tree = $(this).data("tree");
@@ -824,116 +818,123 @@ function wb_newid(separator,prefix) {
 
 function wb_multiinput() {
     if ($("[data-wb-role=multiinput]").length && $(document).data("wb-multiinput-menu") == undefined) {
-        $.get("/ajax/getform/common/multiinput_menu/", function (data) {
-            $(document).data("wb-multiinput-menu", data);
-        });
-        $.get("/ajax/getform/common/multiinput_row/", function (data) {
-            $(document).data("wb-multiinput-row", data);
-        });
-    }
-    if ($("[data-wb-role=multiinput]").length) {
-        $("[data-wb-role=multiinput]").sortable({
-            update: function(e) {
-                wb_multiinput_sort(e.target);
+
+        wbapp.getWait("/ajax/getform/common/multiinput_menu/",{},function(data) {
+                $(document).data("wb-multiinput-menu", data);
             }
-        });
+        );
+
+        wbapp.getWait("/ajax/getform/common/multiinput_row/",{},function(data) {
+                $(document).data("wb-multiinput-row", data);
+            }
+        );
     }
-    $(document).undelegate(".wb-multiinput", "mouseenter");
-    $(document).delegate(".wb-multiinput", "mouseenter", function () {
-        $(document).data("wb-multiinput", this);
-    });
-    $(document).undelegate(".wb-multiinput", "mouseleave");
-    $(document).delegate(".wb-multiinput", "mouseleave", function () {
-        //    $("body").find(".wb-multiinput-menu").remove();
-    });
-    $(document).undelegate(".wb-multiinput", "contextmenu");
-    $(document).delegate(".wb-multiinput", "contextmenu", function (e) {
-        $("body").find(".wb-multiinput-menu").remove();
-        $("body").append("<div class='wb-multiinput-menu'>" + $(document).data("wb-multiinput-menu") + "</div>");
-        var relativeX = (e.clientX - 10);
-        var relativeY = (e.clientY - 10);
-        $("body").find(".wb-multiinput-menu").css("left", relativeX + "px").css("top", relativeY + "px");
-        $("body").find(".wb-multiinput-menu [data-toggle=dropdown]").trigger("click");
-        return false;
-    });
-    
-    $(document).undelegate(".wb-multiinput .wb-multiinput-del", "click");
-    $(document).delegate(".wb-multiinput .wb-multiinput-del", "click", function (e) {
+
+    $.fn.wbMultiInpitEvents  = function() {
+        var $multi = this;
+        $(document).undelegate(".wb-multiinput", "mouseenter");
+        $(document).delegate(".wb-multiinput", "mouseenter", function () {
+            $(document).data("wb-multiinput", this);
+        });
+        $(document).undelegate(".wb-multiinput", "mouseleave");
+        $(document).delegate(".wb-multiinput", "mouseleave", function () {
+            //    $("body").find(".wb-multiinput-menu").remove();
+        });
+        $(document).undelegate(".wb-multiinput", "contextmenu");
+        $(document).delegate(".wb-multiinput", "contextmenu", function (e) {
+            $("body").find(".wb-multiinput-menu").remove();
+            $("body").append("<div class='wb-multiinput-menu'>" + $(document).data("wb-multiinput-menu") + "</div>");
+            var relativeX = (e.clientX - 10);
+            var relativeY = (e.clientY - 10);
+            $("body").find(".wb-multiinput-menu").css("left", relativeX + "px").css("top", relativeY + "px");
+            $("body").find(".wb-multiinput-menu [data-toggle=dropdown]").trigger("click");
+            return false;
+        });
+
+        $(document).undelegate(".wb-multiinput .wb-multiinput-del", "click");
+        $(document).delegate(".wb-multiinput .wb-multiinput-del", "click", function (e) {
+                var line = $(document).data("wb-multiinput");
+                var multi = $(line).parents("[data-wb-role=multiinput]");
+                console.log("Trigger: before_remove");
+                $(multi).trigger("before_remove", line);
+                $(line).remove();
+        });
+
+        $(document).undelegate(".wb-multiinput .wb-multiinput-add", "click");
+        $(document).delegate(".wb-multiinput .wb-multiinput-add", "click", function (e) {
             var line = $(document).data("wb-multiinput");
             var multi = $(line).parents("[data-wb-role=multiinput]");
-            console.log("Trigger: before_remove");
-            $(multi).trigger("before_remove", line);
-            $(line).remove();
-    });
-
-    $(document).undelegate(".wb-multiinput .wb-multiinput-add", "click");
-    $(document).delegate(".wb-multiinput .wb-multiinput-add", "click", function (e) {
-        var line = $(document).data("wb-multiinput");
-        var multi = $(line).parents("[data-wb-role=multiinput]");
-        var tpl = $($(multi).attr("data-wb-tpl")).html();
-        var row = $(document).data("wb-multiinput-row");
-        var name = $(multi).attr("name");
-        row = str_replace("{{template}}", tpl, row);
-        row = wb_setdata(row, {
-            "form": "procucts"
-            , "id": "_new"
-        }, true);
-        $(line).after(row);
-    });
-    
-    $(document).undelegate(".wb-multiinput-menu .dropdown-item", "click");
-    $(document).delegate(".wb-multiinput-menu .dropdown-item", "click", function (e) {
-        var line = $(document).data("wb-multiinput");
-        var multi = $(line).parents("[data-wb-role=multiinput]");
-        var tpl = $($(multi).attr("data-wb-tpl")).html();
-        var row = $(document).data("wb-multiinput-row");
-        var name = $(multi).attr("name");
-        row = str_replace("{{template}}", tpl, row);
-        row = wb_setdata(row, {
-            "form": "procucts"
-            , "id": "_new"
-        }, true);
-        if ($(this).attr("href") == "#after") {
+            var tpl = $($(multi).attr("data-wb-tpl")).html();
+            var row = $(document).data("wb-multiinput-row");
+            var name = $(multi).attr("name");
+            row = str_replace("{{template}}", tpl, row);
+            row = wb_setdata(row, {
+                "form": "procucts"
+                , "id": "_new"
+            }, true);
             $(line).after(row);
-        }
-        if ($(this).attr("href") == "#before") {
-            $(line).before(row);
-        }
-        if ($(this).attr("href") == "#remove") {
-            console.log("Trigger: before_remove");
-            $(multi).trigger("before_remove", line);
-            $(line).remove();
-        }
-        if (!$(multi).find(".wb-multiinput").length) {
-            $(multi).append(row);
-        }
-        wb_multiinput_sort(multi);
-        $(multi).trigger("multiinput", multi, this);
-        wb_plugins();
-        e.preventDefault();
-    });
+        });
+
+        $(document).undelegate(".wb-multiinput-menu .dropdown-item", "click");
+        $(document).delegate(".wb-multiinput-menu .dropdown-item", "click", function (e) {
+            var line = $(document).data("wb-multiinput");
+            var multi = $(line).parents("[data-wb-role=multiinput]");
+            var tpl = $($(multi).attr("data-wb-tpl")).html();
+            var row = $(document).data("wb-multiinput-row");
+            var name = $(multi).attr("name");
+            row = str_replace("{{template}}", tpl, row);
+            row = wb_setdata(row, {
+                "form": "procucts"
+                , "id": "_new"
+            }, true);
+            if ($(this).attr("href") == "#after") {
+                $(line).after(row);
+            }
+            if ($(this).attr("href") == "#before") {
+                $(line).before(row);
+            }
+            if ($(this).attr("href") == "#remove") {
+                console.log("Trigger: before_remove");
+                $(multi).trigger("before_remove", line);
+                $(line).remove();
+            }
+            if (!$(multi).find(".wb-multiinput").length) {
+                $(multi).append(row);
+            }
+            $(multi).wbMultiInpitSort();
+            $(multi).trigger("multiinput", multi, this);
+            wb_plugins();
+            e.preventDefault();
+        });
+    }
+
+    $.fn.wbMultiInpitSort  = function() {
+        var name = $(this).attr("name");
+        var last = null;
+        $(this).find(".wb-multiinput").each(function (i) {
+            $(this).find("input,select,textarea").each(function () {
+                if ($(this).attr("data-wb-field") > "") {
+                    var field = $(this).attr("data-wb-field");
+                }
+                else {
+                    var field = $(this).attr("name");
+                }
+                if (field !== undefined && field > "") {
+                    $(this).attr("name", name + "[" + i + "][" + field + "]");
+                    $(this).attr("data-wb-field", field);
+                }
+                last = this;
+            });
+        });
+        if (last!==null) {$(last).trigger("change");}
+    }
+
+		if ($("[data-wb-role=multiinput]").length) {
+			$("[data-wb-role=multiinput]").sortable( { update: function(e) {$(e.target).wbMultiInpitSort();} } );
+    	$("[data-wb-role=multiinput]").wbMultiInpitEvents();
+		}
 }
 
-function wb_multiinput_sort(mi) {
-    var name = $(mi).attr("name");
-    var last = null;
-    $(mi).find(".wb-multiinput").each(function (i) {
-        $(this).find("input,select,textarea").each(function () {
-            if ($(this).attr("data-wb-field") > "") {
-                var field = $(this).attr("data-wb-field");
-            }
-            else {
-                var field = $(this).attr("name");
-            }
-            if (field !== undefined && field > "") {
-                $(this).attr("name", name + "[" + i + "][" + field + "]");
-                $(this).attr("data-wb-field", field);
-            }
-            last = this;
-        });
-    });
-    if (last!==null) {$(last).trigger("change");}
-}
 
 function wb_base_fix() {
     if ($("base").length) {
@@ -1605,7 +1606,7 @@ function wb_check_email(email) {
 function wb_check_required(form) {
     var res = true;
     var idx = 0;
-    $(form).find("input[required],select[required],textarea[required],[type=password],[minlength]").each(function (i) {
+    $(form).find("[required],[type=password],[minlength]").each(function (i) {
         idx++;
         $(this).data("idx", idx);
         if ($(this).is(":not([disabled],[type=checkbox]):visible")) {
@@ -1654,14 +1655,30 @@ function wb_check_required(form) {
 }
 
 function wb_ajax() {
-
-
+    var that = this;
 	var wb_ajax_process = function(that) {
         wb_ajax_loader();
         var link = that;
         var src = $(that).attr("data-wb-ajax");
-        var call = $(that).attr("data-wb-ajax-done");
+        var start = $(that).attr("data-wb-ajax-start");
+        var done = $(that).attr("data-wb-ajax-done");
         var flag = true;
+        var data = {};
+        if ($(that).parents("form").length) {form = $(that).parents("form");}
+        if ($(that).is("form").length) {form = $(that);}
+        data = $(form).serializeArray();
+        if (data["_tpl"]==undefined && data["_form"]==undefined && $(that).attr("data-automail")!=="false") {
+            var data = {
+                _message: $(form).wbMailForm()
+            };
+        }
+
+        if (start !== undefined && is_callable(start)) {
+            console.log(start);
+            (eval(start))(link, src, data);
+        }
+        console.log("wb_ajax_start");
+        $(document).trigger("wb_ajax_start", [link, src, data]);
         if (src > "") {
             var ajax = {};
             if ($(that).attr("data-wb-tpl") !== undefined) {
@@ -1719,9 +1736,10 @@ function wb_ajax() {
                             $("#" + $(this).attr("id")).modal();
                         }
                     });
-                    if (call !== undefined && is_callable(call)) {
-                        (eval(call))(link, src, data);
+                    if (done !== undefined && is_callable(done)) {
+                        (eval(done))(link, src, data);
                     }
+                    console.log("wb_ajax_start");
                     $(document).trigger("wb_ajax_done", [link, src, data]);
                     wb_plugins();
                     wb_delegates();
@@ -1758,6 +1776,28 @@ function wb_ajax() {
 		}
     });
 }
+
+$.fn.wbMailForm = function() {
+    // создание автописьма из формы
+    var tpl = "";
+    $(this).find(":input").each(function(){
+        if (!$(this).is("[type=button]") && !$(this).is("[data-mail=false]")) {
+            var label = "";
+            var value = "";
+            if ($(this).attr("placeholder")!==undefined) {label=$(this).attr("placeholder");}
+            if ($(this).prev("label").length && $(this).prev("label").text()>"") {label=$(this).prev("label").text();}
+            if ($(this).parent("label").length && $(this).parent("label").text()>"") {label=$(this).parent("label").text();}
+            if ($(this).attr("data-label")!==undefined) {label=$(this).attr("data-label");}
+            if ($(this).is("textarea")) {value=$(this).val();} else {value=$(this).val();}
+            label="<b>"+trim(strip_tags(label))+"</b>: ";
+            value=trim(strip_tags(value));
+            if (value> " ") {tpl+=label+value+"<br>\n\r";}
+        }
+    });
+    return tpl;
+}
+
+
 $(document).unbind("wb_required_false");
 $(document).on("wb_required_false", function (event, that, text) {
     var delay = (4000 + $(that).data("idx") * 250) * 1;
