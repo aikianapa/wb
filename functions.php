@@ -20,24 +20,25 @@ function wbInitEnviroment() {
   if (!isset($_SESSION["trigger"])) {$_SESSION["trigger"]=array();}
   if (!isset($_SESSION["order_id"]) OR $_SESSION["order_id"]=="") {$_SESSION["order_id"]=wbNewId();$new=true;} else {$new=false;}
 	wbTrigger("func",__FUNCTION__,"before");
-	$_ENV["path_engine"]=__DIR__;
-	$_ENV["path_app"]=$_SERVER["DOCUMENT_ROOT"];
-	$_ENV["dbe"]=__DIR__."/database"; 			// Engine data
+  $_ENV["path_app"]=$_SERVER["DOCUMENT_ROOT"];
+	$_ENV["path_engine"]=$_ENV["path_app"]."/engine";
+  $_ENV["path_tpl"]=$_ENV["path_app"]."/tpl";
+	$_ENV["dbe"]=$_ENV["path_engine"]."/database"; 			// Engine data
 	$_ENV["dba"]=$_ENV["path_app"]."/database";	// App data
-	$_ENV["dbec"]=__DIR__."/database/_cache"; 			// Engine data
+	$_ENV["dbec"]=$_ENV["path_engine"]."/database/_cache"; 			// Engine data
 	$_ENV["dbac"]=$_ENV["path_app"]."/database/_cache";	// App data
 	$_ENV["error"]=array();
 	$_ENV["env_id"]=$_ENV["new_id"]=wbNewId();
-    $_ENV["datetime"]=date("Y-m-d H:i:s");
+  $_ENV["datetime"]=date("Y-m-d H:i:s");
 	$_ENV["forms"]=wbListForms(false);
-    $_ENV["modules"]=wbListModules();
-    $_ENV["tables"]=wbTableList();
-    $_ENV["thumb_width"]=200;
-    $_ENV["thumb_height"]=160;
-    $_ENV["intext_width"]=320;
-    $_ENV["intext_height"]=240;
-    $_ENV["page_size"]=15;
-    wbCheckWorkspace();
+  $_ENV["modules"]=wbListModules();
+  $_ENV["tables"]=wbTableList();
+  $_ENV["thumb_width"]=200;
+  $_ENV["thumb_height"]=160;
+  $_ENV["intext_width"]=320;
+  $_ENV["intext_height"]=240;
+  $_ENV["page_size"]=15;
+  wbCheckWorkspace();
 	$variables=array();
 	$settings=wbItemRead("admin","settings");
     if (!$settings) {$settings=array();} else {
@@ -48,6 +49,7 @@ function wbInitEnviroment() {
 	$_ENV["variables"]=$variables;
 	$settings=array_merge($settings,$variables);
 	$_ENV["settings"]=$settings;
+    if (isset($_ENV["settings"]["path_tpl"]) AND $_ENV["settings"]["path_tpl"]>"") $_ENV["path_tpl"]=$_ENV["settings"]["path_tpl"];
     if (isset($_ENV["settings"]["thumb_width"]) AND $_ENV["settings"]["thumb_width"]>"0") $_ENV["thumb_width"]=$_ENV["settings"]["thumb_width"];
     if (isset($_ENV["settings"]["thumb_height"]) AND $_ENV["settings"]["thumb_height"]>"0") $_ENV["thumb_height"]=$_ENV["settings"]["thumb_height"];
     if (isset($_ENV["settings"]["intext_width"]) AND $_ENV["settings"]["intext_width"]>"0") $_ENV["intext_width"]=$_ENV["settings"]["intext_width"];
@@ -766,7 +768,7 @@ function wbGetTpl($tpl=null,$path=false) {
 	if ($path==true) {
 		if (!$out AND is_file($_ENV["path_app"]."/{$tpl}")) {$out=wbFromFile($_ENV["path_app"]."/{$tpl}");}
 	} else {
-		if (!$out AND is_file($_ENV["path_app"]."/tpl/{$tpl}")) {$out=wbFromFile($_ENV["path_app"]."/tpl/{$tpl}");}
+		if (!$out AND is_file($_ENV["path_tpl"]."/{$tpl}")) {$out=wbFromFile($_ENV["path_tpl"]."/{$tpl}");}
 		if (!$out AND is_file($_ENV["path_engine"]."/tpl/{$tpl}")) {$out=wbFromFile($_ENV["path_engine"]."/tpl/{$tpl}");}
 	}
 	if ($out==null) wbErrorOut(wbError("func",__FUNCTION__,404,func_get_args()));
@@ -1784,7 +1786,7 @@ function wbClearValues($out) {
 }
 
 function wbListTpl() {
-	$dir=$_ENV["path_app"]."/tpl";
+	$dir=$_ENV["path_tpl"];
 	$list=array(); $result=array();
 	if (is_dir($dir)) {
 		$list=wbListFilesRecursive($dir,true);

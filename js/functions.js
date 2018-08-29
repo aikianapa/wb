@@ -1933,8 +1933,8 @@ function wb_pagination(pid) {
         var id = $(this).attr("id");
         var tplid = substr(id, 5);
         $(this).data("route",$(this).attr("data-wb-route")).removeAttr("data-wb-route");
-        if ($(this).is(":not([data-idx])")) {
-            $(this).attr("data-idx", idx);
+        if ($(this).is(":not([data-wb-idx])")) {
+            $(this).attr("data-wb-idx", idx);
         }
         /*
         if ($("[data-wb-tpl='" + tplid + "']").data("variables") == undefined) {
@@ -2398,13 +2398,6 @@ function getcookie(cookie_name) {
     }
 }
 
-    $(document).ready(function() {
-        "use strict";
-        if ($("link[rel$=less],style[rel$=less]").length) wb_include("/engine/js/less.min.js");
-        wb_alive();
-        wb_delegates();
-        $("body").removeClass("cursor-wait");
-    });
 function base64_decode( data ) {	// Decodes data encoded with MIME base64
 	//
 	// +   original by: Tyler Akins (http://rumkin.com)
@@ -2432,3 +2425,122 @@ function base64_decode( data ) {	// Decodes data encoded with MIME base64
 
 	return enc;
 }
+function base64_encode( str ) {
+
+    function decodeSurrogatePair(hi, lo) {
+        var resultChar = 0x010000;
+        resultChar += lo - 0xDC00;
+        resultChar += (hi - 0xD800) << 10;
+        return resultChar;
+    }
+
+    var bytes = [0, 0, 0];
+    var byteIndex = 0;
+    var result = [];
+
+    function output(s) {
+        result.push(s);
+    }
+
+    function emitBase64() {
+
+        var digits =
+                'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
+                'abcdefghijklmnopqrstuvwxyz' +
+                '0123456789+/';
+
+        function toDigit(value) {
+            return digits[value];
+        }
+
+        // --Byte 0--    --Byte 1--    --Byte 2--
+        // 1111  1122    2222  3333    3344  4444
+
+        var d1 = toDigit(bytes[0] >> 2);
+        var d2 = toDigit(
+            ((bytes[0] & 0x03) << 4) |
+            (bytes[1] >> 4));
+        var d3 = toDigit(
+            ((bytes[1] & 0x0F) << 2) |
+            (bytes[2] >> 6));
+        var d4 = toDigit(
+            bytes[2] & 0x3F);
+
+        if (byteIndex === 1) {
+            output(d1 + d2 + '==');
+        }
+        else if (byteIndex === 2) {
+            output(d1 + d2 + d3 + '=');
+        }
+        else {
+            output(d1 + d2 + d3 + d4);
+        }
+    }
+
+    function emit(chr) {
+        bytes[byteIndex++] = chr;
+        if (byteIndex == 3) {
+            emitBase64();
+            bytes[0] = 0;
+            bytes[1] = 0;
+            bytes[2] = 0;
+            byteIndex = 0;
+        }
+    }
+
+    function emitLast() {
+        if (byteIndex > 0) {
+            emitBase64();
+        }
+    }
+
+    // Converts the string to UTF8:
+
+    var i, chr;
+    var hi, lo;
+    for (i = 0; i < str.length; i++) {
+        chr = str.charCodeAt(i);
+
+        // Test and decode surrogate pairs in the string
+        if (chr >= 0xD800 && chr <= 0xDBFF) {
+            hi = chr;
+            lo = str.charCodeAt(i + 1);
+            if (lo >= 0xDC00 && lo <= 0xDFFF) {
+                chr = decodeSurrogatePair(hi, lo);
+                i++;
+            }
+        }
+
+        // Encode the character as UTF-8.
+        if (chr < 0x80) {
+            emit(chr);
+        }
+        else if (chr < 0x0800) {
+            emit((chr >> 6) | 0xC0);
+            emit(((chr >> 0) & 0x3F) | 0x80);
+        }
+        else if (chr < 0x10000) {
+            emit((chr >> 12) | 0xE0);
+            emit(((chr >>  6) & 0x3F) | 0x80);
+            emit(((chr >>  0) & 0x3F) | 0x80);
+        }
+        else if (chr < 0x110000) {
+            emit((chr >> 18) | 0xF0);
+            emit(((chr >> 12) & 0x3F) | 0x80);
+            emit(((chr >>  6) & 0x3F) | 0x80);
+            emit(((chr >>  0) & 0x3F) | 0x80);
+        }
+    }
+
+    emitLast();
+
+    return result.join('');
+}
+
+$(document).ready(function() {
+		"use strict";
+		if ($("link[rel$=less],style[rel$=less]").length) wb_include("/engine/js/less.min.js");
+		wb_alive();
+		wb_delegates();
+		$("body").removeClass("cursor-wait");
+});
