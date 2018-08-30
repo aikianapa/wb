@@ -1243,7 +1243,7 @@ abstract class kiNode
 
 
 	public function wbSetData($Item=array()) {
-            $this->excludeTextarea($Item);
+      $this->excludeTextarea($Item);
 			$this->wbSetAttributes($Item);
 			$this->wbUserAllow();
 			$nodes=new IteratorIterator($this->find("*"));
@@ -1504,6 +1504,7 @@ abstract class kiNode
     }
 
     public function wbSetValues($Item=array(),$obj=TRUE) {
+    if (!is_array($Item)) {$Item=array($Item);}
 		$this->wbSetAttributes($Item);
 			if (isset($Item["form"])) {
                 $Item=wbTrigger("form",__FUNCTION__,"BeforeSetValues",func_get_args(),$Item);
@@ -1516,7 +1517,6 @@ abstract class kiNode
                     $name=$inp->attr("name");	$def=$inp->attr("value");
                         if ($inp->is("textarea")) {
                             if (isset($Item[$name])) {$inp->html(htmlspecialchars($Item[$name]));} else {$inp->html(htmlspecialchars($def));}
-                            $inp->addClass("wb-value");
                           } else {
                             if (substr($name,-2)=="[]") {$name=substr($name,0,-2);}
                             if (substr($def,0,3)=="{{_") {$def="";}
@@ -1529,13 +1529,11 @@ abstract class kiNode
                                 if (!$inp->hasAttr("value") AND isset($Item[$name])) {
                                     if (is_array($Item[$name])) {$Item[$name]=wbJsonEncode($Item[$name]);}
                                     $inp->attr("value",$Item[$name]);
-                                    $inp->addClass("wb-value");
                                 }
                             }
 
                             if ($inp->attr("type")=="checkbox") {
                                 if ($inp->attr("value")=="on" OR $inp->attr("value")=="1") {$inp->checked="checked";}
-                                $inp->addClass("wb-value");
                             }
 
                             if ($inp->is("select") AND $inp->attr("value")>"") {
@@ -1548,20 +1546,23 @@ abstract class kiNode
                                 } else {
                                     $inp->find("option[value=".$value."]")->selected="selected";
                                 }
-                                $inp->addClass("wb-value");
                             }
                     };
                     $inp->wbSetMultiValue($Item);
-
+                    $inp->addClass("wb-value");
                 }
             }
 			unset($list);
-			if (!is_array($Item)) {$Item=array($Item);}
-            $this->excludeTextarea($Item);
-			$this->html(wbSetValuesStr($this->html(),$Item));
-			$this->includeTextarea($Item);
-		if ($obj==FALSE) {return $this->outerHtml();}
+      $this->excludeTextarea($Item);
+			$this->wbSetValuesStr($Item);
+      $this->includeTextarea($Item);
+		  if ($obj==FALSE) {return $this->outerHtml();}
 	}
+
+  public function wbSetValuesStr($Item=array()) {
+    $this->html(wbSetValuesStr($this->html(),$Item));
+  }
+
 
 	public function wbDatePickerPrep() {
 		// тут что-то криво работает - нужно переделывать
@@ -1910,7 +1911,7 @@ abstract class kiNode
 			$Item["_{$name}__dict_"]=$dictdata["_tree__dict_"];
 			if (!isset($Item[$name])) {$Item[$name]=$dictdata["tree"];}
 			unset($dictdata);
-        }
+    }
 		if (($this->hasAttr("name") OR $this->is("input")) AND !$this->is("select") ) {
 			$tree=wbGetForm("common","tree_ol");
 			$this->append("<input type='hidden' name='{$name}'><input type='hidden' name='_{$name}__dict_' data-name='dict'>");

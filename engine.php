@@ -25,7 +25,7 @@ $_ENV["DOM"]->wbTargeter();
 $_ENV["DOM"]->wbClearClass();
 
 session_write_close();
-//echo $_ENV["DOM"]->beautyHtml(); die;
+echo $_ENV["DOM"]->beautyHtml(); die;
 
 echo $_ENV["DOM"]->outerHtml();
 ?>
