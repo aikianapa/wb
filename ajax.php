@@ -53,7 +53,7 @@ function ajax__cache_clear() {
             if (isset($_POST["data"]) && is_array($_POST["data"]) && !in_array($file,$_POST["data"])) {
                 // если файл не в списке присутствующих на эеране списков, то удаляем
                 unlink($path."/".$file);
-            } 
+            }
         } else {
             if (filemtime($path."/".$file)+86400 < time()) {
                 // если файл не принадлежит юзеру, но ему больше суток, то удаляем
@@ -132,6 +132,7 @@ function ajax__setdata() {
 	$form=$_ENV["route"]["form"];
 	$item=$_ENV["route"]["item"];
 	$table=wbTable($form);
+	$_REQUEST=json_decode(base64_decode($_REQUEST["data"]),true);
 	if (!isset($_REQUEST["data-wb-mode"])) {$_REQUEST["mode"]="list";} else {$_REQUEST["mode"]=$_REQUEST["data-wb-mode"];}
 	$Item=wbItemRead($table,$item);
     if (!is_array($Item)) {$Item=array($Item);}
@@ -225,7 +226,7 @@ if (!isset($_POST["email"])) {$_POST["email"]=$_ENV["route"]["mode"]."@".$_ENV["
 if (!isset($_POST["name"])) {$_POST["name"]="Site Mailer";}
 
 if (isset($_POST["_mailto"])) {$mailto=$_POST["_mailto"];} else {$mailto = $_ENV["settings"]["email"];}
-    
+
 $out->wbSetData($_POST);
 $out=$out->outerHtml();
 

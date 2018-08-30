@@ -24,8 +24,8 @@
                                 </td>
                               <td>{{header}}<br><small>{{techdescr}}</small></td>
                               <td class="text-center">
-                                <div class="status-pill green" data-title="Активен" data-wb-role="where" data='active="on"' data-toggle="tooltip"></div>
-                                <div class="status-pill red" data-title="Активен" data-wb-role="where" data='active=""' data-toggle="tooltip"></div>
+                                <div class="status-pill green" data-title="Включен" data-wb-role="where" data='active="on"' data-toggle="tooltip"></div>
+                                <div class="status-pill red" data-title="Отключен" data-wb-role="where" data='active=""' data-toggle="tooltip"></div>
                               </td>
                               <td class="text-right" data-wb-role="include" src="/engine/forms/common/item_actions.php">
                               </td>
