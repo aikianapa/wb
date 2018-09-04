@@ -395,7 +395,7 @@ function wb_alive() {
       $.post("/ajax/alive", {
         data: post
       }, function(ret) {
-        ret = JSON.safeParse(ret);
+        ret = wb_json_decode(ret);
         if (ret == false) {
           post = "wb_session_die";
         }
@@ -431,6 +431,29 @@ function wb_cache_clear() {
 function wb_get_cdata(cdata) {
   return cdata.replace("<![CDATA[", "").replace("]]>", "");
 }
+
+function wb_json_replacer(key, value) {
+  if (is_object(value)) return value;
+  if (is_string(value)) {
+  value=str_replace("'",'\u0027',value);
+  value=str_replace('"','\u0022',value);
+  value=str_replace('&','\u0026',value);
+  value=str_replace('<','\u003C',value);
+  value=str_replace('>','\u003E',value);
+
+  console.log(value);
+  }
+  return value;
+}
+
+function wb_json_encode(obj) {
+  return JSON.stringify(obj,wb_json_replacer);
+}
+
+function wb_json_decode(str) {
+  return JSON.safeParse(str);
+}
+
 
 function wb_tree() {
   if ($(document).data("wb-tree-rowmenu") == undefined && $(".wb-tree").length) {
@@ -472,7 +495,7 @@ function wb_tree() {
   $.fn.treeStore = function() {
     var name = $(this).attr("name");
     var store = $(this).find("input[name='" + name + "']");
-    $(store).val(JSON.stringify($(this).treeBranchStore()));
+    $(store).val(wb_json_encode($(this).treeBranchStore()));
   };
 
   $.fn.treeBranchStore = function() {
@@ -507,7 +530,7 @@ function wb_tree() {
   }
 
   $.fn.treeBranchData = function() {
-    return JSON.safeParse($(this).children("input[data]").attr("data"));
+    return wb_json_decode($(this).children("input[data]").attr("data"));
   }
 
   $.fn.treeBranchChange = function(edid) {
@@ -527,13 +550,13 @@ function wb_tree() {
         }
       });
 
-      var data = wb_tree_json_prep(JSON.stringify($(edid).find(".treeData > form").serializeArray()), dict);
-      $(that).children("input").attr("data", JSON.stringify(data));
+      var data = wb_tree_json_prep(wb_json_encode($(edid).find(".treeData > form").serializeArray()), dict);
+      $(that).children("input").attr("data", wb_json_encode(data));
     }
   };
 
   $.fn.treeDict = function() {
-    return JSON.safeParse($(this).children("[data-name=dict]").val());
+    return wb_json_decode($(this).children("[data-name=dict]").val());
   }
 
   $.fn.treeEvents = function() {
@@ -783,8 +806,8 @@ function wb_tree() {
     });
 
     $(this).data("dict", dict);
-    $(tree).children("[data-name=dict]").val(JSON.stringify(dict));
-    $(this).data("data")["data"] = JSON.safeParse($(this).data("that").children("input").attr("data"));
+    $(tree).children("[data-name=dict]").val(wb_json_encode(dict));
+    $(this).data("data")["data"] = wb_json_decode($(this).data("that").children("input").attr("data"));
     $(this).data("data")["fields"] = $(tree).treeDict();
     var tpl = $(tree).treeEditModal($(this).data("data"));
     $(this).find(".treeData").children("form").html($(tpl).find(".treeData form").html());
@@ -794,7 +817,7 @@ function wb_tree() {
   }
 
   function wb_tree_json_prep(data, dict) {
-    var data = JSON.safeParse(data);
+    var data = wb_json_decode(data);
     var values = {};
     $(data).each(function(j, d) {
       var fldname = d["name"];
@@ -2143,7 +2166,7 @@ function wb_pagination(pid) {
             url: url,
             cache: false,
             success: function(data) {
-              var data = JSON.parse(data);
+              var data = wb_json_decode(data);
               $("[data-wb-tpl=" + tid + "]").html(data.data);
               if (data.pages > "1") {
                 $(".pagination[id=ajax-" + pid + "]").show();
