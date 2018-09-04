@@ -1474,23 +1474,20 @@ abstract class kiNode
 
 	public function excludeTextarea($Item=array()) {
         if (!isset($_ENV["ta_save"])) {$_ENV["ta_save"]=array();}
-		$list=$this->find("textarea,[type=text/template],.wb-value,pre,.nowb,[data-role=module]");
-		$_ENV["ta_save"]=array();
+		$list=$this->find("textarea,[type=text/template],.wb-value,pre,.nowb,[data-role=module],[data-wb-role=module]");
 		foreach ($list as $ta) {
             $id=wbNewId();
             if (!$ta->is(".wb-attrs")) $ta->wbSetAttributes($Item);
-            $_ENV["ta_save"][$id]=$ta->outerHtml();
             $ta->attr("taid",$id);
-		}; unset($ta,$list);
+            $ta->replaceWith(strtr($ta->outerHtml(),array("{{"=>"#~#~","}}"=>"~#~#")));
+		};
 	}
 	function includeTextarea($Item=array()) {
 		$list=$this->find("[taid]");
 		foreach ($list as $ta) {
-			$id=$ta->attr("taid");
-			if (isset($_ENV["ta_save"][$id])) $ta->replaceWith($_ENV["ta_save"][$id]);
-            $ta->removeAttr("taid");
-			unset($_ENV["ta_save"][$id]);
-		}; unset($ta,$list);
+      $ta->removeAttr("taid");
+      $ta->replaceWith(strtr($ta->outerHtml(),array("#~#~"=>"{{","~#~#"=>"}}")));
+		};
 	}
 
     public function wbClearClass() {
