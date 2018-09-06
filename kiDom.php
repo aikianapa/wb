@@ -1897,7 +1897,8 @@ abstract class kiNode
 	}
 
 	public function tagTree($Item=array()) {
-        $srcVal=array(); foreach($Item as $k => $v) {$srcVal["%{$k}"]=$v;}; unset($v);
+    if (!is_array($Item)) {$Item=array($Item);}
+    $srcVal=array(); foreach($Item as $k => $v) {$srcVal["%{$k}"]=$v;}; unset($v);
 		include("wbattributes.php");
 		$this->wbSetAttributes($Item);
 		$name=$this->attr("name"); if (isset($from)) {$name=$from;}
