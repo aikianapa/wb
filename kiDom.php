@@ -1287,7 +1287,7 @@ abstract class kiNode
 
 
 	public function wbPlugins(){
-		$script=$this->find("script[data-wb-src]:not(.wb-done)");
+		$script=$this->find("[data-wb-src]:not(.wb-done)");
 		foreach($script as $sc) {
             if ($sc->attr("data-wb-src")=="jquery") {
 					        $sc->after('<script src="/engine/js/jquery.min.js" ></script>');
@@ -1298,8 +1298,26 @@ abstract class kiNode
 					         $sc->after('<script src="/engine/js/bootstrap3/bootstrap.min.js" ></script>');
                    $sc->remove();
             }
-            if ($sc->attr("data-wb-src")=="bootstrap") {
+            if ($sc->attr("data-wb-src")=="bootstrap3css") {
+					         $sc->before('<link href="/engine/js/bootstrap3/bootstrap.min.css" rel="stylesheet">');
+                   $sc->remove();
+            }
+            if ($sc->attr("data-wb-src")=="bootstrap3js") {
+					         $sc->after('<script src="/engine/js/bootstrap3/bootstrap.min.js" ></script>');
+                   $sc->remove();
+            }
+
+
+            if ($sc->attr("data-wb-src")=="bootstrap4" OR $sc->attr("data-wb-src")=="bootstrap") {
  					     $sc->before('<link href="/engine/js/bootstrap/bootstrap.min.css" rel="stylesheet">');
+					     $sc->after('<script src="/engine/js/bootstrap/bootstrap.min.js" ></script>');
+               $sc->remove();
+            }
+            if ($sc->attr("data-wb-src")=="bootstrap4css") {
+ 					     $sc->before('<link href="/engine/js/bootstrap/bootstrap.min.css" rel="stylesheet">');
+               $sc->remove();
+            }
+            if ($sc->attr("data-wb-src")=="bootstrap4js") {
 					     $sc->after('<script src="/engine/js/bootstrap/bootstrap.min.js" ></script>');
                $sc->remove();
             }
@@ -1855,8 +1873,8 @@ abstract class kiNode
 	}
 
 	public function tagHideAttrs() {
-        if (($this->is("[data-wb-role]") AND !$this->hasClass("wb-done") AND !$this->is("[data-wb-done=true]")) OR $this->attr("data-wb-hide")=="") return;
-		$list=wbAttrToArray($this->attr("data-wb-hide"));
+        if (($this->is("[data-wb-role]") AND !$this->hasClass("wb-done") AND !$this->is("[data-wb-done]")) OR $this->attr("data-wb-hide")=="") return;
+		    $list=wbAttrToArray($this->attr("data-wb-hide"));
         $hide="";
         if (in_array("wb",$list)) {
             $attrs=$this->attributes();
@@ -2327,7 +2345,7 @@ public function tagInclude($Item=array()) {
         }
 		$vars=$this->attr("data-wb-vars");	if ($vars>"") {$Item=wbAttrAddData($vars,$Item);}
     if (!isset($this_content)) {
-		if ($src=="") {$src=$this->html(); $this_content=ki::fromString($src);} else {
+		if ($src=="") {$src=$this->html(); $this_content=wbfromString($src);} else {
 			$tplpath=explode("/",$src);
 			$tplpath=array_slice($tplpath,0,-1);
 			$tplpath=implode("/",$tplpath)."/";

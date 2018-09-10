@@ -440,8 +440,6 @@ function wb_json_replacer(key, value) {
   value=str_replace('&','\u0026',value);
   value=str_replace('<','\u003C',value);
   value=str_replace('>','\u003E',value);
-
-  console.log(value);
   }
   return value;
 }
