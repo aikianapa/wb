@@ -133,19 +133,22 @@ function ajax__setdata() {
 	$item=$_ENV["route"]["item"];
 	$table=wbTable($form);
 	$_REQUEST=json_decode(base64_decode($_REQUEST["data"]),true);
+	if (isset($_REQUEST["_base"])) {$_ENV['path_tpl'] = $_ENV['path_app'].$_REQUEST["_base"];}
 	if (!isset($_REQUEST["data-wb-mode"])) {$_REQUEST["mode"]="list";} else {$_REQUEST["mode"]=$_REQUEST["data-wb-mode"];}
 	$Item=wbItemRead($table,$item);
-    if (!is_array($Item)) {$Item=array($Item);}
-    if (!is_array($_REQUEST["data"])) {$_REQUEST["data"]=array($_REQUEST["data"]);}
+	if (!is_array($Item)) {$Item=array($Item);}
+	if (!is_array($_REQUEST["data"])) {$_REQUEST["data"]=array($_REQUEST["data"]);}
 	$Item=array_merge(wbItemToArray($Item),$_REQUEST["data"]);
-    if (isset($Item["_form"])) {$_ENV["route"]["form"]=$_GET["form"]=$Item["_form"]; $_ENV["route"]["controller"]="form";}
-    if (isset($Item["_item"])) {$_ENV["route"]["item"]=$_GET["item"]=$Item["_item"];}
-    $Item=wbCallFormFunc("BeforeShowItem",$Item,$form,$_REQUEST["mode"]);
-    $Item=wbCallFormFunc("BeforeItemShow",$Item,$form,$_REQUEST["mode"]);
+	if (isset($Item["_form"])) {$_ENV["route"]["form"]=$_GET["form"]=$Item["_form"]; $_ENV["route"]["controller"]="form";}
+	if (isset($Item["_item"])) {$_ENV["route"]["item"]=$_GET["item"]=$Item["_item"];}
+	if (isset($Item["_mode"])) {$_ENV["route"]["mode"]=$_GET["mode"]=$Item["_mode"];}
+	$Item=wbCallFormFunc("BeforeShowItem",$Item,$form,$_REQUEST["mode"]);
+	$Item=wbCallFormFunc("BeforeItemShow",$Item,$form,$_REQUEST["mode"]);
 	$tpl=wbFromString($_REQUEST["tpl"]);
 	$tpl->find(":first")->attr("item","{{id}}");
 	foreach($tpl->find("[data-wb-role]") as $dr) {$dr->removeClass("wb-done"); }
 	$tpl->wbSetData($Item);
+	$tpl->tagHideAttrs();
 	return $tpl;
 }
 

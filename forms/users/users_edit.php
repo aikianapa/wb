@@ -5,7 +5,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
                 <h5 class="modal-title">{{header}}</h5> </div>
             <div class="modal-body">
-                <form id="{{_GET[form]}}EditForm" data-wb-form="{{_GET[form]}}" data-wb-item="{{id}}" class="form-horizontal" role="form">
+                <form id="{{_GET[form]}}EditForm" data-wb-form="{{_GET[form]}}" data-wb-item="{{id}}" class="form-horizontal" role="form" data-wb-allow="admin moder">
                     <div class="form-group row">
                         <label class="col-sm-2 form-control-label">Логин</label>
                         <div class="input-group col-sm-4">
@@ -15,14 +15,18 @@
                         </div>
                         <label class="col-sm-2 form-control-label">Группа</label>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" name="role" placeholder="Группа">
+                                <select class="form-control" placeholder="Без роли" name="role"
+                                data-wb-role="foreach" data-wb-form="users" data-wb-tpl="false" data-wb-where='isgroup="on"'>
+                                        <option value="{{id}}">{{id}}</option>
+                                </select>
                         </div>
                     </div>
                     <div class="nav-active-primary">
                         <ul class="nav nav-tabs" role="tablist">
-                            <li class="nav-item"><a class="nav-link active" href="#{{_GET[form]}}Descr" data-toggle="tab">Характеристики</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#{{_GET[form]}}Text" data-toggle="tab">Контент</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#{{_GET[form]}}Images" data-toggle="tab">Изображения</a></li>
+                                <li class="nav-item"><a class="nav-link active" href="#{{_GET[form]}}Descr" data-toggle="tab">Характеристики</a></li>
+                                <li class="nav-item" data-wb-allow="admin"><a class="nav-link" href="#{{_GET[form]}}Group" data-toggle="tab">Группа</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#{{_GET[form]}}Text" data-toggle="tab">Контент</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#{{_GET[form]}}Images" data-toggle="tab">Изображения</a></li>
                         </ul>
                     </div>
                     <div class="tab-content  p-a m-b-md">
@@ -55,22 +59,37 @@
                                     <input type="email" class="form-control" name="email" placeholder="Электронная почта">
                                 </div>
                             </div>
-                            <div class="form-group row" data-wb-allow="admin">
-                                <label class="col-sm-2 form-control-label">Точка входа</label>
-                                <div class="col-sm-6">
-                                    <input type="text" class="form-control" name="point" placeholder="Точка входа">
-                                </div>
-                            </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 form-control-label">Аватар</label>
                                 <div class="col-auto">
                                     <input type="hidden" name="avatar" data-wb-role="uploader"> </div>
                             </div>
                         </div>
+                        <div id="{{_GET[form]}}Group" class="tab-pane fade" role="tabpanel" data-wb-allow="admin">
+                                <div class="form-group row">
+                                        <label class="col-5 form-control-label">Использовать как группу</label>
+                                        <div class="col-2">
+                                            <label class="switch switch-success">
+                                                <input type="checkbox" name="isgroup"><span></span></label>
+                                        </div>
+                                </div>
+                                <div class="form-group row" data-wb-allow="admin">
+                                        <label class="col-sm-2 form-control-label">Точка входа</label>
+                                        <div class="col-sm-6">
+                                        <input type="text" class="form-control" name="point" placeholder="Точка входа">
+                                        </div>
+                                        <label class="col-12 form-control-label">Свойства группы</label>
+                                        <div class="col-12">
+                                                <div data-wb-role="tree" name="roleprop"></div>
+                                        </div>
+                                </div>
+                        </div>
+
                         <div id="{{_GET[form]}}Text" class="tab-pane fade" data-wb-role="include" src="editor" role="tabpanel"></div>
                         <div id="{{_GET[form]}}Images" class="tab-pane fade" data-wb-role="include" src="uploader" role="tabpanel"></div>
-                    </div>
+                     </div>
                 </form>
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Закрыть</button>
                     <button type="button" class="btn btn-primary" data-wb-formsave="#{{_GET[form]}}EditForm"><span class="glyphicon glyphicon-ok"></span> Сохранить изменения</button>

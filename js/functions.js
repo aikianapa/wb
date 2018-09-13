@@ -1,5 +1,9 @@
 var wbapp = new Object();
 $(document).ready(function(){
+        wb_init();
+});
+
+function wb_init() {
       if ($("link[rel$=less],style[rel$=less]").length) wb_include("/engine/js/less.min.js");
       wbapp.ajaxWait = function(options) {
         wb_ajaxWait([options]);
@@ -53,7 +57,7 @@ $(document).ready(function(){
       wb_delegates();
       $("body").removeClass("cursor-wait");
       $(document).trigger("wbapp");
-});
+}
 
 function wb_delegates() {
   wb_ajax();
@@ -1973,20 +1977,24 @@ function wb_setdata(selector, data, ret) {
   } else {
     var html = selector;
   }
-  var form = "undefined";
-  var item = "undefined";
-  if (data.form !== undefined) {
-    form = data.form;
-  }
-  if (data.id !== undefined) {
-    item = data.id;
-  }
-  if (data._form !== undefined) {
-    form = data._form;
-  }
-  if (data._id !== undefined) {
-    item = data._id;
-  }
+        var form = "undefined";
+        var item = "undefined";
+        if (data.form !== undefined) {
+            form = data.form;
+        }
+        if (data.id !== undefined) {
+            item = data.id;
+        }
+        if (data._form !== undefined) {
+            form = data._form;
+        }
+        if (data._id !== undefined) {
+            item = data._id;
+        }
+        if (data._item !== undefined) {
+            item = data._item;
+        }
+
 
   var url = "/ajax/setdata/" + form + "/" + item;
   var res = null;

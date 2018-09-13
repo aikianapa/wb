@@ -2278,17 +2278,18 @@ public function tagModule($Item=array()) {
 }
 
 public function tagInclude($Item=array()) {
-		$src=$ssrc=$this->attr("src"); $res=0;
-		$did=$this->attr("data-wb-id");
-		$dad=$this->attr("data-wb-add");
-		$header=$this->attr("data-wb-header"); if ($header>"") {$Item["header"]=$header;}
-		$footer=$this->attr("data-wb-footer"); if ($footer>"") {$Item["footer"]=$footer;}
-		$vars=$this->attr("data-wb-vars"); 	if ($vars>"") {$Item=wbAttrAddData($vars,$Item);}
-		$json=$this->attr("data-wb-json"); 	if ($json>"") {$Item=json_decode($json,true);}
-		$dfs=$this->attr("data-wb-formsave");
-		$class=$this->attr("data-wb-class");
-		$name=$this->attr("data-wb-name");
-    if ($name=="") {$name=$this->attr("name");}
+		include("wbattributes.php");
+		if (!isset($src)) {$src=$ssrc=$this->attr("src");} else {$ssrc=$src;}
+		$res=0;
+		if (isset($id)) {$did=$id;} else {$did=""; unset($id);}
+		if (isset($add)) {$dad=$add;} else {$dad=""; unset($add);}
+		if (isset($header)) {$Item["header"]=$header;} else {$header="";}
+		if (isset($footer)) {$Item["footer"]=$footer;} else {$footer="";}
+		if (isset($vars)) {$Item=wbAttrAddData($vars,$Item);} else {$vars="";}
+		if (isset($json)) {$Item=json_decode($json,true);} else {$json="";}
+		if (isset($formsave)) {$dfs=$formsave; unset($formsave);} else {$dfs="";}
+		if (!isset($class)) {$class="";}
+		if (!isset($name)) {$name=$this->attr("name");}
         switch($src) {
             case "modal":
                 $this_content=wbGetForm("common",$src);
@@ -2344,21 +2345,21 @@ public function tagInclude($Item=array()) {
                 break;
         }
 		$vars=$this->attr("data-wb-vars");	if ($vars>"") {$Item=wbAttrAddData($vars,$Item);}
-    if (!isset($this_content)) {
-		if ($src=="") {$src=$this->html(); $this_content=wbfromString($src);} else {
-			$tplpath=explode("/",$src);
-			$tplpath=array_slice($tplpath,0,-1);
-			$tplpath=implode("/",$tplpath)."/";
-			$src=wbSetValuesStr($src,$Item);
-			$file=$_ENV["path_app"].$src;
-			if (is_file($_SERVER["DOCUMENT_ROOT"].$file)) {
-				$src=$_SERVER["DOCUMENT_ROOT"].$file;
-			} else {
-				if (substr($src,0,7)!=="{$_ENV["route"]["scheme"]}://") { if (substr($src,0,1)!="/") {$src="/".$src;} $src=$_ENV["route"]["hostp"].$src;}
-			}
-			$this_content=wbFromFile($src);
-		}
-    }
+		    if (!isset($this_content)) {
+				if ($src=="") {$src=$this->html(); $this_content=wbfromString($src);} else {
+					$tplpath=explode("/",$src);
+					$tplpath=array_slice($tplpath,0,-1);
+					$tplpath=implode("/",$tplpath)."/";
+					$src=wbSetValuesStr($src,$Item);
+					$file=$_ENV["path_app"].$src;
+					if (is_file($_SERVER["DOCUMENT_ROOT"].$file)) {
+						$src=$_SERVER["DOCUMENT_ROOT"].$file;
+					} else {
+						if (substr($src,0,7)!=="{$_ENV["route"]["scheme"]}://") { if (substr($src,0,1)!="/") {$src="/".$src;} $src=$_ENV["route"]["hostp"].$src;}
+					}
+					$this_content=wbFromFile($src);
+				}
+		    }
 		if ($did>"") {$this_content->find(":first")->attr("id",$did);}
 		if ($dad=="false") {$this_content->find("[data-wb-formsave]")->attr("data-add",$dad);}
 		if ($dfs>"") {$this_content->find("[data-wb-formsave]")->attr("data-formsave",$dfs);}
@@ -2390,6 +2391,9 @@ public function tagInclude($Item=array()) {
 			$this->append($this_content);
 		}
 		$this->wbSetData($Item);
+		if ($this->attr("data-wb-hide")=="*" OR $this->is("meta")) {
+			$this->replaceWith($this->html());
+		}
 	}
 
     public function includeTag($Item) {
