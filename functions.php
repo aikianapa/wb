@@ -196,9 +196,15 @@ function wbItemToArray($Item = array())
 {
     if (is_array($Item)) {
         foreach ($Item as $i => $item) {
-            if (!is_array($item) and '[{' == substr($item, 0, 2)) {
+            if (!is_array($item) and substr($item, 0, 2) == '[{') {
                 $item = json_decode($item, true);
                 $item = wbItemToArray($item);
+            } else if (is_array($item)) {
+                foreach($item as $j => $branch) {
+                        if (!is_array($branch) and substr($branch, 0, 2) == '[{') {
+                                $item[$j] = json_decode($branch, true);
+                        }
+                }
             }
             if (isset($item['id'])) {
                 unset($Item[$i]);
@@ -321,11 +327,16 @@ function wbFieldBuild($param, $data = array())
         case 'image':
             $tpl->wbSetValues($param);
             $tpl->wbSetData($data);
+            if ($data['_form']=="tree" AND isset($_POST['data-id'])) {
+                $tpl->find('.wb-uploader')->attr('data-wb-path', "/uploads/{$data['_form']}/{$data['_item']}/{$_POST['data-id']}/");
+            } else {
+                $tpl->find('.wb-uploader')->attr('data-wb-path', "/uploads/{$data['_form']}/{$data['_item']}/");
+            }
             break;
         case 'gallery':
             $tpl->wbSetValues($param);
             $tpl->wbSetData($data);
-                        $tpl->find('.wb-uploader')->attr('data-wb-path', "/uploads/{$data['_form']}/{$data['_item']}/");
+            $tpl->find('.wb-uploader')->attr('data-wb-path', "/uploads/{$data['_form']}/{$data['_item']}/");
             break;
         case 'multiinput':
             $flds = wbFromString('');
@@ -599,6 +610,7 @@ function wbTreeRead($name)
     } else {
         $tree['dict'] = json_decode($tree['_tree__dict_'], true);
     }
+    $tree = wbItemToArray($tree);
     $tree = wbTrigger('form', __FUNCTION__, 'AfterTreeRead', func_get_args(), $tree);
 
     return $tree;
@@ -1963,7 +1975,7 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2)
                 }
             }
             if (isset($_GET['mode']) && 'edit' == $_GET['mode']) {
-                $tag = ki::fromString($tag);
+                $tag = wbFromString($tag);
                 foreach ($tag->find('pre') as $pre) {
                     $pre->html(htmlspecialchars($pre->html()));
                 }

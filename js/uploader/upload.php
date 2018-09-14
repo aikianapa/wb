@@ -10,9 +10,9 @@ ini_set('display_errors', 'Off');
  * Contributing: http://www.plupload.com/contributing
  */
 
-#!! IMPORTANT: 
-#!! this file is just an example, it doesn't incorporate any security checks and 
-#!! is not recommended to be used in production environment as it is. Be sure to 
+#!! IMPORTANT:
+#!! this file is just an example, it doesn't incorporate any security checks and
+#!! is not recommended to be used in production environment as it is. Be sure to
 #!! revise it and customize to your needs.
 
 
@@ -23,12 +23,12 @@ header("Cache-Control: no-store, no-cache, must-revalidate");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-include_once(__DIR__ . "/../../functions.php");	
+include_once(__DIR__ . "/../../functions.php");
 wbInitEnviroment();
 
 
 
-/* 
+/*
 // Support CORS
 header("Access-Control-Allow-Origin: *");
 // other CORS headers if any...
@@ -46,18 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 // Settings
 if (!isset($_GET["path"])) {$path="/uploads";} else {$path=$_GET["path"];}
 
-$dir=explode("/",$_GET["path"]);
-$path="";
-foreach($dir as $key => $folder) {
-	if ($folder>"") {
-		$path.="/".$folder;
-		if (!is_dir($_SERVER["DOCUMENT_ROOT"].$path)) {
-			mkdir($_SERVER["DOCUMENT_ROOT"].$path,0757);} 
-		else { chmod($_SERVER["DOCUMENT_ROOT"].$path,0757);}
-	}
-}
 $path=$_ENV["path_app"].$path;
-
 $targetDir = $path;
 $cleanupTargetDir = true; // Remove old files
 $maxFileAge = 5 * 3600; // Temp file age in seconds
@@ -86,7 +75,7 @@ $chunk = isset($_REQUEST["chunk"]) ? intval($_REQUEST["chunk"]) : 0;
 $chunks = isset($_REQUEST["chunks"]) ? intval($_REQUEST["chunks"]) : 0;
 
 
-// Remove old temp files	
+// Remove old temp files
 if ($cleanupTargetDir) {
 	if (!is_dir($targetDir) || !$dir = opendir($targetDir)) {
 		die('{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}');
@@ -106,7 +95,7 @@ if ($cleanupTargetDir) {
 		}
 	}
 	closedir($dir);
-}	
+}
 
 
 // Open temp file
@@ -123,7 +112,7 @@ if (!empty($_FILES)) {
 	if (!$in = @fopen($_FILES["file"]["tmp_name"], "rb")) {
 		die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
 	}
-} else {	
+} else {
 	if (!$in = @fopen("php://input", "rb")) {
 		die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
 	}
@@ -138,7 +127,7 @@ while ($buff = fread($in, 4096)) {
 
 // Check if file has been uploaded
 if (!$chunks || $chunk == $chunks - 1) {
-	// Strip the temp .part suffix off 
+	// Strip the temp .part suffix off
 	rename("{$filePath}.part", $filePath);
 }
 
