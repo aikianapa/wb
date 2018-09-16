@@ -176,6 +176,7 @@ abstract class CLexer
 	protected $string;
 
 	protected function cleanString(&$string) {
+		if (is_array($string)) $string=implode(" ",$string);
 		$string = trim($string);
 		if (strpos($string, "\r") !== false) {
 			$string = str_replace(array("\r\n", "\r"), "\n", $string);
@@ -2334,6 +2335,11 @@ public function tagInclude($Item=array()) {
                 if (isset($arr[1])) {unset($arr[0]); $mode=implode("_",$arr);}
                 $this_content=wbGetForm($form,$mode);
                 break;
+            case "snippet":
+		$this_content=wbGetForm("snippets",$mode);
+		$this_content->wbSetValues($_ENV["attributes"]);
+		$this_content->wbClearClass();
+		break;
             case "template":
                 $this_content=wbGetTpl($name);
                 break;

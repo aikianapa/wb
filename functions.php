@@ -84,34 +84,58 @@ function wbInitEnviroment()
     }
 }
 
+function wbMailer(
+        $from = null, $sent = null, $subject = null, $message = null, $attach = null
+        ) {
+        return wbMail($from, $sent, $subject, $message, $attach);
+}
+
+
 function wbMail(
          $from = null, $sent = null, $subject = null, $message = null, $attach = null
     ) {
-    if (!is_array($from)) {
-        $from = array($from);
-    }
-    if (!is_array($sent)) {
-        $sent = array($sent);
-    }
-    if (!is_array($attach) and null !== $attach) {
-        $from = array($from);
-    }
-    if (!isset($from[1])) {
-        $from[1] = strip_tags($_ENV['settings']['header']);
-    }
-    if (!isset($sent[1])) {
-        $sent[1] = $sent[0];
-    }
+        require $_ENV["path_engine"].'/lib/phpmailer/PHPMailerAutoload.php';
+        $mail = new PHPMailer(); // for mail
+        // $mail = new PHPMailer(true); // for sendmail
 
-    $headers = array();
-    $headers[] = 'MIME-Version: 1.0';
-    $headers[] = 'Content-type: text/html; charset=UTF-8';
-    $headers[] = "To: {$sent[1]} <{$sent[0]}>";
-    $headers[] = "Reply-To: {$from[1]} <{$from[0]}>";
+/*
+    $mail->SMTPDebug = 2;                                 // Enable verbose debug output
+    $mail->isSMTP();                                      // Set mailer to use SMTP
+    $mail->Host = 'smtp1.example.com;smtp2.example.com';  // Specify main and backup SMTP servers
+    $mail->SMTPAuth = true;                               // Enable SMTP authentication
+    $mail->Username = 'user@example.com';                 // SMTP username
+    $mail->Password = 'secret';                           // SMTP password
+    $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
+    $mail->Port = 587;                                    // TCP port to connect to
+*/
 
-    $res = mail($sent[0], $subject, $message, implode("\r\n", $headers));
+        if (strpos($from,";")) {$from=explode(";",$from);} else {$from=array($from,strip_tags($_ENV['settings']['header']));}
+        if (!is_array($sent) AND is_string($sent) AND strpos($sent,";")) {$sent=array(explode(";",$sent));} else {$sent=array(array($sent,$sent));}
 
-    return $res;
+        $mail->setFrom($from[0], $from[1]);
+        $mail->addReplyTo($from[0], $from[1]);
+
+        foreach($sent as $s) {
+             $mail->addAddress($s[0], $s[1]);
+        }
+
+	$mail->Subject = $subject;
+	//Read an HTML message body from an external file, convert referenced images to embedded,
+	//convert HTML into a basic plain-text alternative body
+	$mail->msgHTML($message, dirname(__FILE__));
+	$mail->CharSet = 'utf-8';
+	//Replace the plain text body with one created manually
+	$mail->AltBody = strip_tags($message);
+	//Attach an image file
+
+        if (!is_array($attach) AND is_string($attach)) {$attach=array($attach);}
+        foreach($attach as $a) {
+                $mail->addAttachment($attach);
+        }
+	//send the message, check for errors
+	$mail->send();
+        $_ENV["error"]=$mail->ErrorInfo;
+        if ($error>"") {return false;} else {return true;}
 }
 
 function wbCheckWorkspace()
@@ -813,15 +837,29 @@ function wbItemRemove($table = null, $id = null, $flush = true)
 
         return null;
     }
-    if (null !== $id) {
-        $item = wbItemRead($table, $id);
-        wbTrigger('form', __FUNCTION__, 'BeforeItemRemove', func_get_args(), $item);
-        if (is_array($item)) {
-            $item['_removed'] = true;
-            $_ENV['cache'][md5($table)][$id] = $item;
+    if (is_array($id)) {
+        foreach($id as $iid) {
+                wbItemRemove($table, $iid, false);
         }
-        $res = wbItemSave($table, $item);
-    }
+        if ($flush==true) {wbTableFlush($table);}
+    } else if (is_string($id)) {
+            if (strpos($id," ") OR strpos($id,'"') OR strpos($id,'=') OR strpos($id,'>') OR strpos($id,'<')) {
+                $list=wbItemList($table,$id);
+                $list=array_keys($list);
+                foreach($list as $iid) {
+                        wbItemRemove($table, $iid, false);
+                }
+                if ($flush==true) {wbTableFlush($table);}
+            } else {
+                $item = wbItemRead($table, $id);
+                wbTrigger('form', __FUNCTION__, 'BeforeItemRemove', func_get_args(), $item);
+                if (is_array($item)) {
+                    $item['_removed'] = true;
+                    $_ENV['cache'][md5($table)][$id] = $item;
+                }
+                $res = wbItemSave($table, $item, $flush);
+            }
+   }
 
     if (!$res) {
         wbError('func', __FUNCTION__, 1007, func_get_args());

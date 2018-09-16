@@ -234,49 +234,12 @@ $out->wbSetData($_POST);
 $out=$out->outerHtml();
 
 if ($_ENV["route"]["mode"]=="mailer") {
-	require $_ENV["path_engine"].'/lib/phpmailer/PHPMailerAutoload.php';
-	//Create a new PHPMailer instance
-	$mail = new PHPMailer(true);
-
-/*
-    $mail->SMTPDebug = 2;                                 // Enable verbose debug output
-    $mail->isSMTP();                                      // Set mailer to use SMTP
-    $mail->Host = 'smtp1.example.com;smtp2.example.com';  // Specify main and backup SMTP servers
-    $mail->SMTPAuth = true;                               // Enable SMTP authentication
-    $mail->Username = 'user@example.com';                 // SMTP username
-    $mail->Password = 'secret';                           // SMTP password
-    $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
-    $mail->Port = 587;                                    // TCP port to connect to
-*/
-
-	//Set who the message is to be sent from
-	$mail->setFrom($_POST["email"], 'Site Form');
-	//Set an alternative reply-to address
-	$mail->addReplyTo($_POST["email"], $_POST["name"]);
-	//Set who the message is to be sent to
-	$mail->addAddress($mailto, $_ENV["settings"]["header"]);
-	//Set the subject line
-	$mail->Subject = $_POST["_subject"];
-	//Read an HTML message body from an external file, convert referenced images to embedded,
-	//convert HTML into a basic plain-text alternative body
-	$mail->msgHTML($out, dirname(__FILE__));
-	$mail->CharSet = 'utf-8';
-	//Replace the plain text body with one created manually
-	//$mail->AltBody = 'This is a plain-text message body';
-	//Attach an image file
-	//$mail->addAttachment('images/phpmailer_mini.png');
-	//send the message, check for errors
-	$mail->send();
-	$error=$mail->ErrorInfo;
-    if ($error>"") {$res=false;} else {$res=true;}
+	$res=wbMailer("{$_POST["email"]};{$_POST["name"]}","{$mailto};{$_ENV["settings"]["header"]}",$_POST["_subject"],$out);
 } else {
-	$headers  = 'MIME-Version: 1.0' . "\r\n";
-	$headers .= 'Content-type: text/html; charset=utf-8' . "\r\n";
-	$res=mail($mailto, $_POST["subject"], $out,$headers);
-	$error=error_get_last()['message'];
+	$res=wbMail("{$_POST["email"]};{$_POST["name"]}","{$mailto};{$_ENV["settings"]["header"]}", $_POST["subject"], $out);
 }
 if (!$res) {
-    $result=json_encode(array("error"=>true,"msg"=>"Ошибка отправки сообщения: ".$error));
+    $result=json_encode(array("error"=>true,"msg"=>"Ошибка отправки сообщения: ".$_ENV["error"]));
 } else {
     $result=json_encode(array("error"=>false,"msg"=>"Сообщение отправлено!"));
 }
