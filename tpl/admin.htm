@@ -44,13 +44,13 @@
     </div>
     <!-- kt-sideleft-header -->
     <!-- ##### SIDEBAR MENU ##### -->
-    <div class="kt-sideleft">
+    <div class="kt-sideleft" data-wb-role="formdata" data-wb-form="users" data-wb-form="users" data-wb-item="{{_SESS[user_role]}}" data-wb-hide="wb">
         <label class="kt-sidebar-label">Навигация</label>
         <li class="nav-item" data-wb-prepend=".nav.kt-sideleft-menu">
             <a href="/admin" class="nav-link active"> <i class="fa fa-home"></i> <span>Главная</span> </a>
         </li>
         <!-- nav-item -->
-        <ul class="nav kt-sideleft-menu" data-wb-role="tree" data-wb-item="_config" data-wb-branch="side_menu" data-wb-parent="false" data-wb-limit="1" data-wb-hide="wb">
+        <ul class="nav kt-sideleft-menu" data-wb-role="tree" data-wb-from="roleprop" data-wb-branch="side_menu" data-wb-parent="false" data-wb-limit="1" data-wb-hide="wb">
             <li class="nav-item" data-wb-role="where" data-wb-where='children>""' data-wb-hide="wb">
                 <a href class="nav-link with-sub"> <i class="{{data[icon]}}"></i> <span>{{name}}</span> </a>
                 <ul class="nav-sub" data-wb-role="foreach" data-wb-from="children" data-wb-where='id>""' data-wb-tpl="false" data-wb-hide="wb">
@@ -70,7 +70,7 @@
         <div class="kt-headpanel-left"> <a id="naviconMenu" href="" class="kt-navicon d-none d-lg-flex"><i class="icon ion-navicon-round"></i></a> <a id="naviconMenuMobile" href="" class="kt-navicon d-lg-none"><i class="icon ion-navicon-round"></i></a> </div>
         <!-- kt-headpanel-left -->
         <div class="kt-headpanel-right">
-            <div>
+            <div data-wb-allow="admin">
                 <a href="" tabindex class="nav-link pd-x-7 pos-relative" data-wb-ajax="/form/edit/admin/settings" data-wb-html=".content-box"> <i class="icon ion-ios-gear tx-24"></i> </a>
             </div>
             <div class="dropdown dropdown-profile">

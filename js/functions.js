@@ -71,6 +71,7 @@ function wb_delegates() {
 }
 
 function wb_settings() {
+        if ($("#setup.wbengine").length) {return;}
   if ($(document).data("settings") !== undefined) {
     return $(document).data("settings");
   } else {
@@ -483,7 +484,9 @@ function wb_tree() {
   }, 10);
   $(document).off("wb-tree-init");
   $(document).on("wb-tree-init", function(e, tree) {
-    $(tree).treeEvents();
+        $(tree).treeEvents();
+        $(tree).treeStore();
+
   });
 
   $(document).off("tree_before_formsave");

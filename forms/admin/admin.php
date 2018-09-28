@@ -3,9 +3,9 @@
 function _adminAfterItemRead($Item, $mode=null)
 {
     if (isset($_ENV["route"]) AND $_ENV["route"]["mode"]=="edit" AND $_ENV["route"]["item"]=="settings") {
-        
+
         // ******************** BACKUPS ******************** //
-        
+
         $backups=wbListFiles($_ENV["path_app"]."/backup", true);
         $Item["backups"]=array();
         foreach ($backups as $key => $name) {
@@ -24,7 +24,7 @@ function _adminAfterItemRead($Item, $mode=null)
                 $Item["backups"][]=array("type"=>"uploads","size"=>$size,"_created"=>$date,"name"=>$name,"date"=>date("d.m.Y H:i:s", strtotime($date)));
             }
         }
-        
+
         // ******************** MERCHANTS ******************** //
         if (!isset($Item["merchant"])) {$Item["merchant"]="yapay";}
         $Item["merchants"]=wbMerchantList();
@@ -35,7 +35,7 @@ function _adminAfterItemRead($Item, $mode=null)
 function _adminBeforeItemSave($Item)
 {
     if ($Item["id"]=="settings") {
-        unset($Item["backups"]);        
+        unset($Item["backups"]);
     }
     return $Item;
 }

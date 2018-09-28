@@ -191,13 +191,14 @@ font-family: FontAwesome;
 .tree-edit {
     position: fixed;
     right:0;
+        padding: 0px;
 }
 
 #tree_edit .tree-view {
     height: calc(100vh - 140px);
     overflow: auto;
 }
-    
+
 .tree-edit.modal {
     box-shadow: -5px 0px 2px #00000066;
 }

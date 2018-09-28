@@ -427,6 +427,15 @@ function wbFlushDatabase()
 function wbTable($table = 'data', $engine = false)
 {
     wbTrigger('func', __FUNCTION__, 'before');
+        if (strpos($table,":")) {
+                $table=explode(":",$table);
+                if ($table[1]=="engine" OR $table[1]=="e") {$engine=true;}
+                $table=$table[0];
+        }
+
+    if (substr($table,0,strlen($_ENV['dbe'])) == $_ENV['dbe']) {
+            $engine = true;
+    }
     if (false == $engine) {
         $db = $_ENV['dba'];
     } else {
@@ -455,7 +464,10 @@ function wbTableName($table)
     $table = explode('/', $table);
     $table = array_pop($table);
     $table = str_replace('.json', '', $table);
-
+        if (strpos($table,":")) {
+                $table=explode(":",$table);
+                $table=$table[0];
+        }
     return $table;
 }
 
@@ -520,11 +532,10 @@ function wbTablePath($table = 'data', $engine = false)
     if (false == $engine) {
         $db = $_ENV['dba'];
     } else {
-        $_ENV['dbe'];
+        $db = $_ENV['dbe'];
     }
     $table = $db.'/'.$table.'.json';
     wbTrigger('func', __FUNCTION__, 'after', func_get_args(), $table);
-
     return $table;
 }
 
@@ -570,8 +581,8 @@ function wbListItems($table = 'pages', $where = '', $sort = null)
 function wbItemList($table = 'pages', $where = '', $sort = null)
 {
     $list = array();
-    $tname = wbTableName($table);
     $table = wbTable($table);
+    $tname = wbTableName($table);
     if (!is_file($table)) {
         wbError('func', __FUNCTION__, 1001, func_get_args());
 
@@ -776,6 +787,7 @@ function wbItemRead($table = null, $id = null)
         $item = $_ENV['cache'][md5($table)][$id];
     } else {
         $list = wbItemList($table);
+
         if (isset($list[$id])) {
             $item = $list[$id];
         } else {
@@ -791,11 +803,9 @@ function wbItemRead($table = null, $id = null)
             if ('remove' == $item['_removed']) {
                 $item = null;
             }
-        } else {
-            $item = wbTrigger('form', __FUNCTION__, 'AfterItemRead', func_get_args(), $item);
         }
     }
-
+    $item = wbTrigger('form', __FUNCTION__, 'AfterItemRead', func_get_args(), $item);
     return $item;
 }
 
@@ -834,7 +844,6 @@ function wbItemRemove($table = null, $id = null, $flush = true)
     $table = wbTable($table);
     if (!is_file($table)) {
         wbError('func', __FUNCTION__, 1001, func_get_args());
-
         return null;
     }
     if (is_array($id)) {
@@ -861,13 +870,8 @@ function wbItemRemove($table = null, $id = null, $flush = true)
             }
    }
 
-    if (!$res) {
-        wbError('func', __FUNCTION__, 1007, func_get_args());
-    } else {
-        wbLog('func', __FUNCTION__, 1008, func_get_args());
-    }
+    //if (!$res) {wbError('func', __FUNCTION__, 1007, func_get_args());}
     wbTrigger('form', __FUNCTION__, 'AfterItemRemove', func_get_args(), $item);
-
     return $res;
 }
 
@@ -924,7 +928,9 @@ function wbTableFlush($table)
         $fp = fopen($table, 'rb');
         flock($fp, LOCK_SH);
         $data = file_get_contents($table);
-        if (substr($data,0,1)=="{") {$data = json_decode($data,true);} else {
+        if (substr($data,0,1)=="{") {
+                $data = json_decode($data,true);
+        } else {
                 $data=unserialize($data);
         }
         $flag = false;
@@ -943,7 +949,11 @@ function wbTableFlush($table)
                 }
             }
         }
-        $data = serialize($data);
+        if (isset($_ENV["settings"]["format"]) AND $_ENV["settings"]["format"]=="serialize") {
+                $data = serialize($data);
+        } else {
+                $data = wbJsonEncode($data);
+        }
 
         flock($fp, LOCK_UN);
         fclose($fp);
@@ -1032,6 +1042,22 @@ function wbTrigger($type, $name, $trigger, $args = null, $data = null)
     }
 
     return $data;
+}
+
+function wbGetFormLocal($form=null) {
+        if ($form==null) $form=$_ENV["route"]["form"];
+        $ePath="{$_ENV["path_engine"]}/forms/{$form}/{$form}_lang.ini";
+        $aPath="{$_ENV["path_app"]}/forms/{$form}/{$form}_lang.ini";
+        if (is_file($ePath)) {$_ENV["locale"]=parse_ini_file($ePath,true);}
+        if (is_file($aPath)) {
+                $loc=parse_ini_file($aPath,true);
+                foreach($loc as $lang => $variables) {
+                        if (!isset($_ENV["locale"][$lang])) {$_ENV["locale"][$lang]=array();}
+                        foreach($variables as $var => $val) {
+                                $_ENV["locale"][$lang][$var]=$val;
+                        }
+                }
+        }
 }
 
 function wbFurlPut($item, $string, $flag = 'update')
@@ -1146,12 +1172,16 @@ function wbGetTpl($tpl = null, $path = false)
     return $out;
 }
 
-function wbLoopProtect($func)
+function wbLoopProtect($func,$args=array())
 {
     if (!isset($_ENV['wbGetFormStack'])) {
         $_ENV['wbGetFormStack'] = array();
     }
-    $_ENV['wbGetFormStack'][] = $func;
+    $_ENV['wbGetFormStack'][] = $func."_".md5(json_encode($args));
+}
+
+function wbLoopCheck($func,$args) {
+        if (in_array($func."_".md5(json_encode($args)),$_ENV['wbGetFormStack'])) {return true;} else {return false;}
 }
 
 function wbOconv($value, $oconv)
@@ -1879,7 +1909,7 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2)
             $err = false;
             $nIter = 0;
             $_FUNC = '';
-            $mask = '`(\{\{){1,1}(%*[\w\d]+|_form|_mode|_item|((_SETT|_sett|_SETTINGS|_SESS|_sess|_SESSION|_VAR|_var|_SRV|_COOK|_COOKIE|_FUNC|_ENV|_env|_REQ|_GET|_POST|%*[\w\d]+)?([\[]{1,1}(%*[\w\d]+|"%*[\w\d]+")[\]]{1,1})*))(\}\}){1,1}`u';
+            $mask = '`(\{\{){1,1}(%*[\w\d]+|_form|_mode|_item|((_SETT|_sett|_SETTINGS|_SESS|_sess|_SESSION|_VAR|_var|_SRV|_COOK|_COOKIE|_FUNC|_lang|_LANG|_ENV|_env|_REQ|_GET|_POST|%*[\w\d]+)?([\[]{1,1}(%*[\w\d]+|"%*[\w\d]+")[\]]{1,1})*))(\}\}){1,1}`u';
             while (!$exit) {
                 $nUndef = 0;
                 $nSub = preg_match_all($mask, $tag, $res, PREG_OFFSET_CAPTURE);				// найти все вставки, не содержащие в себе других вставок
@@ -1904,6 +1934,18 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2)
                                 break;
                             case '_SETTINGS':
                                 $sub = '$_ENV["settings"]';
+                                break;
+                            case '_lang':
+                                if (isset($_ENV["lang"])) {$lang=$_ENV["lang"];}
+                                if (isset($_SESSION["lang"])) {$lang=$_SESSION["lang"];}
+                                if (!isset($lang)) {$lang="eng";}
+                                $sub = '$_ENV["locale"][$lang]';
+                                break;
+                            case '_LANG':
+                                if (isset($_ENV["lang"])) {$lang=$_ENV["lang"];}
+                                if (isset($_SESSION["lang"])) {$lang=$_SESSION["lang"];}
+                                if (!isset($lang)) {$lang="eng";}
+                                $sub = '$_ENV["locale"][$lang]';
                                 break;
                             case '_VAR':
                                 $sub = '$_ENV["variables"]';

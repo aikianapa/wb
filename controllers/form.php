@@ -1,5 +1,6 @@
 <?php
 function form__controller() {
+	wbGetFormLocal($_ENV["route"]["form"]);
 	wbTrigger("func",__FUNCTION__,"before");
 	if ($_ENV["route"]["mode"]!=="setup_engine" AND !in_array($_ENV["route"]["form"],$_ENV["forms"])) {
 		echo form__controller__error_404();
@@ -200,6 +201,7 @@ function form__controller__select2() {
 
 function form__controller__setup_engine() {
     $out=wbGetTpl("/engine/tpl/setup.htm",true);
+    if (isset($_GET["params"]["lang"])) {$_SESSION["lang"]=$_ENV["lang"]=$_GET["params"]["lang"];} else {unset($_SESSION["lang"],$_ENV["lang"]);}
     if (is_dir($_ENV["dba"]) AND is_dir($_ENV["path_app"]."/tpl")) {
         $out->find("#setup")->remove();
         $out->wbSetData();

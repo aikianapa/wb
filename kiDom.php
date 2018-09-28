@@ -1244,16 +1244,16 @@ abstract class kiNode
 
 
 	public function wbSetData($Item=array()) {
-      $this->excludeTextarea($Item);
-			$this->wbSetAttributes($Item);
-			$this->wbUserAllow();
-			$nodes=new IteratorIterator($this->find("*"));
-			foreach($nodes as $inc) {
-				if (!$inc->parents("[type=text/template]")->length) {
-                    $inc->wbUserAllow();
+		$this->excludeTextarea($Item);
+		$this->wbSetAttributes($Item);
+		$this->wbUserAllow();
+		$nodes=new IteratorIterator($this->find("*"));
+		foreach($nodes as $inc) {
+			if (!$inc->parents("[type=text/template]")->length) {
+				$inc->wbUserAllow();
                     $inc->wbWhere($Item);
                     $tag=$inc->wbCheckTag();
-                    if (!$tag==FALSE && !$inc->hasClass("wb-done")) {
+                    if (!$tag==FALSE && !$inc->is(".wb-done")) {
                         if ($inc->has("[data-wb-json]")) {$inc->attr("data-wb-json",wbSetValuesStr($inc->attr("data-wb-json"),$Item));}
                             if ($inc->is("[data-wb-tpl=true]")) {$inc->addTemplate();}
                             $inc->wbProcess($Item,$tag);
@@ -1261,7 +1261,7 @@ abstract class kiNode
                         }
                     }
 			}; unset($inc);
-            $this->includeTag($Item);
+			$this->includeTag($Item);
       			$this->wbSetValues($Item);
       			$this->contentLoop($Item);
       			$this->wbPlugins($Item);
@@ -1418,7 +1418,7 @@ abstract class kiNode
 		$res=FALSE;
 		$tags=wbControls("tags");
 		foreach($tags as $tag) {
-			if ($this->hasRole($tag) AND !$this->hasClass("wb-done")) {$res=$tag; return $res;}
+			if ($this->hasRole($tag)) {$res=$tag; return $res;}
 		}; unset($tag);
 		return $res;
 	}
@@ -1436,7 +1436,7 @@ abstract class kiNode
 	}
 
 	function wbTargeter($Item=array()) {
-    $controls=wbControls("target");
+		$controls=wbControls("target");
 		$tar=$this->find($controls);
 		$attr=(explode(",",str_replace(array("[","]"," "),array("","",""),$controls)));
 		foreach($tar as $inc) {
@@ -2333,9 +2333,11 @@ public function tagInclude($Item=array()) {
                 $arr=explode("_",$name);
                 if (isset($arr[0])) {$form=$arr[0];}
                 if (isset($arr[1])) {unset($arr[0]); $mode=implode("_",$arr);}
+                wbGetFormLocal($form);
                 $this_content=wbGetForm($form,$mode);
                 break;
             case "snippet":
+		if (!isset($mode) AND isset($name)) {$mode=$name;}
 		$this_content=wbGetForm("snippets",$mode);
 		$this_content->wbSetValues($_ENV["attributes"]);
 		$this_content->wbClearClass();
@@ -2684,12 +2686,17 @@ public function tagThumbnail($Item=array()) {
 		contentAppends($this);
 	}
 
-	public function hasRole($role) {
-		$tl=array();
-		if 		($this->hasAttr("data-wb-role")) {$tl=wbAttrToArray($this->attr("data-wb-role"));}
-		elseif 	($this->hasAttr("role")) 		{$tl=wbAttrToArray($this->attr("role"));}
-		if (in_array($role,$tl)) {return true;} else {return false;}
+	public function hasRole($role=null) {
+		if ($role!==null) {
+			$tl=array();
+			if ($this->hasAttr("data-wb-role")) {$tl=wbAttrToArray($this->attr("data-wb-role"));}
+			elseif 	($this->hasAttr("role")) 		{$tl=wbAttrToArray($this->attr("role"));}
+			if (in_array($role,$tl)) {return true;} else {return false;}
+		} else {
+			return $this->wbCheckTag();
+		}
 	}
+
 
 	public function hasAttr($attr) {
 		if ($this->attr($attr)==NULL) {return FALSE;} else {return TRUE;}

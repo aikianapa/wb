@@ -35,111 +35,71 @@
     </div>
     <div class="kt-pagebody">
         <div class="row">
-            <div class="col-12 col-lg-10 ml-lg-auto mr-lg-auto col-xl-8">
-                <div class="card col-12 pd-20 pd-sm-40">
-                    <div id="setup">
-                        <h6 class="card-body-title">Web Basic Installation</h6>
-                        <p class="mg-b-20 mg-sm-b-30">Use installation wizard to setup engine.</p>
-                        <form id="setup" method="post">
-                            <input type="hidden" name="setup" value="done" />
-                            <div id="wizard">
-                                <h3>Personalisation</h3>
-                                <section>
-                                    <div class="row success">
-                                        <div class="col-sm-12">
-                                            <div class="form-group">
-                                                <label for="">Header</label>
-                                                <input class="form-control" placeholder="Header" type="text" name="header" required> </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label for="">Email</label>
-                                                <input class="form-control" placeholder="Email	" type="email" name="email" required> </div>
-                                        </div>
-                                    </div>
-                                </section>
-                                <h3>Security</h3>
-                                <section>
-                                    <div class="form-group">
-                                        <label for="">Login</label>
-                                        <input class="form-control" placeholder="Superuser Login" type="text" value="admin" name="login" required> </div>
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label for="">Password</label>
-                                                <input class="form-control" placeholder="Superuser password" type="password" name="password" required> </div>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <div class="form-group">
-                                                <label for="">Check password</label>
-                                                <input class="form-control" placeholder="Check password" type="password" name="password_check" required> </div>
-                                        </div>
-                                    </div>
-                                </section>
-                                <h3>Template</h3>
-                                <section>
-                                    <div class="form-group">
-                                        <label>Base template</label>
-                                        <select class="form-control" placeholder="Base template" required>
-                                            <option value=""> Select Base template </option>
-                                            <option value="single"> Landing page </option>
-                                            <option value="multi"> Traditional site </option>
-                                        </select>
-                                    </div>
-                                </section>
-                                <h3>Installation</h3>
-                                <section>
-                                    <p>Ready to installation. Click Install button to Start.</p>
-                                </section>
-                            </div>
-                        </form>
-                    </div>
-                    <div id="error" class="alert alert-warning">
-                        <h4 class="text-secondary">Installation Error!</h4>
-                        <p>
-                        Work directory <i>{{_ENV[path_app]}}</i> include files of previous installation.
-                        </p>
-                        <p>
-                            For new installation, please, remove all files and directories except <i>/engine</i> and try again.
-                        </p>
-                        <a class="btn btn-warning" href="/engine">Ready</a>
-                    </div>
-                    <div id="errors" class="d-none">
-						<div id="rights">
-							<p><h4>Installation Error!</h4>
-							Dirrectory <i>{{_ENV[path_app]}}</i> do not have access rights.
-							Please, set access rights to 766 and try again.</p>
-						</div>
-					</div>
+            <div class="col-12 col-lg-10 ml-lg-auto mr-lg-auto col-xl-8" data-wb-where='"{{_SESS[lang]}}"!=""' data-wb-hide="wb">
+                <div class="card col-12 pd-20 pd-sm-40" data-wb-role="include" src="form" data-wb-name="admin_setup">
                 </div>
             </div>
+                <div class="col-12 col-lg-10 ml-lg-auto mr-lg-auto col-xl-8" data-wb-where='"{{_SESS[lang]}}"=""' data-wb-hide="wb">
+                <div class="card rounded-0">
+                        <div class="card-header card-header-default">
+                          Choose language
+                        </div><!-- card-header -->
+                        <div class="card-body bg-gray-200">
+                        <div class="row">
+                                <div class="col-12 pt-3 pb-5 text-center">
+                                <img src="/engine/tpl/img/logo/logo.svg" style="height:2.9rem">
+                                </div>
+
+                                <div class="col-6 text-center">
+                                        <a href="/engine/?lang=eng">
+                                                <img src="/engine/tpl/img/flags-icons/uk.png" class="img-fluid">
+                                        </a>
+                                        <br>
+                                        <a href="/engine/?lang=eng" class="btn btn-primary mt-3">
+                                                English
+                                        </a>
+                                </div>
+                                <div class="col-6 text-center">
+                                        <a href="/engine/?lang=rus">
+                                                <img src="/engine/tpl/img/flags-icons/ru.png" class="img-fluid">
+                                        </a>
+                                        <br>
+                                        <a href="/engine/?lang=rus" class="btn btn-primary mt-3">
+                                                Руссий
+                                        </a>
+                                </div>
+                        </div>
+                        </div><!-- card-body -->
+                </div>
+                </div>
+
             <!-- card -->
         </div>
     </div>
     <!-- kt-pagebody -->
     <script data-wb-src="jquery"></script>
+    <script data-wb-src="bootstrap4js"></script>
     <script src="./lib/popper.js/popper.js"></script>
-    <script src="./lib/bootstrap/bootstrap.js"></script>
     <script src="./lib/jquery.steps/jquery.steps.js"></script>
     <script src="./js/katniss.js"></script>
     <script data-wb-src="engine"></script>
     <script data-wb-src="plugins"></script>
     <script>
         $(document).ready(function () {
-            'use strict';
             $(".kt-loading").css("opacity","0").css("z-index","-1");
+            var template = $(".wizard-tpl").html();
             $('#wizard').steps({
                 headerTag: 'h3'
                 , bodyTag: 'section'
                 , autoFocus: true
                 , labels: {
-                    next: "Next"
-                    , previous: "Prev"
-                    , finish: "Install"
+                          next: $("meta[name=btn_next]").attr("value")
+                        , previous: $("meta[name=btn_prev]").attr("value")
+                        , finish: $("meta[name=btn_install]").attr("value")
                 }
-                , titleTemplate: '<span class="number">#index#</span> <span class="title">#title#</span>'
+                , titleTemplate: template
                 , onStepChanging: function (event, currentIndex, newIndex) {
-                    return wb_check_required("#setup");
+                    return wb_check_required("#setup  section:visible");
                 }
                 , onFinishing: function (event, currentIndex) {
                     $("form#setup").submit();
