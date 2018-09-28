@@ -220,15 +220,9 @@ function wbItemToArray($Item = array())
 {
     if (is_array($Item)) {
         foreach ($Item as $i => $item) {
-            if (!is_array($item) and substr($item, 0, 2) == '[{') {
+            if (!is_array($item) and '[{' == substr($item, 0, 2)) {
                 $item = json_decode($item, true);
                 $item = wbItemToArray($item);
-            } else if (is_array($item)) {
-                foreach($item as $j => $branch) {
-                        if (!is_array($branch) and substr($branch, 0, 2) == '[{') {
-                                $item[$j] = json_decode($branch, true);
-                        }
-                }
             }
             if (isset($item['id'])) {
                 unset($Item[$i]);
@@ -646,9 +640,27 @@ function wbTreeRead($name)
         $tree['dict'] = json_decode($tree['_tree__dict_'], true);
     }
     $tree = wbItemToArray($tree);
+    $tree["assoc"] = wbTreeToArray($tree['tree']);
     $tree = wbTrigger('form', __FUNCTION__, 'AfterTreeRead', func_get_args(), $tree);
 
     return $tree;
+}
+
+function wbTreeToArray($tree) {
+        $assoc=array();
+        foreach($tree as $i => $item) {
+                if (isset($item["children"])  AND is_array($item["children"]) AND count($item["children"]) ) {$item["children"]=wbTreeToArray($item["children"]);}
+                if (isset($item["id"])) {
+                        $key=$item["id"];
+                } else {
+                        $key=$i;
+                }
+                if (!count($item["children"])) {$item["children"]="";}
+                if (!count($item["data"])) {$item["data"]="";}
+                $assoc[$key]=$item;
+
+        }
+        return $assoc;
 }
 
 function wbTreeFindBranchById($Item, $id)
@@ -1260,7 +1272,7 @@ function wbErrorList()
         404 => 'Page not found',
         1001 => 'Table {{0}} not exists',
         1002 => 'Table {{0}} already exixts',
-        1003 => 'Не удалось удалить {{0}}',
+        1003 => 'Do not remove {{0}}',
         1004 => 'Failed to remove file {{0}}',
         1005 => 'Failed to remove table {{0}}',
         1006 => 'Item {{1}} in table {{0}} not exists',

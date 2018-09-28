@@ -1720,38 +1720,38 @@ abstract class kiNode
 
 
 	public function tagVariable($Item) {
-        include("wbattributes.php");
+		include("wbattributes.php");
 		if (!isset($_ENV["variables"])) {$_ENV["varriables"]=array();}
 		$var=$this->attr("var");
-        if ($var>"") {
-            if (strtoupper(substr($var,0,5))=="_SESS") {
-                $var=str_replace(array('[',']','_SESS'),array('["','"]','_SESSION'),$var);
-                eval('$'.$var.' = "'.$this->attr("value").'";');
-            } else {
-                $_ENV["variables"][$var]="";
-                if (!isset($where)) $where=$if;
-                if ($where=="") {
-                    $_ENV["variables"][$var]=wbSetValuesStr($this->attr("value"),$Item);
-                } else {
-                    if (wbWhereItem($Item,$where)) {
-                        $_ENV["variables"][$var]=wbSetValuesStr($this->attr("value"),$Item);
-                    } else {
-                        $_ENV["variables"][$var]=wbSetValuesStr($this->attr("else"),$Item);
-                    }
-                }
-                $tmp=substr($_ENV["variables"][$var],0,1);
-                if ($tmp=="{" OR $tmp=="]") {
-                    $array=json_decode($_ENV["variables"][$var],true);
-                    if (is_array($array)) {$_ENV["variables"][$var]=$array;}
-                }
-                unset($array,$tmp);
+		if ($var>"") {
+		    if (strtoupper(substr($var,0,5))=="_SESS") {
+			$var=str_replace(array('[',']','_SESS'),array('["','"]','_SESSION'),$var);
+			eval('$'.$var.' = "'.$this->attr("value").'";');
+		    } else {
+			$_ENV["variables"][$var]="";
+			if (!isset($where)) $where=$if;
+			if ($where=="") {
+			    $_ENV["variables"][$var]=wbSetValuesStr($this->attr("value"),$Item);
+			} else {
+			    if (wbWhereItem($Item,$where)) {
+				$_ENV["variables"][$var]=wbSetValuesStr($this->attr("value"),$Item);
+			    } else {
+				$_ENV["variables"][$var]=wbSetValuesStr($this->attr("else"),$Item);
+			    }
+			}
+			$tmp=substr($_ENV["variables"][$var],0,1);
+			if ($tmp=="{" OR $tmp=="]" AND is_array(json_decode($_ENV["variables"][$var],true))) {
+			    $array=json_decode($_ENV["variables"][$var],true);
+			    if (is_array($array)) {$_ENV["variables"][$var]=$array;}
+			}
+			unset($array,$tmp);
 
-                if (isset($oconv) AND $oconv>"") {
-                    $_ENV["variables"][$var]=wbOconv($_ENV["variables"][$var],$oconv);
-                }
-            }
-        }
-        if ($this->attr("data-wb-hide")!=="false") {$this->remove();}
+			if (isset($oconv) AND $oconv>"") {
+			    $_ENV["variables"][$var]=wbOconv($_ENV["variables"][$var],$oconv);
+			}
+		    }
+		}
+		if ($this->attr("data-wb-hide")!=="false") {$this->remove();}
 		return $Item;
 	}
 
@@ -1939,7 +1939,7 @@ abstract class kiNode
 		} elseif ($type=="select") {
 				$this->tagTreeUl($Item,null,$srcVal);
 		} else {
-			if ($item>"") {$tree=wbTreeRead($item); $Item[$name]=$tree["tree"]; $Item["_{$name}"]=$tree["dict"];}
+			if ($item>"") {$tree=wbTreeRead($item); $Item[$name]=$tree["assoc"]; $Item["_{$name}"]=$tree["dict"];}
 			$this->tagTreeUl($Item,null,$srcVal);
 		}
     }
