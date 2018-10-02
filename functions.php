@@ -1217,14 +1217,16 @@ function wbGetForm($form = null, $mode = null, $engine = null)
     }
     $aCall = $form.'_'.$mode;
     $eCall = $form.'__'.$mode;
-    if (!isset($_ENV['wbGetFormStack'])) {
-        $_ENV['wbGetFormStack'] = array();
+
+    $loop=false;
+    foreach(debug_backtrace() as $func) {
+        if ($aCall==$func["function"]) {$loop=true;}
+        if ($eCall==$func["function"]) {$loop=true;}
     }
-    if (is_callable($aCall) and !in_array($aCall, $_ENV['wbGetFormStack'], true)) {
-        $_ENV['wbGetFormStack'][] = $aCall;
+
+    if (is_callable($aCall) and $loop == false) {
         $out = $aCall();
-    } elseif (is_callable($eCall) and false !== $engine and !in_array($eCall, $_ENV['wbGetFormStack'], true)) {
-        $_ENV['wbGetFormStack'][] = $eCall;
+    } elseif (is_callable($eCall) and false !== $engine and $loop == false) {
         $out = $eCall();
     }
 
