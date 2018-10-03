@@ -2060,44 +2060,56 @@ function wb_pagination(pid) {
         $(this).parents(".pagination").find("li.active").prev("li").find("a").trigger("click");
       }
     });
-    $(document).undelegate(".pagination[id=" + id + "] li a, thead[data=" + id + "] th[data-sort]", "click");
-    $(document).delegate(".pagination[id=" + id + "] li a, thead[data=" + id + "] th[data-sort]", "click", function(event) {
+
+        $(document).undelegate("thead th[data-wb-sort]", "click");
+        $(document).delegate("thead th[data-wb-sort]", "click", function(event) {
+                var that=this;
+                var thead=$(this).parents("thead");
+                var tbody=$(this).parents("table").children("tbody");
+                var id = $(thead).attr("data-wb");
+                var page=$(".pagination[id="+id+"] .active").attr("data-page");
+                var desc=$(this).data("desc");
+                //====//
+                var oldsort=$(tbody).attr("data-wb-sort");
+                var s=explode(":",oldsort);
+                if (s[1]==undefined || s[1]=="a") {s[1]="a";} else {s[1]="d";}
+                oldsort = implode(":",s);
+                $(tbody).attr("data-wb-sort",oldsort);
+                //====//
+                var newsort=$(this).attr("data-wb-sort");
+                var s=explode(":",newsort);
+                if (s[1]==undefined) {s[1]="a";}
+                if (s[1]=="a" || s[1]=="asc") {s[1]="d"; desc="true";} else {s[1]="a"; desc="false";}
+                newsort = implode(":",s);
+                $(that).attr("data-wb-sort",newsort);
+                //====//
+                $(thead).find(".wb-desc,.wb-asc").removeClass("wb-desc wb-asc");
+                if (desc=="true") {
+                        $(this).addClass("wb-desc");
+                        $(this).data("desc","false");
+                } else {
+                        $(this).addClass("wb-asc");
+                        $(this).data("desc","true");
+                }
+                $(tbody).attr("data-wb-sort",newsort);
+                var page=$(".pagination[id="+id+"] .active").attr("data-page");
+                $(".pagination[id="+id+"] .active").removeClass("active");
+                if (page>0) {
+                        $(".pagination[id="+id+"] [data-page='"+page+"'] a").trigger("click");
+                } else {
+                        $(".pagination[id="+id+"] [data-page]:eq(1) a").trigger("click");
+                }
+
+        });
+
+
+
+    $(document).undelegate(".pagination[id=" + id + "] li a", "click");
+    $(document).delegate(".pagination[id=" + id + "] li a", "click", function(event) {
       if (!$(this).is("a") || !$(this).parent().hasClass("active")) { // отсекает дубль вызова ajax, но не работает trigger в поиске
         console.log("active_pagination(): Click");
         var that = $(this);
-        /*
-        			if ($(this).is("th[data-sort]")) {
-        				var $source=$(this).parents("thead");
-        				var page=$source.attr("data")+"-"+$(".pagination[id="+id+"] .active").attr("data-page");
-        				var sort=$(this).attr("data-sort");
-        				var desc=$(this).attr("data-desc");
-        				var sort=explode(" ",trim(sort));
-        				$(sort).each(function(i){
-        					var s=explode(":",sort[i]);
-        					if (s[1]==undefined) {
-        						if (desc==undefined) {s[1]="a";}
-        						if (desc!==undefined && desc=="false") {s[1]="a"; desc="false";}
-        						if (desc!==undefined && desc=="true") {s[1]="d"; desc="true";}
-        					}
-        					if (s[1]=="a") {s[1]="d";} else {s[1]="a";}
-        					$(that).attr("data-sort",implode(":",s));
-        				});
-        				var sort=$(this).attr("data-sort");
 
-        				$(this).parents("thead").find("th[data-sort]").each(function(){
-        					$(this).find(".aiki-sort").remove();
-        					$(this).data("desc","");
-        					$(this).removeAttr("data-desc");
-        				});
-        				if (desc=="true") {
-        					$(this).prepend("<i class='aiki-sort fa fa-long-arrow-up pull-left'></i>");
-        					$(this).data("desc","false");
-        				} else {
-        					$(this).prepend("<i class='aiki-sort fa fa-long-arrow-down pull-left'></i>");
-        					$(this).data("desc","true");
-        				}
-        			} else {
-        */
         var $source = $(this).parents(".pagination");
         var tid = explode("-", $(this).parents(".pagination").attr("id"));
         var tid = tid[1];
@@ -2116,7 +2128,6 @@ function wb_pagination(pid) {
         var page = "ajax-" + page[c - 3] + "-" + page[c - 2];
         var sort = null;
         var desc = null;
-        //			}
         if (substr(page, 0, 4) == "page") {
           // js пагинация
           $("[data-page^=" + id + "]").hide();
@@ -2219,8 +2230,7 @@ function wb_pagination(pid) {
         }
         //$(document).trigger("after_pagination_click",[id,page,arr[2]]);
       }
-      event.preventDefault();
-      return false;
+
     });
   });
 }

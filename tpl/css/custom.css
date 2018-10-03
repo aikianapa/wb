@@ -520,6 +520,24 @@ select.form-control+.select2-container {
     height:38px!important;
 }
 
+th[data-wb-sort] {
+        cursor: pointer;
+}
+
+th[data-wb-sort]:before {
+    font-family: FontAwesome;
+    content: "\f0dc";
+    padding-right: 5px;
+}
+
+th.wb-desc[data-wb-sort]:before {
+        content: "\f0dd";
+}
+
+th.wb-asc[data-wb-sort]:before {
+        content: "\f0de";
+}
+
 
 @media screen {
   .wb-print-box {
