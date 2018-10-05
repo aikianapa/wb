@@ -1,6 +1,5 @@
 <?php
 function form__controller() {
-	wbGetFormLocal($_ENV["route"]["form"]);
 	wbTrigger("func",__FUNCTION__,"before");
 	if ($_ENV["route"]["mode"]!=="setup_engine" AND !in_array($_ENV["route"]["form"],$_ENV["forms"])) {
 		echo form__controller__error_404();

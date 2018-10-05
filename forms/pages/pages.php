@@ -8,6 +8,7 @@ function pages__edit() {
 		$Item["template"]=$_ENV["settings"]["template"];
 	}
 	$Item["tpllist"]=wbListTpl();
+	$Item=wbCallFormFunc("BeforeItemEdit",$Item);
 	$out->wbSetData($Item);
 	$options=$out->find("select[name=template] option");
 	foreach($options as $opt) {

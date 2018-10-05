@@ -1,15 +1,18 @@
-<h5 class="element-header">Настройки</h5>
+<h5 class="element-header">
+        {{_LANG[settings]}}
+        <a type="button" href="#" class="btn btn-primary pull-right" data-wb-formsave="#admin_settings"><i class="fa fa-save"></i> &nbsp; {{_LANG[btn_save]}}</a>
+</h5>
 <form method="post" id="admin_settings" data-wb-form="admin" data-wb-item="settings" data-wb-allow="admin">
     <div class="nav-active-primary">
         <ul class="nav nav-pills flex-column flex-md-row" role="tablist">
-            <li class="nav-item"><a class="nav-link active" href="#adminMain" data-toggle="tab">Основные</a></li>
-            <li class="nav-item"><a class="nav-link" href="#adminAdd" data-toggle="tab">Вставки</a></li>
-            <li class="nav-item"><a class="nav-link" href="#adminTree" data-toggle="tab">Каталог</a></li>
-            <li class="nav-item"><a class="nav-link" href="#adminUpdate" data-toggle="tab">Обновление</a></li>
-            <li class="nav-item"><a class="nav-link" href="#adminBackups" data-toggle="tab">Бэкапы</a></li>
-            <li class="nav-item"><a class="nav-link" href="#" data-wb-ajax="/module/sitemap" data-wb-html=".content-box">Карта сайта</a></li>
-            <li class="nav-item"><a class="nav-link" href="#" data-wb-ajax="/form/list/users" data-wb-html=".content-box">Пользователи</a></li>
-            <li class="nav-item"><a class="nav-link" href="#" data-wb-ajax="/form/list/source" data-wb-html=".content-box">Проводник</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#adminMain" data-toggle="tab">{{_LANG[tab_main]}}</a></li>
+                <li class="nav-item"><a class="nav-link" href="#adminCache" data-toggle="tab">{{_LANG[tab_cache]}}</a></li>
+                <li class="nav-item"><a class="nav-link" href="#adminAdd" data-toggle="tab">{{_LANG[tab_includes]}}</a></li>
+                <li class="nav-item"><a class="nav-link" href="#adminTree" data-toggle="tab">{{_LANG[tab_catalog]}}</a></li>
+                <li class="nav-item"><a class="nav-link" href="#adminUpdate" data-toggle="tab">{{_LANG[tab_update]}}</a></li>
+                <li class="nav-item"><a class="nav-link" href="#adminBackups" data-toggle="tab">{{_LANG[tab_backup]}}</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" data-wb-ajax="/module/sitemap" data-wb-html=".content-box">{{_LANG[tab_sitemap]}}</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" data-wb-ajax="/form/list/source" data-wb-html=".content-box">{{_LANG[tab_explorer]}}</a></li>
         </ul>
     </div>
     <div class="tab-content pd-y-20">
@@ -40,6 +43,15 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-sm-12">
+                        <div class="form-group">
+                                <label for="">{{_LANG[beautifyHtml]}}</label>
+                                <label class="switch switch-sm switch-success">
+				<input type="checkbox" name="beautifyHtml" value="">
+				<span></span>
+			</label>
+                        </div>
+                </div>
                 <div class="col-sm-12" data-wb-role="multiinput" name="variables">
                     <div class="col-sm-3 col-xs-12">
                         <input class="form-control" placeholder="Переменная" type="text" name="var"> </div>
@@ -48,10 +60,10 @@
                     <div class="col-sm-5 col-xs-12">
                         <input class="form-control" placeholder="Описание" type="text" name="header"> </div>
                 </div>
-                <div class="col-sm-12">
-                    <button type="button" class="btn btn-primary mg-t-20" data-wb-formsave="#admin_settings">Сохранить</button>
-                </div>
             </div>
+        </div>
+        <div id="adminCache" class="tab-pane" role="tabpanel" data-wb-role="include" src="form" data-wb-name="admin_cache">
+
         </div>
         <div id="adminAdd" class="tab-pane" role="tabpanel">
             <div class="row">
@@ -69,19 +81,12 @@
                     </div>
                     <div data-wb-role="include" data-wb-name="body_add" src="source" role="tabpanel"></div>
                 </div>
-
-                <div class="col-sm-12">
-                    <button type="button" class="btn btn-primary mg-t-20" data-wb-formsave="#admin_settings">Сохранить</button>
-                </div>
             </div>
         </div>
         <div id="adminTree" class="tab-pane fade" role="tabpanel">
             <div class="row">
                 <div class="col-sm-12">
                     <div data-wb-role="tree" name="tree"></div>
-                </div>
-                <div class="col-sm-12">
-                    <button type="button" class="btn btn-primary mg-t-20" data-wb-formsave="#admin_settings">Сохранить</button>
                 </div>
             </div>
         </div>
@@ -199,3 +204,58 @@
 </div>
 
 <script src="/engine/forms/admin/admin.js"></script>
+<script type="text/locale">
+[rus]
+        settings	= Настройки
+        slogan 		= Используйте мастер для подготовки установки.
+        step1 		= Основное
+        step2 		= Безопасность
+        step3 		= Шаблон
+        step4 		= Установка
+        header		= Заголовок
+        email		= Эл.почта
+        login		= Логин админа
+        password	= Пароль админа
+        chkpass		= Повтор пароля
+        beautifyHtml    = Форматировать HTML
+        msg_ready	= Всё готово к установке. Нажмите кнопку Установить для начала процесса.
+        btn_prev	= Назад
+        btn_next	= Далее
+        btn_install	= Установить
+        btn_save	= Сохранить
+        tab_cache	= Кэширование
+        tab_main	= Основные
+        tab_includes	= Вставки
+        tab_catalog	= Каталог
+        tab_update	= Обновление
+        tab_backup	= Бэкап
+        tab_sitemap	= Карта сайта
+        tab_explorer	= Проводник
+
+[eng]
+        settings	= Settings
+        slogan 		= Use installation wizard to setup engine.
+        step1 		= Main
+        step2 		= Security
+        step3 		= Template
+        step4 		= Installation
+        header		= Header
+        email		= Email
+        login		= Admin Login
+        password	= Admin Password
+        chkpass		= Check password
+        beautifyHtml    = Beautify HTML
+        msg_ready	= Ready to installation. Click Install button to Start.
+        btn_prev	= Prev
+        btn_next	= Next
+        btn_install	= Install
+        btn_save	= Save
+        tab_cache	= Cache
+        tab_main	= Main
+        tab_includes	= Includes
+        tab_catalog	= Catalog
+        tab_update	= Update
+        tab_backup	= Backup
+        tab_sitemap	= Sitemap
+        tab_explorer	= Explorer
+</script>

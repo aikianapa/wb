@@ -821,6 +821,42 @@ function wbItemRead($table = null, $id = null)
     return $item;
 }
 
+function wbCacheCheck() {
+        $cache = array("check"=>false,"id"=>false,"path"=>false,"data"=>false);
+        if (isset($_ENV["settings"]["cache"]) AND is_array($_ENV["settings"]["cache"])) {
+                foreach($_ENV["settings"]["cache"] as $line) {
+                        $c=wbAttrToArray($line["controller"]);
+                        $f=wbAttrToArray($line["form"]);
+                        $m=wbAttrToArray($line["mode"]);
+                        if (
+                                (in_array($_ENV["route"]["controller"],$c) OR $c==array("*") )
+                        AND     (in_array($_ENV["route"]["form"],$f) OR $f==array("*") OR ($f==array() AND !in_array("form",$c)))
+                        AND     (in_array($_ENV["route"]["mode"],$m) OR $m==array("*") OR ($m==array() AND !in_array("form",$c)))
+                        AND     $line["active"] == "on"
+                        )
+                        {
+                                $cacheId = md5(json_encode($_ENV["route"]));
+                                $cacheFile = $_ENV["dbac"]."/".$cacheId.".htm";
+                                if (!is_file($cacheFile)) {
+                                        $cache = array("check"=>null,"id"=>$cacheId,"path"=>$cacheFile,"data"=>false);
+                                } else {
+                                        $lastmod = filemtime($cacheFile);
+                                        $expired = $lastmod + $line["lifetime"]*1;
+                                        if (time() > $expired) {
+                                                $cache = array("check"=>null,"id"=>$cacheId,"path"=>$cacheFile,"data"=>false);
+                                        } else {
+                                                $data = file_get_contents($cacheFile);
+                                                $cache = array("check"=>true,"id"=>$cacheId,"path"=>$cacheFile,"data"=>$data);
+                                        }
+
+                                }
+                        }
+                }
+        }
+        return $cache;
+}
+
+
 function wbCacheName($table, $id = null)
 {
     $tmp = explode($_ENV['dbe'], $table);
@@ -1056,22 +1092,6 @@ function wbTrigger($type, $name, $trigger, $args = null, $data = null)
     return $data;
 }
 
-function wbGetFormLocal($form=null) {
-        if ($form==null) $form=$_ENV["route"]["form"];
-        $ePath="{$_ENV["path_engine"]}/forms/{$form}/{$form}_lang.ini";
-        $aPath="{$_ENV["path_app"]}/forms/{$form}/{$form}_lang.ini";
-        if (is_file($ePath)) {$_ENV["locale"]=parse_ini_file($ePath,true);}
-        if (is_file($aPath)) {
-                $loc=parse_ini_file($aPath,true);
-                foreach($loc as $lang => $variables) {
-                        if (!isset($_ENV["locale"][$lang])) {$_ENV["locale"][$lang]=array();}
-                        foreach($variables as $var => $val) {
-                                $_ENV["locale"][$lang][$var]=$val;
-                        }
-                }
-        }
-}
-
 function wbFurlPut($item, $string, $flag = 'update')
 {
     $res = false;
@@ -1193,6 +1213,9 @@ function wbLoopProtect($func,$args=array())
 }
 
 function wbLoopCheck($func,$args) {
+        if (!isset($_ENV['wbGetFormStack'])) {
+                $_ENV['wbGetFormStack'] = array();
+        }
         if (in_array($func."_".md5(json_encode($args)),$_ENV['wbGetFormStack'])) {return true;} else {return false;}
 }
 
@@ -1939,21 +1962,12 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2)
                         $text .= substr($tag, $startIn, $beforSize);		// исходный текст между предыдущей и текущей вставками
                         $default = false;
                         $special = 0;
-                        switch ($res[4][$i][0]) {					// префикс вставки
+                        switch (strtoupper($res[4][$i][0])) {					// префикс вставки
                             case '_SETT':
-                                $sub = '$_ENV["settings"]';
-                                break;
-                            case '_sett':
                                 $sub = '$_ENV["settings"]';
                                 break;
                             case '_SETTINGS':
                                 $sub = '$_ENV["settings"]';
-                                break;
-                            case '_lang':
-                                if (isset($_ENV["lang"])) {$lang=$_ENV["lang"];}
-                                if (isset($_SESSION["lang"])) {$lang=$_SESSION["lang"];}
-                                if (!isset($lang)) {$lang="eng";}
-                                $sub = '$_ENV["locale"][$lang]';
                                 break;
                             case '_LANG':
                                 if (isset($_ENV["lang"])) {$lang=$_ENV["lang"];}
@@ -1964,13 +1978,7 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2)
                             case '_VAR':
                                 $sub = '$_ENV["variables"]';
                                 break;
-                            case '_var':
-                                $sub = '$_ENV["variables"]';
-                                break;
                             case '_SESS':
-                                $sub = '$_SESSION';
-                                break;
-                            case '_sess':
                                 $sub = '$_SESSION';
                                 break;
                             case '_SESSION':
@@ -1989,9 +1997,6 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2)
                                 $sub = '$_GET';
                                 break;
                             case '_ENV':
-                                $sub = '$_ENV';
-                                break;
-                            case '_env':
                                 $sub = '$_ENV';
                                 break;
                             case '_FUNC':
@@ -2040,15 +2045,20 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2)
                                 $text .= $temp;
                             }
                         } else {
+                                $tmp=explode("[",$res[2][$i][0]); $tmp=$tmp[0];
                             /*
-                            $skip=array("_GET","_POST","_COOK","_COOKIE","_SESS","_SESSION","_SETT","_SETTINGS");
-                            $tmp=explode("[",$res[2][$i][0]); $tmp=$tmp[0];
-                            if (in_array($tmp,$skip)) {
-                                $text.="";
-                            } else {
-                                $text .= '{{' . $res[2][$i][0] . '}}';;
-                            }
+                                $skip=array("_GET","_POST","_COOK","_COOKIE","_SESS","_SESSION","_SETT","_SETTINGS");
+                                if (in_array($tmp,$skip)) {
+                                        $text.="";
+                                } else {
+                                        $text .= '{{' . $res[2][$i][0] . '}}';;
+                                }
                             */
+                                $allow=array("_LANG");
+                                if (in_array($tmp,$allow)) {
+                                        $text .= '{{' . $res[2][$i][0] . '}}';
+                                }
+
                             $text .= '';
                             ++$nUndef;
                         }

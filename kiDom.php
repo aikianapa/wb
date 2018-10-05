@@ -1287,8 +1287,21 @@ abstract class kiNode
         return $this;
     }
 
+        public function wbGetFormLocale() {
+                if ($this->find("script[type='text/locale']")->length) {
+                        $loc=$this->find("script[type='text/locale']",0)->html();
+                        $loc=parse_ini_string($loc,true);
+                        foreach($loc as $lang => $variables) {
+                                if (!isset($_ENV["locale"][$lang])) {$_ENV["locale"][$lang]=array();}
+                                foreach($variables as $var => $val) {
+                                        $_ENV["locale"][$lang][$var]=$val;
+                                }
+                        }
+                }
+        }
 
     public function wbSetData($Item=array()) {
+        $this->wbGetFormLocale();
         $this->excludeTextarea($Item);
         $this->wbSetAttributes($Item);
         $this->wbUserAllow();
@@ -2848,8 +2861,8 @@ abstract class kiNode
                 unset($arr[0]);
                 $mode=implode("_",$arr);
             }
-            wbGetFormLocal($form);
             $this_content=wbGetForm($form,$mode);
+            $this_content->wbGetFormLocale();
             break;
         case "snippet":
             if (!isset($mode) AND isset($name)) {
