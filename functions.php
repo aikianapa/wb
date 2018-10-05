@@ -220,9 +220,13 @@ function wbItemToArray($Item = array())
 {
     if (is_array($Item)) {
         foreach ($Item as $i => $item) {
-            if (!is_array($item) and '[{' == substr($item, 0, 2)) {
-                $item = json_decode($item, true);
-                $item = wbItemToArray($item);
+            if (!is_array($item)) {
+                $tmp = json_decode($item, true);
+                if (is_array($tmp)) {
+                        $item = wbItemToArray($tmp);
+                        unset($tmp);
+                }
+
             }
             if (isset($item['id'])) {
                 unset($Item[$i]);
@@ -231,6 +235,13 @@ function wbItemToArray($Item = array())
                 $Item[$i] = $item;
             }
         }
+    } else {
+        $tmp = json_decode($Item, true);
+        if (is_array($tmp)) {
+                $Item = wbItemToArray($tmp);
+                unset($tmp);
+        }
+
     }
 
     return $Item;
@@ -983,7 +994,7 @@ function wbTableFlush($table)
         }
         $flag = false;
         foreach ($cache as $key => $item) {
-            //    print_r($item);
+
             $item['_table'] = $tname;
             if (isset($data[$key])) {
                 $data[$key]=array_merge($data[$key],$item);
@@ -1913,7 +1924,6 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2)
     if (!is_array($Item)) {
         $Item = array($Item);
     }
-    $Item = wbItemToArray($Item);
     // Обработка для доступа к полям с JSON имеющим id в содержании, в частности к tree
     $arr = new ArrayIterator($Item);
     $Item = array();
@@ -1933,6 +1943,7 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2)
             $Item[$key] = $item;
         }
     }
+        $Item=wbItemToArray($Item);
 
     // =========== Конец обработки ===============
     if (is_string($tag)) {
@@ -2027,6 +2038,10 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2)
                                 $default = true;
                                 $n = strlen($res[4][$i][0]);
                                 $In = '['.substr($In, 0, $n).']'.substr($In, $n, strlen($In) - $n);
+                                // Заплатка
+                                if ($In == '[data][image][0][img]') {
+                                       $Item["data"]["image"]=wbItemToArray($Item["data"]["image"]);
+                                }
                                 break;
                         }
                         if ($default) {

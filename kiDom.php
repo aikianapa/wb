@@ -2303,6 +2303,7 @@ abstract class kiNode
         $idx=0;
         if (is_array($tree)) {
             foreach($tree as $i => $item) {
+                $item=wbItemToArray($item);
                 $lvl++;
                 $item=(array)$srcVal + (array)$item;
                 $item["_idx"]=$idx;
@@ -2515,7 +2516,7 @@ abstract class kiNode
                         if ($field>"") {
                             $Item=$Item[0][$field];
                             if (is_string($Item)) {
-                                $Item=json_decode($Item,true);
+                                $Item=wbItemToArray($Item);
                             }
                             if (isset($Item[0]["img"]) && isset($Item[0]["visible"])) {
                                 $Item=array_filter_value($Item,"visible","1");
