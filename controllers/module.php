@@ -9,7 +9,8 @@ function module__controller() {
 		die;
 	}
 	wbTrigger("func",__FUNCTION__,"after");
-return $_ENV["DOM"];
+	$_ENV["DOM"]->wbSetFormLocale();
+	return $_ENV["DOM"];
 }
 
 function module__controller__init() {

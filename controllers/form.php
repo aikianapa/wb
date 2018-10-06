@@ -23,7 +23,7 @@ function form__controller() {
         }
         if (!is_object($out)) {$_ENV["DOM"]=wbFromString($out);} else {$_ENV["DOM"]=$out;}
 	}
-    unset($out);
+	unset($out);
 	wbTrigger("func",__FUNCTION__,"after");
 return $_ENV["DOM"];
 }
@@ -59,6 +59,7 @@ function form__controller__show() {
         if ($fid) {$item=$fid;} else {return form__controller__error_404();}
         $Item=$_ENV["ITEM"]=wbItemRead($form,$item);
     }
+    $Item=wbItemToArray($Item);
     if (is_callable("wbBeforeShowItem")) {$Item=$_ENV["ITEM"]=wbBeforeShowItem($Item);}
     $Item=$_ENV["ITEM"]=wbCallFormFunc("BeforeShowItem",$Item,$form,$mode);
 

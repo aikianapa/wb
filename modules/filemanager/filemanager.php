@@ -6,7 +6,7 @@ function filemanager__init()
         $call="filemanager__{$mode}";
         if (is_callable($call)) {
             $out=@$call();
-        }
+       }
         die;
     } else {
         $out=file_get_contents(__DIR__ ."/filemanager_ui.php");
@@ -65,6 +65,7 @@ function filemanager__getdir($result=false)
 				return $arr;
 		} else {
 	    $out=wbGetTpl("/engine/modules/filemanager/filemanager_ui.php", true);
+            $out->wbSetFormLocale();
 	    $out=$out->find("#panel", 0);
 	    $out->wbSetData($arr);
 	    echo $out;
@@ -92,6 +93,7 @@ function filemanager__dialog()
 {
     if (filemanager__allow()) {
         $out=wbGetTpl("/engine/modules/filemanager/filemanager_ui.php", true);
+        $out->wbSetFormLocale();
         $out=$out->find("#filemanagerModalDialog", 0);
         $action=$_ENV["route"]["params"][1];
         $title=$out->find("meta[name=$action]")->attr("title");
@@ -185,10 +187,10 @@ function filemanager__action_paste($out=null)
                         if ($_POST["method"]=="cut") {
                           rename($src,$dst);
                         }
-                    
+
                         if ($_POST["method"]=="copy") {
                             if (file_exists($dst)) {$dst=filemanager__copyname($dst);}
-						      wbRecurseCopy($src,$dst);                            
+						      wbRecurseCopy($src,$dst);
                         }
 
 				}
@@ -240,7 +242,7 @@ function filemanager__action()
 }
 
 function filemanager__action_multi() {
-    
+
     return null;
 }
 

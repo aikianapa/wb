@@ -20,6 +20,19 @@ function wbInitEnviroment()
     if (!isset($_SESSION['user'])) {
         $_SESSION['user'] = '';
     }
+
+    if ((!isset($_SESSION['lang']) OR $_SESSION['lang']=="") AND (!isset($_ENV['lang']) OR $_ENV['lang']=="")) {
+        $_SESSION['lang'] = $_ENV["lang"] = 'eng';
+    } else {
+        if (isset($_SESSION['lang'])) {
+                $_ENV['lang']=$_SESSION["lang"];
+        } else if (isset($_ENV['lang'])) {
+                $_SESSION["lang"]=$_ENV['lang'];
+        } else {
+                $_SESSION['lang'] = $_ENV["lang"] = 'eng';
+        }
+    }
+
     if (!isset($_SESSION['user_role'])) {
         $_SESSION['user_role'] = '';
     }
@@ -220,22 +233,21 @@ function wbItemToArray($Item = array())
 {
     if (is_array($Item)) {
         foreach ($Item as $i => $item) {
-            if (!is_array($item)) {
-                $tmp = json_decode($item, true);
-                if (is_array($tmp)) {
-                        $item = wbItemToArray($tmp);
-                        unset($tmp);
+            if (is_string($item) AND ( substr($item,0,1)=="{" OR substr($item,0,1)=="[") )  {
+                        $tmp = json_decode($item, true);
+                        if (is_array($tmp)) {
+                                $item = wbItemToArray($item);
+                                unset($tmp);
+                        }
+            }
+                if (is_array($item) AND isset($item['id'])) {
+                        unset($Item[$i]);
+                        $Item[$item['id']] = $item;
+                } else {
+                        $Item[$i] = $item;
                 }
-
-            }
-            if (isset($item['id'])) {
-                unset($Item[$i]);
-                $Item[$item['id']] = $item;
-            } else {
-                $Item[$i] = $item;
-            }
         }
-    } else {
+    } else if (is_string($item) AND substr($Item,0,1)=="{" OR substr($Item,0,1)=="[") {
         $tmp = json_decode($Item, true);
         if (is_array($tmp)) {
                 $Item = wbItemToArray($tmp);
@@ -251,7 +263,7 @@ function wbGetDataWbFrom($Item, $str)
 {
     $str = trim($str);
     $str = wbSetValuesStr($str, $Item);
-    $Item = wbItemToArray($Item);
+    //$Item = wbItemToArray($Item);
     $pos = strpos($str, '[');
     if ($pos) {
         $fld = '['.substr($str, 0, $pos).']';
@@ -260,7 +272,11 @@ function wbGetDataWbFrom($Item, $str)
         $fld = str_replace('[', '["', $fld);
         $fld = str_replace(']', '"]', $fld);
         $fld = str_replace('""', '"', $fld);
-        eval('$res=$Item'.$fld.';');
+        if (eval('return isset($Item'.$fld.');')) {
+                eval('$res=$Item'.$fld.';');
+        } else {
+                $res="";
+        }
 
         return $res;
     }
@@ -594,8 +610,8 @@ function wbItemList($table = 'pages', $where = '', $sort = null)
         return array();
     }
     wbTrigger('form', __FUNCTION__, 'BeforeItemList', func_get_args(), array());
-    if (isset($_ENV['cache'][md5($table.$where.$sort)])) {
-        $list = $_ENV['cache'][md5($table.$where.$sort)];
+    if (isset($_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])])) {
+        $list = $_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])];
     } else {
         $list = wb_file_get_contents($table);
         if (substr($list,0,1)=="{") {$list = json_decode($list,true);} else {
@@ -629,7 +645,7 @@ function wbItemList($table = 'pages', $where = '', $sort = null)
     if (null !== $sort) {
         $list = wbArraySortMulti($list, $sort);
     }
-    $_ENV['cache'][md5($table.$where.$sort)] = $list;
+    $_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])] = $list;
     $list = wbTrigger('form', __FUNCTION__, 'AfterItemList', func_get_args(), $list);
     $list = wbTrigger('func', __FUNCTION__, 'after', func_get_args(), $list);
 
@@ -650,7 +666,6 @@ function wbTreeRead($name)
     } else {
         $tree['dict'] = json_decode($tree['_tree__dict_'], true);
     }
-    $tree = wbItemToArray($tree);
     $tree["assoc"] = wbTreeToArray($tree['tree']);
     $tree = wbTrigger('form', __FUNCTION__, 'AfterTreeRead', func_get_args(), $tree);
 
@@ -666,8 +681,8 @@ function wbTreeToArray($tree) {
                 } else {
                         $key=$i;
                 }
-                if (!count($item["children"])) {$item["children"]="";}
-                if (!count($item["data"])) {$item["data"]="";}
+                if (!is_array($item["children"]) OR !count($item["children"])) {$item["children"]="";}
+                if (!is_array($item["data"]) OR !count($item["data"])) {$item["data"]="";}
                 $assoc[$key]=$item;
 
         }
@@ -726,7 +741,7 @@ function wbTreeWhere($tree, $id, $field, $inc = true)
     } else {
         $tree = wbTreeFindBranchById($tree, $id);
     }
-    $cache_id = md5($tree_id.$id.$field.$inc);
+    $cache_id = md5($tree_id.$id.$field.$inc.$_ENV["lang"].$_SESSION["lang"]);
     if (isset($_ENV['cache'][__FUNCTION__][$cache_id])) {
         return $_ENV['cache'][__FUNCTION__][$cache_id];
     }
@@ -750,7 +765,7 @@ function wbTreeIdList($tree, $list = array())
     if (isset($tree['id'])) {
         $list[] = $tree['id'];
     }
-    $tree = wbItemToArray($tree);
+    //$tree = wbItemToArray($tree);
     if (isset($tree['children']) and is_array($tree['children'])) {
         foreach ($tree['children'] as $key => $child) {
             $list = wbTreeIdList($child, $list);
@@ -806,8 +821,8 @@ function wbItemRead($table = null, $id = null)
     }
     wbTrigger('form', __FUNCTION__, 'BeforeItemRead', func_get_args(), array());
     $table = wbTable($table);
-    if (isset($_ENV['cache'][md5($table)][$id])) {
-        $item = $_ENV['cache'][md5($table)][$id];
+    if (isset($_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$id])) {
+        $item = $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$id];
     } else {
         $list = wbItemList($table);
 
@@ -846,7 +861,7 @@ function wbCacheCheck() {
                         AND     $line["active"] == "on"
                         )
                         {
-                                $cacheId = md5(json_encode($_ENV["route"]));
+                                $cacheId = md5(json_encode($_ENV["route"]).$_ENV["lang"].$_SESSION["lang"]);
                                 $cacheFile = $_ENV["dbac"]."/".$cacheId.".htm";
                                 if (!is_file($cacheFile)) {
                                         $cache = array("check"=>null,"id"=>$cacheId,"path"=>$cacheFile,"data"=>false);
@@ -923,7 +938,7 @@ function wbItemRemove($table = null, $id = null, $flush = true)
                 wbTrigger('form', __FUNCTION__, 'BeforeItemRemove', func_get_args(), $item);
                 if (is_array($item)) {
                     $item['_removed'] = true;
-                    $_ENV['cache'][md5($table)][$id] = $item;
+                    $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$id] = $item;
                 }
                 $res = wbItemSave($table, $item, $flush);
             }
@@ -952,20 +967,20 @@ function wbItemSave($table, $item = null, $flush = true)
 
         return null;
     }
-    if (!isset($_ENV['cache'][md5($table)])) {
+    if (!isset($_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])])) {
         //$_ENV["cache"][md5($table)]=wbItemList($table);
-        $_ENV['cache'][md5($table)] = array();
+        $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])] = array();
     }
     if (!isset($item['id']) or '_new' == $item['id']) {
         $item['id'] = wbNewId();
     } else {
-        if (isset($_ENV['cache'][md5($table)][$item['id']])) {
-            //$item=array_merge($_ENV["cache"][md5($table)][$item["id"]],$item);
+        if (isset($_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$item['id']])) {
+            //$item=array_merge($_ENV["cache"][md5($table.$_ENV["lang"].$_SESSION["lang"])][$item["id"]],$item);
         }
     }
     $item = wbItemSetTable($table, $item);
     $item = wbTrigger('form', __FUNCTION__, 'BeforeItemSave', func_get_args(), $item);
-    $_ENV['cache'][md5($table)][$item['id']] = $item;
+    $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$item['id']] = $item;
     wbTrigger('form', __FUNCTION__, 'AfterItemSave', func_get_args(), $item);
     $res = true;
 
@@ -982,8 +997,8 @@ function wbTableFlush($table)
     $res = false;
     $table = wbTable($table);
     $tname = wbTableName($table);
-    $cache = $_ENV['cache'][md5($table)];
-    if (is_file($table) and isset($_ENV['cache'][md5($table)])) {
+    $cache = $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])];
+    if (is_file($table) and isset($_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])])) {
         $fp = fopen($table, 'rb');
         flock($fp, LOCK_SH);
         $data = file_get_contents($table);
@@ -1022,7 +1037,7 @@ function wbTableFlush($table)
         } else {
             $res = null;
         }
-        unset($_ENV['cache'][md5($table)]);
+        unset($_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])]);
     }
 
     return $res;
@@ -1220,14 +1235,14 @@ function wbLoopProtect($func,$args=array())
     if (!isset($_ENV['wbGetFormStack'])) {
         $_ENV['wbGetFormStack'] = array();
     }
-    $_ENV['wbGetFormStack'][] = $func."_".md5(json_encode($args));
+    $_ENV['wbGetFormStack'][] = $func."_".md5(json_encode($args).$_ENV["lang"].$_SESSION["lang"]);
 }
 
 function wbLoopCheck($func,$args) {
         if (!isset($_ENV['wbGetFormStack'])) {
                 $_ENV['wbGetFormStack'] = array();
         }
-        if (in_array($func."_".md5(json_encode($args)),$_ENV['wbGetFormStack'])) {return true;} else {return false;}
+        if (in_array($func."_".md5(json_encode($args).$_ENV["lang"].$_SESSION["lang"]),$_ENV['wbGetFormStack'])) {return true;} else {return false;}
 }
 
 function wbOconv($value, $oconv)
@@ -1545,7 +1560,7 @@ function wbQuery($sql)
 
     $parser = new PHPSQLParser();
     $p = $parser->parse($sql);
-    $sid = md5($sql);
+    $sid = md5($sql.$_ENV["lang"].$_SESSION["lang"]);
 
     foreach ($p as $r => $a) {
         foreach ($a as $e) {
@@ -1916,7 +1931,7 @@ function wbGetWords($str, $w)
     return $res;
 }
 
-function wbSetValuesStr($tag = '', $Item = array(), $limit = 2)
+function wbSetValuesStr($tag = '', $Item = array(), $limit = 2, $vars = null)
 {
     if (is_object($tag)) {
         $tag = $tag->outerHtml();
@@ -1943,7 +1958,6 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2)
             $Item[$key] = $item;
         }
     }
-        $Item=wbItemToArray($Item);
 
     // =========== Конец обработки ===============
     if (is_string($tag)) {
@@ -1957,7 +1971,11 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2)
             $err = false;
             $nIter = 0;
             $_FUNC = '';
-            $mask = '`(\{\{){1,1}(%*[\w\d]+|_form|_mode|_item|((_SETT|_sett|_SETTINGS|_SESS|_sess|_SESSION|_VAR|_var|_SRV|_COOK|_COOKIE|_FUNC|_lang|_LANG|_ENV|_env|_REQ|_GET|_POST|%*[\w\d]+)?([\[]{1,1}(%*[\w\d]+|"%*[\w\d]+")[\]]{1,1})*))(\}\}){1,1}`u';
+            if ($vars==null) {
+                $mask = '`(\{\{){1,1}(%*[\w\d]+|_form|_mode|_item|((_SETT|_sett|_SETTINGS|_SESS|_sess|_SESSION|_VAR|_var|_SRV|_COOK|_COOKIE|_FUNC|_lang|_LANG|_ENV|_env|_REQ|_GET|_POST|%*[\w\d]+)?([\[]{1,1}(%*[\w\d]+|"%*[\w\d]+")[\]]{1,1})*))(\}\}){1,1}`u';
+            } else {
+                $mask = '`(\{\{){1,1}(%*[\w\d]+|(('.$vars.'|%*[\w\d]+)?([\[]{1,1}(%*[\w\d]+|"%*[\w\d]+")[\]]{1,1})*))(\}\}){1,1}`u';
+            }
             while (!$exit) {
                 $nUndef = 0;
                 $nSub = preg_match_all($mask, $tag, $res, PREG_OFFSET_CAPTURE);				// найти все вставки, не содержащие в себе других вставок
@@ -1984,7 +2002,11 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2)
                                 if (isset($_ENV["lang"])) {$lang=$_ENV["lang"];}
                                 if (isset($_SESSION["lang"])) {$lang=$_SESSION["lang"];}
                                 if (!isset($lang)) {$lang="eng";}
-                                $sub = '$_ENV["locale"][$lang]';
+                                if ($vars!==null AND is_array($Item) AND isset($Item["_global"]) AND $Item["_global"]==false ) {
+                                        $sub = '$Item[$lang]';
+                                } else {
+                                        $sub = '$_ENV["locale"][$lang]';
+                                }
                                 break;
                             case '_VAR':
                                 $sub = '$_ENV["variables"]';
@@ -2038,10 +2060,6 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2)
                                 $default = true;
                                 $n = strlen($res[4][$i][0]);
                                 $In = '['.substr($In, 0, $n).']'.substr($In, $n, strlen($In) - $n);
-                                // Заплатка
-                                if ($In == '[data][image][0][img]') {
-                                       $Item["data"]["image"]=wbItemToArray($Item["data"]["image"]);
-                                }
                                 break;
                         }
                         if ($default) {
@@ -2051,6 +2069,9 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2)
                         }
                         $sub .= wbSetQuotes(substr($In, $pos, strlen($In) - $pos));		// индексная часть текущей вставки с добавленными кавычками у текстовых индексов
                         if (eval('return isset('.$sub.');')) {
+                            if (!eval('return is_array('.$sub.');')) {
+                                    $Item=wbsvRestoreValue($Item,$sub);
+                            }
                             if (eval('return is_array('.$sub.');')) {
                                 $text .= eval('return json_encode('.$sub.');');
                             } else {
@@ -2059,24 +2080,38 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2)
                                 $temp = strtr($temp, array('{{' => '#~#~', '}}' => '~#~#'));
                                 $text .= $temp;
                             }
-                        } else {
-                                $tmp=explode("[",$res[2][$i][0]); $tmp=$tmp[0];
-                            /*
-                                $skip=array("_GET","_POST","_COOK","_COOKIE","_SESS","_SESSION","_SETT","_SETTINGS");
-                                if (in_array($tmp,$skip)) {
-                                        $text.="";
-                                } else {
-                                        $text .= '{{' . $res[2][$i][0] . '}}';;
-                                }
-                            */
-                                $allow=array("_LANG");
-                                if (in_array($tmp,$allow)) {
-                                        $text .= '{{' . $res[2][$i][0] . '}}';
-                                }
 
-                            $text .= '';
-                            ++$nUndef;
+
+                        } else {
+                                $Item = wbsvRestoreValue($Item,$sub);
+                                if (eval('return isset('.$sub.');')) {
+                                        $text.=wbsvSetValue($Item,$sub);
+                                } else {
+                                        $tmp=explode("[",$res[2][$i][0]); $tmp=$tmp[0];
+                                    /*
+                                        $skip=array("_GET","_POST","_COOK","_COOKIE","_SESS","_SESSION","_SETT","_SETTINGS");
+                                        if (in_array($tmp,$skip)) {
+                                                $text.="";
+                                        } else {
+                                                $text .= '{{' . $res[2][$i][0] . '}}';;
+                                        }
+                                    */
+                                        $allow=array("_LANG");
+                                        if (in_array($tmp,$allow)) {
+                                                $text .= '{{' . $res[2][$i][0] . '}}';
+                                        }
+                                    ++$nUndef;
+                                }
                         }
+
+
+
+
+
+
+
+
+
                         $startIn += $beforSize + strlen($res[2][$i][0]) + 4;
                         if ($i + 1 == $nSub) {		// это была последняя вставка
                             $text .= substr($tag, $startIn, strlen($tag) - $startIn);
@@ -2107,6 +2142,40 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2)
         return $tag;
     }
 }
+
+function wbsvSetValue($Item,$sub) {
+        $text="";
+            if (eval('return is_array('.$sub.');')) {
+                $text .= eval('return json_encode('.$sub.');');
+            } else {
+                $temp = '';
+                eval('$temp .= '.$sub.';');
+                $temp = strtr($temp, array('{{' => '#~#~', '}}' => '~#~#'));
+                $text .= $temp;
+            }
+        return $text;
+}
+
+
+function wbsvRestoreValue($Item,$sub) {
+        $arr=explode("~#~#|~#~#",str_replace("][","]~#~#|~#~#[",$sub));
+        $index="";
+        $result=true;
+        foreach($arr as $a) {
+                $index.=$a;
+                if ($result==true AND eval('return isset('.$index.');')) {
+                        if (eval('return is_array('.$index.');')) {
+
+                        } else {
+
+                                $value=eval('return wbItemToArray('.$index.');');
+                                eval($index.' = $value ;');
+                        }
+                }
+        }
+        return $Item;
+}
+
 
 // добавление кавычек к нечисловым индексам
 function wbSetQuotes($In)
@@ -2582,6 +2651,7 @@ function wbCallFormFunc($name, $Item, $form = null, $mode = null)
     //	formCurrentInclude($form);
     $func = $form.$name;
     $_func = '_'.$func;
+    $Item=wbItemToArray($Item);
     if (is_callable($func)) {
         $Item = $func($Item, $mode);
     } else {

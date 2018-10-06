@@ -49,26 +49,6 @@ function ajax__settings() {
     return base64_encode(json_encode($sett));
 }
 
-function ajax__cache_clear() {
-    $path=$_ENV["dba"]."/_cache";
-    $files=wbListFiles($path);
-    foreach($files as $file) {
-        $user=md5($_SESSION["user_id"]);
-        if (substr($file,0,strlen($user))==$user) {
-            if (isset($_POST["data"]) && is_array($_POST["data"]) && !in_array($file,$_POST["data"])) {
-                // если файл не в списке присутствующих на эеране списков, то удаляем
-                unlink($path."/".$file);
-            }
-        } else {
-            if (filemtime($path."/".$file)+86400 < time()) {
-                // если файл не принадлежит юзеру, но ему больше суток, то удаляем
-                unlink($path."/".$file);
-            }
-        }
-    }
-}
-
-
 function ajax__cart() {
     return wbCartAction();
 }
@@ -93,6 +73,26 @@ function ajax__alive() {
             $ret["mode"]=$_POST["data"];
         }
     }
+    // Clear cache
+
+    $path=$_ENV["dba"]."/_cache";
+    $files=wbListFiles($path);
+    foreach($files as $file) {
+        $user=md5($_SESSION["user_id"]);
+        if (substr($file,0,strlen($user))==$user) {
+            if (isset($_POST["data"]) && is_array($_POST["data"]) && !in_array($file,$_POST["data"])) {
+                // если файл не в списке присутствующих на экране списков, то удаляем
+                unlink($path."/".$file);
+            }
+        } else {
+            if (filemtime($path."/".$file)+86400 < time()) {
+                // если файл не принадлежит юзеру, но ему больше суток, то удаляем
+                unlink($path."/".$file);
+            }
+        }
+    }
+
+
     return json_encode($ret);
 }
 

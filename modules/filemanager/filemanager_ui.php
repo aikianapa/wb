@@ -1,5 +1,5 @@
 <h6 class="element-header">
-    Файловый менеджер
+    {{_LANG[filemanager]}}
     <button class="btn btn-sm btn-success pull-right" data-wb-ajax="" data-wb-append="body">
      <i class="fa fa-plus"></i>
    </button>
@@ -10,66 +10,66 @@
 
         <div id="filemanagerUploader">
             <div class="uploader">
-                <button id="pickfiles" class="btn btn-default btn-block mg-b-20">Загрузить файлы</button>
+                <button id="pickfiles" class="btn btn-default btn-block mg-b-20">{{_LANG[upload]}}</button>
             </div>
         </div>
 
 
-            <label class="content-left-label">Действия</label>
+            <label class="content-left-label">{{_LANG[actions]}}</label>
             <ul class="nav mg-t-1-force">
                 <li class="nav-item">
                     <a href="#refresh" class="nav-link">
                   <i class="fa fa-refresh"></i>
-                  <span>Обновить список</span>
+                  <span>{{_LANG[refresh]}}</span>
                 </a>
                 </li>
                 <!-- nav-item -->
                 <li class="nav-item">
                     <a href="#newdir" class="nav-link">
                   <i class="fa fa-folder-o"></i>
-                  <span>Новая директория</span>
+                  <span>{{_LANG[title_new_dir]}}</span>
                 </a>
                 </li>
                 <!-- nav-item -->
                 <li class="nav-item">
                     <a href="#newfile" class="nav-link">
                   <i class="fa fa-file-o"></i>
-                  <span>Новый файл</span>
+                  <span>{{_LANG[title_new_file]}}</span>
                 </a>
                 </li>
                 <!-- nav-item -->
                 <li class="nav-item hidden allow-single allow-file allow-file1" data-no-ext="zip tar arj rar gzip jpg jpeg png gif tif tiff">
                     <a href="#edit" class="nav-link">
                   <i class="fa fa-edit"></i>
-                  <span>Редактировать</span>
+                  <span>{{_LANG[edit]}}</span>
                 </a>
                 </li>
                 <!-- nav-item -->
                 <li class="nav-item hidden allow-single allow-dir allow-file allow-dir1 allow-file1">
                     <a href="#rename" class="nav-link">
                   <i class="fa fa-i-cursor"></i>
-                  <span>Переименовать</span>
+                  <span>{{_LANG[rename]}}</span>
                 </a>
                 </li>
                 <!-- nav-item -->
                 <li class="nav-item hidden allow-all">
                     <a href="#remove" class="nav-link">
                   <i class="fa fa-trash-o"></i>
-                  <span>Удалить</span>
+                  <span>{{_LANG[remove]}}</span>
                 </a>
                 </li>
                 <!-- nav-item -->
                 <li class="nav-item hidden allow-all" data-no-ext="zip">
                     <a href="#zip" class="nav-link">
                   <i class="fa fa-file-archive-o"></i>
-                  <span>Архивировать</span>
+                  <span>{{_LANG[zip]}}</span>
                 </a>
                 </li>
                 <!-- nav-item -->
                 <li class="nav-item hidden allow-single allow-file" data-ext="zip">
                     <a href="#unzip" class="nav-link">
                   <i class="fa fa-file-archive-o"></i>
-                  <span>Разахивировать</span>
+                  <span>{{_LANG[unzip]}}</span>
                 </a>
                 </li>
                 <!-- nav-item -->
@@ -83,21 +83,21 @@
                 <li class="nav-item hidden allow-all">
                     <a href="#copy" class="nav-link">
                   <i class="fa fa-copy"></i>
-                  <span>Копировать</span>
+                  <span>{{_LANG[copy]}}</span>
                 </a>
                 </li>
                 <!-- nav-item -->
                 <li class="nav-item hidden allow-all">
                     <a href="#cut" class="nav-link">
                   <i class="fa fa-cut"></i>
-                  <span>Вырезать</span>
+                  <span>{{_LANG[cut]}}</span>
                 </a>
                 </li>
                 <!-- nav-item -->
                 <li class="nav-item hidden allow-buffer">
                     <a href="#paste" class="nav-link">
                   <i class="fa fa-paste"></i>
-                  <span>Вставить</span>
+                  <span>{{_LANG[paste]}}</span>
                 </a>
                 </li>
                 <!-- nav-item -->
@@ -144,15 +144,15 @@
                         <a href="#" data-toggle="dropdown" class="btn pd-y-3 tx-gray-500 hover-info" data-wb-where='type!="back"'><i class="icon ion-more"></i></a>
                         <div class="dropdown-menu dropdown-menu-right pd-10" data-wb-where='type!="back"'>
                             <nav class="nav nav-style-1 flex-column">
-                                <a href="#edit" class="nav-link" data-wb-where='type="file"'><i class="fa fa-edit"></i> Редактировать</a>
-                                <a href="#rendir" class="nav-link" data-wb-where='type="dir"'><i class="fa fa-i-cursor"></i> Переименовать</a>
-                                <a href="#renfile" class="nav-link" data-wb-where='type="file"'><i class="fa fa-i-cursor"></i> Переименовать</a>
-                                <a href="#renlink" class="nav-link" data-wb-where='type="dir1" OR type="file1"'><i class="fa fa-i-cursor"></i> Переименовать</a>
-                                <a href="#clone" class="nav-link" data-wb-where='type="file"'><i class="fa fa-copy"></i> Дублировать</a>
-                                <a href="{{href}}" download="{{name}}" class="nav-link" data-wb-where='type="file"'><i class="fa fa-download"></i> Скачать</a>
-                                <a href="#rmfile" class="nav-link" data-wb-where='type="file"'><i class="fa fa-remove"></i> Удалить</a>
-                                <a href="#rmdir" class="nav-link" data-wb-where='type="dir"'><i class="fa fa-remove"></i> Удалить</a>
-                                <a href="#rmlink" class="nav-link" data-wb-where='type="dir1" OR type="file1"'><i class="fa fa-trash-o"></i> Удалить</a>
+                                <a href="#edit" class="nav-link" data-wb-where='type="file"'><i class="fa fa-edit"></i> {{_LANG[edit]}}</a>
+                                <a href="#rendir" class="nav-link" data-wb-where='type="dir"'><i class="fa fa-i-cursor"></i> {{_LANG[rename]}}</a>
+                                <a href="#renfile" class="nav-link" data-wb-where='type="file"'><i class="fa fa-i-cursor"></i> {{_LANG[rename]}}</a>
+                                <a href="#renlink" class="nav-link" data-wb-where='type="dir1" OR type="file1"'><i class="fa fa-i-cursor"></i> {{_LANG[rename]}}</a>
+                                <a href="#clone" class="nav-link" data-wb-where='type="file"'><i class="fa fa-copy"></i> {{_LANG[duplicate]}}</a>
+                                <a href="{{href}}" download="{{name}}" class="nav-link" data-wb-where='type="file"'><i class="fa fa-download"></i> {{_LANG[download]}}</a>
+                                <a href="#rmfile" class="nav-link" data-wb-where='type="file"'><i class="fa fa-remove"></i> {{_LANG[remove]}}</a>
+                                <a href="#rmdir" class="nav-link" data-wb-where='type="dir"'><i class="fa fa-remove"></i> {{_LANG[remove]}}</a>
+                                <a href="#rmlink" class="nav-link" data-wb-where='type="dir1" OR type="file1"'><i class="fa fa-trash-o"></i> {{_LANG[remove]}}</a>
                             </nav>
                         </div>
                         <!-- dropdown-menu -->
@@ -180,16 +180,16 @@
     </div>
 
     <div id="filemanagerModalDialog" class="modal fade hidden" tabindex="-1" role="dialog" aria-hidden="true">
-        <meta name="newdir" title="Новая директория" content="Создать новую директорию с именем:<br> {{newname}}">
-        <meta name="newfile" title="Новый файл" content="Создать новый файл с именем:<br> {{newname}}">
-        <meta name="rmdir" title="Удаление директории" content="Удалить директорию <b>{{_POST[name]}}</b> со всем её содержимым? {{dirname}}" invisible="dirname">
-        <meta name="rmfile" title="Удаление файла" content="Удалить файл <b>{{_POST[name]}}</b>? {{filename}}" invisible="filename">
-        <meta name="remove" title="Множественное удаление" content="<span class='text-danger'>Выполнить удаление</span> выбранных объектов? {{filename}}">
-        <meta name="rendir" title="Переименование директории" content="Переименовать директорию <b>{{_POST[name]}}</b> в: {{dirname}} {{oldname}}" visible="dirname" invisible="oldname">
-        <meta name="renfile" title="Переименование файла" content="Переименовать файл <b>{{_POST[name]}}</b> в: {{filename}} {{oldname}}" visible="filename" invisible="oldname">
-        <meta name="paste" title="Вставка" content="Некоторые объекты уже существуют в этой директории.<br> Выполнить перезапись существующих объектов?">
-        <meta name="zip" title="Архивация" content="Сжать выбранные объекты в архив? {{filename}}" visible="filename">
-        <meta name="unzip" title="Распаковка архива" content="Извлечь файлы и папки из архива?<br>Существующие объекты будут перезаписаны.">
+        <meta name="newdir" title="{{_LANG[title_new_dir]}}" content="{{_LANG[prompt_new_dir]}}:<br> {{newname}}">
+        <meta name="newfile" title="{{_LANG[title_new_file]}}" content="{{_LANG[prompt_new_file]}}:<br> {{newname}}">
+        <meta name="rmdir" title="{{_LANG[title_rmdir]}}" content="{{_LANG[prompt_rmdir]}} <b>{{_POST[name]}}</b>? {{dirname}}" invisible="dirname">
+        <meta name="rmfile" title="{{_LANG[title_rmfile]}}" content="{{_LANG[prompt_rmfile]}} <b>{{_POST[name]}}</b>? {{filename}}" invisible="filename">
+        <meta name="remove" title="{{_LANG[title_rmlist]}}" content="<span class='text-danger'>{{_LANG[prompt_rmlist]}}</span> {{_LANG[prompt_rmlist1]}}? {{filename}}">
+        <meta name="rendir" title="{{_LANG[title_rendir]}}" content="{{_LANG[prompt_rendir]}} <b>{{_POST[name]}}</b> {{_LANG[prompt_to]}}: {{dirname}} {{oldname}}" visible="dirname" invisible="oldname">
+        <meta name="renfile" title="{{_LANG[title_renfile]}}" content="{{_LANG[prompt_renfile]}} <b>{{_POST[name]}}</b> {{_LANG[prompt_to]}}: {{filename}} {{oldname}}" visible="filename" invisible="oldname">
+        <meta name="paste" title="{{_LANG[title_rewrite]}}" content="{{_LANG[prompt_paste]}}">
+        <meta name="zip" title="{{_LANG[title_zip]}}" content="{{_LANG[prompt_zip]}} {{filename}}" visible="filename">
+        <meta name="unzip" title="{{_LANG[title_unzip]}}" content="{{_LANG[prompt_unzip]}}">
         <input type="text" class="form-control" name="newname">
         <input type="hidden" class="form-control" name="dirname" value="{{_POST[name]}}">
         <input type="hidden" class="form-control" name="filename" value="{{_POST[name]}}">
@@ -206,8 +206,8 @@
                     <form></form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
-                    <button type="button" class="btn btn-primary">Выполнить</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{_LANG[cancel]}}</button>
+                    <button type="button" class="btn btn-primary">{{_LANG[ok]}}</button>
                 </div>
             </div>
         </div>
@@ -222,6 +222,90 @@
     </div>
 
 </div>
+
+<script src="/engine/modules/filemanager/filemanager.js?{{_ENV[new_id]}}"></script>
+
+<script type="text/locale">
+[rus]
+        refresh		= Обновить
+        upload		= Загрузить
+        actions		= Действия
+        edit		= Редактировать
+        rename		= Переименовать
+        remove		= Удалить
+        zip		= Архивировать
+        unzip		= Разархивировать
+        copy		= Копировать
+        cut		= Вырезать
+        paste		= Вставить
+        download	= Скачать
+        duplicate	= Дублировать
+        filemanager     = Файловый менеджер
+        cancel          = Отмена
+        ok              = Выполнить
+        title_new_dir	= Новая директория
+        title_new_file	= Новый файл
+        title_rmdir     = Удаление директории
+        title_rmfile    = Удаление файла
+        title_rmlist    = Множественное удаление
+        title_rendir    = Переименование директории
+        title_renfile   = Переименование файла
+        title_rewrite   = Переизапись
+        title_zip       = Архивация
+        title_unzip     = Распаковка архива
+        prompt_new_dir  = Создать новую директорию с именем
+        prompt_new_file = Создать новый файл с именем
+        prompt_rmdir    = Удалить рекурсивно директорию
+        prompt_rmfile   = Удалить файл
+        prompt_rmlist   = Выполнить удаление
+        prompt_rmlist1  = выбранных объектов
+        prompt_rendir   = Переименовать директорию
+        prompt_renfile  = Переименовать файл
+        prompt_paste    = Некоторые объекты уже существуют в этой директории.<br> Выполнить перезапись существующих объектов?
+        prompt_zip      = Сжать выбранные объекты в архив?
+        prompt_unzip    = Извлечь файлы и папки из архива?<br>Существующие объекты будут перезаписаны.
+        prompt_to       = в
+[eng]
+        refresh		= Refresh
+        upload		= Upload
+        actions		= Actions
+        edit		= Edit
+        rename		= Rename
+        remove		= Remove
+        zip		= Zip
+        unzip		= UnZip
+        copy		= Copy
+        cut		= Cut
+        paste		= Insert
+        download	= Download
+        duplicate	= Duplicate
+        filemanager     = File Manager
+        cancel          = Cancel
+        ok              = Ok
+        title_new_dir	= New folder
+        title_new_file	= New file
+        title_rmdir     = Remove folder
+        title_rmfile    = Remove file
+        title_rmlist    = Remove objects
+        title_rendir    = Rename folder
+        title_renfile   = Rename file
+        title_rewrite   = Rewrite
+        title_zip       = Zip
+        title_unzip     = Unzip
+        prompt_new_dir  = "Create new folder with name"
+        prompt_new_file = "Create new file with name"
+        prompt_rmdir    = Remove folder recursive
+        prompt_rmfile   = Remove file
+        prompt_rmlist   = Remove
+        prompt_rmlist1  = selected objects
+        prompt_rendir   = Rename folder
+        prompt_renfile  = Rename file
+        prompt_paste    = Some objects already exists in this folder.<br> Rewrite exists objects?
+        prompt_zip      = Zip selected objects?
+        prompt_unzip    = Unzip objects from archive?<br>Exists objects will be rewrite.
+        prompt_to       = to
+</script>
+
 
 <style>
     #filemanager #filemanagerModalSrc .btn-edit-close {
@@ -357,5 +441,3 @@
     }
 
 </style>
-
-<script src="/engine/modules/filemanager/filemanager.js?{{_ENV[new_id]}}"></script>
