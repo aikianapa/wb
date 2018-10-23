@@ -36,6 +36,7 @@ function wb_init() {
       }
 
       wbapp.settings = wb_settings();
+      wbapp.sysmsg = wb_getsysmsg();
       wbapp.getTree = function(tree, branch, parent, childrens) {
         return wb_gettree(tree, branch, parent, childrens);
       }
@@ -52,7 +53,6 @@ function wb_init() {
       if ($("[data-wb-role=cart]").length) {
         wbapp.cart = wb_getcart();
       }
-
       wb_alive();
       wb_delegates();
       $("body").removeClass("cursor-wait");
@@ -71,7 +71,7 @@ function wb_delegates() {
 }
 
 function wb_settings() {
-        if ($("#setup.wbengine").length) {return;}
+  if ($("#setup.wbengine").length) {return;}
   if ($(document).data("settings") !== undefined) {
     return $(document).data("settings");
   } else {
@@ -82,6 +82,19 @@ function wb_settings() {
       });
       return settings;
   }
+}
+
+function wb_getsysmsg() {
+        if ($("#setup.wbengine").length) {
+                var url = "/engine/ajax.php?getsysmsg"
+        } else {
+                var url = "/ajax/getsysmsg/"
+        }
+        var sysmsg=null;
+        wbapp.getWait(url, {}, function(data) {
+                sysmsg = $.parseJSON(base64_decode(data));
+        });
+        return sysmsg;
 }
 
 function wb_gettree(tree, branch, parent, childrens) {
@@ -425,7 +438,7 @@ function wb_alive() {
         }
         //if (ret==false && document.location.pathname=="/admin") {document.location.href="/login";}
       });
-    }, 10000);
+    }, 60000);
   }
 }
 
@@ -941,6 +954,8 @@ function wb_multiinput() {
       console.log("Trigger: before_remove");
       $(multi).trigger("before_remove", line);
       $(line).remove();
+      $(multi).wbMultiInpitSort();
+      return false;
     });
 
     $(document).undelegate(".wb-multiinput .wb-multiinput-add", "click");
@@ -952,13 +967,13 @@ function wb_multiinput() {
       var name = $(multi).attr("name");
       row = str_replace("{{template}}", tpl, row);
       row = wb_setdata(row, {
-        "form": "procucts",
+        //"form": "procucts",
         "id": "_new"
       }, true);
       $(line).after(row);
       $(multi).wbMultiInpitSort();
       wb_plugins();
-      e.preventDefault();
+      return false;
     });
 
     $(document).undelegate(".wb-multiinput-menu .dropdown-item", "click");
@@ -1319,7 +1334,7 @@ function wb_plugin_editor() {
             }
           });
           editor.ui.addButton('Save', {
-            label: 'Сохранить',
+            label: wbapp.sysmsg.save,
             command: 'save'
           });
         }
@@ -1583,7 +1598,7 @@ function wb_formsave_obj(formObj) {
         data: form,
         success: function(data) {
           if ($.bootstrapGrowl) {
-            $.bootstrapGrowl("Сохранено!", {
+            $.bootstrapGrowl(wbapp.sysmsg.saved, {
               ele: 'body',
               type: 'success',
               offset: {
@@ -1638,7 +1653,7 @@ function wb_formsave_obj(formObj) {
           $(document).trigger("wb_after_formsave", [name, item, form, false]);
           console.log("call: wb_after_formsave");
           if ($.bootstrapGrowl) {
-            $.bootstrapGrowl("Ошибка сохранения!", {
+            $.bootstrapGrowl(wbapp.sysmsg.save_failed+"!", {
               ele: 'body',
               type: 'danger',
               offset: {
@@ -1659,7 +1674,7 @@ function wb_formsave_obj(formObj) {
       });
     }
   } else {
-    $.bootstrapGrowl("Ошибка сохранения!", {
+    $.bootstrapGrowl(wbapp.sysmsg.save_failed+"!", {
       ele: 'body',
       type: 'danger',
       offset: {
@@ -1696,7 +1711,7 @@ function wb_check_required(form) {
       } else {
         if ($(this).attr("type") == "email" && !wb_check_email($(this).val())) {
           res = false;
-          $(this).data("error", "Введите корректный email");
+          $(this).data("error", wbapp.sysmsg.email_correct);
           $(document).trigger("wb_required_false", [this]);
         } else {
           $(document).trigger("wb_required_true", [this]);
@@ -1708,7 +1723,7 @@ function wb_check_required(form) {
       if ($("input[type=password][name=" + pcheck + "]").length) {
         if ($(this).val() !== $("input[type=password][name=" + pcheck + "]").val()) {
           res = false;
-          $(this).data("error", "Пароли должны совпадать");
+          $(this).data("error", wbapp.sysmsg.pass_match);
           $(document).trigger("wb_required_false", [this]);
         }
       }
@@ -1718,7 +1733,7 @@ function wb_check_required(form) {
       var lenstr = strlen($(this).val());
       if (lenstr < minlen) {
         res = false;
-        $(this).data("error", "Минимальная длинна поля " + minlen + " символов");
+        $(this).data("error", wbapp.sysmsg.min_length+": " + minlen);
         $(document).trigger("wb_required_false", [this]);
       }
     }
@@ -1899,12 +1914,12 @@ $(document).on("wb_required_false", function(event, that, text) {
   var delay = (4000 + $(that).data("idx") * 250) * 1;
   var text = $(that).data("error");
   if (!text > "") {
-    text = "Заполните поле: " + $(that).attr("name");
+    text = wbapp.sysmsg.fill_field+": " + $(that).attr("name");
     if ($(that).parents(".form-group").find("label").text() > "") {
-      text = "Заполните поле: " + $(that).parents(".form-group").find("label").text();
+      text = wbapp.sysmsg.fill_field+": " + $(that).parents(".form-group").find("label").text();
     }
     if ($(that).attr("placeholder") > "") {
-      text = "Заполните поле: " + $(that).attr("placeholder");
+      text = wbapp.sysmsg.fill_field+": " + $(that).attr("placeholder");
     }
   }
   if (wb_plugins_loaded()) {

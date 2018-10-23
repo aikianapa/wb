@@ -1,6 +1,6 @@
 
 .wbImagesAll {margin-top:10px;}
-.wbImagesAll .thumbnail {display: inline-block; position:relative; margin-bottom:10px; width:300px;}
+.wbImagesAll .thumbnail {display: inline-block; position:relative; margin-bottom:10px;}
 .wbImagesAll .thumbnail img {border: 1px #d3d4d5 solid; opacity:0.6;}
 .wbImagesAll .thumbnail.selected img {border: 2px #3b6998 solid; opacity:1;}
 .wbImagesAll .img-thumbnail {width: 200px; height: 130px; background: url() 50% 25% no-repeat; background-size: cover; border-radius:0px; }

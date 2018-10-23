@@ -79,3 +79,4 @@
 		<meta name="btn_next" value="{{_LANG[btn_next]}}">
 		<meta name="btn_install" value="{{_LANG[btn_install]}}">
         </div>
+<script type="text/locale" data-wb-role="include" src="admin_common"></script>

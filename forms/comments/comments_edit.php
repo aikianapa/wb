@@ -7,27 +7,15 @@
         </button>
         <h5 class="modal-title">{{header}}</h5>
       </div>
-        <div class="modal-body" data-wb-role="include" src="/engine/forms/comments/comments_form.php">
+        <div class="modal-body" data-wb-role="include" src="form" data-wb-name="comments_form">
         </div>
-		  <div class="modal-footer">
-			<button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-close"></span> Закрыть</button>
-			<button type="button" class="btn btn-primary" data-wb-formsave="#{{_GET[form]}}EditForm"><span class="fa fa-check"></span> Сохранить изменения</button>
-		  </div>
+	<div class="modal-footer" data-wb-role="include" src="form" data-wb-name="common_close_save" data-wb-hide="wb"></div>
 
 		</div>
 </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
 <style>
 .comments-rating .rating-symbol {font-size:25px; color:#FFA500;}
 </style>
+<script type="text/locale" data-wb-role="include" src="comments_common"></script>

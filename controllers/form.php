@@ -18,7 +18,7 @@ function form__controller() {
         } elseif (form__controller__common__controller()==true) {
             $out=$_ENV["DOM"];
         } else {
-              echo __FUNCTION__ .": отсутствует функция ".$call."()";
+              echo __FUNCTION__ .": {$_ENV['sysmsg']['err_func_lost']} ".$call."()";
               die;
         }
         if (!is_object($out)) {$_ENV["DOM"]=wbFromString($out);} else {$_ENV["DOM"]=$out;}
@@ -123,11 +123,11 @@ function form__controller__remove() {
 
 function form__controller__error_404($id=null) {
 	header("HTTP/1.0 404 Not Found");
-    $_ENV["route"]["error"]="404";
-    $_ENV["DOM"]=wbGetTpl("404.php");
-    if (is_object($_ENV["DOM"])) $_ENV["DOM"]->wbSetData();
+	$_ENV["route"]["error"]="404";
+	$_ENV["DOM"]=wbGetTpl("404.php");
+	if (is_object($_ENV["DOM"])) $_ENV["DOM"]->wbSetData();
 	wbLog("func",__FUNCTION__,404,$_ENV["route"]);
-    return $_ENV["DOM"];
+	return $_ENV["DOM"];
 }
 
 function form__controller__error_301() {
@@ -202,11 +202,10 @@ function form__controller__select2() {
 function form__controller__setup_engine() {
     $out=wbGetTpl("/engine/tpl/setup.htm",true);
     if (isset($_GET["params"]["lang"])) {$_SESSION["lang"]=$_ENV["lang"]=$_GET["params"]["lang"];} else {unset($_SESSION["lang"],$_ENV["lang"]);}
-    if (is_dir($_ENV["dba"]) AND is_dir($_ENV["path_app"]."/tpl")) {
+    if (is_dir($_ENV["path_tpl"])) {
+	$out->wbSetFormLocale();
         $out->find("#setup")->remove();
-        $out->wbSetData();
         return $out;
-        die;
      } elseif (isset($_POST["setup"]) AND $_POST["setup"]=="done" AND !is_dir($_ENV["path_app"]."/form")) {
 		unset($_ENV["DOM"],$_ENV["errors"]);
 		wbRecurseCopy($_ENV["path_engine"]."/_setup/",$_ENV["path_app"]);
@@ -215,11 +214,10 @@ function form__controller__setup_engine() {
 		wbTableCreate("todo");
 		wbTableCreate("news");
 		wbTableCreate("orders");
-		$user=array("id"=>$_POST["login"],"password"=>md5($_POST["password"]),"role"=>"admin","point"=>"/admin/","active"=>"on","super"=>"on");
-        $settings=array("id"=>"settings","header"=>$_POST["header"],"email"=>$_POST["email"]);
+		$user=array("id"=>$_POST["login"],"password"=>md5($_POST["password"]),"email"=>$_POST["email"],"role"=>"admin","login_url"=>"/admin/","logout_url"=>"/login/","isgroup"=>"on","active"=>"on","super"=>"on","lang"=>$_SESSION["lang"]);
+		$settings=array("id"=>"settings","header"=>$_POST["header"],"email"=>$_POST["email"],"lang"=>$_SESSION["lang"]);
 		wbItemSave("users",$user);
-        wbItemSave("admin",$settings);
-
+		wbItemSave("admin",$settings);
 		header('Location: '.'/');
 		die;
 	}

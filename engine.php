@@ -6,7 +6,7 @@ $cache=wbCacheCheck();
 if ($cache["check"] === false OR $cache["check"] === null) {
 	$_ENV["ITEM"]=array();
 	if (!isset($_ENV["route"]["form"]) OR $_ENV["route"]["form"]!=="default_form") {
-	    $exclude=in_array($_ENV["route"]["controller"],array("module","ajax","thumbnails"));
+		$exclude=in_array($_ENV["route"]["controller"],array("module","ajax","thumbnails"));
 		$_ENV["DOM"]=wbFromString(""); $_ENV["ITEM"]=array();
 		if (is_callable("wbBeforeEngine") AND !$exclude) {$_ENV["ITEM"] = wbBeforeEngine();}
 		if (is_callable("wbCustomEngine") AND !$exclude) {$_ENV["DOM"]  = wbCustomEngine();} else {wbLoadController();}

@@ -4,7 +4,7 @@ function ajax__controller() {
     if (is_file($_ENV["path_app"]."/ajax.php")) {include_once($_ENV["path_app"]."/ajax.php");}
 	wbTrigger("func",__FUNCTION__,"before");
 	$ecall=__FUNCTION__ ."__".$_ENV["route"]["mode"];
-    $acall=__FUNCTION__ ."_".$_ENV["route"]["mode"];
+	$acall=__FUNCTION__ ."_".$_ENV["route"]["mode"];
 	if (is_callable($ecall)) {
         $_ENV["DOM"]=$ecall();
     } elseif (is_callable($acall)) {

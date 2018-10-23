@@ -5,16 +5,16 @@
     <input type="hidden" name="target_item" value="{{_ENV[route][item]}}" data-wb-role="where" data-wb-data='target_item=""' data-wb-hide="wb">
     <div role="where" data='"{{_ENV[route][mode]}}"="edit"'>
         <div class="form-group row" data-wb-allow="admin">
-            <label class="col-sm-3 form-control-label">Дата</label>
+            <label class="col-sm-3 form-control-label">{{_LANG[datetime]}}</label>
             <div class="col-sm-5">
-                <input type="datetimepicker" class="form-control" name="date" placeholder="Дата/время отзыва">
+                <input type="datetimepicker" class="form-control" name="date" placeholder="{{_LANG[datetime]}}">
             </div>
         </div>
 
         <div class="form-group row" data-wb-allow="admin">
-            <label class="col-sm-3 form-control-label">Пользователь <i class="fa fa-times-circle float-right" onclick='$("[name=user_id]").val("").empty().trigger("change");'></i></label>
+            <label class="col-sm-3 form-control-label">{{_LANG[user]}} <i class="fa fa-times-circle fa-2x float-right" onclick='$("[name=user_id]").val("").empty().trigger("change");return false;'></i></label>
             <div class="col-sm-9">
-                <select class="form-control select2" id="uid" role="foreach" data-wb-ajax="/form/select2/users" data-wb-where='active="on"' name="user_id" placeholder="Пользователь">
+                <select class="form-control select2" id="uid" role="foreach" data-wb-ajax="/form/select2/users" data-wb-where='active="on"' name="user_id" placeholder="{{_LANG[user]}}">
                     <option value="{{id}}">
                         [ {{id}} ] - {{name}}
                     </option>
@@ -24,25 +24,28 @@
     </div>
 
     <div role="formdata" data-wb-json="{{_SESS[user]}}" data-wb-hide="*">
+        <meta data-wb-role="variable" var="name" data-wb-if='"{{name}}">""' value="{{name}}" else="{{%name}}">
+        <meta data-wb-role="variable" var="email" data-wb-if='"{{email}}">""' value="{{email}}" else="{{%email}}">
+    </div>
         <div class="form-group row">
-            <label class="col-sm-3 control-label label-name">Ваше имя</label>
-            <div class="col-sm-9"><input type="text" class="form-control" name="name" placeholder="Ваше имя" value="{{name}}" required></div>
+            <label class="col-sm-3 control-label label-name">{{_LANG[u_name]}}</label>
+            <div class="col-sm-9"><input type="text" class="form-control" name="name" value="{{_VAR[name]}}" placeholder="{{_LANG[u_name]}}" required></div>
         </div>
         <div class="form-group row">
-            <label class="col-sm-3 control-label label-email">Эл.почта</label>
-            <div class="col-sm-9"><input type="email" class="form-control" name="email" placeholder="Электронная почта" required></div>
+            <label class="col-sm-3 control-label label-email">{{_LANG[u_email]}}</label>
+            <div class="col-sm-9"><input type="email" class="form-control" name="email" value="{{_VAR[email]}}" placeholder="{{_LANG[u_email]}}" required></div>
         </div>
 
-    </div>
+
     <div class="form-group row">
-        <label class="col-sm-3 control-label label-comment">Ваш отзыв</label>
+        <label class="col-sm-3 control-label label-comment">{{_LANG[u_comment]}}</label>
         <div class="col-sm-9">
-            <textarea name="text" class="form-control" rows="5" required placeholder="Ваш отзыв"></textarea>
+            <textarea name="text" class="form-control" rows="auto" required placeholder="{{_LANG[u_comment]}}"></textarea>
         </div>
     </div>
 
     <div class="form-group row">
-        <label class="col-sm-3 control-label label-rating">Рейтинг</label>
+        <label class="col-sm-3 control-label label-rating">{{_LANG[rating]}}</label>
         <div class="col-sm-9 comments-rating">
             <input type="hidden" class="rating" name="rating" data-fractions="2">
         </div>
@@ -50,27 +53,25 @@
 
     <div>
         <div class="form-group row" data-wb-allow="admin moder" data-wb-allow="admin moder" data-wb-role="where" data='"{{_ENV[route][form]}}"="comments" AND "{{_ENV[route][mode]}}"="edit"'>
-            <label class="col-sm-3 form-control-label label-publish">Опубликовать</label>
+            <label class="col-sm-3 form-control-label label-publish">{{_LANG[publish]}}</label>
             <div class="col-sm-2"><label class="switch switch-success"><input type="checkbox" name="active"><span></span></label></div>
         </div>
         <div class="form-group row" data-wb-allow="admin moder" data-wb-role="where" data='"{{_ENV[route][form]}}"="comments" AND "{{_ENV[route][mode]}}"="edit"'>
-            <label class="col-sm-3 control-label label-reply">Ответ</label>
+            <label class="col-sm-3 control-label label-reply">{{_LANG[reply]}}</label>
             <div class="col-sm-9">
-                <textarea name="reply" class="form-control" rows="3" placeholder="Ответ на отзыв"></textarea>
+                <textarea name="reply" class="form-control" rows="auto" placeholder="{{_LANG[reply]}}"></textarea>
             </div>
         </div>
     </div>
     <div class="form-group row" data-wb-role="where" data='"{{_ENV[route][mode]}}"<>"edit"'>
-        <label class="col-sm-3 control-label label-norobot">Я не робот</label>
+        <label class="col-sm-3 control-label label-norobot">{{_LANG[norobot]}}</label>
         <div class="col-sm-1 norobot">
             <label class="switch switch-success"><input type="checkbox" name="norobot"><span></span></label>
         </div>
-        <div class="col-sm-4">
-            <a class="btn btn-default btn-block btn-back" href='javascript:$("a[href=#commentsList]").trigger("click");'>Назад</a>
-        </div>
 
         <div class="col-sm-4 sendbutton hidden">
-            <a class="btn btn-primary btn-block btn-send" data-wb-formsave="#commentsEditForm">Отправить</a>
+            <a class="btn btn-primary btn-block btn-send" data-wb-formsave="#commentsEditForm">{{_LANG[send]}}</a>
         </div>
     </div>
 </form>
+<script type="text/locale" data-wb-role="include" src="comments_common"></script>

@@ -552,15 +552,6 @@ class ki extends CLexer
         if ($file=="") {
             return ki::fromString("");
         } else {
-            /* в этом Content-Type не передаётся сессия
-            $context = stream_context_create(array(
-            	'http' => array(
-            		'method' => 'POST',
-            		'header' => 'Content-Type: application/x-www-form-urlencoded' . PHP_EOL ,
-            		'content' => http_build_query($_POST),
-            	)
-            ));
-            */
             $context = stream_context_create(array(
                                                  'http'=>array(
                                                          'method'=>"POST",
@@ -578,11 +569,12 @@ class ki extends CLexer
                 flock ($fp, LOCK_SH);
             }
             if (isset($url["scheme"])) {
-                $res=file_get_contents($file,false,$context);
-            } else {
+                $res=@file_get_contents($file,false,$context);
+            } else if (is_file($file)) {
                 $res=file_get_contents($file);
             }
             if (is_file($file)) {
+                $res=file_get_contents($file,false,$context);
                 flock ($fp, LOCK_UN);
                 fclose ($fp);
             }
@@ -1287,28 +1279,46 @@ abstract class kiNode
         return $this;
     }
 
-        public function wbGetFormLocale() {
-                $locale=array();
-                if ($this->find("script[type='text/locale']")->length) {
-                        $loc=$this->find("script[type='text/locale']",0)->html();
-                        $loc=parse_ini_string($loc,true);
-                        if (isset($loc["_global"]) AND $loc["_global"]==false) {$global=false;} else {$global=true;}
-                        foreach($loc as $lang => $variables) {
-                                if (!isset($locale[$lang])) {$locale[$lang]=array();}
-                                if (!isset($_ENV["locale"][$lang])) {$_ENV["locale"][$lang]=array();}
-                                foreach($variables as $var => $val) {
-                                        $locale[$lang][$var]=$val;
-                                        if ($global==true) {$_ENV["locale"][$lang][$var]=$val;}
+        public function wbGetFormLocale($ini=null) {
+                $locale=null;
+                if ($this->find("[type='text/locale']")->length OR $ini!==null) {
+                        $obj=$this->find("[type='text/locale']");
+                        if ( $ini!==null AND is_file($ini) ) {
+                                $loc=parse_ini_string(file_get_contents($ini),true);
+                        } else {
+                                if ($obj->is("[data-wb-role=include]") AND $ini!==null) {
+                                        $obj->tagInclude();
+                                        $obj->html("\n\r".$obj->html());
+                                }
+                                $loc=parse_ini_string($obj->html(),true);
+                        }
+                        if (count($loc)) {
+                                $locale=array();
+                                if (isset($loc["_global"]) AND $loc["_global"]==false) {$global=false;} else {$global=true;}
+                                foreach($loc as $lang => $variables) {
+                                        if (!isset($locale[$lang])) {$locale[$lang]=array();}
+                                        if (!isset($_ENV["locale"][$lang])) {$_ENV["locale"][$lang]=array();}
+                                        foreach($variables as $var => $val) {
+                                                $locale[$lang][$var]=$val;
+                                                if ($global==true) {$_ENV["locale"][$lang][$var]=$val;}
+                                        }
                                 }
                         }
+                        if (is_object($obj)) $obj->remove();
                 }
                 return $locale;
         }
 
 
-        public function wbSetFormLocale() {
-                $locale=$this->wbGetFormLocale();
-                wbSetValuesStr($this,$locale,2,"_LANG|_lang");
+        public function wbSetFormLocale($ini=null) {
+                $locale=$this->wbGetFormLocale($ini);
+                if ($locale!==null AND count($locale)) {
+                        $this->wrap("div");
+                        $loc=wbFromString(wbSetValuesStr($this,$locale,2,"_LANG"));
+                        $this->html($loc);
+                        $this->unwrap("div");
+                }
+                return $locale;
         }
 
 
@@ -1370,83 +1380,111 @@ abstract class kiNode
     public function wbPlugins() {
         $script=$this->find("[data-wb-src]:not(.wb-done)");
         foreach($script as $sc) {
-            if ($sc->attr("data-wb-src")=="jquery") {
-                $sc->after('<script src="/engine/js/jquery.min.js" ></script>');
-                $sc->remove();
-            }
-            if ($sc->attr("data-wb-src")=="bootstrap3") {
-                $sc->before('<link href="/engine/js/bootstrap3/bootstrap.min.css" rel="stylesheet">');
-                $sc->after('<script src="/engine/js/bootstrap3/bootstrap.min.js" ></script>');
-                $sc->remove();
-            }
-            if ($sc->attr("data-wb-src")=="bootstrap3css") {
-                $sc->before('<link href="/engine/js/bootstrap3/bootstrap.min.css" rel="stylesheet">');
-                $sc->remove();
-            }
-            if ($sc->attr("data-wb-src")=="bootstrap3js") {
-                $sc->after('<script src="/engine/js/bootstrap3/bootstrap.min.js" ></script>');
-                $sc->remove();
-            }
+                switch( $sc->attr("data-wb-src") ) {
+                    case "jquery" :
+                        $sc->after('<script src="/engine/js/jquery.min.js" ></script>');
+                        $sc->remove();
+                        break;
+                    case "bootstrap3" :
+                        $sc->before('<link href="/engine/js/bootstrap3/bootstrap.min.css" rel="stylesheet">');
+                        $sc->after('<script src="/engine/js/bootstrap3/bootstrap.min.js" ></script>');
+                        $sc->remove();
+                        break;
+                    case "bootstrap3css" :
+                        $sc->before('<link href="/engine/js/bootstrap3/bootstrap.min.css" rel="stylesheet">');
+                        $sc->remove();
+                        break;
+                    case "bootstrap3js" :
+                        $sc->after('<script src="/engine/js/bootstrap3/bootstrap.min.js" ></script>');
+                        $sc->remove();
+                        break;
+                    case "bootstrap4" :
+                        $sc->before('<link href="/engine/js/bootstrap/bootstrap.min.css" rel="stylesheet">');
+                        $sc->after('<script src="/engine/js/bootstrap/bootstrap.min.js" ></script>');
+                        $sc->remove();
+                        break;
+                    case "bootstrap" :
+                        $sc->before('<link href="/engine/js/bootstrap/bootstrap.min.css" rel="stylesheet">');
+                        $sc->after('<script src="/engine/js/bootstrap/bootstrap.min.js" ></script>');
+                        $sc->remove();
+                        break;
+                    case "bootstrap4css" :
+                        $sc->before('<link href="/engine/js/bootstrap/bootstrap.min.css" rel="stylesheet">');
+                        $sc->remove();
+                        break;
+                    case "bootstrap4js" :
+                        $sc->after('<script src="/engine/js/bootstrap/bootstrap.min.js" ></script>');
+                        $sc->remove();
+                        break;
+                    case "datepicker" :
+                        $lang=substr($_SESSION["lang"],0,2);
+                        if ($sc->attr("data-wb-lang")>"") {
+                            $lang=$sc->attr("data-wb-lang");
+                        }
+                        $sc->before('<link href="/engine/js/datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet">');
+                        if ($lang>"") $sc->after("<script src='/engine/js/datetimepicker/locales/bootstrap-datetimepicker.{$lang}.js' type='text/javascript' charset='UTF-8'></script>");
+                        $sc->after('<script src="/engine/js/datetimepicker/bootstrap-datetimepicker.min.js" ></script>');
+                        $sc->remove();
+                        break;
+                    case "plugins" :
+                        $sc->before('<link href="/engine/js/plugins/plugins.css" rel="stylesheet">');
+                        $sc->after('<script src="/engine/js/plugins/plugins.js"></script>');
+                        $lang="ru";
+                        if ($sc->attr("data-wb-lang")>"") {
+                            $lang=$sc->attr("data-wb-lang");
+                        }
+                        $sc->before('<link href="/engine/js/datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet">');
+                        if ($lang>"") $sc->after("<script src='/engine/js/datetimepicker/locales/bootstrap-datetimepicker.{$lang}.js' type='text/javascript' charset='UTF-8'></script>");
+                        $sc->after('<script src="/engine/js/datetimepicker/bootstrap-datetimepicker.min.js" ></script>');
+                        $sc->remove();
+                        break;
+                    case "ckeditor" :
+                        //$sc->before('<link href="/engine/js/ckeditor/style.css" rel="stylesheet">');
+                        $sc->after('<script src="/engine/js/ckeditor/adapters/jquery.js"></script>');
+                        $sc->after('<script src="/engine/js/ckeditor/bootstrap-ckeditor-fix.js"></script>');
+                        $sc->after('<script src="/engine/js/ckeditor/ckeditor.js"></script>');
+                        $sc->remove();
+                        break;
+                    case "source" :
+                        $sc->after('<script language="javascript" src="/engine/js/ace/ace.js"></script>');
+                        $sc->remove();
+                        break;
+                    case "uploader" :
+                        $sc->after(wb_file_get_contents(__DIR__ ."/js/uploader/uploader.php"));
+                        $sc->remove();
+                        break;
 
+                    case "imgviewer" :
+                        $sc->after(wb_file_get_contents(__DIR__ ."/js/fancybox/fancybox.php"));
+                        $sc->remove();
+                        break;
 
-            if ($sc->attr("data-wb-src")=="bootstrap4" OR $sc->attr("data-wb-src")=="bootstrap") {
-                $sc->before('<link href="/engine/js/bootstrap/bootstrap.min.css" rel="stylesheet">');
-                $sc->after('<script src="/engine/js/bootstrap/bootstrap.min.js" ></script>');
-                $sc->remove();
-            }
-            if ($sc->attr("data-wb-src")=="bootstrap4css") {
-                $sc->before('<link href="/engine/js/bootstrap/bootstrap.min.css" rel="stylesheet">');
-                $sc->remove();
-            }
-            if ($sc->attr("data-wb-src")=="bootstrap4js") {
-                $sc->after('<script src="/engine/js/bootstrap/bootstrap.min.js" ></script>');
-                $sc->remove();
-            }
+                    case "font" :
+                        switch ($name) {
+                                case "font-awesome":
+                                        $sc->after('<link href="/engine/lib/fonts/font-awesome/css/font-awesome.min.css" rel="stylesheet">');
+                                        break;
+                                case "open-sans":
+                                        $sc->after('<link href="/engine/lib/fonts/open-sans/stylesheet.css" rel="stylesheet">');
+                                        break;
+                                case "simple-line-icons":
+                                        $sc->after('<link href="/engine/lib/fonts/simple-line-icons/css/simple-line-icons.css" rel="stylesheet">');
+                                        break;
+                                case "weather-icons":
+                                        $sc->after('<link href="/engine/lib/fonts/weather-icons/css/weather-icons.min.css" rel="stylesheet">');
+                                        $sc->after('<link href="/engine/lib/fonts/weather-icons/css/weather-icons-wind.min.css" rel="stylesheet">');
+                                        break;
+                        }
+                        $sc->remove();
+                        break;
 
+                    case "engine" :
+                        $sc->after('<script src="/engine/js/wbengine.js" ></script>');
+                        //$sc->before('<link href="/engine/tpl/css/custom.css" rel="stylesheet">');
+                        $sc->remove();
+                        break;
 
-            if ($sc->attr("data-wb-src")=="datepicker") {
-                $lang="ru";
-                if ($sc->attr("data-wb-lang")>"") {
-                    $lang=$sc->attr("data-wb-lang");
                 }
-                $sc->before('<link href="/engine/js/datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet">');
-                if ($lang>"") $sc->after("<script src='/engine/js/datetimepicker/locales/bootstrap-datetimepicker.{$lang}.js' type='text/javascript' charset='UTF-8'></script>");
-                $sc->after('<script src="/engine/js/datetimepicker/bootstrap-datetimepicker.min.js" ></script>');
-                $sc->remove();
-            }
-            if ($sc->attr("data-wb-src")=="plugins") {
-                $sc->before('<link href="/engine/js/plugins/plugins.css" rel="stylesheet">');
-                $sc->after('<script src="/engine/js/plugins/plugins.js"></script>');
-                $sc->remove();
-            }
-            if ($sc->attr("data-wb-src")=="ckeditor") {
-                //$sc->before('<link href="/engine/js/ckeditor/style.css" rel="stylesheet">');
-                $sc->after('<script src="/engine/js/ckeditor/adapters/jquery.js"></script>');
-                $sc->after('<script src="/engine/js/ckeditor/bootstrap-ckeditor-fix.js"></script>');
-                $sc->after('<script src="/engine/js/ckeditor/ckeditor.js"></script>');
-                $sc->remove();
-            }
-            if ($sc->attr("data-wb-src")=="source") {
-                $sc->after('<script language="javascript" src="/engine/js/ace/ace.js"></script>');
-                $sc->remove();
-            }
-            if ($sc->attr("data-wb-src")=="uploader") {
-                $sc->after(wb_file_get_contents(__DIR__ ."/js/uploader/uploader.php"));
-                $sc->remove();
-            }
-
-            if ($sc->attr("data-wb-src")=="imgviewer") {
-                $sc->after(wb_file_get_contents(__DIR__ ."/js/fancybox/fancybox.php"));
-                $sc->remove();
-            }
-
-
-            if ($sc->attr("data-wb-src")=="engine") {
-                $sc->after('<script src="/engine/js/wbengine.js" ></script>');
-                $sc->remove();
-            }
-
-
         }
     }
 
@@ -2005,6 +2043,25 @@ abstract class kiNode
         };
         unset($attrs);
 
+        if (isset($form) AND isset($item) AND !isset($path)) {
+                $Item["path"]="/uploads/{$form}/{$item}";
+                $out->find(".wb-uploader")->attr("data-wb-path",$Item["path"]);
+        } else if (!isset($path)) {
+                $Item["path"]=wbFormUploadPath();
+                if (!isset($form)) {$form=$_ENV["route"]["form"];}
+                if (!isset($item)) {$item=$_ENV["route"]["item"];}
+                $out->find(".wb-uploader")->attr("data-wb-form",$form);
+                $out->find(".wb-uploader")->attr("data-wb-item",$item);
+                $out->find(".wb-uploader")->attr("data-wb-path",$Item["path"]);
+        } else {
+                $Item["path"]=$path;
+        }
+
+        if (!isset($width) AND $this->attr("width")!==NULL) {$width=$this->attr("width");} else if (!isset($width)) {$width=$_ENV['thumb_width'];}
+        if (!isset($height) AND $this->attr("height")!==NULL) {$height=$this->attr("height");} else if (!isset($height)) {$height=$_ENV['thumb_height'];}
+        if (!isset($size) AND $this->attr("size")!==NULL) {$size=$this->attr("size");} else if (!isset($size)) {$size="cover";}
+
+/*
         if (!$this->hasAttr("data-wb-path")) {
             $Item["path"]=wbFormUploadPath();
             $out->find(".wb-uploader")->attr("data-wb-path",$Item["path"]);
@@ -2013,6 +2070,9 @@ abstract class kiNode
         } else {
             $Item["path"]=$this->attr("data-wb-path");
         }
+        */
+        $out->find(".wb-uploader [data-wb-role=thumbnail]")->attr($size,"true");
+        $out->find(".wb-uploader [data-wb-role=thumbnail]")->attr("size","{$width};{$height}");
         $out->find(".wb-uploader")->children("input[name]")->attr("name",$fldname);
         $out->find(".wb-uploader .gallery[data-wb-from]")->attr("data-wb-from",$fldname);
         $out->wbSetData($Item);
@@ -2183,6 +2243,7 @@ abstract class kiNode
         if (isset($from)) {
             $name=$from;
         }
+
         if ($name=="" AND isset($item)) {
             $name=$item;
         }
@@ -2228,7 +2289,7 @@ abstract class kiNode
         $rowtpl=wbGetForm("common","tree_row");
         $name=$this->find("input[name]")->attr("name");
         if (!is_array($data)) {
-            $data=json_decode($data,true);
+            $data=wbItemToArray($data);
         }
         foreach($data as $item) {
             $tpl=$rowtpl->clone();
@@ -2262,6 +2323,7 @@ abstract class kiNode
             if (isset($from)) {
                 $name=$from;
             }
+
             if ($name=="" AND isset($item)) {
                 $name=$item;
             }
@@ -2271,6 +2333,9 @@ abstract class kiNode
             else {
                 $tree=$Item[$name];
             }
+        if (isset($call) AND $call > "" AND is_callable($call)) {
+                $tree=@$call();
+        }
             $tag=$this->tag();
             if (!isset($limit) OR $limit=="false" OR $limit*1<0) {
                 $limit=-1;
@@ -2317,7 +2382,6 @@ abstract class kiNode
         $idx=0;
         if (is_array($tree)) {
             foreach($tree as $i => $item) {
-                //$item=wbItemToArray($item);
                 $lvl++;
                 $item=(array)$srcVal + (array)$item;
                 $item["_idx"]=$idx;
@@ -2467,7 +2531,7 @@ abstract class kiNode
         }
 
         if (isset($form) AND !isset($table)) {$table=$form;}
-		if ($table > "") {
+        if ($table > "") {
             $table=wbTable($table);
             $itemform=wbTableName($table);
       			if (isset($item) AND $item>"") {
@@ -2482,13 +2546,14 @@ abstract class kiNode
       			}  else {
                 $Item=wbItemList($table,$where);
       			}
-		}
+        }
+                if (isset($call) AND is_callable($call)) {$Item=@$call();}
+                if (isset($oconv) AND is_callable($oconv)) {$Item=@$oconv($Item);}
 
 		if (is_string($Item)) $Item=json_decode($Item,true);
 		if (!is_array($Item)) $Item=array($Item);
-		if ($sort>"") {$Item=wbArraySort($Item,$sort);}
+		if ($sort>"") {$Item=wbArraySortMulti($Item,$sort);}
 		if (isset($rand) AND $rand!=="false") {shuffle($Item);}
-		if (isset($call) AND is_callable($call)) {$Item=$call($Item);}
 
 		if ($add=="true" AND $this->find(":first-child",0)->length) {$this->find(":first-child",0)->attr("item","{{id}}");}
 		$tpl=$this->innerHtml(); $inner=""; $this->html("");
@@ -2504,8 +2569,9 @@ abstract class kiNode
         if (isset($rand) AND $rand=="true") {shuffle($Item);}
         if (!$this->hasClass("pagination") AND $form=="" AND $table=="" ) {
             // если список формируется функцией, то используем кэш
-            if ($cacheId==0) {
-                $cacheId=md5($_SESSION["user_id"].$_ENV["lang"].$_SESSION["lang"]).md5($_ENV["route"]["uri"].$find);
+            $checkCache=md5($_SESSION["user_id"].$_ENV["lang"].$_SESSION["lang"]).md5($_ENV["route"]["uri"].$sort.$find);
+            if ($cacheId==0 OR $cacheId!==$checkCache) {
+                $cacheId=$checkCache;
                 file_put_contents($_ENV["dbac"]."/".$cacheId,base64_encode(wbJsonEncode($Item)));
             } else {
                 $Item=json_decode(base64_decode(file_get_contents($_ENV["dbac"]."/".$cacheId)),true);
@@ -2750,7 +2816,6 @@ abstract class kiNode
                 $mode=implode("_",$arr);
             }
             $this_content=wbGetForm($form,$mode);
-            $this_content->wbGetFormLocale();
             break;
         case "snippet":
             if (!isset($mode) AND isset($name)) {
@@ -2770,7 +2835,18 @@ abstract class kiNode
             $this_content=wbFromFile($module);
             $this_content->wbSetFormLocale();
             break;
+        case "shortcode":
+                $tree=wbItemRead("admin","shortcodes");
+                if ($_ENV["last_error"]=="1006") {
+                        $tree=wbItemRead("admin:engine","shortcodes");
+                        wbItemSave("admin",$tree);
+                }
+                $tree=wbItemToArray($tree["shortcode"]);
+                $tree=wbTreeFindBranch($tree,$name);
+                $this_content=wbFromString($tree[0]["data"]["code"]);
+                break;
         }
+
         $vars=$this->attr("data-wb-vars");
         if ($vars>"") {
             $Item=wbAttrAddData($vars,$Item);
@@ -2835,13 +2911,13 @@ abstract class kiNode
             }
 
         }
+        $this_content->wbSetData($Item);
+        $this->append($this_content);
         if ($this->find("include")->length) {
             $this->includeTag($Item);
-        } else {
-            $this->append($this_content);
         }
-        $this->wbSetData($Item);
-        if ($this->attr("data-wb-hide")=="*" OR $this->is("meta")) {
+
+        if ($this->attr("data-wb-hide")=="*" OR $this->is("meta") OR $this->is("link")) {
             $this->replaceWith($this->html());
         }
     }
@@ -2960,11 +3036,11 @@ abstract class kiNode
         $style=$this->attr("style");
         $width=$this->attr("width");
         if ($width=="") {
-            $width="160px";
+            $width=$_ENV['thumb_width']."px";
         }
         $height=$this->attr("height");
         if ($height=="") {
-            $height="120px";
+            $height=$_ENV['thumb_height']."px";
         }
         $offset=$this->attr("offset");
         $contain=$this->attr("contain");
@@ -3175,7 +3251,7 @@ abstract class kiNode
         }
 
         if ($bkg==true) {
-            if (!in_array($srcExt,$exts)) {
+            if (!in_array($srcExt,$exts) OR $contain=="true") {
                 $bSize="contain";
             }
             else {
@@ -3187,7 +3263,8 @@ abstract class kiNode
             if (is_numeric($height)) {
                 $height.="px";
             }
-            $style="width:{$width}; height: {$height}; background: url('{$src}') {$left} {$top} no-repeat; display:inline-block; background-size: {$bSize}; background-clip: content-box;".$style;
+            //$style="width:{$width}; height: {$height}; background: url('{$src}') {$left} {$top} no-repeat; display:inline-block; background-size: {$bSize}; background-clip: content-box;".$style;
+            $style="background: url('{$src}') {$left} {$top} no-repeat; display:inline-block; background-size: {$bSize}; background-clip: content-box;".$style;
             $this->attr("src","/engine/uploads/__system/transparent.png");
             $this->attr("width",$width);
             $this->attr("height",$height);

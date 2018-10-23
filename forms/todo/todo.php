@@ -41,7 +41,7 @@ function ajax__todo_counter() {
 	$where='user = "'.$_SESSION["user_id"].'"';
 	if (isset($_GET["status"])) {$where.=' AND status = "'+$_GET["status"]+'"';}
 	$list=wbListItems(wbTable("todo"),$where);
-	$res=count($list["result"]);
+	$res=count($list);
 	unset($list,$item);
 	return $res;
 }
@@ -96,7 +96,7 @@ function ajax__todo_generate() {
 		"id"		=> newIdRnd(),
 		"form"		=> "todo",
 		"user"		=> $_SESSION["user_id"],
-		"task"		=> "Абра швабра кадабра ".$i,
+		"task"		=> "Abra shvabra cadabra ".$i,
 		"status"	=> "default",
 		"done"		=> "",
 		"time"		=> date("Y-m-d H:i:s")

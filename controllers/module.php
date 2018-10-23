@@ -5,11 +5,10 @@ function module__controller() {
 	if (is_callable($call)) {
 		$_ENV["DOM"]=$call();
 	} else {
-		echo __FUNCTION__ .": отсутствует функция ".$call."()";
+		echo __FUNCTION__ .": {$_ENV['sysmsg']['err_func_lost']} ".$call."()";
 		die;
 	}
 	wbTrigger("func",__FUNCTION__,"after");
-	$_ENV["DOM"]->wbSetFormLocale();
 	return $_ENV["DOM"];
 }
 
@@ -22,7 +21,7 @@ function module__controller__init() {
 	$call=$module."_init"; if (is_callable($call)) {$out=@$call();}
 	$call=$module."__init"; if (is_callable($call)) {$out=@$call();}
 	if ($out!==null) {$_ENV["DOM"]=$out;} else {
-		$_ENV["DOM"]=wbFromString("Модуль {$module} не инициализирован!");
+		$_ENV["DOM"]=wbFromString("{$_ENV['sysmsg']['err_mod_lost']}: [{$module}]");
 	}
 	if (!is_object($_ENV["DOM"])) {$_ENV["DOM"]=wbFromString($_ENV["DOM"]);}
 	return $_ENV["DOM"];

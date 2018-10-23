@@ -5,24 +5,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Meta -->
-    <meta name="description" content="{{_VAR[signup_reg]}}">
-    <meta data-wb-role="variable" var="signup_reg" value="Регистрация пользователя">
-    <meta data-wb-role="variable" var="signup_email" value="Электронная почта">
-    <meta data-wb-role="variable" var="signup_firstname" value="Имя">
-    <meta data-wb-role="variable" var="signup_lastname" value="Фамилия">
-    <meta data-wb-role="variable" var="signup_pass1" value="Пароль">
-    <meta data-wb-role="variable" var="signup_pass2" value="Пароль (повторно)">
-    <meta data-wb-role="variable" var="signup_submit" value="Зарегистрироваться">
-    <meta data-wb-role="variable" var="signup_already" value="Уже зарегистрированы?">
-    <meta data-wb-role="variable" var="signup_login" value="Вход">
-      
+    <meta name="description" content="{{_LANG[signup_reg]}}">
+
+
     <base href="/engine/tpl/">
-    <title>{{_VAR[signup_reg]}}</title>
+    <title>{{_LANG[signup_header]}}</title>
 
     <!-- vendor css -->
     <link href="./lib/font-awesome/css/font-awesome.css" rel="stylesheet">
-    <link href="./lib/Ionicons/css/ionicons.css" rel="stylesheet">
-    <link href="./lib/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet">
 
     <!-- Katniss CSS -->
     <link rel="stylesheet" href="./css/katniss.css">
@@ -32,26 +22,33 @@
     <form class="signpanel-wrapper" method="POST">
       <div class="signbox signup">
         <div class="signbox-header">
-          <h4>{{_SETT[header]}}</h4>
-          <p class="mg-b-0">{{_VAR[signup_reg]}}</p>
+          <i class="pb-3 fa fa-user-circle-o fa-4x text-white"></i>
+          <h4>{{_LANG[signup_header]}}</h4>
+          <p class="mg-b-0">{{_LANG[signup_reg]}}</p>
         </div><!-- signbox-header -->
         <div class="signbox-body">
           <div class="form-group">
-            <label class="form-control-label">{{_VAR[signup_email]}}</label>
-            <input type="email" name="email" class="form-control" placeholder="E-mail" required>
+              <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-at"></i></span>
+                    <input type="email" name="email" class="form-control" placeholder="{{_LANG[signup_email]}}" required>
+              </div>
           </div><!-- form-group -->
 
           <div class="row row-xs">
             <div class="col-sm">
               <div class="form-group">
-                <label class="form-control-label">{{_VAR[signup_firstname]}}:</label>
-                <input type="text" name="firstname" class="form-control" placeholder="{{_VAR[signup_firstname]}}" required>
+                      <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                            <input type="text" name="firstname" class="form-control" placeholder="{{_LANG[signup_firstname]}}" required>
+                      </div>
               </div><!-- form-group -->
             </div><!-- col -->
             <div class="col-sm">
               <div class="form-group">
-                <label class="form-control-label">{{_VAR[signup_lastname]}}:</label>
-                <input type="text" name="lastname" class="form-control" placeholder="{{_VAR[signup_lastname]}}" required>
+                      <div class="input-group">
+                      <span class="input-group-addon"><i class="fa fa-user-o"></i></span>
+                            <input type="text" name="lastname" class="form-control" placeholder="{{_LANG[signup_lastname]}}" required>
+                      </div>
               </div><!-- form-group -->
             </div><!-- col -->
           </div><!-- row -->
@@ -59,73 +56,129 @@
           <div class="row row-xs">
             <div class="col-sm">
               <div class="form-group">
-                <label class="form-control-label">{{_VAR[signup_pass1]}}:</label>
-                <input type="password" name="password" class="form-control" placeholder="{{_VAR[signup_pass1]}}" minlength="6" required>
+                        <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                                <input type="password" name="password" class="form-control" placeholder="{{_LANG[signup_pass1]}}" minlength="6" required>
+                        </div>
               </div><!-- form-group -->
             </div><!-- col -->
             <div class="col-sm">
               <div class="form-group">
-                <label class="form-control-label">{{_VAR[signup_pass2]}}:</label>
-                <input type="password" name="conpassword" class="form-control" placeholder="{{_VAR[signup_pass2]}}"  minlength="6" required>
+                        <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-unlock-alt"></i></span>
+                                <input type="password" name="conpassword" class="form-control" placeholder="{{_LANG[signup_pass2]}}"  minlength="6" required>
+                        </div>
               </div><!-- form-group -->
             </div><!-- col -->
           </div><!-- row -->
 
-          <!--div class="form-group mg-b-20 tx-12">By clicking Sign Up button below you agree to our <a href="">Terms of Use</a> and our <a href="">Privacy Policy</a></div-->
+                <div class="form-group mg-b-20 tx-12 text-center" data-wb-where='"{{_SETT[agree]}}" = "on" '>
+                        By clicking Sign Up button below you agree to our<br> <a href="">Terms of Use</a> and our <a href="">Privacy Policy</a>
+                </div>
 
-          <button type="submit" class="btn btn-dark btn-block">{{_VAR[signup_submit]}} &nbsp;<i class="fa fa-envelope"></i></button>
-          <div class="tx-center bd pd-10 mg-t-40">{{_VAR[signup_already]}} <a href="/login">{{_VAR[signup_login]}} <i class="fa fa-sign-in"></i></a></div>
+          <button type="submit" class="btn btn-dark btn-block">{{_LANG[signup_submit]}} &nbsp;<i class="fa fa-envelope"></i></button>
+          <div class="tx-center bd pd-10 mg-t-40">{{_LANG[signup_already]}} <a href="/login">{{_LANG[signup_login]}} <i class="fa fa-sign-in"></i></a></div>
         </div><!-- signbox-body -->
       </div><!-- signbox -->
     </form><!-- signpanel-wrapper -->
     <div class="signbox mail d-none">
-        <h3 class="subject">Регистрация на сайте: {{_SETT[header]}}</h3>
-        <p class="message">{{name}}, для активации учётной записи на сайте {{_SETT[header]}} (<a href="{{_ENV[route][hostp]}}">{{_ENV[route][hostp]}}</a>), 
-            пожалуйста перейдите по ссылке: <a href="{{_ENV[route][hostp]}}/signup/{{id}}">{{_ENV[route][hostp]}}/signup/{{id}}</a>
+        <h3 class="subject">{{_LANG[subject]}}: {{_SETT[header]}}</h3>
+        <p class="message">{{name}}, {{_LANG[message1]}} {{_SETT[header]}} (<a href="{{_ENV[route][hostp]}}">{{_ENV[route][hostp]}}</a>)
+            {{_LANG[message2]}}: <a href="{{_ENV[route][hostp]}}/signup/{{id}}">{{_ENV[route][hostp]}}/signup/{{id}}</a>
             <br><br>
-            После активации вы сможете войти в систему:<br>
-            Логин: <b>{{_POST[email]}}</b><br>
-            Пароль: <b>{{_POST[password]}}</b><br>
+            {{_LANG[message2]}}:<br>
+            {{_LANG[login]}}: <b>{{_POST[email]}}</b><br>
+            {{_LANG[password]}}: <b>{{_POST[password]}}</b><br>
         </p>
     </div>
     <div class="signbox success d-none">
         <div class="signbox-header">
-          <h4>{{_SETT[header]}}</h4>
-          <p class="mg-b-0">{{_VAR[signup_reg]}}</p>
+          <i class="pb-3 fa fa-user-circle-o fa-4x text-white"></i>
+          <h4>{{_LANG[signup_header]}}</h4>
         </div>
         <div class="signbox-body">
-            <p>Ваша учётная запись успешно активирована. Теперь вы можете войти в систему с вашими учётными данными.</p>
-            <a  class="btn btn-dark btn-block" href="/login">{{_VAR[signup_login]}} <i class="fa fa-sign-in"></i></a>
+            <p>{{_LANG[success]}}.</p>
+            <a  class="btn btn-dark btn-block" href="/login">{{_LANG[signup_login]}} <i class="fa fa-sign-in"></i></a>
         </div>
     </div>
-      
+
     <div class="signbox exist d-none">
         <div class="signbox-header">
-          <h4>{{_SETT[header]}}</h4>
-          <p class="mg-b-0">{{_VAR[signup_reg]}}</p>
+          <i class="pb-3 fa fa-user-circle-o fa-4x text-white"></i>
+          <h4>{{_LANG[signup_header]}}</h4>
         </div>
         <div class="signbox-body">
-            <p>Учётная запись <b>{{_POST[email]}}</b> ранее уже была зарегистрирована. Вы можете войти в систему с вашими учётными данными.</p>
-            <a  class="btn btn-dark btn-block" href="/login">{{_VAR[signup_login]}} <i class="fa fa-sign-in"></i></a>
+            <p>{{_LANG[account]}} <b>{{_POST[email]}}</b> {{_LANG[exist]}}</p>
+            <a  class="btn btn-dark btn-block" href="/login">{{_LANG[signup_login]}} <i class="fa fa-sign-in"></i></a>
         </div>
     </div>
-      
+
     <div class="signbox check d-none">
         <div class="signbox-header">
-          <h4>{{_SETT[header]}}</h4>
-          <p class="mg-b-0">{{_VAR[signup_reg]}}</p>
+          <i class="pb-3 fa fa-user-circle-o fa-4x text-white"></i>
+          <h4>{{_LANG[signup_header]}}</h4>
         </div>
         <div class="signbox-body">
-            <p>Учётная запись зарегистрирована. Для активации выполните следующие действия:</p>
+            <p>{{_LANG[check_message1]}}:</p>
             <ol>
-                <li class="mg-b-10">Войдите в свой почтовый ящик {{_POST[email]}}</li>
-                <li class="mg-b-10">Откройте регистрационное письмо</li>
-                <li class="mg-b-10">Перейдите по ссылке активации</li>
+                <li class="mg-b-10">{{_LANG[check_message2]}} {{_POST[email]}}</li>
+                <li class="mg-b-10">{{_LANG[check_message3]}}</li>
+                <li class="mg-b-10">{{_LANG[check_message4]}}</li>
             </ol>
         </div>
     </div>
-    <script src="../lib/jquery/jquery.js"></script>
-    <script src="../lib/popper.js/popper.js"></script>
-    <script src="../lib/bootstrap/bootstrap.js"></script>
+    <script data-wb-src="jquery"></script>
+    <script data-wb-src="bootstrap4js"></script>
   </body>
 </html>
+
+<script type="text/locale">
+[eng]
+                signup_reg              = "All the fields are mandatory to fill in"
+                signup_email            = "Email"
+                signup_firstname        = "First Name"
+                signup_lastname         = "Last Name"
+                signup_pass1            = "Password"
+                signup_pass2            = "Password (confirm)"
+                signup_submit           = "Sign up"
+                signup_already          = "Already registred?"
+                signup_login            = "Sign in"
+                signup_header           = "Sign up"
+                login                   = "Login"
+                password                = "Password"
+                subject                 = "Account registration"
+                message1                = "to activate account on the site"
+                message2                = "go to link"
+                message3                = "After activation your can sign in to the site"
+                account                 = "Account"
+                success                 = "Account activation success. Your can sign in with you Login and Password"
+                exist                   = "has already been registered. You can sign in with your credentials."
+                check_message1          = "Account registered. To activate, follow these steps"
+                check_message2          = "Sign in to your mailbox"
+                check_message3          = "Open the registration email"
+                check_message4          = "Click the activation link"
+[rus]
+                signup_reg              = "Все поля обязательны для заполнения"
+                signup_email            = "Электронная почта"
+                signup_firstname        = "Имя"
+                signup_lastname         = "Фамилия"
+                signup_pass1            = "Пароль"
+                signup_pass2            = "Пароль (повторно)"
+                signup_submit           = "Зарегистрироваться"
+                signup_already          = "Уже зарегистрированы?"
+                signup_login            = "Вход"
+                signup_header           = "Регистрация"
+                login                   = "Логин"
+                password                = "Пароль"
+                subject                 = "Регистрация учётной записи"
+                message1                = "для активации учётной записи на сайте"
+                message2                = "перейдите по ссылке"
+                message3                = "После активации вы сможете войти в систему"
+                account                 = "Учётная запись"
+                success                 = "Ваша учётная запись успешно активирована. Теперь вы можете войти в систему с вашими учётными данными"
+                exist                   = "ранее уже была зарегистрирована. Вы можете войти в систему с вашими учётными данными."
+                check_message1          = "Учётная запись зарегистрирована. Для активации выполните следующие действия"
+                check_message2          = "Войдите в свой почтовый ящик"
+                check_message3          = "Откройте регистрационное письмо"
+                check_message4          = "Перейдите по ссылке активации"
+</script>

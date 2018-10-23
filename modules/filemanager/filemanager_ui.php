@@ -1,8 +1,5 @@
 <h6 class="element-header">
     {{_LANG[filemanager]}}
-    <button class="btn btn-sm btn-success pull-right" data-wb-ajax="" data-wb-append="body">
-     <i class="fa fa-plus"></i>
-   </button>
 </h6>
 <div class="col-12" id="filemanager">
     <div class="content-wrapper">
@@ -10,7 +7,7 @@
 
         <div id="filemanagerUploader">
             <div class="uploader">
-                <button id="pickfiles" class="btn btn-default btn-block mg-b-20">{{_LANG[upload]}}</button>
+                <button id="pickfiles" class="btn btn-success btn-block mg-b-20"><i class="fa fa-upload"></i> &nbsp; {{_LANG[upload]}}</button>
             </div>
         </div>
 
@@ -122,42 +119,44 @@
                 <li class="col-12 {{type}}{{link}} {{ext}}" data-name="{{name}}">{{name}}</li>
               </ul-->
 
-            <table id="list" class="table table-striped mg-b-0" data-wb-role="foreach" data-wb-from="result" data-wb-tpl="false" data-wb-size="false" data-wb-hide="wb">
-                <tr class="col-12 {{type}}{{link}} {{ext}}" data-name="{{name}}" data-ext="{{ext}}">
-                    <td class="valign-middle">
-                        <label class="ckbox mg-b-0">
-                    <input type="checkbox"><span></span>
-                  </label>
-                    </td>
-                    <td class="col name">
-                        <i class="fa {{type}} {{ext}} tx-22 tx-primary lh-0 valign-middle"></i>
-                        <span class="pd-l-5">{{name}}</span>
-                    </td>
-                    <td class="hidden-xs">
-                        <nobr>{{perms}}</nobr>
-                    </td>
-                    <td class="hidden-xs">
-                        <nobr>{{size}}</nobr>
-                    </td>
-                    <td class="hidden-xs-down">{{ext}}</td>
-                    <td class="dropdown">
-                        <a href="#" data-toggle="dropdown" class="btn pd-y-3 tx-gray-500 hover-info" data-wb-where='type!="back"'><i class="icon ion-more"></i></a>
-                        <div class="dropdown-menu dropdown-menu-right pd-10" data-wb-where='type!="back"'>
-                            <nav class="nav nav-style-1 flex-column">
-                                <a href="#edit" class="nav-link" data-wb-where='type="file"'><i class="fa fa-edit"></i> {{_LANG[edit]}}</a>
-                                <a href="#rendir" class="nav-link" data-wb-where='type="dir"'><i class="fa fa-i-cursor"></i> {{_LANG[rename]}}</a>
-                                <a href="#renfile" class="nav-link" data-wb-where='type="file"'><i class="fa fa-i-cursor"></i> {{_LANG[rename]}}</a>
-                                <a href="#renlink" class="nav-link" data-wb-where='type="dir1" OR type="file1"'><i class="fa fa-i-cursor"></i> {{_LANG[rename]}}</a>
-                                <a href="#clone" class="nav-link" data-wb-where='type="file"'><i class="fa fa-copy"></i> {{_LANG[duplicate]}}</a>
-                                <a href="{{href}}" download="{{name}}" class="nav-link" data-wb-where='type="file"'><i class="fa fa-download"></i> {{_LANG[download]}}</a>
-                                <a href="#rmfile" class="nav-link" data-wb-where='type="file"'><i class="fa fa-remove"></i> {{_LANG[remove]}}</a>
-                                <a href="#rmdir" class="nav-link" data-wb-where='type="dir"'><i class="fa fa-remove"></i> {{_LANG[remove]}}</a>
-                                <a href="#rmlink" class="nav-link" data-wb-where='type="dir1" OR type="file1"'><i class="fa fa-trash-o"></i> {{_LANG[remove]}}</a>
-                            </nav>
-                        </div>
-                        <!-- dropdown-menu -->
-                    </td>
-                </tr>
+            <table id="list" class="table table-striped mg-b-0" >
+                <tbody  data-wb-role="foreach" data-wb-from="result" data-wb-size="20">
+                        <tr class="col-12 {{type}}{{link}} {{ext}}" data-name="{{name}}" data-ext="{{ext}}">
+                            <td class="valign-middle">
+                                <label class="ckbox mg-b-0">
+                            <input type="checkbox"><span></span>
+                          </label>
+                            </td>
+                            <td class="col name">
+                                <i class="fa {{type}} {{ext}} tx-22 tx-primary lh-0 valign-middle"></i>
+                                <span class="pd-l-5">{{name}}</span>
+                            </td>
+                            <td class="hidden-xs">
+                                <nobr>{{perms}}</nobr>
+                            </td>
+                            <td class="hidden-xs">
+                                <nobr>{{size}}</nobr>
+                            </td>
+                            <td class="hidden-xs-down">{{ext}}</td>
+                            <td class="dropdown">
+                                <a href="#" data-toggle="dropdown" class="btn pd-y-3 tx-gray-500 hover-info" data-wb-where='type!="back"'><i class="icon ion-more"></i></a>
+                                <div class="dropdown-menu dropdown-menu-right pd-10" data-wb-where='type!="back"'>
+                                    <nav class="nav nav-style-1 flex-column">
+                                        <a href="#edit" class="nav-link" data-wb-where='type="file"'><i class="fa fa-edit"></i> {{_LANG[edit]}}</a>
+                                        <a href="#rendir" class="nav-link" data-wb-where='type="dir"'><i class="fa fa-i-cursor"></i> {{_LANG[rename]}}</a>
+                                        <a href="#renfile" class="nav-link" data-wb-where='type="file"'><i class="fa fa-i-cursor"></i> {{_LANG[rename]}}</a>
+                                        <a href="#renlink" class="nav-link" data-wb-where='type="dir1" OR type="file1"'><i class="fa fa-i-cursor"></i> {{_LANG[rename]}}</a>
+                                        <a href="#clone" class="nav-link" data-wb-where='type="file"'><i class="fa fa-copy"></i> {{_LANG[duplicate]}}</a>
+                                        <a href="{{href}}" download="{{name}}" class="nav-link" data-wb-where='type="file"'><i class="fa fa-download"></i> {{_LANG[download]}}</a>
+                                        <a href="#rmfile" class="nav-link" data-wb-where='type="file"'><i class="fa fa-remove"></i> {{_LANG[remove]}}</a>
+                                        <a href="#rmdir" class="nav-link" data-wb-where='type="dir"'><i class="fa fa-remove"></i> {{_LANG[remove]}}</a>
+                                        <a href="#rmlink" class="nav-link" data-wb-where='type="dir1" OR type="file1"'><i class="fa fa-trash-o"></i> {{_LANG[remove]}}</a>
+                                    </nav>
+                                </div>
+                                <!-- dropdown-menu -->
+                            </td>
+                        </tr>
+                </tbody>
             </table>
 
 
@@ -227,83 +226,83 @@
 
 <script type="text/locale">
 [rus]
-        refresh		= Обновить
-        upload		= Загрузить
-        actions		= Действия
-        edit		= Редактировать
-        rename		= Переименовать
-        remove		= Удалить
-        zip		= Архивировать
-        unzip		= Разархивировать
-        copy		= Копировать
-        cut		= Вырезать
-        paste		= Вставить
-        download	= Скачать
-        duplicate	= Дублировать
-        filemanager     = Файловый менеджер
-        cancel          = Отмена
-        ok              = Выполнить
-        title_new_dir	= Новая директория
-        title_new_file	= Новый файл
-        title_rmdir     = Удаление директории
-        title_rmfile    = Удаление файла
-        title_rmlist    = Множественное удаление
-        title_rendir    = Переименование директории
-        title_renfile   = Переименование файла
-        title_rewrite   = Переизапись
-        title_zip       = Архивация
-        title_unzip     = Распаковка архива
-        prompt_new_dir  = Создать новую директорию с именем
-        prompt_new_file = Создать новый файл с именем
-        prompt_rmdir    = Удалить рекурсивно директорию
-        prompt_rmfile   = Удалить файл
-        prompt_rmlist   = Выполнить удаление
-        prompt_rmlist1  = выбранных объектов
-        prompt_rendir   = Переименовать директорию
-        prompt_renfile  = Переименовать файл
-        prompt_paste    = Некоторые объекты уже существуют в этой директории.<br> Выполнить перезапись существующих объектов?
-        prompt_zip      = Сжать выбранные объекты в архив?
-        prompt_unzip    = Извлечь файлы и папки из архива?<br>Существующие объекты будут перезаписаны.
-        prompt_to       = в
+refresh		= Обновить
+upload		= Загрузить
+actions		= Действия
+edit		= Редактировать
+rename		= Переименовать
+remove		= Удалить
+zip		= Архивировать
+unzip		= Разархивировать
+copy		= Копировать
+cut		= Вырезать
+paste		= Вставить
+download	= Скачать
+duplicate	= Дублировать
+filemanager     = Файловый менеджер
+cancel          = Отмена
+ok              = Выполнить
+title_new_dir	= Новая директория
+title_new_file	= Новый файл
+title_rmdir     = Удаление директории
+title_rmfile    = Удаление файла
+title_rmlist    = Множественное удаление
+title_rendir    = Переименование директории
+title_renfile   = Переименование файла
+title_rewrite   = Переизапись
+title_zip       = Архивация
+title_unzip     = Распаковка архива
+prompt_new_dir  = Создать новую директорию с именем
+prompt_new_file = Создать новый файл с именем
+prompt_rmdir    = Удалить рекурсивно директорию
+prompt_rmfile   = Удалить файл
+prompt_rmlist   = Выполнить удаление
+prompt_rmlist1  = выбранных объектов
+prompt_rendir   = Переименовать директорию
+prompt_renfile  = Переименовать файл
+prompt_paste    = Некоторые объекты уже существуют в этой директории.<br> Выполнить перезапись существующих объектов?
+prompt_zip      = Сжать выбранные объекты в архив?
+prompt_unzip    = Извлечь файлы и папки из архива?<br>Существующие объекты будут перезаписаны.
+prompt_to       = в
 [eng]
-        refresh		= Refresh
-        upload		= Upload
-        actions		= Actions
-        edit		= Edit
-        rename		= Rename
-        remove		= Remove
-        zip		= Zip
-        unzip		= UnZip
-        copy		= Copy
-        cut		= Cut
-        paste		= Insert
-        download	= Download
-        duplicate	= Duplicate
-        filemanager     = File Manager
-        cancel          = Cancel
-        ok              = Ok
-        title_new_dir	= New folder
-        title_new_file	= New file
-        title_rmdir     = Remove folder
-        title_rmfile    = Remove file
-        title_rmlist    = Remove objects
-        title_rendir    = Rename folder
-        title_renfile   = Rename file
-        title_rewrite   = Rewrite
-        title_zip       = Zip
-        title_unzip     = Unzip
-        prompt_new_dir  = "Create new folder with name"
-        prompt_new_file = "Create new file with name"
-        prompt_rmdir    = Remove folder recursive
-        prompt_rmfile   = Remove file
-        prompt_rmlist   = Remove
-        prompt_rmlist1  = selected objects
-        prompt_rendir   = Rename folder
-        prompt_renfile  = Rename file
-        prompt_paste    = Some objects already exists in this folder.<br> Rewrite exists objects?
-        prompt_zip      = Zip selected objects?
-        prompt_unzip    = Unzip objects from archive?<br>Exists objects will be rewrite.
-        prompt_to       = to
+refresh		= Refresh
+upload		= Upload
+actions		= Actions
+edit		= Edit
+rename		= Rename
+remove		= Remove
+zip		= Zip
+unzip		= UnZip
+copy		= Copy
+cut		= Cut
+paste		= Insert
+download	= Download
+duplicate	= Duplicate
+filemanager     = File Manager
+cancel          = Cancel
+ok              = Ok
+title_new_dir	= New folder
+title_new_file	= New file
+title_rmdir     = Remove folder
+title_rmfile    = Remove file
+title_rmlist    = Remove objects
+title_rendir    = Rename folder
+title_renfile   = Rename file
+title_rewrite   = Rewrite
+title_zip       = Zip
+title_unzip     = Unzip
+prompt_new_dir  = "Create new folder with name"
+prompt_new_file = "Create new file with name"
+prompt_rmdir    = Remove folder recursive
+prompt_rmfile   = Remove file
+prompt_rmlist   = Remove
+prompt_rmlist1  = selected objects
+prompt_rendir   = Rename folder
+prompt_renfile  = Rename file
+prompt_paste    = Some objects already exists in this folder.<br> Rewrite exists objects?
+prompt_zip      = Zip selected objects?
+prompt_unzip    = Unzip objects from archive?<br>Exists objects will be rewrite.
+prompt_to       = to
 </script>
 
 

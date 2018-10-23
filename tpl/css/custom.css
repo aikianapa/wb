@@ -124,7 +124,7 @@ label.switch-primary input:checked+span {
 }
 
 .modal-max, .modal-xl {
-  max-width: 100% !important;
+  min-width: 100vw;
 }
 
 .wb-multiinput.row {

@@ -12,60 +12,60 @@
                 <form id="{{_form}}EditForm" data-wb-form="{{_form}}" data-wb-item="{{_GET[item]}}" class="form-horizontal" role="form">
                     <input type="hidden" name="id">
                     <div class="form-group row">
-                        <label class="col-sm-3 form-control-label">Дата</label>
+                        <label class="col-sm-3 form-control-label">{{_LANG[datetime]}}</label>
                         <div class="col-sm-3">
-                            <input type="datetimepicker" name="date" class="form-control">
+                            <input type="datetimepicker" name="date" class="form-control" placeholder="{{_LANG[datetime]}}">
                         </div>
                     </div>
 
                     <div class="form-group row">
                       <div class="col-sm-6">
-                        <label class="form-control-label">Клиент</label>
-                        <input type="text" name="name" class="form-control">
+                        <label class="form-control-label">{{_LANG[client]}}</label>
+                        <input type="text" name="name" class="form-control" placeholder="{{_LANG[client]}}">
                       </div>
                       <div class="col-sm-3">
-                        <label class="form-control-label">Телефон</label>
-                        <input type="phone" name="phone" class="form-control">
+                        <label class="form-control-label">{{_LANG[phone]}}</label>
+                        <input type="phone" name="phone" class="form-control" placeholder="{{_LANG[phone]}}">
                       </div>
                       <div class="col-sm-3">
-                        <label class="form-control-label">Эл.почта</label>
-                        <input type="email" name="email" class="form-control">
+                        <label class="form-control-label">{{_LANG[email]}}</label>
+                        <input type="email" name="email" class="form-control" placeholder="{{_LANG[email]}}">
                       </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-12">
-                        <label class="form-control-label">Комментарии</label>
-                          <textarea rows="auto" name="comments" class="form-control"></textarea>
+                        <label class="form-control-label">{{_LANG[comments]}}</label>
+                          <textarea rows="auto" name="comments" class="form-control" placeholder="{{_LANG[comments]}}"></textarea>
                         </div>
                     </div>
 
 					<div class="form-group row">
 						<div class="col-2">
-						<label class="form-control-label">Активен</label>
+						<label class="form-control-label">{{_LANG[active]}}</label>
 						</div>
 						<div class="col-2"><label class="switch switch-success"><input type="checkbox" name="active"><span></span></label></div>
 
 						<div class="col-2">
-						<label class="form-control-label">Оплачен</label>
+						<label class="form-control-label">{{_LANG[paid]}}</label>
 						</div>
 						<div class="col-2"><label class="switch switch-success"><input type="checkbox" name="payed"><span></span></label></div>
 
 						<div class="col-2">
-						<label class="form-control-label">Доставлен</label>
+						<label class="form-control-label">{{_LANG[shipped]}}</label>
 						</div>
 						<div class="col-2"><label class="switch switch-success"><input type="checkbox" name="shipped"><span></span></label></div>
-					</div>	
+					</div>
 
                     <div class="nav-active-primary">
                         <ul class="nav nav-tabs" role="tablist">
-                            <li class="nav-item"><a class="nav-link active" href="#{{_form}}Descr" data-toggle="tab">Характеристики</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#{{_form}}Text" data-toggle="tab">Контент</a></li>
+                            <li class="nav-item"><a class="nav-link active" href="#{{_form}}Descr" data-toggle="tab">{{_LANG[prop]}}</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#{{_form}}Text" data-toggle="tab">{{_LANG[content]}}</a></li>
                         </ul>
                     </div>
                     <div class="tab-content  p-a m-b-md">
                         <br />
                         <div id="{{_form}}Descr" class="tab-pane fade show active" role="tabpanel">
-							
+
                             <div class="wb-cart" data-wb-role="cart">
 
                             <div data-wb-role="multiinput" name="items">
@@ -90,7 +90,7 @@
                             </div>
                             <div class="form-group row">
                                 <div class="col-9">
-                                    <label class="form-control">ИТОГО:</label>
+                                    <label class="form-control">{{_LANG[total]}}:</label>
                                 </div>
                                 <div class="col-3">
                                     <input type="number" name="total" readonly class="form-control cart-total">
@@ -105,11 +105,9 @@
 
 
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-close"></span> Закрыть</button>
-                <button type="button" class="btn btn-primary" data-wb-formsave="#{{_form}}EditForm"><span class="fa fa-check"></span> Сохранить изменения</button>
-            </div>
+            <div class="modal-footer" data-wb-role="include" src="form" data-wb-name="common_close_save" data-wb-hide="wb"></div>
 
         </div>
     </div>
 </div>
+<script type="text/locale" data-wb-role="inlclude" src="orders_common"></script>

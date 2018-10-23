@@ -17,8 +17,8 @@
 							{{price}}
 						</div>
 						<div class="col-sm-3 col-xs-6 text-center">
-							<input type="hidden" name="item" class="cart-item-id">	
-                            <input type="hidden" name="form" class="cart-item-form">	
+							<input type="hidden" name="item" class="cart-item-id">
+                            <input type="hidden" name="form" class="cart-item-form">
                             <input type="text" name="count" class="cart-item-count" placeholder="{{quant}}">
 								<div>
 									<br>
@@ -33,15 +33,15 @@
 				</div>
 			</div>
 			<div class="col-12 text-right">
-				<h5>ИТОГО: <span class="cart-total"></span></h5>
+				<h5>{{_LANG[total]}}: <span class="cart-total"></span></h5>
 			</div>
-			<div class="actions"> 
+			<div class="actions">
                 <div class="col-12">
-				<a href="/" class="btn btn-primary">Продолжить</a>
+				<a href="/" class="btn btn-primary">{{_LANG[continue]}}</a>
                     &nbsp;
-				<a href="#" class="btn btn-success" data-toggle="modal" data-target="#modalOrder">Оформить</a>
+				<a href="#" class="btn btn-success" data-toggle="modal" data-target="#modalOrder">{{_LANG[checkout]}}</a>
                     &nbsp;
-				<a href="#" class="btn btn-danger cart-clear">Очистить</a>
+				<a href="#" class="btn btn-danger cart-clear">{{_LANG[clear]}}</a>
                 </div>
 			</div>
 	</div>
@@ -50,17 +50,17 @@
 			<p><i class="fa fa-info-circle fa-2x"></i></p>
 		</div>
 		<div class="col-xs-11">
-			<p>Ваш заказ успешно отправлен менеджеру. В ближайшее время с вами обязательно свяжутся по телефону, указанному в заказе.</p>
+			<p>{{_LANG[success]}}</p>
 		</div>
 	</div>
 	<div data-wb-role="where" data='"{{_SESSION[settings][checkout]}}">""' data-role-hide="true">
 		<div data-wb-role="include" data-wb-ajax="/engine/ajax.php?mode=checkout&form={{_SESSION[settings][checkout]}}" autoload="true" id="orderCheckout"  style="display:none;">
 		</div>
 	</div>
-	
+
 </div>
 
-<div data-role="include" src="modal" data-id="modalOrder" data-formsave="#orderForm" data-header="Оформление заказа" data-hide="*">
+<div data-role="include" src="modal" data-id="modalOrder" data-formsave="#orderForm" data-header="{{_LANG[checkout_header]}}" data-hide="*">
 	<div data-role="include" src="/engine/forms/orders/order.inc.php" data-hide="data-role,src" append=".modal-body"></div>
 </div>
-
+<script type="text/locale" data-wb-role="inlclude" src="orders_common"></script>

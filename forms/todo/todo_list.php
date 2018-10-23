@@ -1,8 +1,8 @@
 <div id="content" class="app-content box-shadow-z2 pjax-container" role="main">
 <style>
-    #add-todo-form {padding-top:1em;}
-  .todo-list .hide {display:none;}
-  .todo-list .list-item * {color:#666;}
+	#add-todo-form {padding-top:1em;}
+	.todo-list .hide {display:none;}
+	.todo-list .list-item * {color:#666;}
 	.todo-list .list-item input[type=checkbox] {width:1.5em;height:1.5em;}
 	.todo-list .item-title {display:inline-block; width: 100%;}
 	.todo-list [type=datetimepicker] {border:0;background:transparent;}
@@ -10,8 +10,8 @@
 	.todo-list .danger {background-color: rgba(244, 67, 54, 0.3)!important;}
 	.todo-list .success {background-color: rgba(76, 175, 80, 0.3)!important;}
 	.todo-list .muted {background-color: rgba(158, 158, 158, 0.4);}
-  .todo-list ul {padding:0;}
-  .todo-list li {display: flex!important;}
+	.todo-list ul {padding:0;}
+	.todo-list li.list-item {display: flex;}
 	#content .nav .dropdown-menu {margin-left: -140px;}
 	#switcher {display:none;}
 </style>
@@ -22,7 +22,7 @@
 <div class="row">
 <div class="col-12">
 <h3 class="element-header">
-    Чек-лист
+    {{_LANG[checklist]}}
 <ul class="nav navbar-nav pull-right" id="todo-status-menu">
 <li class="nav-item dropdown">
 <a class="nav-link text-muted" href="#" data-toggle="dropdown">
@@ -31,20 +31,20 @@
 </a>
 		<div class="dropdown-menu  dropdown-menu-right status">
 			<a class="dropdown-item" href="javascript:void(0);" data-status="success">
-			<i class="fa fa-dot-circle-o text-success"></i> Активные</a>
+			<i class="fa fa-dot-circle-o text-success"></i> {{_LANG[active]}}</a>
 
 			<a class="dropdown-item" href="javascript:void(0);" data-status="danger">
-			<i class="fa fa-dot-circle-o text-danger"></i> Важные</a>
+			<i class="fa fa-dot-circle-o text-danger"></i> {{_LANG[danger]}}</a>
 
 			<a class="dropdown-item" href="javascript:void(0);" data-status="muted">
-			<i class="fa fa-circle-o text-muted"></i> Архивные</a>
+			<i class="fa fa-circle-o text-muted"></i> {{_LANG[archive]}}</a>
 
 		</div>
 
 </li>
-</ul>    
-    
-    
+</ul>
+
+
     </h3>
 </div>
 </div>
@@ -69,7 +69,7 @@
 			<input type="datetimepicker" class="text-xs" name="time">
 		</div>
 	</div>
-	<a class="col-1 todo-close pull-right" href="javascript:void(0);"><i class="fa  fa-trash-o"></i></a>
+	<a class="col-1 todo-close text-right" href="javascript:void(0);"><i class="fa  fa-trash-o fa-2x"></i></a>
 	</li>
 </ul>
     <div data-wb-append=".todo-list">
@@ -83,9 +83,9 @@
 <div class="row">
 		<form id="add-todo-form" class="col-12 col-sm-6">
 			<div class="input-group">
-				<input type="text" id="add-todo" name="add-todo" class="form-control" placeholder="Добавить задачу.." >
-				<span class="input-group-addon"><span class="text-sm text-muted bottom_counter"><strong></strong> из <strong></strong></span></span>
-				<button class="input-group-addon ">Добавить</button>
+				<input type="text" id="add-todo" name="add-todo" class="form-control" placeholder="{{_LANG[addtask]}}..." >
+				<span class="input-group-addon"><span class="text-sm text-muted bottom_counter"><strong></strong> {{_LANG[from]}} <strong></strong></span></span>
+				<button class="input-group-addon ">{{_LANG[add]}}</button>
 
 			</div>
 		</form>
@@ -103,3 +103,21 @@
 					</script>
 
 </div>
+<script type="text/locale">
+[eng]
+	checklist	= "Check List"
+	add 		= "Add"
+	addtask		= "Add task"
+	from		= "from"
+	active		= "Active"
+	danger		= "Danger"
+	archive		= "Archive"
+[rus]
+	checklist	= "Список дел"
+	add 		= "Добавить"
+	addtask		= "Добавить задачу"
+	from		= "из"
+	active		= "Активные"
+	danger		= "Важные"
+	archive		= "Архивные"
+</script>

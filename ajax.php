@@ -1,4 +1,10 @@
 <?php
+if (isset($_GET["getsysmsg"])) {
+        require_once __DIR__."/functions.php";
+        wbInitEnviroment();
+        echo ajax__getsysmsg();
+}
+
 function ajax__pagination() {
     if (isset($_REQUEST["route"])) {
         $_ENV["route"]=json_decode($_REQUEST["route"],true);
@@ -51,6 +57,10 @@ function ajax__settings() {
 
 function ajax__cart() {
     return wbCartAction();
+}
+
+function ajax__getsysmsg() {
+        return base64_encode(json_encode(wbGetSysMsg()));
 }
 
 function ajax__alive() {
@@ -237,8 +247,9 @@ function ajax__remove() {
 }
 
 function ajax__getform() {
-    echo wbGetForm($_ENV["route"]["params"][0],$_ENV["route"]["params"][1]);
-    die;
+        $out = wbGetForm($_ENV["route"]["params"][0],$_ENV["route"]["params"][1]);
+        echo $out;
+        die;
 }
 
 function ajax__buildfields() {
@@ -262,13 +273,15 @@ function ajax__treeedit() {
     $out=wbGetForm("common","tree_edit");
     $out->wbSetData($_POST);
     $arr=array();
-    foreach($_POST["fields"] as $dict) {
-        if (isset($dict["name"]) AND !in_array($dict["name"],$arr)) {
-            $dict["value"]=htmlspecialchars($dict["value"]);
-            $res=wbFieldBuild($dict,$_POST["data"]);
-            $out->find(".treeData form")->append($res);
-            $arr[]=$dict["name"];
-        }
+    if (is_array($_POST["fields"])) {
+            foreach($_POST["fields"] as $dict) {
+                if (isset($dict["name"]) AND !in_array($dict["name"],$arr)) {
+                    $dict["value"]=htmlspecialchars($dict["value"]);
+                    $res=wbFieldBuild($dict,$_POST["data"]);
+                    $out->find(".treeData form")->append($res);
+                    $arr[]=$dict["name"];
+                }
+            }
     }
     return $out->outerHtml();
 }

@@ -9,17 +9,21 @@
     <span role="tree" data-wb-item="_config" data-wb-branch="config" data-wb-children="0" data-wb-hide="*">
         <meta role="variable" var="title" value="{{name}}" data-wb-hide="*">
     </span>
-    <title>{{_VAR[title]}}</title>
+    <title>{{_LANG[cpanel]}}</title>
     <!-- vendor css -->
-    <link href="/engine/lib/fonts/font-awesome/css/font-awesome.css" rel="stylesheet">
 
-    <link href="./lib/Ionicons/css/ionicons.css" rel="stylesheet">
+        <link data-wb-role="include" src="shortcode" data-wb-name="fonts->font-awesome">
+        <link data-wb-role="include" src="shortcode" data-wb-name="fonts->open-sans">
+        <link data-wb-role="include" src="shortcode" data-wb-name="fonts->ionicons">
+
+
     <link href="./lib/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet">
     <link href="./lib/rickshaw/rickshaw.min.css" rel="stylesheet">
     <link href="./lib/SpinKit/spinkit.css" rel="stylesheet">
     <!-- Katniss CSS -->
     <link rel="stylesheet" href="./css/katniss.css">
-    <link rel="stylesheet" href="./css/custom.css"> </head>
+    <link rel="stylesheet" href="./css/custom.css">
+
     <meta http-equiv="refresh" content="0; url=/login/" data-wb-disallow="admin" />
 
 <body data-wb-allow="admin,moder" class="cursor-wait" data-wb-alive="true">
@@ -39,29 +43,36 @@
 
     <!-- ##### SIDEBAR LOGO ##### -->
     <div class="kt-sideleft-header">
-        <div class="kt-logo"><a href="/admin">{{_VAR[title]}}</a></div>
+        <div class="kt-logo"><a href="/admin">
+                <img src="/engine/tpl/img/logo/logo.svg" class="img-fluid">
+        </a></div>
         <div id="ktDate" class="kt-date-today"></div>
     </div>
     <!-- kt-sideleft-header -->
     <!-- ##### SIDEBAR MENU ##### -->
     <div class="kt-sideleft" data-wb-role="formdata" data-wb-form="users" data-wb-form="users" data-wb-item="{{_SESS[user_role]}}" data-wb-hide="wb">
-        <label class="kt-sidebar-label">Навигация</label>
+        <label class="kt-sidebar-label">{{_LANG[navigation]}}</label>
         <li class="nav-item" data-wb-prepend=".nav.kt-sideleft-menu">
-            <a href="/admin" class="nav-link active"> <i class="fa fa-home"></i> <span>Главная</span> </a>
+            <a href="/admin" class="nav-link active"> <i class="fa fa-home"></i> <span>{{_LANG[dashboard]}}</span> </a>
         </li>
-        <!-- nav-item -->
-        <ul class="nav kt-sideleft-menu" data-wb-role="tree" data-wb-from="roleprop" data-wb-branch="side_menu" data-wb-parent="false" data-wb-limit="1" data-wb-hide="wb">
-            <li class="nav-item" data-wb-role="where" data-wb-where='children>""' data-wb-hide="wb">
-                <a href class="nav-link with-sub"> <i class="{{data[icon]}}"></i> <span>{{name}}</span> </a>
+
+        <ul class="nav kt-sideleft-menu" data-wb-role="tree" data-wb-call="wbGetUserUi" data-wb-branch="side_menu" data-wb-parent="false" data-wb-limit="1" data-wb-hide="wb">
+            <li class="nav-item" data-wb-role="where" data-wb-where='children>"" AND "{{data[visible]}}" = "on"' data-wb-hide="wb">
+                <meta data-wb-role="variable" var="name1" data-wb-if='"{{data[lang][{{_SESS[lang]}}][name]}}" > ""' value="{{data[lang][{{_SESS[lang]}}][name]}}" else="{{name}}">
+                <a href class="nav-link with-sub"> <i class="{{data[icon]}}"></i> <span>{{_VAR[name1]}}</span> </a>
                 <ul class="nav-sub" data-wb-role="foreach" data-wb-from="children" data-wb-where='id>""' data-wb-tpl="false" data-wb-hide="wb">
-                    <li class="nav-item"><a href data-wb-ajax="{{data[ajax]}}" data-wb-html=".content-box" class="nav-link">{{name}}</a></li>
+                        <meta data-wb-role="variable" var="name2" data-wb-if='"{{data[lang][{{_SESS[lang]}}][name]}}" > ""' value="{{data[lang][{{_SESS[lang]}}][name]}}" else="{{name}}" data-wb-hide="false">
+                        <li class="nav-item" data-wb-where='"{{data[visible]}}" = "on"' data-wb-hide='where hide'>
+                                <a href data-wb-ajax="{{data[ajax]}}"data-wb-html=".content-box" class="nav-link">{{_VAR[name2]}}</a>
+                        </li>
                 </ul>
             </li>
-            <!-- nav-item -->
-            <li class="nav-item" data-wb-role="where" data-wb-where='children=""' data-wb-hide="wb">
-                <a href data-wb-ajax="{{data[ajax]}}" data-wb-html=".content-box" class="nav-link"> <i class="{{data[icon]}}"></i> <span>{{name}}</span> </a>
+
+            <li class="nav-item" data-wb-role="where" data-wb-where='children="" AND "{{data[visible]}}" = "on"' data-wb-hide="wb">
+                <meta data-wb-role="variable" var="name3" data-wb-if='"{{data[lang][{{_SESS[lang]}}][name]}}" > ""' value="{{data[lang][{{_SESS[lang]}}][name]}}" else="{{name}}">
+                <a href data-wb-ajax="{{data[ajax]}}" data-wb-html=".content-box" class="nav-link"> <i class="{{data[icon]}}"></i> <span>{{_VAR[name3]}}</span> </a>
             </li>
-            <!-- nav-item -->
+
         </ul>
     </div>
     <!-- kt-sideleft -->
@@ -83,7 +94,8 @@
               <li><a href=""><i class="icon ion-ios-download-outline"></i> Downloads</a></li>
               <li><a href=""><i class="icon ion-ios-star-outline"></i> Favorites</a></li>
               <li><a href=""><i class="icon ion-ios-folder-outline"></i> Collections</a></li-->
-                        <li><a href="/logout"><i class="icon ion-power"></i> Выйти</a></li>
+                        <li><a href data-wb-ajax="/form/profile/admin" data-wb-html=".content-box"><i class="icon fa fa-user"></i> {{_LANG[profile]}}</a></li>
+                        <li><a href="/logout"><i class="icon ion-power"></i> {{_LANG[exit]}}</a></li>
                     </ul>
                 </div>
                 <!-- dropdown-menu -->
@@ -94,7 +106,7 @@
     </div>
     <!-- kt-headpanel -->
     <div class="kt-breadcrumb">
-        <nav class="breadcrumb"> <a class="breadcrumb-item" href="/admin">{{_VAR[title]}}</a>
+        <nav class="breadcrumb"> <a class="breadcrumb-item" href="/admin">{{_SESS[user][nickname]}}</a>
             <!--span class="breadcrumb-item active">Dashboard</span-->
         </nav>
     </div>
@@ -102,7 +114,7 @@
     <!-- ##### MAIN PANEL ##### -->
     <div class="kt-mainpanel">
         <div class="kt-pagetitle">
-            <h5>Главная</h5> </div>
+            <h5>{{_LANG[dashboard]}}</h5> </div>
         <!-- kt-pagetitle -->
         <div class="kt-pagebody content-box">
             <div class="row row-sm" id="adminDashboard">
@@ -133,3 +145,17 @@
 </body>
 
 </html>
+<script type="text/locale">
+[eng]
+        exit            = "Exit"
+        profile         = "Profile"
+        navigation      = "Navigation"
+        dashboard       = "Dashboard"
+        cpanel          = "Control Panel"
+[rus]
+        exit            = "Выйти"
+        profile         = "Профиль"
+        navigation      = "Навигация"
+        dashboard       = "Инструменты"
+        cpanel          = "Панель управления"
+</script>

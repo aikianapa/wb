@@ -1,3 +1,19 @@
+
+
+<div class="col-12">
+    <div class="form-group row">
+	<label class="col-sm-3">{{_LANG[clear_img]}}</label>
+	<button type="button" class="btn btn-secondary" data-wb-ajax="/ajax/admin/clearcache/images">{{_LANG[clear]}}</button>
+    </div>
+</div>
+<div class="col-12">
+    <div class="form-group row">
+	<label class="col-sm-3">{{_LANG[clear_txt]}}</label>
+	<button type="button" class="btn btn-secondary" data-wb-ajax="/ajax/admin/clearcache/texts">{{_LANG[clear]}}</button>
+	</div>
+</div>
+
+
 <div class="col-12">
 	<div class="row" style="padding-left: 30px; padding-right:60px;">
 		<div class="col-sm-3">
@@ -44,10 +60,16 @@
         mode		= Режим
         lifetime        = Время жизни сек.
         active          = Активто
+        clear_img	= Очистка кэша изображений
+        clear_txt	= Очистка кэша страниц
+        clear		= Очистить
 [eng]
         controller	= Controller
 	form		= Form name
         mode		= Mode
         lifetime        = Lifetime sec.
         active          = Active
+        clear_img	= Clear cache images
+        clear_txt	= Clear cache texts
+        clear		= Clear
 </script>

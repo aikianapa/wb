@@ -15,22 +15,22 @@
                     <div class="row">
                         <div class="col-md-5 col-12 tree-view">
                             <div class="form-group row">
-                                <label class="col-sm-3 form-control-label">Имя записи</label>
+                                <label class="col-sm-3 form-control-label">{{_LANG[name]}}</label>
                                 <div class="col-sm-9">
-                                    <input type="text" class="form-control" name="id" placeholder="Имя записи" required>
+                                    <input type="text" class="form-control" name="id" placeholder="{{_LANG[name]}}" required>
                                 </div>
                             </div>
                             <div class="tab-content p-a m-b-md">
                                 <div class="form-group row">
-                                    <label class="col-sm-3 form-control-label">Заголовок</label>
+                                    <label class="col-sm-3 form-control-label">{{_LANG[header]}}</label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="header" placeholder="Заголовок">
+                                        <input type="text" class="form-control" name="header" placeholder="{{_LANG[header]}}">
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-sm-3 form-control-label">Техническое описание</label>
+                                    <label class="col-sm-3 form-control-label">{{_LANG[tech]}}</label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="techdescr" placeholder="Техническое описание">
+                                        <input type="text" class="form-control" name="techdescr" placeholder="{{_LANG[tech]}}">
                                     </div>
                                 </div>
                                 <div data-wb-role="tree" name="tree"></div>
@@ -42,10 +42,10 @@
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-close"></span> Закрыть</button>
-                <button type="button" class="btn btn-primary" data-wb-formsave="#{{_GET[form]}}EditForm"><span class="fa fa-save"></span> Сохранить изменения</button>
+            <div class="modal-footer" data-wb-role="include" src="form" data-wb-name="common_close_save" data-wb-hide="wb">
             </div>
         </div>
     </div>
 </div>
+
+<script type="text/locale" data-wb-role="include" src="tree_common"></script>

@@ -51,15 +51,15 @@
 		});
 		uploader.init();
     }
-    
+
     function filemanagerListEvents() {
-        
-    $('#filemanager').undelegate('#filemanagerModalDialog','shown.bs.modal');    
+
+    $('#filemanager').undelegate('#filemanagerModalDialog','shown.bs.modal');
     $('#filemanager').delegate('#filemanagerModalDialog','shown.bs.modal', function () {
       $('#filemanagerModalDialog input:visible:first').focus();
     });
-        
-        
+
+
     $("#filemanager").undelegate("#filemanagerModalDialog","keydown");
     $("#filemanager").delegate("#filemanagerModalDialog","keydown",function(e){
         if (e.keyCode == 13) {
@@ -67,7 +67,7 @@
             return false;
         }
     });
-        
+
 
     $("#filemanager").off("checkbox");
     $("#filemanager").on("checkbox", function() {
@@ -83,7 +83,7 @@
                 $("#filemanager").find(".allow-buffer, .allow-single, .allow-all").hide();
             }
     });
-        
+
     $("#filemanager").delegate("#list tr", "dblclick", function() {
             var path = $("#filemanager #list").data("path");
             if ($(this).is(".dir,.dir1")) {
@@ -198,7 +198,7 @@
             }
             $("#filemanager").trigger("checkbox");
             return false;
-        });   
+        });
     }
 
     function filemanagerDialogMulti(href) {
@@ -211,7 +211,7 @@
             $.post("/module/filemanager/dialog/" + substr(href, 1), post, function(data) {
                 $("#filemanager").append(data);
                 $("#filemanager #filemanagerModalDialog").modal("show");
-            });       
+            });
     }
 
 
@@ -296,14 +296,14 @@
                     $("#filemanager").data("buffertype", "copy");
                     $("#filemanager .allow-buffer").show();
                     break
-                    
+
                 case '#cut':
                     $("#filemanager").data("buffer", $("#filemanager #list").find("tr:not(.back) [type=checkbox]:checked").parents("tr"));
                     $("#filemanager").data("bufferpath", $("#filemanager #list").data("path"));
                     $("#filemanager").data("buffertype", "cut");
                     $("#filemanager .allow-buffer").show();
                     break
-                    
+
                 case '#paste':
                     if ($("#filemanager").data("bufferpath") !== $("#filemanager #list").data("path")) {
                         filemanagerPaste();
@@ -390,6 +390,7 @@
             if ($("#filemanager").data("buffer")!==undefined) {
                 $("#filemanager .content-left .allow-buffer").show();
             };
+            wb_pagination();
             wb_ajax_loader_done();
         });
         return d;

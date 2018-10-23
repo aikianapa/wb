@@ -7,7 +7,7 @@
     <!-- Meta -->
     <meta name="description" content="Login">
     <base href="/engine/tpl/">
-    <title>Вход в систему</title>
+    <title>{{_LANG[title]}}</title>
 
     <!-- vendor css -->
     <link href="./lib/font-awesome/css/font-awesome.css" rel="stylesheet">
@@ -23,35 +23,53 @@
     <div class="signpanel-wrapper">
       <div class="signbox">
         <div class="signbox-header">
-          <h4>{{_SETT[header]}}</h4>
-          <p class="mg-b-0">Вход в систему</p>
+          <i class="pb-3 fa fa-user-circle fa-4x text-white"></i>
+          <p class="mg-b-0">{{_LANG[prompt]}}</p>
         </div><!-- signbox-header -->
         <div class="signbox-body">
             <form action="" method="post">
           <div class="form-group">
               <div class="input-group">
               <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                    <input class="form-control" placeholder="Логин" name="l" type="text">
+                    <input class="form-control" placeholder="{{_LANG[login]}}" name="l" type="text">
               </div>
           </div><!-- form-group -->
           <div class="form-group">
               <div class="input-group">
               <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                  <input class="form-control" placeholder="Пароль" name="p" type="password">
+                  <input class="form-control" placeholder="{{_LANG[password]}}" name="p" type="password">
               </div>
           </div><!-- form-group -->
-          <button class="btn btn-dark btn-block">Войти &nbsp; <i class="fa fa-sign-in"></i></button>
-          <div class="tx-center bd pd-10 mg-t-20">Вы не зарегистрированы? <a href="/signup">Создать аккаунт</a></div>
+          <button class="btn btn-dark btn-block">{{_LANG[signin]}} &nbsp; <i class="fa fa-sign-in"></i></button>
+          <div class="tx-center bd pd-10 mg-t-20">{{_LANG[reg]}} <a href="/signup">{{_LANG[signup]}}</a></div>
           <div class="form-group mg-t-20">
-            <div data-wb-role="module" src="ulogin"></div>
+            <div data-wb-role="module" src="ulogin" data-wb-where='"{{_SETT[ulogin]}}"="on"'></div>
           </div><!-- form-group -->
             </form>
         </div><!-- signbox-body -->
       </div><!-- signbox -->
     </div><!-- signpanel-wrapper -->
 
-    <script src="./lib/jquery/jquery.js"></script>
-    <script src="./lib/popper.js/popper.js"></script>
-    <script src="./lib/bootstrap/bootstrap.js"></script>
+        <script data-wb-src="jquery"></script>
+        <script data-wb-src="bootstrap4js"></script>
   </body>
 </html>
+
+<script type="text/locale">
+[eng]
+        login           = "Login"
+        password        = "Password"
+        signup          = "Sign up"
+        signin          = "Sign in"
+        prompt          = "Please, fill in your login and password to sign in"
+        reg             = "Not registred?"
+        title           = "Sign in to the system"
+[rus]
+        login           = "Логин"
+        password        = "Пароль"
+        signup          = "Создать аккаунт"
+        signin          = "Войти"
+        prompt          = "Пожалуйста, введите ваш логин и пароль"
+        reg             = "Не зарегестрированы?"
+        title           = "Вход в систему"
+</script>

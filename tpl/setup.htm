@@ -34,7 +34,7 @@
         </div>
     </div>
     <div class="kt-pagebody">
-        <div class="row">
+        <div class="row" id="setup">
             <div class="col-12 col-lg-10 ml-lg-auto mr-lg-auto col-xl-8" data-wb-where='"{{_SESS[lang]}}"!=""' data-wb-hide="wb">
                 <div class="card col-12 pd-20 pd-sm-40" data-wb-role="include" src="form" data-wb-name="admin_setup">
                 </div>
@@ -49,24 +49,16 @@
                                 <div class="col-12 pt-3 pb-5 text-center">
                                 <img src="/engine/tpl/img/logo/logo.svg" style="height:2.9rem">
                                 </div>
-
-                                <div class="col-6 text-center">
-                                        <a href="/engine/?lang=eng">
-                                                <img src="/engine/tpl/img/flags-icons/uk.png" class="img-fluid">
-                                        </a>
-                                        <br>
-                                        <a href="/engine/?lang=eng" class="btn btn-primary mt-3">
-                                                English
-                                        </a>
-                                </div>
-                                <div class="col-6 text-center">
-                                        <a href="/engine/?lang=rus">
-                                                <img src="/engine/tpl/img/flags-icons/ru.png" class="img-fluid">
-                                        </a>
-                                        <br>
-                                        <a href="/engine/?lang=rus" class="btn btn-primary mt-3">
-                                                Руссий
-                                        </a>
+                                <div data-wb-role="foreach" data-wb-call="wbListLocales" data-wb-hide="*">
+                                        <div class="col-6 text-center">
+                                                <a href="/engine/?lang={{id}}">
+                                                        <img src="{{_flag}}" class="img-fluid">
+                                                </a>
+                                                <br>
+                                                <a href="/engine/?lang={{id}}" class="btn btn-primary mt-3">
+                                                        {{_locale}}
+                                                </a>
+                                        </div>
                                 </div>
                         </div>
                         </div><!-- card-body -->
@@ -75,6 +67,24 @@
 
             <!-- card -->
         </div>
+        <div class="row" id="error">
+                <div class="col-12 col-lg-10 ml-lg-auto mr-lg-auto col-xl-8">
+                <div class="card rounded-0">
+                        <div class="card-header card-header-default">
+                          Installation error
+                        </div><!-- card-header -->
+                        <div class="card-body bg-gray-200">
+                        <div class="row">
+                                <div class="col-12 pt-3 pb-5 text-center">
+                                <img src="/engine/tpl/img/logo/logo.svg" style="height:2.9rem">
+                                </div>
+                                <div class="col-12 text-center">{{_LANG[setup_error]}}</div>
+                        </div>
+                        </div><!-- card-body -->
+                </div>
+                </div>
+        </div>
+
     </div>
     <!-- kt-pagebody -->
     <script data-wb-src="jquery"></script>
@@ -107,6 +117,12 @@
             });
         });
     </script>
-</body>
 
+</body>
+<script type="text/locale">
+[eng]
+setup_error	= "Web Basic has already been installed.<br>if you need to reinstall the system, delete all files and folders in the working directory except <b>/engine</b > and try again."
+[rus]
+setup_error	= "Установка WebBasic уже была выполнена ранее.<br>Если вам необходимо переустановить систему, удалите все файлы и папки в рабочей директории, кроме <b>/engine</b> и попробуйте снова."
+</script>
 </html>

@@ -12,7 +12,7 @@ function comments__widget() {
 
 function comments__edit() {
 	$out=wbGetForm("comments","edit");
-    $Item=wbItemRead("comments",$_ENV["route"]["item"]);
+	$Item=wbItemRead("comments",$_ENV["route"]["item"]);
 	$Item=_commentsBeforeItemShow($Item);
 	$out->wbSetData($Item);
 	return $out->outerHtml();

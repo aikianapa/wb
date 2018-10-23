@@ -9,7 +9,8 @@ function filemanager__init()
        }
         die;
     } else {
-        $out=file_get_contents(__DIR__ ."/filemanager_ui.php");
+        $out=wbFromString(file_get_contents(__DIR__ ."/filemanager_ui.php"));
+        $out->wbSetFormLocale();
         return $out;
     }
 }
@@ -97,7 +98,7 @@ function filemanager__dialog()
         $out=$out->find("#filemanagerModalDialog", 0);
         $action=$_ENV["route"]["params"][1];
         $title=$out->find("meta[name=$action]")->attr("title");
-        $content=$out->find("meta[name=$action]")->attr("content");
+        $content=html_entity_decode($out->find("meta[name=$action]")->attr("content"));
         $visible=$out->find("meta[name=$action]")->attr("visible");
         $invisible=$out->find("meta[name=$action]")->attr("invisible");
         $fields=array();

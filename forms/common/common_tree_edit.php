@@ -8,13 +8,13 @@
 
 <form class="form-horizontal" role="form">
 	<div class="form-group row">
-	  <label class="col-sm-3 form-control-label">Идентификатор</label>
-	   <div class="col-sm-9"><input type="text" class="form-control" name="data-id" placeholder="Идентификатор" required ></div>
+	  <label class="col-sm-3 form-control-label">{{_LANG[id]}}</label>
+	   <div class="col-sm-9"><input type="text" class="form-control" name="data-id" placeholder="{{_LANG[id]}}" required ></div>
 	</div>
 
 	<div class="form-group row">
-	  <label class="col-sm-3 form-control-label">Наименование</label>
-	   <div class="col-sm-9"><input type="text" class="form-control" name="data-name" placeholder="Наименование"></div>
+	  <label class="col-sm-3 form-control-label">{{_LANG[name]}}</label>
+	   <div class="col-sm-9"><input type="text" class="form-control" name="data-name" placeholder="{{_LANG[name]}}"></div>
 	</div>
 </form>
 
@@ -34,3 +34,12 @@
 		</div>
 </div>
 </div>
+
+<script type="text/locale">
+[eng]
+        id    = "ID"
+        name    = "Name"
+[rus]
+        id    = "Идентификатор"
+        name    = "Наименование"
+</script>

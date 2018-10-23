@@ -1,11 +1,10 @@
 <div id="commentsWidget">
-    <div class="tab-content">
-        <div class="tab-pane active" id="commentsList">
-        <ul class="nav nav-tabs">
-            <li class="active hidden"><a href="#commentsList" data-toggle="tab">Отзывы</a></li>
-            <li class="pull-right"><a href="#commentsEdit" data-toggle="tab">Написать отзыв</a></li>
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item"><a href="#commentsList" class="nav-link active list" data-toggle="tab">{{_LANG[comments]}}</a></li>
+            <li class="nav-item"><a href="#commentsEdit" class="nav-link form" data-toggle="tab">{{_LANG[add]}}</a></li>
         </ul>
-
+    <div class="tab-content pt-3">
+        <div class="tab-pane fade show active" id="commentsList" role="tabpanel">
             <div data-wb-role="foreach" data-wb-table="comments" data-wb-size="15" data-wb-sort="date:d" data-wb-where='active = "on" AND (
 				(target_form = "{{_ENV[route][form]}}" AND target_item = "{{_ENV[route][item]}}") OR
 				(target_form = "comments"))'>
@@ -27,7 +26,7 @@
                             <p>{{text}}</p>
                         </div>
                         <div class="comment-reply" data-wb-role="where" data=' reply > "" '>
-                            <span class="user"><i class="fa fa-comment"></i> Админ</span>
+                            <span class="user"><i class="fa fa-comment"></i> {{_LANG[admin]}}</span>
                             <p>{{reply}}</p>
                         </div>
                     </div>
@@ -35,14 +34,15 @@
                 <div class="clearfix">&nbsp;</div>
             </div>
         </div>
-        <div class="tab-pane" id="commentsEdit" data-wb-role="formdata" data-wb-table="users" data-wb-item="{{_SESS[user_id]}}">
-            <div data-wb-role="include" id="commentsEditInc" src="/engine/forms/comments/comments_form.php"></div>
-            <div class="alert alert-success hidden">Ваш отзыв успешно отправлен Администратору!</div>
-            <div class="alert alert-danger hidden">Ваш отзыв не получилось отправить. Попробуйте позже!</div>
+        <div class="tab-pane fade" id="commentsEdit" data-wb-role="formdata" data-wb-table="users" data-wb-item="{{_SESS[user_id]}}" role="tabpanel">
+            <div data-wb-role="include" id="commentsEditInc" src="form" data-wb-name="comments_form"></div>
+            <div class="alert alert-success hidden">{{_LANG[success]}}</div>
+            <div class="alert alert-danger hidden">{{_LANG[error]}}</div>
         </div>
     </div>
 </div>
 <script language="javascript" src="/engine/forms/comments/comments.js" data-wb-append="body"></script>
+<script type="text/locale" data-wb-role="include" src="comments_common"></script>
 <style>
     #commentsList .comment-header .comment-rating{
         float:right;

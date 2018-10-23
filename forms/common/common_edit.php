@@ -5,22 +5,21 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h5 class="modal-title">{{header}}</h5>
+        <h5 class="modal-title">{{_LANG[title]}}</h5>
       </div>
       <div class="modal-body">
 
 <form id="{{_GET[form]}}EditForm" data-wb-form="{{_GET[form]}}" data-wb-item="{{_GET[item]}}"  class="form-horizontal" role="form">
 	<div class="form-group row">
-	  <label class="col-sm-2 form-control-label">Имя записи</label>
-	   <div class="col-sm-10"><input type="text" class="form-control" name="id" placeholder="Имя записи" required ></div>
+	  <label class="col-sm-2 form-control-label">{{_LANG[name]}}</label>
+	   <div class="col-sm-10"><input type="text" class="form-control" name="id" placeholder="{{_LANG[name]}}" required ></div>
 	</div>
 
 <div class="nav-active-primary">
 <ul class="nav nav-tabs" role="tablist">
-	<li class="nav-item"><a class="nav-link active" href="#{{_GET[form]}}Descr" data-toggle="tab">Характеристики</a></li>
-	<li class="nav-item"><a class="nav-link" href="#{{_GET[form]}}Text" data-toggle="tab" >Контент</a></li>
-	<li class="nav-item"><a class="nav-link" href="#{{_GET[form]}}Source" data-toggle="tab" >Исходный код</a></li>
-	<li class="nav-item"><a class="nav-link" href="#{{_GET[form]}}Images" data-toggle="tab">Изображения</a></li>
+	<li class="nav-item"><a class="nav-link active" href="#{{_GET[form]}}Descr" data-toggle="tab">{{_LANG[prop]}}</a></li>
+	<li class="nav-item"><a class="nav-link" href="#{{_GET[form]}}Text" data-toggle="tab" >{{_LANG[content]}}</a></li>
+	<li class="nav-item"><a class="nav-link" href="#{{_GET[form]}}Images" data-toggle="tab">{{_LANG[images]}}</a></li>
 </ul>
 </div>
 <div class="tab-content  p-a m-b-md">
@@ -28,41 +27,61 @@
 <div id="{{_GET[form]}}Descr" class="tab-pane fade show active" role="tabpanel">
 
 	<div class="form-group row">
-	  <label class="col-sm-2 form-control-label">Заголовок</label>
-	   <div class="col-sm-10"><input type="text" class="form-control" name="header" placeholder="Заголовок"></div>
+	  <label class="col-sm-2 form-control-label">{{_LANG[header]}}</label>
+	   <div class="col-sm-10"><input type="text" class="form-control" name="header" placeholder="{{_LANG[header]}}"></div>
 	</div>
 
 	<div class="form-group row">
-	  <label class="col-sm-2 form-control-label">Описание</label>
-	   <div class="col-sm-10"><input type="text" class="form-control" name="meta_description" placeholder="Описание"></div>
+	  <label class="col-sm-2 form-control-label">{{_LANG[descr]}}</label>
+	   <div class="col-sm-10"><input type="text" class="form-control" name="meta_description" placeholder="{{_LANG[descr]}}"></div>
 	</div>
 
 	<div class="form-group row">
-		<label class="col-sm-2 form-control-label">Отображать</label>
+		<label class="col-sm-2 form-control-label">{{_LANG[visible]}}</label>
 		<div class="col-sm-2"><label class="switch switch-success"><input type="checkbox" name="active"><span></span></label></div>
 	</div>
 
 
 	<div class="form-group row">
-	  <label class="col-sm-2 form-control-label">Ключевые слова</label>
-	   <div class="col-sm-10"><input type="text" class="form-control input-tags" name="meta_keywords" placeholder="Ключевые слова"></div>
+	  <label class="col-sm-2 form-control-label">{{_LANG[keywords]}}</label>
+	   <div class="col-sm-10"><input type="text" class="form-control input-tags" name="meta_keywords" placeholder="{{_LANG[keywords]}}"></div>
 	</div>
 
 </div>
 
 <div id="{{_GET[form]}}Text" class="tab-pane fade" data-wb-role="include" src="editor" role="tabpanel"></div>
-<div id="{{_GET[form]}}Source" class="tab-pane fade" data-wb-role="include" src="source" role="tabpanel"></div>
 <div id="{{_GET[form]}}Images" class="tab-pane fade" data-wb-role="include" src="uploader" role="tabpanel"></div>
 </div>
 </form>
 
 
     </div>
-		  <div class="modal-footer">
-			<button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-close"></span> Закрыть</button>
-			<button type="button" class="btn btn-primary" data-wb-formsave="#{{_GET[form]}}EditForm"><span class="fa fa-check"></span> Сохранить изменения</button>
+		  <div class="modal-footer" data-wb-role="include" src="form" data-wb-name="common_close_save" data-wb-hide="wb">
 		  </div>
 
 		</div>
 </div>
 </div>
+
+<script type="text/locale">
+[eng]
+        title		= "Edit item"
+	name            = "Item name"
+	header		= "Header"
+	descr		= "Description"
+	visible		= "Visible"
+	keywords	= "Keywords"
+	prop		= "Properties"
+	content		= "Content"
+	images		= "Images"
+[rus]
+        title		= "Редактирование записи"
+	name            = "Имя записи"
+	header		= "Заголовок"
+	descr		= "Описание"
+	visible		= "Отображать"
+	keywords	= "Ключевые слова"
+	prop		= "Характеристики"
+	content		= "Контент"
+	images		= "Изображения"
+</script>
