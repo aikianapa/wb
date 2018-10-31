@@ -7,12 +7,35 @@ $.fn.outerHTML = function (s) {
 function wb_include(url,defer,async) {
     if (defer==undefined) {defer=false;}
     if (async==undefined) {async=false;}
-    var js_script = document.createElement('script');
-    js_script.type = "text/javascript";
-    js_script.src = url;
-    js_script.async = async;
-    js_script.defer = defer;
-    document.getElementsByTagName('head')[0].appendChild(js_script);
+    if ($(document).data("wb_include")==undefined) {
+        $(document).data("wb_include",[]);
+    }
+    var loaded=$(document).data("wb_include");
+    var res=false;
+    $(loaded).each(function(i){
+        if (loaded[i]==url) {res=true;}
+    });
+    if (res==false) {
+                if (url.substr(-3) == ".js" ) {
+                        $.getScript( url );
+                } else {
+                        if (url.substr(-4) == ".css" ) {
+                                    var inc = document.createElement('link');
+                                    inc.type = "text/css";
+                                    inc.rel = "stylesheet"
+                                    inc.href = url;
+                                } else if (url.substr(-5) == ".less" ) {
+                                    var inc = document.createElement('link');
+                                    inc.type = "text/css";
+                                    inc.rel = "less"
+                                    inc.href = url;
+                                }
+                                    inc.async = async;
+                                    inc.defer = defer;
+                                    document.getElementsByTagName('body')[0].appendChild(inc);
+                        }
+            loaded.push(url);
+    }
     return;
 }
 

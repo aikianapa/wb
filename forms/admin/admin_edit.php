@@ -123,14 +123,14 @@
                         <div class="col-6"><h5>{{_LANG[head_inc]}}</h5></div>
                         <div class="col-6"><label class="switch switch-success"><input type="checkbox" name="head_add_active"><span></span></label></div>
                     </div>
-                    <div data-wb-role="include" data-wb-name="head_add" src="source" role="tabpanel"></div>
+                    <div data-wb-role="module" data-wb-name="head_add" data-wb-toolbar="false" data-wb-height="450" src="editarea" role="tabpanel"></div>
                 </div>
                 <div class="col-xl-6">
                     <div class="row">
                         <div class="col-6"><h5>{{_LANG[body_inc]}}</h5></div>
                         <div class="col-6"><label class="switch switch-success"><input type="checkbox" name="body_add_active"><span></span></label></div>
                     </div>
-                    <div data-wb-role="include" data-wb-name="body_add" src="source" role="tabpanel"></div>
+                    <div data-wb-role="module" data-wb-name="body_add" data-wb-toolbar="false" data-wb-height="450" src="editarea" role="tabpanel"></div>
                 </div>
             </div>
         </div>

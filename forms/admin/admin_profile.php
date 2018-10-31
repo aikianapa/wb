@@ -30,7 +30,7 @@
                   <label class="col-sm-3 form-control-label">{{_LANG[password]}}:  <span class="tx-danger">*</span></label>
                   <div class="col-sm-8 mg-t-10 mg-sm-t-0">
                         <input type="hidden" class="form-control" name="password">
-                        <a href="" data-toggle="modal" data-target="#{{_GET[form]}}_{{_GET[mode]}}_pswd" class="btn btn-default"><i class="fa fa-key"></i> Change Password</a>
+                        <a href="" data-toggle="modal" data-target="#{{_GET[form]}}_{{_GET[mode]}}_pswd" class="btn btn-default"><i class="fa fa-key"></i> {{_LANG[change_pass]}}</a>
                   </div>
                 </div>
 
@@ -125,6 +125,7 @@ about		= "About You"
 about1		= "Enter some description of yourself"
 lang		= "Language"
 phone           = "Phone"
+change_pass     = "Change Password"
 
 [rus]
 profile		= "Профиль"
@@ -145,4 +146,5 @@ about		= "О себе"
 about1		= "Напишите немного о себе"
 lang		= "Язык"
 phone           = "Телефон"
+change_pass     = "Сменить пароль"
 </script>

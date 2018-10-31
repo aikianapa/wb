@@ -1,13 +1,12 @@
 <div id="moduleShortcodes">
-        <div class="row">
-                <div class="col">
                         <h6 class="element-header">
                                 <br>{{_LANG[header]}}
-                                <a href class="btn btn-primary pull-right" data-wb-formsave="#EditShortcodes">
+                                <button type="button" class="btn btn-primary pull-right" data-wb-formsave="#EditShortcodes">
                                             <i class="fa fa-save"></i> {{_LANG[save]}}
-                                </a>
+                                </button>
                         </h6>
-
+        <div class="row">
+                <div class="col">
                         <form id="EditShortcodes" data-wb-form="admin" data-wb-item="shortcodes">
                                         <div class="row">
                                                 <div class="col">

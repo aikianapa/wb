@@ -481,7 +481,6 @@ function wbFieldBuild($param, $data = array(),$locale=array())
     $set->find('.form-group > div')->html($tpl->outerHtml());
     $set->wbSetData($param);
     $set->wbSetValues($data);
-
     return $set->outerHtml();
 }
 
