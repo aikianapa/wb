@@ -1,0 +1,131 @@
+    #filemanager #filemanagerModalSrc .btn-edit-close {
+        position: absolute;
+        right: 0;
+        z-index: 1;
+    }
+
+    #filemanager #list .fa.back:before {
+        content: "\f077";
+    }
+
+    #filemanager #list .fa.dir:before {
+        content: "\f114";
+        color: #ffc107;
+    }
+
+    #filemanager #list .fa.dir1:before {
+        content: "\f114";
+        color: #ffc107;
+    }
+
+    #filemanager #list .fa.file:before {
+        content: "\f016";
+    }
+
+    #filemanager #list .fa.file1:before {
+        content: "\f016";
+    }
+
+    #filemanager #list .fa.php:before {
+        content: "\f1c9";
+    }
+
+    #filemanager #list .fa.css:before {
+        content: "\f1c9";
+    }
+
+    #filemanager #list .fa.scss:before {
+        content: "\f1c9";
+    }
+
+    #filemanager #list .fa.less:before {
+        content: "\f1c9";
+    }
+
+    #filemanager #list .fa.htm:before {
+        content: "\f1c9";
+    }
+
+    #filemanager #list .fa.html:before {
+        content: "\f1c9";
+    }
+
+    #filemanager #list .fa.js:before {
+        content: "\f1c9";
+    }
+
+    #filemanager #list .fa.json:before {
+        content: "\f1c9";
+    }
+
+    #filemanager #list .fa.ini:before {
+        content: "\f1c9";
+    }
+
+    #filemanager #list .fa.txt:before {
+        content: "\f0f6";
+    }
+
+    #filemanager #list .fa.ico:before {
+        content: "\f1c5";
+    }
+
+    #filemanager #list .fa.svg:before {
+        content: "\f1c5";
+    }
+
+    #filemanager #list .fa.png:before {
+        content: "\f1c5";
+    }
+
+    #filemanager #list .fa.gif:before {
+        content: "\f1c5";
+    }
+
+    #filemanager #list .fa.jpg:before {
+        content: "\f1c5";
+    }
+
+    #filemanager #list .fa.jpeg:before {
+        content: "\f1c5";
+    }
+
+    #filemanager #list .fa.tiff:before {
+        content: "\f1c5";
+    }
+
+    #filemanager #list .fa.bmp:before {
+        content: "\f1c5";
+    }
+
+    #filemanager #list .fa.zip:before {
+        content: "\f1c6";
+    }
+
+    #filemanager #list .fa.tar:before {
+        content: "\f1c6";
+    }
+
+    #filemanager #list .fa.gzip:before {
+        content: "\f1c6";
+    }
+
+    #filemanager #list .fa.arj:before {
+        content: "\f1c6";
+    }
+
+    #filemanager #list .fa.rar:before {
+        content: "\f1c6";
+    }
+
+    #filemanager #list .fa.z:before {
+        content: "\f1c6";
+    }
+
+    #filemanager .content-left {
+        position:fixed;
+        top:inherit;
+        left:inherit;
+        height: calc( 100vh - 200px );
+        overflow-y:auto;
+    }

@@ -10,7 +10,7 @@ function filemanager__init()
         die;
     } else {
         $out=wbFromString(file_get_contents(__DIR__ ."/filemanager_ui.php"));
-        $out->wbSetFormLocale();
+        $out->wbSetData();
         return $out;
     }
 }

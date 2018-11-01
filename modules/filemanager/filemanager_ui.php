@@ -20,84 +20,84 @@
                   <span>{{_LANG[refresh]}}</span>
                 </a>
                 </li>
-                <!-- nav-item -->
+
                 <li class="nav-item">
                     <a href="#newdir" class="nav-link">
                   <i class="fa fa-folder-o"></i>
                   <span>{{_LANG[title_new_dir]}}</span>
                 </a>
                 </li>
-                <!-- nav-item -->
+
                 <li class="nav-item">
                     <a href="#newfile" class="nav-link">
                   <i class="fa fa-file-o"></i>
                   <span>{{_LANG[title_new_file]}}</span>
                 </a>
                 </li>
-                <!-- nav-item -->
+
                 <li class="nav-item hidden allow-single allow-file allow-file1" data-no-ext="zip tar arj rar gzip jpg jpeg png gif tif tiff">
                     <a href="#edit" class="nav-link">
                   <i class="fa fa-edit"></i>
                   <span>{{_LANG[edit]}}</span>
                 </a>
                 </li>
-                <!-- nav-item -->
+
                 <li class="nav-item hidden allow-single allow-dir allow-file allow-dir1 allow-file1">
                     <a href="#rename" class="nav-link">
                   <i class="fa fa-i-cursor"></i>
                   <span>{{_LANG[rename]}}</span>
                 </a>
                 </li>
-                <!-- nav-item -->
+
                 <li class="nav-item hidden allow-all">
                     <a href="#remove" class="nav-link">
                   <i class="fa fa-trash-o"></i>
                   <span>{{_LANG[remove]}}</span>
                 </a>
                 </li>
-                <!-- nav-item -->
+
                 <li class="nav-item hidden allow-all" data-no-ext="zip">
                     <a href="#zip" class="nav-link">
                   <i class="fa fa-file-archive-o"></i>
                   <span>{{_LANG[zip]}}</span>
                 </a>
                 </li>
-                <!-- nav-item -->
+
                 <li class="nav-item hidden allow-single allow-file" data-ext="zip">
                     <a href="#unzip" class="nav-link">
                   <i class="fa fa-file-archive-o"></i>
                   <span>{{_LANG[unzip]}}</span>
                 </a>
                 </li>
-                <!-- nav-item -->
+
                 <!--li class="nav-item hidden allow-single allow-file">
                     <a href="#dnload" class="nav-link">
                   <i class="fa fa-download"></i>
                   <span>Скачать</span>
                 </a>
                 </li-->
-                <!-- nav-item -->
+
                 <li class="nav-item hidden allow-all">
                     <a href="#copy" class="nav-link">
                   <i class="fa fa-copy"></i>
                   <span>{{_LANG[copy]}}</span>
                 </a>
                 </li>
-                <!-- nav-item -->
+
                 <li class="nav-item hidden allow-all">
                     <a href="#cut" class="nav-link">
                   <i class="fa fa-cut"></i>
                   <span>{{_LANG[cut]}}</span>
                 </a>
                 </li>
-                <!-- nav-item -->
+
                 <li class="nav-item hidden allow-buffer">
                     <a href="#paste" class="nav-link">
                   <i class="fa fa-paste"></i>
                   <span>{{_LANG[paste]}}</span>
                 </a>
                 </li>
-                <!-- nav-item -->
+
             </ul>
         </div>
         <!-- content-left -->
@@ -113,11 +113,7 @@
                     </nav>
                 </div>
             </div>
-            <!-- content-body-header -->
 
-            <!--ul id="list" class="row" data-wb-role="foreach" data-wb-from="result" data-wb-tpl="false" data-wb-size="false" data-wb-hide="wb">
-                <li class="col-12 {{type}}{{link}} {{ext}}" data-name="{{name}}">{{name}}</li>
-              </ul-->
 
             <table id="list" class="table table-striped mg-b-0" >
                 <tbody  data-wb-role="foreach" data-wb-from="result" data-wb-size="20">
@@ -153,7 +149,6 @@
                                         <a href="#rmlink" class="nav-link" data-wb-where='type="dir1" OR type="file1"'><i class="fa fa-trash-o"></i> {{_LANG[remove]}}</a>
                                     </nav>
                                 </div>
-                                <!-- dropdown-menu -->
                             </td>
                         </tr>
                 </tbody>
@@ -162,21 +157,8 @@
 
 
         </div>
-        <!-- content-body -->
     </div>
-    <!-- content-wrapper -->
 
-
-
-    <div id="filemanagerModalSrc" class="modal fade hidden" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <button class="btn btn-sm btn-default btn-edit-close" data-toggle="modal" data-target="#filemanagerModalSrc"><i class="fa fa-close"></i></button>
-            <div class="modal-content">
-                <div data-wb-role="include" src="source" id="filemanagerSrc">
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div id="filemanagerModalDialog" class="modal fade hidden" tabindex="-1" role="dialog" aria-hidden="true">
         <meta name="newdir" title="{{_LANG[title_new_dir]}}" content="{{_LANG[prompt_new_dir]}}:<br> {{newname}}">
@@ -212,6 +194,15 @@
         </div>
     </div>
 
+    <div id="filemanagerModalSrc" class="modal fade hidden" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <button class="btn btn-sm btn-default btn-edit-close" data-toggle="modal" data-target="#filemanagerModalSrc"><i class="fa fa-close"></i></button>
+            <div class="modal-content">
+                <div data-wb-role="include" src="source" id="filemanagerSrc"></div>
+            </div>
+        </div>
+    </div>
+
 
     <div class="nav-active-primary mg-t-5" data-wb-append="#filemanagerSrc .source-toolbar">
         <ul class="nav nav-tabs" role="tablist" id="filemanagerTabs">
@@ -223,7 +214,9 @@
 </div>
 
 <script src="/engine/modules/filemanager/filemanager.js?{{_ENV[new_id]}}"></script>
-
+<script>
+        wb_include("/engine/modules/filemanager/filemanager.css");
+</script>
 <script type="text/locale">
 [rus]
 refresh		= Обновить
@@ -305,138 +298,3 @@ prompt_unzip    = Unzip objects from archive?<br>Exists objects will be rewrite.
 prompt_to       = to
 </script>
 
-
-<style>
-    #filemanager #filemanagerModalSrc .btn-edit-close {
-        position: absolute;
-        right: 0;
-        z-index: 1;
-    }
-
-    #filemanager #list .fa.back:before {
-        content: "\f077";
-    }
-
-    #filemanager #list .fa.dir:before {
-        content: "\f114";
-        color: #ffc107;
-    }
-
-    #filemanager #list .fa.dir1:before {
-        content: "\f114";
-        color: #ffc107;
-    }
-
-    #filemanager #list .fa.file:before {
-        content: "\f016";
-    }
-
-    #filemanager #list .fa.file1:before {
-        content: "\f016";
-    }
-
-    #filemanager #list .fa.php:before {
-        content: "\f1c9";
-    }
-
-    #filemanager #list .fa.css:before {
-        content: "\f1c9";
-    }
-
-    #filemanager #list .fa.scss:before {
-        content: "\f1c9";
-    }
-
-    #filemanager #list .fa.less:before {
-        content: "\f1c9";
-    }
-
-    #filemanager #list .fa.htm:before {
-        content: "\f1c9";
-    }
-
-    #filemanager #list .fa.html:before {
-        content: "\f1c9";
-    }
-
-    #filemanager #list .fa.js:before {
-        content: "\f1c9";
-    }
-
-    #filemanager #list .fa.json:before {
-        content: "\f1c9";
-    }
-
-    #filemanager #list .fa.ini:before {
-        content: "\f1c9";
-    }
-
-    #filemanager #list .fa.txt:before {
-        content: "\f0f6";
-    }
-
-    #filemanager #list .fa.ico:before {
-        content: "\f1c5";
-    }
-
-    #filemanager #list .fa.svg:before {
-        content: "\f1c5";
-    }
-
-    #filemanager #list .fa.png:before {
-        content: "\f1c5";
-    }
-
-    #filemanager #list .fa.gif:before {
-        content: "\f1c5";
-    }
-
-    #filemanager #list .fa.jpg:before {
-        content: "\f1c5";
-    }
-
-    #filemanager #list .fa.jpeg:before {
-        content: "\f1c5";
-    }
-
-    #filemanager #list .fa.tiff:before {
-        content: "\f1c5";
-    }
-
-    #filemanager #list .fa.bmp:before {
-        content: "\f1c5";
-    }
-
-    #filemanager #list .fa.zip:before {
-        content: "\f1c6";
-    }
-
-    #filemanager #list .fa.tar:before {
-        content: "\f1c6";
-    }
-
-    #filemanager #list .fa.gzip:before {
-        content: "\f1c6";
-    }
-
-    #filemanager #list .fa.arj:before {
-        content: "\f1c6";
-    }
-
-    #filemanager #list .fa.rar:before {
-        content: "\f1c6";
-    }
-
-    #filemanager #list .fa.z:before {
-        content: "\f1c6";
-    }
-
-    #filemanager .content-left {
-        position:fixed;
-        top:inherit;
-        left:inherit;
-        height: calc( 100vh - 200px );
-        overflow-y:auto;
-    }
-
-</style>
