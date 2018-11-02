@@ -1,5 +1,6 @@
     var editor;
     var $=jQuery.noConflict();
+    var locale = wbapp.getlocale("url","/module/filemanager/locale");
     filemanagerGetDir('');
     filemanagerSideMenu();
     filemanagerListEvents();
@@ -544,7 +545,7 @@
                 text: editor.getValue()
             }, function(data) {
                 if ($.bootstrapGrowl) {
-                    $.bootstrapGrowl("Сохранено!", {
+                    $.bootstrapGrowl(locale.saved, {
                         ele: 'body',
                         type: 'success',
                         offset: {

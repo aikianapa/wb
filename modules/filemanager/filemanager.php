@@ -15,6 +15,13 @@ function filemanager__init()
     }
 }
 
+function filemanager__locale() {
+        $out=wbFromString(file_get_contents(__DIR__ ."/filemanager_ui.php"));
+        $locale=$out->wbGetFormLocale();
+        echo base64_encode(json_encode($locale[$_SESSION["lang"]]));
+        die;
+}
+
 function filemanager__getdir($result=false)
 {
     if (filemanager__allow()) {

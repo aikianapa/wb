@@ -165,6 +165,30 @@ function ajax__save($form=null) {
     return json_encode($ret);
 }
 
+function ajax__getlocale($type="tpl",$name="default.php") {
+        if ($type=="tpl") {
+                $out=wbGetTpl($name);
+        } else if ($type=="form") {
+                $arr=explode("_",$name);
+                $form=$arr[0];
+                unset($arr[0]);
+                if ($arr[1]=="_") {unset($arr[1]);}
+                $name=implode("_",$arr);
+                $out=wbGetForm($form,$name);
+        } else if ($type=="file") {
+                $out=wbFromString(file_get_contents(__DIR__ . $name));
+                $locale=$out->wbGetFormLocale();
+                $locale[$_SESSION["lang"]];
+        } else if ($type=="url") {
+                $out=wbFromString(file_get_contents($name));
+                $locale=$out->wbGetFormLocale();
+                $locale[$_SESSION["lang"]];
+
+        }
+        return base64_encode(json_encode($locale));
+}
+
+
 function ajax__setdata() {
     $form=$_ENV["route"]["form"];
     $item=$_ENV["route"]["item"];

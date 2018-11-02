@@ -440,18 +440,24 @@ function wbFieldBuild($param, $data = array(),$locale=array())
             $tpl->wbSetData($param);
             break;
         case 'image':
+            if (isset($_POST['data-id']) AND $_POST['_form']=="tree") {
+                $data["path"]="/uploads/{$_POST['_form']}/{$_POST['_item']}/{$_POST['data-id']}/";
+            } else {
+                $data["path"]="/uploads/{$data['_form']}/{$data['_item']}/";
+            }
+            $tpl->find('[data-wb-role=uploader]')->attr('data-wb-path',$data["path"]);
             $tpl->wbSetValues($param);
             $tpl->wbSetData($data);
-            if ($data['_form']=="tree" AND isset($_POST['data-id'])) {
-                $tpl->find('.wb-uploader')->attr('data-wb-path', "/uploads/{$data['_form']}/{$data['_item']}/{$_POST['data-id']}/");
-            } else {
-                $tpl->find('.wb-uploader')->attr('data-wb-path', "/uploads/{$data['_form']}/{$data['_item']}/");
-            }
             break;
         case 'gallery':
+            if (isset($_POST['data-id']) AND $_POST['_form']=="tree") {
+                $data["path"]="/uploads/{$_POST['_form']}/{$_POST['_item']}/{$_POST['data-id']}/";
+            } else {
+                $data["path"]="/uploads/{$data['_form']}/{$data['_item']}/";
+            }
+            $tpl->find('[data-wb-role=uploader]')->attr('data-wb-path',$data["path"]);
             $tpl->wbSetValues($param);
             $tpl->wbSetData($data);
-            $tpl->find('.wb-uploader')->attr('data-wb-path', "/uploads/{$data['_form']}/{$data['_item']}/");
             break;
         case 'multiinput':
             $flds = wbFromString('');
@@ -2202,10 +2208,10 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2, $vars = null)
                             $pos = strlen($res[4][$i][0]);
                         }
                         $sub .= wbSetQuotes(substr($In, $pos, strlen($In) - $pos));		// индексная часть текущей вставки с добавленными кавычками у текстовых индексов
+                        if (!eval('return is_array('.$sub.');')) {
+                                $Item=wbsvRestoreValue($Item,$sub);
+                        }
                         if (eval('return isset('.$sub.');')) {
-                            if (!eval('return is_array('.$sub.');')) {
-                                    $Item=wbsvRestoreValue($Item,$sub);
-                            }
                             if (eval('return is_array('.$sub.');')) {
                                 $text .= eval('return json_encode('.$sub.');');
                             } else {

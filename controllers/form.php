@@ -76,8 +76,12 @@ function form__controller__show() {
         } else {
             $out=wbGetForm($form,$mode);
             if ($_ENV["error"]["wbGetForm"]!=="noform") { $_ENV["DOM"]=$out; } else {
-                if (!isset($Item["template"]) OR $Item["template"]=="") {$Item["template"]="default.php";}
-                $_ENV["DOM"]=wbGetTpl($Item["template"]);
+                if (!isset($Item["template"]) OR $Item["template"]=="") {
+			//$Item["template"]="default.php";
+			$_ENV["DOM"]=wbFromString("<html>{{text}}</html>");
+		} else {
+			$_ENV["DOM"]=wbGetTpl($Item["template"]);
+		}
                 if (!is_object($_ENV["DOM"])) {$_ENV["DOM"]=wbFromString($_ENV["DOM"]);}
             }
         }

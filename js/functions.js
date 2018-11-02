@@ -37,6 +37,9 @@ function wb_init() {
 
       wbapp.settings = wb_settings();
       wbapp.sysmsg = wb_getsysmsg();
+      wbapp.getlocale = function(type,form) {
+        return wb_getlocale(type,form);
+      }
       wbapp.getTree = function(tree, branch, parent, childrens) {
         return wb_gettree(tree, branch, parent, childrens);
       }
@@ -84,7 +87,7 @@ function wb_settings() {
   }
 }
 
-function wb_getsysmsg() {
+var wb_getsysmsg = function() {
         if ($("#setup.wbengine").length) {
                 var url = "/engine/ajax.php?getsysmsg"
         } else {
@@ -96,6 +99,17 @@ function wb_getsysmsg() {
         });
         return sysmsg;
 }
+
+var wb_getlocale = function(type,name) {
+        var url = "/ajax/getlocale/";
+        var msg = null;
+        if (type == "url") {url = name;}
+        wbapp.postWait(url, {"type":type,"name":name}, function(data) {
+                msg = $.parseJSON(base64_decode(data));
+        });
+        return msg;
+}
+
 
 function wb_gettree(tree, branch, parent, childrens) {
   if (branch == undefined) {
@@ -678,8 +692,8 @@ function wb_tree() {
   }
 
   $.fn.treeEditModal = function(data) {
-		var res = false;
-    wbapp.postWait("/ajax/treeedit/",data,function(data){
+	var res = false;
+        wbapp.postWait("/ajax/treeedit/",data,function(data){
         res = data;
     });
     return res;
@@ -803,6 +817,10 @@ function wb_tree() {
   $.fn.treeDictChange = function() {
     var dict = [];
     var tree = $(this).data("tree");
+
+    var form = $(tree).parents("[data-wb-form]").attr("data-wb-form");
+    var formitem = $(tree).parents("[data-wb-form]").attr("data-wb-item");
+
     $(this).find(".treeDict .wb-multiinput").each(function(i) {
       var fld = {};
       $(this).find("input,select,textarea").each(function() {
@@ -823,6 +841,8 @@ function wb_tree() {
     $(tree).children("[data-name=dict]").val(wb_json_encode(dict));
     $(this).data("data")["data"] = wb_json_decode($(this).data("that").children("input").attr("data"));
     $(this).data("data")["fields"] = $(tree).treeDict();
+    $(this).data("data")["_form"] = form;
+    $(this).data("data")["_item"] = formitem;
     var tpl = $(tree).treeEditModal($(this).data("data"));
     $(this).find(".treeData").children("form").html($(tpl).find(".treeData form").html());
     $(this).treeContentEditEvents();
@@ -1812,22 +1832,38 @@ function wb_ajax() {
           }
           if ($(link).attr("data-wb-after") !== undefined) {
             $($(link).attr("data-wb-after")).after(data);
+            $($(link).attr("data-wb-after")).data("wb_ajax",src);
           }
           if ($(link).attr("data-wb-before") !== undefined) {
             $($(link).attr("data-wb-before")).before(data);
+            $($(link).attr("data-wb-before")).data("wb_ajax",src);
           }
           if ($(link).attr("data-wb-html") !== undefined) {
             $($(link).attr("data-wb-html")).html(data);
+            $($(link).attr("data-wb-html")).data("wb_ajax",src);
           }
           if ($(link).attr("data-wb-replace") !== undefined) {
             $($(link).attr("data-wb-replace")).replaceWith(data);
+            $($(link).attr("data-wb-reolace")).data("wb_ajax",src);
           }
           if ($(link).attr("data-wb-append") !== undefined) {
             $($(link).attr("data-wb-append")).append(data);
+            $($(link).attr("data-wb-append")).data("wb_ajax",src);
           }
           if ($(link).attr("data-wb-prepend") !== undefined) {
             $($(link).attr("data-wb-prepend")).prepend(data);
+            $($(link).attr("data-wb-prepend")).data("wb_ajax",src);
           }
+          if ($(link).attr("data-wb-value") !== undefined) {
+            $($(link).attr("data-wb-value")).val(data);
+            $($(link).attr("data-wb-value")).data("wb_ajax",src);
+          }
+
+          if ($(link).attr("data-wb-data") !== undefined) {
+                $($(link).attr("data-wb-data")).data("wb_ajax",src);
+                $($(link).attr("data-wb-data")).data("data",data);
+          }
+
           $("<div>" + data + "</div>").find(".modal[id]:not(.hidden)").each(function(i) {
             if (i == 0) {
               $("#" + $(this).attr("id")).modal();

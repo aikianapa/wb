@@ -1429,7 +1429,7 @@ abstract class kiNode
                     case "plugins" :
                         $sc->before('<link href="/engine/js/plugins/plugins.css" rel="stylesheet">');
                         $sc->after('<script src="/engine/js/plugins/plugins.js"></script>');
-                        $lang="ru";
+                        $lang="en";
                         if ($sc->attr("data-wb-lang")>"") {
                             $lang=$sc->attr("data-wb-lang");
                         }
@@ -2041,18 +2041,26 @@ abstract class kiNode
                 $$tmp=$attr."";
             }
         };
-        unset($attrs);
 
+        unset($attrs);
         if (isset($form) AND isset($item) AND !isset($path)) {
                 $Item["path"]="/uploads/{$form}/{$item}";
                 $out->find(".wb-uploader")->attr("data-wb-path",$Item["path"]);
         } else if (!isset($path)) {
-                $Item["path"]=wbFormUploadPath();
-                if (!isset($form)) {$form=$_ENV["route"]["form"];}
-                if (!isset($item)) {$item=$_ENV["route"]["item"];}
-                $out->find(".wb-uploader")->attr("data-wb-form",$form);
-                $out->find(".wb-uploader")->attr("data-wb-item",$item);
-                $out->find(".wb-uploader")->attr("data-wb-path",$Item["path"]);
+                if (isset($Item['_form']) AND isset($Item['_item']) AND isset($Item['_id'])) {
+                        // this branch work in wbFieldBuild
+                        $data["path"]="/uploads/{$Item['_form']}/{$Item['_item']}/{$Item['_id']}/";
+                        $out->find(".wb-uploader")->attr("data-wb-path",$data["path"]);
+                        $out->find(".wb-uploader")->attr("data-wb-form",$form);
+                        $out->find(".wb-uploader")->attr("data-wb-item",$item);
+                } else {
+                        $Item["path"]=wbFormUploadPath();
+                        if (!isset($form)) {$form=$_ENV["route"]["form"];}
+                        if (!isset($item)) {$item=$_ENV["route"]["item"];}
+                        $out->find(".wb-uploader")->attr("data-wb-form",$form);
+                        $out->find(".wb-uploader")->attr("data-wb-item",$item);
+                        $out->find(".wb-uploader")->attr("data-wb-path",$Item["path"]);
+                }
         } else {
                 $Item["path"]=$path;
         }
@@ -2061,16 +2069,6 @@ abstract class kiNode
         if (!isset($height) AND $this->attr("height")!==NULL) {$height=$this->attr("height");} else if (!isset($height)) {$height=$_ENV['thumb_height'];}
         if (!isset($size) AND $this->attr("size")!==NULL) {$size=$this->attr("size");} else if (!isset($size)) {$size="cover";}
 
-/*
-        if (!$this->hasAttr("data-wb-path")) {
-            $Item["path"]=wbFormUploadPath();
-            $out->find(".wb-uploader")->attr("data-wb-path",$Item["path"]);
-            $out->find(".wb-uploader")->attr("data-wb-form",$_ENV["route"]["form"]);
-            $out->find(".wb-uploader")->attr("data-wb-item",$_ENV["route"]["item"]);
-        } else {
-            $Item["path"]=$this->attr("data-wb-path");
-        }
-        */
         $out->find(".wb-uploader [data-wb-role=thumbnail]")->attr($size,"true");
         $out->find(".wb-uploader [data-wb-role=thumbnail]")->attr("size","{$width};{$height}");
         $out->find(".wb-uploader")->children("input[name]")->attr("name",$fldname);
@@ -2100,7 +2098,7 @@ abstract class kiNode
             $this->tagMultiInputSetData($Item[$name]);
         }
         elseif (isset($Item["%".$name]) AND is_array($Item["%".$name])) {
-            // грязная заплатка если мультиинпут в цикле
+            // dirty fix where multiinput in loop
             $this->tagMultiInputSetData($Item["%".$name]);
         } else {
             $this->tagMultiInputSetData();

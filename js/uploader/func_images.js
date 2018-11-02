@@ -1,4 +1,7 @@
 $(document).ready(function(){
+	wb_include("/engine/js/uploader/uploader.css");
+	wb_include("/engine/js/uploader/i18n/ru.js");
+
 	$(document).on("wb_ajax_done",function(event,target,ajax){
 		wbCommonUploader();
 	});
