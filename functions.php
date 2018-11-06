@@ -111,6 +111,13 @@ function wbInitEnviroment()
         $_ENV['page_size'] = $_ENV['settings']['page_size'];
     }
     $_ENV['sysmsg'] = wbGetSysMsg();
+
+        // Load tags
+        $_ENV['tags'] = wbListTags();
+        foreach(array_keys($_ENV['tags']) as $name) {
+                require_once $_ENV['tags'][$name];
+        }
+
 }
 
 function wbGetSysMsg() {
@@ -1293,32 +1300,36 @@ function wbGetTpl($tpl = null, $path = false)
 {
     $out = null;
     $cur = null;
-    if (true == $path) {
-        if (!$out and is_file($_ENV['path_app']."/{$tpl}")) {
-            $out = wbFromFile($_ENV['path_app']."/{$tpl}");
-            $cur = $_ENV['path_app']."/{$tpl}";
+    $locale = null;
+        if (true == $path) {
+                if (!$cur and is_file($_ENV['path_app']."/{$tpl}")) {
+                    $cur = wbNormalizePath($_ENV['path_app']."/{$tpl}");
+                }
+        } else {
+                if (!$cur and is_file($_ENV['path_tpl']."/{$tpl}")) {
+                    $cur = wbNormalizePath($_ENV['path_tpl']."/{$tpl}");
+                }
+                if (!$cur and is_file($_ENV['path_engine']."/tpl/{$tpl}")) {
+                    $cur = wbNormalizePath($_ENV['path_engine']."/tpl/{$tpl}");
+                }
+        }
+        if ($cur !== null ) {$out = wbFromFile($cur);}
+        if (!$out) {
+                wbErrorOut(wbError('func', __FUNCTION__, 404, func_get_args()));
+        }
 
-        }
-    } else {
-        if (!$out and is_file($_ENV['path_tpl']."/{$tpl}")) {
-            $out = wbFromFile($_ENV['path_tpl']."/{$tpl}");
-            $cur = $_ENV['path_tpl']."/{$tpl}";
-        }
-        if (!$out and is_file($_ENV['path_engine']."/tpl/{$tpl}")) {
-            $out = wbFromFile($_ENV['path_engine']."/tpl/{$tpl}");
-            $cur = $_ENV['path_engine']."/{$tpl}";
-        }
-    }
-    if (null == $out) {
-        wbErrorOut(wbError('func', __FUNCTION__, 404, func_get_args()));
-    }
-    if ($cur==null) {
-        $ini=null;
-    } else {
         $ini = substr($cur,0,-4).".ini";
-    }
-        if (is_object($out)) $locale=$out->wbSetFormLocale($ini);
-        if ($locale!==null) wbEnvData("tpl->{$tpl}->locale",$locale);
+        if (!is_file($ini) AND $out->find("[type='text/locale'][src]")->length) {
+                $ini=$out->find("[type='text/locale'][src]")->attr("src");
+                if (is_file($_ENV['path_app']."/{$ini}")) {
+                        $ini=$_ENV['path_app']."/{$ini}";
+                } else {
+                        $path=implode("/",array_slice(explode("/",$cur),0,-1));
+                        $ini=$path."/".$out->find("[type='text/locale'][src]")->attr("src");
+                }
+        }
+    if (is_object($out) AND is_file($ini)) {$locale=$out->wbSetFormLocale($ini);}
+    if ($locale!==null) wbEnvData("tpl->{$tpl}->locale",$locale);
     return $out;
 }
 
@@ -1744,6 +1755,8 @@ function wbWhereItem($item, $where = null)
 {
     $where = htmlspecialchars_decode($where);
     $res = true;
+    $where = wbSetValuesStr($where, $item);
+
     if (!null == $where) {
         if ('%' == substr($where, 0, 1)) {
             $phpif = substr($where, 1);
@@ -1783,7 +1796,13 @@ function wbWherePhp($str = '', $item = array())
         if (!in_array(strtoupper($fld), $exclude, true)) {
             if (isset($item[$fld]) and true == $flag) {
                 //if ($flag==true) {
-                $str = str_replace(" {$fld} ", ' $item["'.$fld.'"] ', $str);
+                if (is_array($item[$fld])) {
+                        $res=wbJsonEncode($Item[$fld]);
+                        if ($res=="null") {$res='"[]"';} else {$res=htmlentities($res);}
+                        $str = str_replace(" {$fld} ", $res , $str);
+                } else {
+                        $str = str_replace(" {$fld} ", ' $item["'.$fld.'"] ', $str);
+                }
                 $flag = false;
             }
         } else {
@@ -2379,8 +2398,10 @@ function wbRole($role, $userId = null)
         $target = '[data-wb-prepend],[data-wb-append],[data-wb-remove],[data-wb-before],[data-wb-after],[data-wb-html],[data-wb-replace],[data-wb-selector],[data-wb-addclass],[data-wb-removeclass]';
         $tags = array('module', 'formdata', 'foreach', 'dict', 'tree', 'gallery',
                     'include', 'imageloader', 'thumbnail', 'uploader',
-                    'multiinput', 'where', 'cart', 'variable',
+                    'multiinput', 'where', 'variable',
         );
+        $tags = array_merge($tags,array_keys($_ENV["tags"]));
+
         if ('' !== $set) {
             $res = $$set;
         } else {
@@ -2390,119 +2411,6 @@ function wbRole($role, $userId = null)
 
         return $res;
     }
-
-function wbCartAction()
-{
-    if (!isset($_SESSION['order_id']) or '' == $_SESSION['order_id']) {
-        $_SESSION['order_id'] = wbNewId();
-        $new = true;
-    } else {
-        $new = false;
-    }
-    $param = wbCartParam();
-    $order = wbItemRead('orders', $_SESSION['order_id']);
-    if (!isset($order['id']) or $new = true) {
-        $order['id'] = $_SESSION['order_id'];
-        $order['user_id'] = $_SESSION['user_id'];
-        $order['date'] = date('Y-m-d H:i:s');
-    }
-
-    switch ($param['action']) {
-        case 'add-to-cart':       wbCartItemAdd($order); break;
-        case 'cart-update':   	  wbCartUpdate($order); break;
-        //case "cart-item-recalc":  wbCartItemRecalc($order); break;
-        case 'cart-item-remove':  wbCartItemRemove($order); break;
-        case 'cart-clear':        wbCartClear($order); break;
-        case 'getdata':            wbCartGetData($order); break;
-    }
-
-    return $_SESSION['order_id'];
-}
-
-function wbCartGetData($order)
-{
-    echo json_encode($order);
-    die;
-}
-
-function wbCartUpdate($order)
-{
-    $order['items'] = $_POST;
-    $order['total'] = wbCartCalcTotal($order);
-    wbItemSave('orders', $order);
-}
-
-function wbCartParam()
-{
-    $param = $_ENV['route']['params'];
-    $param['mode'] = $_ENV['route']['mode'];
-    $param = array_merge($param, $_REQUEST);
-    $param['action'] = $param[0];
-
-    return $param;
-}
-
-function wbCartClear($order)
-{
-    $order['items'] = array();
-    $order['total'] = 0;
-    $order['lines'] = 0;
-    wbItemSave('orders', $order);
-}
-
-function wbCartItemAdd($order)
-{
-    $param = wbCartParam();
-    if ($param['item'] > '' and $param['count'] > '') {
-        $pos = wbCartItemPos($order);
-        $line = $param;
-        unset($line['mode'],$line['action']);
-        $order['items'][$pos] = $line;
-        $order['total'] = wbCartCalcTotal($order);
-        wbItemSave('orders', $order);
-    }
-}
-
-function wbCartCalcTotal($order)
-{
-    $order['total'] = 0;
-    foreach ($order['items'] as $item) {
-        $order['total'] += $item['count'] * $item['price'];
-    }
-    unset($item);
-
-    return $order['total'];
-}
-
-function wbCartItemPos($order)
-{
-    $param = wbCartParam();
-    if (!isset($order['items'])) {
-        $order['items'] = array();
-    }
-    $pos = 0;
-    foreach ($order['items'] as $key => $Item) {
-        if ($Item['form'] == $param['form'] and $Item['item'] == $param['item']) {
-            return $pos;
-        }
-        ++$pos;
-    }
-
-    return $pos;
-}
-
-function wbCartItemPosCheck($Item)
-{
-    $res = true;
-    $param = wbCartParam();
-    foreach ($param as $k => $fld) {
-        if ($Item[$fld] !== $_GET[$fld]) {
-            $res = false;
-        }
-    }
-
-    return $res;
-}
 
 function wbListForms($exclude = true)
 {
@@ -2574,6 +2482,35 @@ function wbListModules()
         $name = $name[0];
         if (('php' == $ext) && !$inc && $name > '' && !in_array($name, $list, true)) {
             $list[] = $name;
+        }
+    }
+    unset($arr);
+
+    return $list;
+}
+
+function wbListTags()
+{
+    $list = array();
+    $eList = wbListFilesRecursive($_ENV['path_engine'].'/tags', true);
+    $aList = wbListFilesRecursive($_ENV['path_app'].'/tags', true);
+    $arr = $eList;
+    foreach ($aList as $a) {
+        $arr[] = $a;
+    }
+    unset($eList,$aList);
+    foreach ($arr as $i => $data) {
+        $name = $data['file'];
+        $path = $filepath = $data['path'];
+        $path = str_replace(array($_ENV['path_engine'], $_ENV['path_app']), array('.', '.'), $path);
+        $inc = strpos($name, '.inc');
+        $ext = explode('.', $name);
+        $ext = $ext[count($ext) - 1];
+        $name = substr($name, 0, -(strlen($ext) + 1));
+        $name = explode('_', $name);
+        $name = $name[0];
+        if (('php' == $ext) && !$inc && $name > '' && !in_array($name, $list, true)) {
+            $list[strtolower($name)] = $filepath."/{$name}.{$ext}";
         }
     }
     unset($arr);

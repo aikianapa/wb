@@ -1,5 +1,4 @@
 <div data-wb-role="cart" data-wb-name="cart">
-	 <div class="cart-table">
 			<div data-wb-role="foreach" data-wb-from="items">
 				<div class="cart-item row" id="{{form}}_{{item}}">
 					<div class="col-sm-2 col-xs-12 text-center" data-wb-role="formdata" data-wb-table="{{form}}" data-wb-item="{{item}}" data-wb-hide="wb">

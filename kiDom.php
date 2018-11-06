@@ -1240,7 +1240,6 @@ abstract class kiNode
 
 //======================================================================//
 //======================================================================//
-
     public function saveCache() {
         $cachename=wbGetCacheName();
         $expired=$this->find("meta[name=cache]")->attr("content")+time();
@@ -1309,7 +1308,6 @@ abstract class kiNode
                 return $locale;
         }
 
-
         public function wbSetFormLocale($ini=null) {
                 $locale=$this->wbGetFormLocale($ini);
                 if ($locale!==null AND count($locale)) {
@@ -1333,7 +1331,7 @@ abstract class kiNode
                 $inc->wbUserAllow();
                 $inc->wbWhere($Item);
                 $tag=$inc->wbCheckTag();
-                if (!$tag==FALSE && !$inc->is(".wb-done")) {
+                if (!$tag==FALSE && !$inc->is(".wb-done") AND !in_array($tag,array_keys($_ENV['tags']))) {
                     if ($inc->has("[data-wb-json]")) {
                         $inc->attr("data-wb-json",wbSetValuesStr($inc->attr("data-wb-json"),$Item));
                     }
@@ -1342,6 +1340,9 @@ abstract class kiNode
                     }
                     $inc->wbProcess($Item,$tag);
                     $inc->tagHideAttrs();
+                } else if (!$tag==FALSE && !$inc->is(".wb-done") AND in_array($tag,array_keys($_ENV['tags']))) {
+                        $inc->wbProcess($Item,$tag);
+                        $inc->tagHideAttrs();
                 }
             }
         };
@@ -1579,8 +1580,11 @@ abstract class kiNode
             if ($this->attr("src")>"") {
                 $this->attr("src",wbNormalizePath($this->attr("src")));
             }
-            if ($tag>"") {
+            if ($tag>"" AND !in_array($tag,array_keys($_ENV['tags']))) {
                 $this->$func($Item);
+            } else if ($tag>"" AND in_array($tag,array_keys($_ENV['tags']))) {
+                $node = new $func($this);
+                $node->$func();
             }
             $this->tagHideAttrs($Item);
         }
@@ -2207,25 +2211,6 @@ abstract class kiNode
         $this->removeAttr("data-wb-hide");
     }
 
-
-    public function tagCart() {
-        if ($this->find(".cart-item")->length) {
-            $Item=wbItemRead("orders",$_SESSION["order_id"]);
-            $tplid=uniqId();
-            $this->attr("data-template",$tplid);
-            $this->addTemplate($this->innerHtml());
-            if (!$this->children("[data-wb-role=multiinput][name=items]")->length) $this->wbSetData($Item);
-            $items=$this->find(".cart-item");
-            $idx=0;
-            foreach($items as $i) {
-                if ($i->attr("idx")=="") {
-                    $i->attr("idx",$idx);
-                    $idx++;
-                }
-            }
-        }
-    }
-
     public function tagTree($Item=array()) {
         if (!is_array($Item)) {
             $Item=array($Item);
@@ -2560,8 +2545,10 @@ abstract class kiNode
 		$ndx=0; $fdx=0; $n=0; $stp=0;
 		$count=count($Item);
 		$inner="";
-		$srcVal=array(); foreach($srcItem as $k => $v) {$srcVal["%{$k}"]=$v;}; unset($v); //$srcVal["_parent"]=$srcItem;
-
+		$srcVal=array();
+                if (is_array($srcItem)) {
+                        foreach($srcItem as $k => $v) {$srcVal["%{$k}"]=$v;}; unset($v); //$srcVal["_parent"]=$srcItem;
+                }
 		$ndx=0; $n=0; $f=0;
 		$tmptpl=wbFromString($tpl);
         if (isset($rand) AND $rand=="true") {shuffle($Item);}

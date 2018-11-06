@@ -55,10 +55,6 @@ function ajax__settings() {
     return base64_encode(json_encode($sett));
 }
 
-function ajax__cart() {
-    return wbCartAction();
-}
-
 function ajax__getsysmsg() {
         return base64_encode(json_encode(wbGetSysMsg()));
 }
