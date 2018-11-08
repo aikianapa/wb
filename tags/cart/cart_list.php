@@ -1,5 +1,4 @@
 	 <div class="cart-table">
-		<h3>{{_LANG[cart]}}</h3>
 			<div data-wb-role="foreach" data-wb-from="items" data-wb-where='"{{id}}"!==""' data-wb-item="*">
 				<div class="cart-item row" id="{{form}}_{{item}}">
 					<div class="col-12 col-sm-2 col-xs-12 text-center" data-wb-role="formdata" data-wb-table="{{form}}" data-wb-item="{{item}}" data-wb-hide="wb">
@@ -13,19 +12,18 @@
 							<div class="col-12 col-sm-5 col-xs-12">
 								<a href="/{{form}}/show/{{item}}">{{_VAR[prod_name]}} </a>
 							</div>
-							<div class="col-3 col-sm-2 col-xs-3 text-center cart-item-price">
-								{{price}}
-							</div>
 							<div class="col-6 col-sm-3 col-xs-6 text-center">
 								<input type="hidden" name="id" class="cart-item-id">
 								    <input type="hidden" name="form" class="cart-item-form">
-								    <input type="text" name="quant" class="cart-item-quant form-control" placeholder="{{quant}}">
-									<div>
-										<br>
-										<a class="btn btn-primary cart-item-minus"><i class="fa fa-minus"></i></a>
-										<a class="btn btn-success cart-item-plus"><i class="fa fa-plus"></i></a>
-										<a class="btn btn-danger cart-item-remove"><i class="fa fa-trash"></i></a>
+								    <input type="text" name="quant" class="cart-item-quant form-control form-control-sm" placeholder="{{quant}}">
+									<div class="pull-right">
+										<a class="btn btn-sm btn-primary cart-item-minus"><i class="fa fa-minus"></i></a>
+										<a class="btn btn-sm btn-success cart-item-plus"><i class="fa fa-plus"></i></a>
+										<a class="btn btn-sm btn-danger cart-item-remove"><i class="fa fa-trash"></i></a>
 									</div>
+							</div>
+							<div class="col-3 col-sm-2 col-xs-3 text-center cart-item-price">
+								{{price}}
 							</div>
 							<div class="col-3 col-sm-2 col-xs-3 text-center cart-item-total"></div>
 						</div>

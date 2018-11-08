@@ -1,12 +1,16 @@
 <?php
-    $_attributes=$this->attributes();
-    $_ENV["attributes"]=array();
+	if (is_object($this->DOM)) {
+		$_attributes=$this->DOM->attributes();
+	} else {
+		$_attributes=$this->attributes();
+	}
+
     if ($_attributes) {
 	$attrs=new IteratorIterator($_attributes);
 	foreach ($attrs as $attr) {
 		$tmp=$attr->name;
-		if (strpos($tmp,"ata-wb-")) {$tmp=str_replace("data-wb-","",$tmp); $_ENV["attributes"][$tmp]=$$tmp=$attr->value()."";} else {
-			$_ENV["attributes"][$attr->name]=$attr->value();
+		if (strpos($tmp,"ata-wb-")) {$tmp=str_replace("data-wb-","",$tmp); $$tmp=$attr->value()."";} else {
+			$$tmp=$attr->value();
 		}
 	}; unset($attrs);
     }

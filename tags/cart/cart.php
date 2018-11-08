@@ -5,13 +5,12 @@ class tagCart extends kiNode  {
         $this->DOM = $that;
     }
 
-	public function tagCart() {
+	public function tagCart($Item) {
 		include($_ENV["path_engine"]."/wbattributes.php");
 		if ($this->DOM->text()=="" AND !isset($mode)) {
 			$mode="list";
 			$tpl=wbGetTpl("/engine/tags/cart/cart_list.php",true);
 			$l=$tpl->wbSetFormLocale();
-			print_r($l);
 			$this->DOM->html($tpl);
 		} else if ($this->DOM->text()=="" AND isset($mode)) {
 			$this->DOM->html(wbFromFile(__DIR__."/cart_{$mode}.php"));

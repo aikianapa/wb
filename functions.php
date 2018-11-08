@@ -2398,7 +2398,7 @@ function wbRole($role, $userId = null)
         $target = '[data-wb-prepend],[data-wb-append],[data-wb-remove],[data-wb-before],[data-wb-after],[data-wb-html],[data-wb-replace],[data-wb-selector],[data-wb-addclass],[data-wb-removeclass]';
         $tags = array('module', 'formdata', 'foreach', 'dict', 'tree', 'gallery',
                     'include', 'imageloader', 'thumbnail', 'uploader',
-                    'multiinput', 'where', 'variable',
+                    'multiinput', 'where'
         );
         $tags = array_merge($tags,array_keys($_ENV["tags"]));
 
