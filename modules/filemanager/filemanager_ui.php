@@ -198,19 +198,22 @@
         <div class="modal-dialog modal-lg" role="document">
             <button class="btn btn-sm btn-default btn-edit-close" data-toggle="modal" data-target="#filemanagerModalSrc"><i class="fa fa-close"></i></button>
             <div class="modal-content">
-                <div data-wb-role="include" src="source" id="filemanagerSrc"></div>
+                    <div class="nav-active-primary">
+                        <ul class="nav nav-tabs" role="tablist" id="filemanagerTabs">
+                            <li class="nav-item"><a class="nav-link" href="" data-toggle="tab" aria-expanded="false"> <i class="fa fa-close"></a></i>
+                            </li>
+                        </ul>
+                    </div>
+                        <div id="filemanagerSrc" class="tab-content  p-a m-b-md">
+                                <script type="text/template" id="filemanagerTabsContentTpl">
+                                        <div class="tab-pane fade show active" id="{{id}}" role="tabpanel">
+                                                <div data-wb-role="module" src="editarea" data-wb-file="{{file}}" data-wb-height="500" data-wb-id="{{id}}"></div>
+                                        </div>
+                                </script>
+                        </div>
             </div>
         </div>
     </div>
-
-
-    <div class="nav-active-primary mg-t-5" data-wb-append="#filemanagerSrc .source-toolbar">
-        <ul class="nav nav-tabs" role="tablist" id="filemanagerTabs">
-            <li class="nav-item"><a class="nav-link" href="" data-toggle="tab" aria-expanded="false"> <i class="fa fa-close"></a></i>
-            </li>
-        </ul>
-    </div>
-
 </div>
 
 <script src="/engine/modules/filemanager/filemanager.js?{{_ENV[new_id]}}"></script>

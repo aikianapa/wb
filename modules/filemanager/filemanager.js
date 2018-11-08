@@ -396,7 +396,7 @@
         });
         return d;
     }
-
+//--------------------------------------------//////////////////////////
     function filemanagerCallEditor(file) {
         wb_ajax_loader();
         var res = false;
@@ -406,18 +406,26 @@
             if ($(this).data("file") == file) {
                 $(this).addClass("active");
                 $(this).find(".nav-link").addClass("active");
+                var tab_id = $(this).attr("id");
                 res = true;
             }
         });
 
         if (res == false) {
-            fname = explode("/", file);
-            fname = fname[fname.length - 1];
-            tab = $($("#filemanagerTabs").data("tab"));
-            $(tab).find(".nav-link").prepend(fname).addClass("active");
-            $(tab).data("file", file);
-            $("#filemanagerTabs").append($(tab));
+                var tab_id = wb_newid();
+                fname = explode("/", file);
+                fname = fname[fname.length - 1];
+                tab = $($("#filemanagerTabs").data("tab"));
+                tab_cont = "<div>"+wb_setdata($("#filemanagerTabsContentTpl").html(),{id:tab_id,file:file},true)+"</div>";
+                $(tab).find(".nav-link").prepend(fname).addClass("active");
+                $(tab).find(".nav-link").attr("href","#"+tab_id);
+                $(tab_cont).find(".tab-pane").attr("id",tab_id);
+                $(tab).data("file", file);
+                $("#filemanagerTabs").append($(tab));
+                $("#filemanagerSrc .tab-pane").removeClass("active");
+                $("#filemanagerSrc").append($(tab_cont).html());
         }
+        console.log(tab_id);
         filemanagerEditFile(file);
 
         $("#filemanagerTabs").undelegate(".fa-close", "click");
@@ -439,10 +447,10 @@
             filemanagerStateLoad(this);
         });
 
-        $("#filemanagerSrc").undelegate(".btnSave", "click");
-        $("#filemanagerSrc").delegate(".btnSave", "click", function() {
-            filemanagerSave();
-        });
+        //$("#filemanagerSrc").undelegate(".btnSave", "click");
+        //$("#filemanagerSrc").delegate(".btnSave", "click", function() {
+        //    filemanagerSave();
+        //});
 
         $("#filemanagerSrc").undelegate(".btnFullScr", "click");
         $("#filemanagerSrc").delegate(".btnFullScr", "click", function() {
@@ -509,25 +517,14 @@
         $("#filemanager").find(".breadcrumb .breadcrumb-item:last > a").trigger("click");
     }
 
-
+//--------------------------------------------//////////////////////////
     function filemanagerEditFile(file) {
         $.post("/module/filemanager/getfile/", {
             file: file
         }, function(data) {
-            editor = wb_call_source($("#filemanagerSrc .ace_editor").attr("id"));
-            editor.setValue(data);
-            editor.gotoLine(0, 0);
-            editor.commands.addCommand({
-                name: 'save',
-                bindKey: {
-                    win: 'Ctrl-S',
-                    mac: 'Command-S'
-                },
-                exec: function() {
-                    filemanagerSave();
-                },
-                readOnly: false
-            });
+                var eid = $("#filemanagerSrc .mod_editarea").attr("id");
+
+
             filemanagerStateSave($("#filemanagerTabs .nav-item.active"));
             $("#filemanagerModalSrc").removeClass("fullscr");
             if (!$("#filemanagerModalSrc:visible").length) {
@@ -538,6 +535,7 @@
     }
 
     function filemanagerSave() {
+            /*
         var tab = $("#filemanagerTabs .nav-link.active").parents(".nav-item");
         if ($(tab).length) {
             $.post("/module/filemanager/putfile/", {
@@ -561,21 +559,26 @@
                 }
             });
         }
+        * */
     }
 
     function filemanagerStateSave(tab) {
+            /*
         if ($(tab).length) {
             $(tab).data("editor", editor.getValue());
             $(tab).data("editorUndo", editor.getSession().getUndoManager());
             $(tab).data("editorPos", editor.getCursorPosition());
         }
+        */
     }
 
     function filemanagerStateLoad(tab) {
+            /*
         if ($(tab).length && $(tab).data("editor") !== undefined) {
             editor.setValue($(tab).data("editor"));
             editor.getSession().setUndoManager($(tab).data("editorUndo"));
             var pos = $(tab).data("editorPos");
             editor.gotoLine(pos["row"] + 1, pos["column"]);
         }
+        */
     }

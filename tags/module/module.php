@@ -29,11 +29,11 @@ class tagModule extends kiNode  {
         $_func=$src."__afterRead";
         // функция вызывается после получения шаблона модуля
         if (is_callable($func)) {
-            $func($out,$Item,$this);
+            $func($out,$Item,$this->DOM);
         }
         else {
             if (is_callable($_func)) {
-                $_func($out,$Item,$this);
+                $_func($out,$Item,$this->DOM);
             }
         }
         $out->wbSetData($Item);

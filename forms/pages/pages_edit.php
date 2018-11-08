@@ -63,7 +63,7 @@
 </div>
 
 <div id="pageText" class="tab-pane fade" data-wb-role="include" src="editor" role="tabpanel"></div>
-<div id="pageSource" class="tab-pane fade" data-wb-role="include" src="source" role="tabpanel"></div>
+<div id="pageSource" class="tab-pane fade" data-wb-role="module" src="editarea" name="text" role="tabpanel"></div>
 <div id="pageImages" class="tab-pane fade" data-wb-role="include" src="uploader" role="tabpanel"></div>
 <div id="pageSeo" class="tab-pane fade" data-wb-role="include" src="seo" role="tabpanel"></div>
 </div>

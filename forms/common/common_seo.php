@@ -37,8 +37,8 @@
           </div>
       </div>
       <div class="col-sm-9">
-          <div data-wb-role="include" data-wb-name="head_add" src="source"></div>
-      </div>
+                <div data-wb-role="module" src="editarea" data-wb-name="head_add" data-wb-id=""></div>
+        </div>
   </div>
 </div>
 <div id="{{_form}}SeoBody" class="tab-pane fade show" role="tabpanel">
@@ -58,7 +58,7 @@
           </div>
       </div>
       <div class="col-sm-9">
-          <div data-wb-role="include" data-wb-name="body_add" src="source"></div>
+                <div data-wb-role="module" src="editarea" data-wb-name="body_add" data-wb-id=""></div>
       </div>
   </div>
 </div>

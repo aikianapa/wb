@@ -34,6 +34,21 @@ function wb_init() {
           }
         }]);
       }
+      wbapp.scriptWait = function(url, data, func) {
+        wb_ajaxWait([{
+          async: false,
+          type: 'POST',
+          dataType: 'script',
+          data: data,
+          url: url,
+          success: function(data) {
+            if (func !== undefined) {
+              func(data);
+            }
+          }
+        }]);
+      }
+
 
       wbapp.settings = wb_settings();
       wbapp.sysmsg = wb_getsysmsg();
@@ -1090,6 +1105,7 @@ function wb_plugins_loaded() {
 }
 
 function wb_plugin_editor() {
+        $(document).data("wb_editor_change",false);
   if ($("textarea.editor:not(.wb-plugin)").length) {
     $("textarea.editor:not(.wb-plugin)").each(function() {
       $(this).addClass("wb-plugin");
@@ -1124,27 +1140,41 @@ function wb_plugin_editor() {
     });
     for (var i in CKEDITOR.instances) {
       // это работает
-      CKEDITOR.instances[i].on('change', function(e) {
-        CKEDITOR.instances[i].updateElement();
-        var instance = CKEDITOR.instances[i].name;
-        var fldname = $("textarea#" + instance).attr("name");
-        var value = CKEDITOR.instances[i].getData();
-        if (fldname > "" && $("textarea#" + instance).parents("form").find("[name='" + fldname + "']").length) {
-          $("textarea#" + instance).parents("form").find("[name='" + fldname + "']:not(.ace_editor,.editor)").val(value);
-        } else {
-          $("textarea#" + instance).val(value);
+        CKEDITOR.instances[i].on('change', function(e) {
+        if ($(document).data("wb_source_change")!==true) {
+                CKEDITOR.instances[i].updateElement();
+                var instance = CKEDITOR.instances[i].name;
+                var form = $(document).find("textarea#" + instance).parents("form[data-wb-form]").attr("data-wb-form");
+                var item = $(document).find("textarea#" + instance).parents("form[data-wb-item]").attr("data-wb-item");
+                var fldname = $(document).find("textarea#" + instance).attr("name");
+                var value = CKEDITOR.instances[i].getData();
+                $(document).data("wb_editor_change",true);
+                $(document).trigger("wb_editor_change", {
+                        "form": form,
+                        "item": item,
+                        "field": fldname,
+                        "value": value
+                });
         }
-        $("textarea#" + instance).html(value);
-        $("textarea#" + instance).trigger("change");
-        $(document).trigger("editorChange", {
-          "value": value,
-          "field": fldname
-        });
       });
     }
   }
 }
-$(document).on("sourceChange", function(e, data) {
+
+
+
+$(document).on("wb_source_change", function(e, data) {
+        if ($(document).data("wb_source_change")==true) {
+                if (CKEDITOR.instances[$("form[data-wb-form='"+data.form+"'] [name='" + data.field + "']").attr("id")] !== undefined) {
+                        CKEDITOR.instances[$("form[data-wb-form='"+data.form+"'] [name='" + data.field + "']").attr("id")].setData(data.value);
+                }
+                $(document).data("wb_source_change",false);
+                return false;
+        }
+});
+
+/*
+$(document).on("", function(e, data) {
   $(document).data("sourceChange", true);
   var form = data.form;
   var field = data.field;
@@ -1164,6 +1194,7 @@ $(document).on("sourceChange", function(e, data) {
   e.preventDefault();
   return false;
 });
+*/
 
 function wb_formsave() {
   // <button data-formsave="#formId" data-src="/path/ajax.php"></button>
@@ -2044,198 +2075,6 @@ function wb_pagination(pid) {
   });
 }
 
-function wb_call_source(id) {
-  if (substr(id, 0, 1) == "#") {
-    var eid = id;
-    id = substr(id, 1);
-  } else {
-    var eid = "#" + id;
-  }
-  if (!$(eid).parents(".formDesignerEditor").length) {
-    $(document).data("sourceFile", null);
-    var form = $(eid).parents("form");
-    var theme = getcookie("sourceEditorTheme");
-    var fsize = getcookie("sourceEditorFsize") * 1;
-    var source = "&nbsp;";
-    var fldname = $(eid).attr("name");
-    if ($("[name='" + fldname + "']").length) {
-      source = $("[name='" + fldname + "']").val();
-    }
-    if (theme == undefined || theme == "") {
-      var theme = "ace/theme/chrome";
-      setcookie("sourceEditorTheme", theme);
-    }
-    if (fsize == undefined || fsize == "") {
-      var fsize = 12;
-      setcookie("sourceEditorFsize", fsize);
-    }
-    if ($(document).data("sourceClipboard") == undefined) {
-      $(document).data("sourceClipboard", "");
-    }
-    var srced = ace.edit(id);
-    srced.setTheme("ace/theme/chrome");
-    srced.setOptions({
-      enableBasicAutocompletion: true,
-      enableSnippets: true
-    });
-    srced.getSession().setUseWrapMode(true);
-    srced.getSession().setUseSoftTabs(true);
-    srced.setDisplayIndentGuides(true);
-    srced.setHighlightActiveLine(false);
-    srced.setAutoScrollEditorIntoView(true);
-    srced.commands.addCommand({
-      name: 'save',
-      bindKey: {
-        win: 'Ctrl-S',
-        mac: 'Command-S'
-      },
-      exec: function() {
-        if (form !== undefined) {
-          console.log(form);
-          wb_formsave(form);
-        }
-      },
-      readOnly: false
-    });
-    srced.gotoLine(0, 0);
-    srced.resize(true);
-    if ($("#cke_text .cke_contents").length) {
-      var ace_height = $("#cke_text .cke_contents").height();
-    } else {
-      var ace_height = 400;
-    }
-    $(".ace_editor").css("height", ace_height);
-    srced.setTheme(theme);
-    srced.setFontSize(fsize);
-    srced.setValue(source);
-    srced.gotoLine(0, 0);
-    srced.getSession().setMode("ace/mode/php");
-    $(form).data(eid, srced);
-    wb_call_source_events(srced, eid, fldname);
-    return srced;
-  }
-}
-
-function wb_call_source_events(srced, eid, fldname) {
-  var tmp = explode("-", eid);
-  var toolbar = tmp[0] + "-toolbar-" + tmp[1] + " ";
-  $(toolbar).data("editor", false);
-  $(toolbar).next(".ace_editor").attr("name", fldname).attr("id", substr(eid, 1));
-  srced.getSession().on('change', function(e) {
-    if ($(toolbar).data("editor") == undefined) {
-      $(toolbar).data("editor", false);
-    }
-    if ($(toolbar).data("editor") == false && $(document).data("editorChange") !== true) {
-      $(toolbar).data("editor", true);
-      setTimeout(function() {
-        $(document).trigger("sourceChange", {
-          "value": srced.getSession().getValue(),
-          "field": fldname,
-          "form": $(toolbar).parents("form")
-        });
-        $(toolbar).data("editor", false);
-      }, 500);
-    }
-  });
-  $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-    if ($(e.target.hash).find(eid).length) {
-      var form = $(eid).parents("form");
-      var val = srced.getSession().getValue();
-      srced.getSession().setValue(val);
-    }
-  });
-  $(document).on("editorChange", function(e, data) {
-    if ($(document).data("sourceChange") !== true) {
-      $(document).data("editorChange", true);
-      var aeid = "#" + $(".ace_editor[name=" + data.field + "]").attr("id");
-      if (eid == aeid) {
-        var form = $(eid).parents("form");
-        srced.getSession().setValue(data.value);
-        setTimeout(function() {
-          $(document).data("editorChange", false);
-        }, 100);
-      }
-    }
-  });
-  $(document).undelegate(toolbar + " button", "click");
-  $(document).delegate(toolbar + " button", "click", function(e) {
-    var theme = getcookie("sourceEditorTheme");
-    var fsize = getcookie("sourceEditorFsize");
-    if (theme == undefined || theme == "") {
-      var theme = "ace/theme/chrome";
-      setcookie("sourceEditorTheme", theme);
-    }
-    if (fsize == undefined || fsize == "") {
-      var fsize = 12;
-      setcookie("sourceEditorFsize", fsize);
-    }
-    //if ($(this).hasClass("btnCopy")) 		{$(document).data("sourceFile",srced.getCopyText());}
-    //if ($(this).hasClass("btnPaste")) 		{srced.insert($(document).data("sourceFile"));}
-    if ($(this).hasClass("btnCopy")) {
-      $(document).data("sourceClipboard", srced.getCopyText());
-    }
-    if ($(this).hasClass("btnPaste")) {
-      srced.insert($(document).data("sourceClipboard"));
-    }
-    if ($(this).hasClass("btnUndo")) {
-      srced.execCommand("undo");
-    }
-    if ($(this).hasClass("btnRedo")) {
-      srced.execCommand("redo");
-    }
-    if ($(this).hasClass("btnFind")) {
-      srced.execCommand("find");
-    }
-    if ($(this).hasClass("btnReplace")) {
-      srced.execCommand("replace");
-    }
-    if ($(this).hasClass("btnLight")) {
-      srced.setTheme("ace/theme/chrome");
-      setcookie("sourceEditorTheme", "ace/theme/chrome");
-    }
-    if ($(this).hasClass("btnDark")) {
-      srced.setTheme("ace/theme/monokai");
-      setcookie("sourceEditorTheme", "ace/theme/monokai");
-    }
-    if ($(this).hasClass("btnClose")) {
-      srced.setValue("");
-      $(document).data("sourceFile", null);
-      $("#sourceEditorToolbar .btnSave").removeClass("btn-danger");
-    }
-    if ($(this).hasClass("btnFontDn")) {
-      if (fsize > 8) {
-        fsize = fsize * 1 - 1;
-      }
-      srced.setFontSize(fsize);
-      setcookie("sourceEditorFsize", fsize);
-    }
-    if ($(this).hasClass("btnFontUp")) {
-      if (fsize < 20) {
-        fsize = fsize * 1 + 1;
-      }
-      srced.setFontSize(fsize);
-      setcookie("sourceEditorFsize", fsize);
-    }
-    if ($(this).hasClass("btnFullScr")) {
-      var div = $(this).parents(toolbar).parent();
-      div.parents(".modal").toggleClass("fullscr");
-      if (div.parents(".modal").hasClass("fullscr")) {
-        var offset = div.find("pre.ace_editor").offset();
-        div.find("pre.ace_editor").height($(window).height() - offset.top - 15);
-      } else {
-        div.find("pre.ace_editor").height(400);
-      }
-      srced.resize();
-      window.dispatchEvent(new Event('resize'));
-    }
-    if ($(this).hasClass("btnSave")) {
-      var fo = $(this).parents(".modal").find("[data-wb-formsave]").trigger("click");
-      //wb_formsave(fo);
-    }
-    e.preventDefault();
-    return false;
-  });
-}
 
 function is_callable(v, syntax_only, callable_name) {
   // Returns true if var is callable.
