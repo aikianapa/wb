@@ -134,7 +134,14 @@ class tagInclude extends kiNode  {
                 unset($arr[0]);
                 $mode=implode("_",$arr);
             }
-            $this_content=wbGetForm($form,$mode);
+            $engine=explode(":",$form);
+            if (isset($engine[1]) AND ($engine[0]=="engine" OR $engine[0]=="e")) {
+                $form=$engine[1];
+                $engine=true;
+            } else {
+                $engine=false;
+            }
+            $this_content=wbGetForm($form,$mode,$engine);
             break;
         case "snippet":
             if (!isset($mode) AND isset($name)) {
@@ -193,6 +200,7 @@ class tagInclude extends kiNode  {
                 $this_content=wbFromFile($src);
             }
         }
+        $this_content->wbSetFormLocale();
         if ($did>"") {
             $this_content->find(":first")->attr("id",$did);
         }

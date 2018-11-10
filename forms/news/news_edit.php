@@ -9,7 +9,7 @@
             </div>
             <div class="modal-body">
 
-                <form id="{{_GET[form]}}EditForm" data-wb-form="{{_GET[form]}}" data-wb-item="{{_GET[item]}}" class="form-horizontal" role="form">
+                <form autocomplete="off" id="{{_GET[form]}}EditForm" data-wb-form="{{_GET[form]}}" data-wb-item="{{_GET[item]}}" class="form-horizontal" role="form">
                     <input type="hidden" class="form-control" name="id" required>
 
                     <div class="form-group row">

@@ -54,7 +54,7 @@ function editarea__afterRead($out,$Item,$obj) {
         if (isset($style)) {$ta->attr("style",$style);}
         if (isset($value)) {$ta->html($value);}
 
-        $sc->append("$(document).ready(function(){module_editarea('{$taid}');});");
+        $sc->append("$(document).on('module_editarea_loaded',function(){module_editarea('{$taid}');});");
         return $out;
 }
 ?>

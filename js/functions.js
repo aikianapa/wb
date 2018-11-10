@@ -35,18 +35,14 @@ function wb_init() {
         }]);
       }
       wbapp.scriptWait = function(url, data, func) {
-        wb_ajaxWait([{
-          async: false,
-          type: 'POST',
-          dataType: 'script',
-          data: data,
-          url: url,
-          success: function(data) {
-            if (func !== undefined) {
-              func(data);
-            }
-          }
-        }]);
+                new Promise(function (resolve, reject) {
+                        var s;
+                        s = document.createElement('script');
+                        s.src = url;
+                        s.onload = resolve;
+                        s.onerror = reject;
+                        document.head.appendChild(s);
+                });
       }
 
 
@@ -908,7 +904,7 @@ function wb_plugins() {
           $(this).val(wb_oconv_object(this));
         }
         $(this).addClass("wb-plugin");
-        var lang = "ru";
+        var lang = wbapp.settings.js_locale;
         if ($(this).attr("data-wb-lang") !== undefined) {
           lang = $(this).attr("data-wb-lang");
         }
@@ -931,7 +927,7 @@ function wb_plugins() {
           $(this).val(wb_oconv_object(this));
         }
         $(this).addClass("wb-plugin");
-        var lang = "ru";
+        var lang = wbapp.settings.js_locale;
         if ($(this).attr("data-wb-lang") !== undefined) {
           lang = $(this).attr("data-wb-lang");
         }
@@ -953,7 +949,7 @@ function wb_plugins() {
           $(this).val(wb_oconv_object(this));
         }
         $(this).addClass("wb-plugin");
-        var lang = "ru";
+        var lang = wbapp.settings.js_locale;
         if ($(this).attr("data-wb-lang") !== undefined) {
           lang = $(this).attr("data-wb-lang");
         }
@@ -1115,9 +1111,10 @@ function wb_plugin_editor() {
       }
       var editor = $(this).ckeditor();
       CKEDITOR.config.extraPlugins = 'youtube';
-      //CKEDITOR.config.skin = 'bootstrapck';
+      CKEDITOR.config.skin = 'office2013';
       CKEDITOR.config.allowedContent = true;
       CKEDITOR.config.forceEnterMode = true;
+      CKEDITOR.config.language = wbapp.settings.js_locale;;
       CKEDITOR.plugins.registered['save'] = {
         init: function(editor) {
           var command = editor.addCommand('save', {
@@ -1147,6 +1144,7 @@ function wb_plugin_editor() {
                 var form = $(document).find("textarea#" + instance).parents("form[data-wb-form]").attr("data-wb-form");
                 var item = $(document).find("textarea#" + instance).parents("form[data-wb-item]").attr("data-wb-item");
                 var fldname = $(document).find("textarea#" + instance).attr("name");
+
                 var value = CKEDITOR.instances[i].getData();
                 $(document).data("wb_editor_change",true);
                 $(document).trigger("wb_editor_change", {

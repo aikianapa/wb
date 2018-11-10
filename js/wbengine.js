@@ -17,7 +17,14 @@ function wb_include(url,defer,async) {
     });
     if (res==false) {
                 if (url.substr(-3) == ".js" ) {
-                        $.getScript( url );
+                        new Promise(function (resolve, reject) {
+                                var s;
+                                s = document.createElement('script');
+                                s.src = url;
+                                s.onload = resolve;
+                                s.onerror = reject;
+                                document.head.appendChild(s);
+                        });
                 } else {
                         if (url.substr(-4) == ".css" ) {
                                     var inc = document.createElement('link');
@@ -41,4 +48,4 @@ function wb_include(url,defer,async) {
 
 var defer = wb_include("/engine/js/php.js");
 var defer = wb_include("/engine/js/jquery.redirect.js");
-var defer = wb_include("/engine/js/functions.js",true);
+var defer = wb_include("/engine/js/functions.js");

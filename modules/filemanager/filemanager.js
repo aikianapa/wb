@@ -425,11 +425,12 @@
                 $("#filemanagerSrc .tab-pane").removeClass("active");
                 $("#filemanagerSrc").append($(tab_cont).html());
         }
-        console.log(tab_id);
         filemanagerEditFile(file);
 
         $("#filemanagerTabs").undelegate(".fa-close", "click");
         $("#filemanagerTabs").delegate(".fa-close", "click", function() {
+            var tab_id=$(this).parents(".nav-link").attr("href");
+            $("#filemanagerModalSrc "+tab_id).remove();
             $(this).parents(".nav-item").remove();
             if (!$("#filemanagerTabs .nav-item").length) {
                 $("#filemanagerModalSrc").modal("hide");

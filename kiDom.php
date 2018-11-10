@@ -1418,7 +1418,7 @@ abstract class kiNode
                         $sc->remove();
                         break;
                     case "datepicker" :
-                        $lang=substr($_SESSION["lang"],0,2);
+                        $lang=$_ENV["settings"]["js_locale"];
                         if ($sc->attr("data-wb-lang")>"") {
                             $lang=$sc->attr("data-wb-lang");
                         }
@@ -1430,7 +1430,7 @@ abstract class kiNode
                     case "plugins" :
                         $sc->before('<link href="/engine/js/plugins/plugins.css" rel="stylesheet">');
                         $sc->after('<script src="/engine/js/plugins/plugins.js"></script>');
-                        $lang="en";
+                        $lang=$_ENV["settings"]["js_locale"];
                         if ($sc->attr("data-wb-lang")>"") {
                             $lang=$sc->attr("data-wb-lang");
                         }

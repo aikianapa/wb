@@ -1,13 +1,14 @@
-	var module_editarea = function(id) {
+		var module_editarea = function(id) {
 		$(document).data("wb_source_change",false);
 		var taid="#"+id;
 		var $edit=$(taid);
+		if (!$edit.length) return;
 		var height = $edit.attr("height");
 		var value = $edit.html();
 		var fldname = $edit.attr("name");
 		var theme = "chrome";
 		var form = $edit.parents("form").attr("data-wb-form");
-		var item = $edit.parents("item").attr("data-wb-item");
+		var item = $edit.parents("form").attr("data-wb-item");
 		var fsize = $(document).data("modEditAreaFsize");
 		var file=$("#ed_"+id).attr("data-wb-file");
 		if (fsize == undefined || fsize == "") {
@@ -32,7 +33,6 @@
 		editor.resize(true);
 		editor.getSession().setMode("ace/mode/html");
 		editor.setFontSize(fsize);
-		var value="";
 		if (file!==undefined && file!=="") {
 			wbapp.postWait("/module/filemanager/getfile/", {
 			    file: file
@@ -68,9 +68,7 @@
 
 		$(document).on("wb_editor_change", function(e, data) {
 			if ($(document).data("wb_editor_change")==true) {
-				console.log(data);
-				console.log(form,item,fldname);
-				if (data.field == fldname && data.form == item && data.form == form) {
+				if (data.field == fldname && data.item == item && data.form == form) {
 					editor.getSession().setValue(data.value);
 				}
 				$(document).data("wb_editor_change",false);
@@ -177,3 +175,4 @@
 		toolbar();
 	}
 
+$(document).trigger('module_editarea_loaded');

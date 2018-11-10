@@ -92,6 +92,9 @@ function wbInitEnviroment()
         }
     }
 
+        $_ENV["settings"]["js_locale"]=substr($_SESSION["lang"],0,2);
+
+
     if (isset($_ENV['settings']['path_tpl']) and $_ENV['settings']['path_tpl'] > '') {
         $_ENV['path_tpl'] = $_ENV['path_app'].$_ENV['settings']['path_tpl'];
     }
@@ -2227,7 +2230,7 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2, $vars = null)
                             $pos = strlen($res[4][$i][0]);
                         }
                         $sub .= wbSetQuotes(substr($In, $pos, strlen($In) - $pos));		// индексная часть текущей вставки с добавленными кавычками у текстовых индексов
-                        if (!eval('return is_array('.$sub.');')) {
+                        if (eval('return isset('.$sub.');') AND !eval('return is_array('.$sub.');')) {
                                 $Item=wbsvRestoreValue($Item,$sub);
                         }
                         if (eval('return isset('.$sub.');')) {

@@ -5,12 +5,12 @@
 
 CKEDITOR.editorConfig = function( config ) {
 	// Define changes to default configuration here. For example:
-	config.language = 'ru';
-    config.skin = 'bootstrapck';
+    //config.language = 'ru';
+    //config.skin = 'bootstrapck';
     config.allowedContent = true;
     config.forceEnterMode = true;
     config.basicEntities = true;
-    
+
 	// config.uiColor = '#AADC6E';
     config.toolbarGroups = [
 /*                {
