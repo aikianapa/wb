@@ -368,6 +368,7 @@ function wb_tree() {
       //setTimeout(function () {$(tree).treeStore();}, 200);
       $(tree).treeStore();
     });
+
     // contextmenu
     $(this).undelegate(".wb-tree-item", "contextmenu");
     $(this).delegate(".wb-tree-item", "contextmenu", function(e) {
@@ -1144,8 +1145,9 @@ function wb_plugin_editor() {
                 var form = $(document).find("textarea#" + instance).parents("form[data-wb-form]").attr("data-wb-form");
                 var item = $(document).find("textarea#" + instance).parents("form[data-wb-item]").attr("data-wb-item");
                 var fldname = $(document).find("textarea#" + instance).attr("name");
-
                 var value = CKEDITOR.instances[i].getData();
+                $(document).find("textarea#" + instance).trigger("change");
+
                 $(document).data("wb_editor_change",true);
                 $(document).trigger("wb_editor_change", {
                         "form": form,
@@ -1158,8 +1160,6 @@ function wb_plugin_editor() {
     }
   }
 }
-
-
 
 $(document).on("wb_source_change", function(e, data) {
         if ($(document).data("wb_source_change")==true) {

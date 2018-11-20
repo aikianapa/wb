@@ -9,10 +9,13 @@
  * @link http://simplehtmldom.sourceforge.net/
  *
  * @modifier Oleg Frolov <oleg_frolov at mail.ru>
+ * @link https://github.com/aikianapa/wb/
+ * @link http://wbcms.online/
+ *
+ *
  * @license MIT
  */
 
-// Steart Router Class
 
 final class wbRouter {
 
