@@ -3,7 +3,7 @@
 				<div class="cart-item row" id="{{form}}_{{item}}">
 					<div class="col-12 col-sm-2 col-xs-12 text-center" data-wb-role="formdata" data-wb-table="{{form}}" data-wb-item="{{item}}" data-wb-hide="wb">
 						<meta data-wb-role="variable" var="prod_name" value="{{name}}" data-wb-hide="*">
-						<a href="/{{form}}/show/{{id}}">
+						<a href="/{{%form}}/show/{{%id}}">
 							<img alt="" data-wb-role="thumbnail" size="100px;100px;src" contain="true" offset="50%;50%" class="img-responsive" src="0">
 						</a>
 					</div>
@@ -37,7 +37,7 @@
                 <div class="col-12">
 				<a href="/" class="btn btn-primary">{{_LANG[continue]}}</a>
                     &nbsp;
-				<a href="#" class="btn btn-success" data-toggle="modal" data-target="#modalOrder">{{_LANG[checkout]}}</a>
+				<a href="#" class="btn btn-success" onclick="wbapp.merchantModal('show')">{{_LANG[checkout]}}</a>
                     &nbsp;
 				<a href="#" class="btn btn-danger cart-clear">{{_LANG[clear]}}</a>
                 </div>
@@ -49,10 +49,6 @@
 		</div>
 		<div class="col-xs-11">
 			<p>{{_LANG[success]}}</p>
-		</div>
-	</div>
-	<div data-wb-role="where" data='"{{_SESSION[settings][checkout]}}">""' data-role-hide="true">
-		<div data-wb-role="include" data-wb-ajax="/engine/ajax.php?mode=checkout&form={{_SESSION[settings][checkout]}}" autoload="true" id="orderCheckout"  style="display:none;">
 		</div>
 	</div>
 

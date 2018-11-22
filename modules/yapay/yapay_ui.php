@@ -1,31 +1,32 @@
 <div data-wb-role="include" src="modal" data-wb-id="yapayModal">
-    <form method="POST" action="https://money.yandex.ru/quickpay/confirm.xml" data-wb-html="#yapayModal .modal-body"> 
-        <h3 class="modal-title" data-wb-html="#yapayModal .modal-header">Выберите способ оплаты</h3>
-        <div class="row">
+    <form method="POST" action="https://money.yandex.ru/quickpay/confirm.xml" data-wb-html="#yapayModal .modal-body">
+        <h3 class="modal-title" data-wb-html="#yapayModal .modal-header">{{_LANG[header]}}</h3>
+        <div class="row" data-wb-role="formdata" data-wb-form="orders" data-wb-item="{{_SESS[order_id]}}">
 			<div class="col-12 col-xs-12 col-sm-6">
-				<input type="hidden" name="receiver" value="{{receiver}}"> 
-				<input type="hidden" name="short-dest" value="Оплата заказа {{_ENV[host]}} № {{id}}"> 
-				<input type="hidden" name="label" value="{{id}}"> 
+				<input type="hidden" name="receiver" value="{{receiver}}">
+				<input type="hidden" name="short-dest" value="Оплата заказа {{_ENV[host]}} № {{id}}">
+				<input type="hidden" name="label" value="{{id}}">
+                                <input type="hidden" name="language" value="{{_SESS[lang]}}">
 				<input type="hidden" name="quickpay-form" value="shop">
 				<input type="hidden" name="successURL" value="{{_ENV[route][hostp]}}/module/yapay/success/{{id}}/{{apikey}}">
-				<input type="hidden" name="targets" value="Заказ {{id}}"> 
-				<input type="hidden" name="sum" value="{{total}}" data-type="number"> 
-				<input type="hidden" name="comment" value=""> 
-				<input type="hidden" name="need-fio" value="false"> 
-				<input type="hidden" name="need-email" value="false"> 
-				<input type="hidden" name="need-phone" value="false"> 
-				<input type="hidden" name="need-address" value="false"> 
-				<label><i class="fa ya-card"></i> <input type="radio" name="paymentType" value="AC" checked> Банковской картой</label> 
+				<input type="hidden" name="targets" value="Заказ {{id}}">
+				<input type="hidden" name="sum" value="{{total}}" data-type="number">
+				<input type="hidden" name="comment" value="">
+				<input type="hidden" name="need-fio" value="false">
+				<input type="hidden" name="need-email" value="false">
+				<input type="hidden" name="need-phone" value="false">
+				<input type="hidden" name="need-address" value="false">
+				<label><i class="fa ya-card"></i> <input type="radio" name="paymentType" value="AC" checked> {{_LANG[ac]}}</label>
 				<br>
-				<label><i class="fa ya-wallet"></i> <input type="radio" name="paymentType" value="PC"> Яндекс.Деньгами</label>
+				<label><i class="fa ya-wallet"></i> <input type="radio" name="paymentType" value="PC"> {{_LANG[pc]}}</label>
 				<br>
-				<label> <i class="fa ya-phone"></i> <input type="radio" name="paymentType" value="MC"> С баланса телефона</label>
+				<label> <i class="fa ya-phone"></i> <input type="radio" name="paymentType" value="MC"> {{_LANG[mc]}}</label>
 			</div>
 			<div class="col-12 col-xs-12 col-sm-6">
 				<h1>{{total}}</h1>
 			</div>
 		</div>
-        <input type="button" onClick="$('#yapayModal form').trigger('submit');" class="btn btn-secondary yapay-button" value="Продолжить"  data-wb-html="#yapayModal .modal-footer">
+        <input type="button" onClick="$('#yapayModal form').trigger('submit');" class="btn btn-primary yapay-button" value="{{_LANG[continue]}}"  data-wb-html="#yapayModal .modal-footer">
     </form>
 </div>
 <style>
@@ -50,4 +51,18 @@
             }
         });
     };
+</script>
+<script type="text/locale">
+[eng]
+header          = "Choose payment method"
+continue        = "Continue"
+ac              = "Credit card"
+pc              = "Yandex.Money"
+mc              = "Mobile ballnce"
+[rus]
+header          = "Выберите способ оплаты"
+continue        = "Продолжить"
+ac              = "Банковской картой"
+pc              = "Яндекс.Деньгами"
+mc              = "С баланса телефона"
 </script>

@@ -741,6 +741,7 @@ function wbTreeRead($name)
 {
     wbTrigger('form', __FUNCTION__, 'BeforeTreeRead', func_get_args(), array());
     $tree = wbItemRead('tree', $name);
+    if ($_ENV["last_error"]==1006) return null;
     if (!isset($tree['tree'])) {
         $tree['tree'] = array();
     } else {

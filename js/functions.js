@@ -1,3 +1,4 @@
+"use strict"
 var wbapp = new Object();
 $(document).ready(function(){
         wb_init();
@@ -172,7 +173,7 @@ function wb_ajaxWait(ajaxObjs, fn) {
 }
 
 function wb_merchant_modal(mode) {
-  var merchant = wbapp.settings().merchant;
+  var merchant = wbapp.settings.merchant;
   if (mode == undefined) {
     mode = "show";
   }

@@ -117,10 +117,8 @@ function wbCartCalcTotal($order)
 {
     $order['total'] = 0;
     foreach ($order['items'] as $item) {
-        $order['total'] += $item['count'] * $item['price'];
+        $order['total'] += intval($item['quant']) * intval($item['price']);
     }
-    unset($item);
-
     return $order['total'];
 }
 
