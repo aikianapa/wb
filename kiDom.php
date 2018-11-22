@@ -555,6 +555,7 @@ class ki extends CLexer
         if ($file=="") {
             return ki::fromString("");
         } else {
+                if (!session_id()) {session_start();}
             $context = stream_context_create(array(
                                                  'http'=>array(
                                                          'method'=>"POST",
@@ -581,7 +582,7 @@ class ki extends CLexer
                 flock ($fp, LOCK_UN);
                 fclose ($fp);
             }
-
+            session_start(); // reopen session after session_write_close()
             return ki::fromString($res);
         }
     }

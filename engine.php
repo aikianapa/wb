@@ -1,5 +1,5 @@
 <?php
-if (!isset($_SESSION)) {session_start();}
+session_start();
 require_once __DIR__."/functions.php";
 wbInit();
 $cache=wbCacheCheck();
@@ -37,6 +37,6 @@ if ($cache["check"]===null) {
 } else if ($cache["check"]===true) {
 	$html=$cache["data"];
 }
-echo $html;
 session_write_close();
+echo $html;
 ?>
