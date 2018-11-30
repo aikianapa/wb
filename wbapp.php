@@ -1,33 +1,75 @@
 <?php
-
 class wbApp {
-    public static $settings = array();
-    public static $route = array();
-    
+    public $settings;
+    public $route;
+    public $data;
+    public $dom;
+    public $template;
+
     public function __construct() {
         include_once (__DIR__."/functions.php");
-        
     }
-    
+
     function __call($func, $params){
-        $func="wb".$func;
-        if (is_callable($func)) {
-            return call_user_func_array($func,$params);
+        $wbfunc="wb".$func;
+        if (is_callable($wbfunc)) {
+                $res = call_user_func_array($wbfunc,$params);
+                if ($func=="Init") {
+                        $this->settings();
+                        $this->getRoute();
+                }
+                return $res;
+        } else if (!is_callable($func)) {
+            die("Функция {$wbfunc} не существует");
         } else {
-            die("Функция wb{$func} не существует");
+            return call_user_func_array($func,$params);
         }
     }
 
-    public function settings() {
-        self::$settings=$_ENV["settings"];
-        return self::$settings;
-    }
-    
-    public function getRoute() {
-        self::$route=$_ENV["route"];
-        return self::$route;
-    }
+        public function settings() {
+        $this->settings=$_ENV["settings"];
+        return $this->settings;
+        }
+
+        public function getRoute() {
+                $this->route=$_ENV["route"];
+                return $this->route;
+        }
+
+        public function variable($name,$value="__wbVarNotAssigned__") {
+        if ($value=="__wbVarNotAssigned__") {
+                return $this->data[$name];
+        }
+        $this->data[$name]=$value;
+        return $this->data;
+        }
+
+        public function data($data="__wbVarNotAssigned__") {
+        if ($data=="__wbVarNotAssigned__") {
+                return $this->data;
+        }
+        $this->data=$data;
+        return $this->data;
+        }
+
+        public function template($name="default.php") {
+                $this->template=wbGetTpl($name);
+                return $this->template;
+        }
+
+        public function form($form="pages",$mode="show",$engine=false) {
+                $this->template=wbGetForm($form,$mode,$engine);
+                return $this->template;
+        }
+
+        public function dom() {
+                $this->dom=$this->template->clone();
+                $this->dom->wbSetData($this->data);
+                return $this->dom;
+        }
+
+        public function html() {
+                return $this->dom()->outerHtml();
+        }
 }
-
-
 ?>

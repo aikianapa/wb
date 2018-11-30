@@ -2001,7 +2001,6 @@ abstract class kiNode
                 $$tmp=$attr."";
             }
         };
-
         unset($attrs);
         if (isset($form) AND isset($item) AND !isset($path)) {
                 $Item["path"]="/uploads/{$form}/{$item}";
@@ -2022,6 +2021,7 @@ abstract class kiNode
                         $out->find(".wb-uploader")->attr("data-wb-path",$Item["path"]);
                 }
         } else {
+                $out->find(".wb-uploader")->attr("data-wb-path",$path);
                 $Item["path"]=$path;
         }
 
@@ -2036,6 +2036,7 @@ abstract class kiNode
         $out->wbSetData($Item);
         $this->replaceWith($out);
     }
+
 
     public function tagMultiInput($Item) {
         $len=count($this->find("input,select,textarea"));

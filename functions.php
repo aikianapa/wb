@@ -1768,6 +1768,8 @@ function wbWhereItem($item, $where = null)
             $phpif = wbWherePhp($where, $item);
         }
         if ($phpif > '') {
+               // echo $where."<br>";
+               // echo $phpif."<br>";
             @eval('if ( '.$phpif.' ) { $res=1; } else { $res=0; } ;');
         }
     }
@@ -1775,8 +1777,80 @@ function wbWhereItem($item, $where = null)
     return $res;
 }
 
+
+function wbWherePhp_NEW($str = '', $item = array()) {
+        $str = wbSetValuesStr($str, $item);
+        $where=""; $func=""; $last=""; $fld="";
+        $cond=array( "=>","<=",">","<","=","<>","==","!==" );
+        $logic=array( 'AND', 'OR', 'LIKE', 'NOT_LIKE', '&&', '||', 'IN_ARRAY', '(', ')' ,",", '"');
+
+        preg_match_all('/\"([^\"]+)\"|\"\"|\w+(?!\")|\d|(AND|OR|NOT|LIKE|NOT_LIKE|&&|\|\|)|,|(\(|\)|\(|\)|!==|==|=>|<=|<>|<|=)|(\|@)|\D|\W|\b/iu', $str, $arr); // возникают ошибки если в тексте пробел
+        $flag_l=$flag_f=false;
+        foreach($arr[0] as $a => $el) {
+                if ($last!=="" AND $flag_f==false) {$where .= $last; $last="";}
+                if ($last!=="" AND $flag_f==true AND $fld!=="") {$func.= $last; $last="";}
+                if ($last!=="" AND $flag_f==true AND $fld=="") {$fld = $last; $last="";}
+                if ($last=="" AND $fld=="" AND !in_array($el,$cond) AND !in_array($el,$logic) AND substr(trim($el),0,1)!=='"') {
+                        $fld = '$item["' . $el . '"]';
+                        $flag_l = true;
+                }
+
+                if ($fld=="") {$fld=$last;}
+                if (in_array($el,$cond) ) {
+                    $el = strtr($el, array(
+                    '=' => ' == ',
+                    '>' => ' > ',
+                    '<' => ' < ',
+                    '>=' => ' >= ',
+                    '<=' => ' <= ',
+                    '<>' => ' !== ',
+                    '!=' => ' !== ',
+                    '!==' => ' !== ',
+                    '#' => ' !== ',
+                    '==' => ' == ',
+                    ));
+                    $fld = "";
+                }
+                if (in_array($el,$logic) ) {
+                        $el = strtr($el, array(
+                                '&&' => 'AND',
+                                '||' => 'OR'
+                        ));
+                }
+
+                if ($flag_f == false) {
+                        if ($el == "|@" ) {
+                                $flag_f = true;
+                        } else {
+                                if ($flag_l!==true) $last = $el;
+                        }
+                } else if ($flag_f == true) {
+                        if (trim($el) == ")") {
+                                $flag_f=false;
+                                $last=$func.$el;
+                                $last=str_replace('$this',$fld,$last);
+                                $func="";
+                                $fld="";
+                        } else if (trim($el) == "(")  {
+                                $last=$el."";
+                        } else {
+                                $last=$el;
+                                $flag_l=false;
+                        }
+                }
+
+        }
+        if ($last!=="" AND $flag_f==false) {$where .= $last; $last="";}
+
+        return $where;
+}
+
+
+
+
 function wbWherePhp($str = '', $item = array())
 {
+
     $str = ' '.trim(strtr($str, array(
                     '(' => ' ( ',
                     ')' => ' ) ',
@@ -2231,7 +2305,7 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2, $vars = null)
                             $pos = strlen($res[4][$i][0]);
                         }
                         $sub .= wbSetQuotes(substr($In, $pos, strlen($In) - $pos));		// индексная часть текущей вставки с добавленными кавычками у текстовых индексов
-                        if (eval('return isset('.$sub.');') AND !eval('return is_array('.$sub.');')) {
+                        if (!eval('return is_array('.$sub.');')) {
                                 $Item=wbsvRestoreValue($Item,$sub);
                         }
                         if (eval('return isset('.$sub.');')) {
