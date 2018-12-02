@@ -1,8 +1,8 @@
-<div class="wb-uploader single wbImagesAll">
+<div class="wb-uploader single wbImagesAll" >
 	<input type="hidden" name="{{name}}">
 	<div id="filelist" class="list-group">{{_LANG[error]}}</div>
 	<div class="uploader">
-		<ul class="gallery list-inline row" data-wb-role="foreach" data-wb-from="{{name}}" data-wb-limit="1" data-wb-tpl="false" data-wb-hide="wb">
+		<ul class="gallery list-inline row" data-wb-role="foreach" data-wb-from="{{name}}" data-wb-limit="1" data-wb-hide="data-wb-role, data-wb-from, data-wb-limit">
 			<li class="col thumbnail" data-name="{{img}}" title="{{title}}" alt="{{alt}}" >
 				<img data-wb-role='thumbnail' size='{{_ENV[thumb_width]}};{{_ENV[thumb_height]}}' style='height:auto;' class='col img-fluid' src="{{%path}}/{{img}}" />
 				<!--a href="#" class="btn btn-outline-primary delete" data-toggle="dropdown"><span class="fa fa-trash"></span></a>

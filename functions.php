@@ -403,6 +403,7 @@ function wbMerchantList($type = 'both')
 
 function wbFieldBuild($param, $data = array(),$locale=array())
 {
+
     $set = wbGetForm('common', 'tree_fldset');
     $tpl = wbGetForm('snippets', $param['type']);
     $opt = json_decode($param['prop'], true);
@@ -417,6 +418,7 @@ function wbFieldBuild($param, $data = array(),$locale=array())
         $options .= ' disabled ';
     }
     $param['options'] = trim($options);
+
     switch ($param['type']) {
         case 'number':
             if (isset($opt['min'])) {
@@ -493,10 +495,16 @@ function wbFieldBuild($param, $data = array(),$locale=array())
 
             break;
     }
+    if (isset($param["style"]) AND $param["style"]>"") {
+            $style=$tpl->attr("style");
+            $tpl->find(":first")->attr("style",$style.$param["style"]);
+    }
+
     $set->find('.form-group > label')->html($param['label']);
     $set->find('.form-group > div')->html($tpl->outerHtml());
     $set->wbSetData($param);
     $set->wbSetValues($data);
+
     return $set->outerHtml();
 }
 
@@ -2305,7 +2313,7 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2, $vars = null)
                             $pos = strlen($res[4][$i][0]);
                         }
                         $sub .= wbSetQuotes(substr($In, $pos, strlen($In) - $pos));		// индексная часть текущей вставки с добавленными кавычками у текстовых индексов
-                        if (!eval('return is_array('.$sub.');')) {
+                        if (eval('return isset('.$sub.');') AND !eval('return is_array('.$sub.');')) {
                                 $Item=wbsvRestoreValue($Item,$sub);
                         }
                         if (eval('return isset('.$sub.');')) {
