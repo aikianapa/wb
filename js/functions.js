@@ -1,41 +1,70 @@
 "use strict"
 var wbapp = new Object();
-$(document).ready(function(){
-        wb_init();
+$(function(){
+        var loading = setInterval(function(){
+                if ($(document).data("wb_include").length >= 3) {
+                        wb_init();
+                        clearInterval(loading);
+                }
+        },50);
 });
 
 function wb_init() {
       if ($("link[rel$=less],style[rel$=less]").length) wb_include("/engine/js/less.min.js");
-      wbapp.ajaxWait = function(options) {
-        wb_ajaxWait([options]);
-      }
-      wbapp.getWait = function(url, data, func) {
-        wb_ajaxWait([{
-          async: false,
-          type: 'GET',
-          data: data,
-          url: url,
-          success: function(data) {
-            if (func !== undefined) {
-              func(data);
-            }
-          }
-        }]);
-      }
-      wbapp.postWait = function(url, data, func) {
-        wb_ajaxWait([{
-          async: false,
-          type: 'POST',
-          data: data,
-          url: url,
-          success: function(data) {
-            if (func !== undefined) {
-              func(data);
-            }
-          }
-        }]);
-      }
-      wbapp.scriptWait = function(url, data, func) {
+        var wb_getsysmsg = function() {
+                if ($("#setup.wbengine").length) {
+                        var url = "/engine/ajax.php?getsysmsg"
+                } else {
+                        var url = "/ajax/getsysmsg/"
+                }
+                var sysmsg=null;
+                wbapp.getWait(url, {}, function(data) {
+                        sysmsg = $.parseJSON(base64_decode(data));
+                });
+                return sysmsg;
+        }
+
+        var wb_getlocale = function(type,name) {
+                var url = "/ajax/getlocale/";
+                var msg = null;
+                if (type == "url") {url = name;}
+                wbapp.postWait(url, {"type":type,"name":name}, function(data) {
+                        msg = $.parseJSON(base64_decode(data));
+                });
+                return msg;
+        }
+
+
+        wbapp.ajaxWait = function(options) {
+                wb_ajaxWait([options]);
+        }
+        wbapp.getWait = function(url, data, func) {
+                wb_ajaxWait([{
+                  async: false,
+                  type: 'GET',
+                  data: data,
+                  url: url,
+                  success: function(data) {
+                    if (func !== undefined) {
+                      func(data);
+                    }
+                  }
+                }]);
+        }
+        wbapp.postWait = function(url, data, func) {
+                wb_ajaxWait([{
+                  async: false,
+                  type: 'POST',
+                  data: data,
+                  url: url,
+                  success: function(data) {
+                    if (func !== undefined) {
+                      func(data);
+                    }
+                  }
+                }]);
+        }
+        wbapp.scriptWait = function(url, data, func) {
                 new Promise(function (resolve, reject) {
                         var s;
                         s = document.createElement('script');
@@ -44,7 +73,7 @@ function wb_init() {
                         s.onerror = reject;
                         document.head.appendChild(s);
                 });
-      }
+        }
 
 
       wbapp.settings = wb_settings();
@@ -93,29 +122,6 @@ function wb_settings() {
       });
       return settings;
   }
-}
-
-var wb_getsysmsg = function() {
-        if ($("#setup.wbengine").length) {
-                var url = "/engine/ajax.php?getsysmsg"
-        } else {
-                var url = "/ajax/getsysmsg/"
-        }
-        var sysmsg=null;
-        wbapp.getWait(url, {}, function(data) {
-                sysmsg = $.parseJSON(base64_decode(data));
-        });
-        return sysmsg;
-}
-
-var wb_getlocale = function(type,name) {
-        var url = "/ajax/getlocale/";
-        var msg = null;
-        if (type == "url") {url = name;}
-        wbapp.postWait(url, {"type":type,"name":name}, function(data) {
-                msg = $.parseJSON(base64_decode(data));
-        });
-        return msg;
 }
 
 
@@ -1325,15 +1331,19 @@ function wb_oconv(value, type, obj) {
 
 function wb_formsave_obj(formObj) {
   if (wb_check_required(formObj)) {
-    var name = formObj.attr("data-wb-form");
+    var name = form = formObj.attr("data-wb-form");
     var item = formObj.attr("data-wb-item");
     var oldi = formObj.attr("data-wb-item-old");
     $(document).trigger("wb_before_formsave", [name, item, form, true]);
     console.log("call: wb_before_formsave");
     $(document).trigger(name + "_before_formsave", [name, item, form, true]);
     console.log("call: " + name + "_before_formsave");
-    var ptpl = formObj.attr("parent-template");
+    var ptpl = formObj.attr("data-wb-parent");
     var padd = formObj.attr("data-wb-add");
+    if (ptpl == undefined) {ptpl = $(document).find("[data-wb-add=true][data-wb-form="+form+"][data-wb-role=foreach]").attr("data-wb-tpl");}
+    if (ptpl == undefined) {ptpl = $(document).find("[data-wb-add=true][data-wb-tpl]").attr("data-wb-tpl");}
+
+
     // обработка switch и checkbox
     var ui_switch = "";
     formObj.find("input[type=checkbox]:not(.bs-switch)").each(function() {
@@ -1390,9 +1400,6 @@ function wb_formsave_obj(formObj) {
     }
     if (oldi !== undefined) {
       src += "&copy=" + oldi;
-    }
-    if (ptpl == undefined) {
-      var ptpl = $(document).find("[data-wb-add=true][data-wb-tpl]").attr("data-wb-tpl");
     }
     if ($(this).parents("#engine__setup").length) {
       var setup = true;
@@ -1563,10 +1570,19 @@ function wb_ajax() {
   var that = this;
   var wb_ajax_process = function(that) {
     wb_ajax_loader();
+    var ptpl = false;
     var link = that;
     var src = $(that).attr("data-wb-ajax");
     var start = $(that).attr("data-wb-ajax-start");
     var done = $(that).attr("data-wb-ajax-done");
+    if ($(that).parents("[data-wb-add=true][data-wb-tpl]").length) {
+            ptpl = $(that).parents("[data-wb-add=true][data-wb-tpl]").attr("data-wb-tpl");
+    }
+    if ($(that).attr("data-wb-parent")!==undefined) {
+            console.log(that);
+            ptpl = $(document).find($(that).attr("data-wb-parent")).attr("data-wb-tpl");
+    }
+
     var flag = true;
     var data = {};
     if ($(that).parents("form").length) {
@@ -1586,7 +1602,7 @@ function wb_ajax() {
       console.log(start);
       (eval(start))(link, src, data);
     }
-    console.log("wb_ajax_start");
+    console.log("trigger: wb_ajax_start");
     $(document).trigger("wb_ajax_start", [link, src, data]);
     if (src > "") {
       var ajax = {};
@@ -1614,6 +1630,7 @@ function wb_ajax() {
             }
             $("#" + $(this).attr("id")).remove();
           });
+        if (ptpl!==false) {$(html).find("form[data-wb-form][data-wb-item]:first").attr("data-wb-parent",ptpl);}
           $("script.sc-" + mid).remove();
           $(html).find("script").addClass("sc-" + mid);
           $("style.st-" + mid).remove();
@@ -1664,7 +1681,7 @@ function wb_ajax() {
           if (done !== undefined && is_callable(done)) {
             (eval(done))(link, src, data);
           }
-          console.log("wb_ajax_start");
+          console.log("trigger: wb_ajax_done");
           $(document).trigger("wb_ajax_done", [link, src, data]);
           wb_plugins();
           wb_delegates();

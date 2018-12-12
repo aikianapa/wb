@@ -46,6 +46,6 @@ function wb_include(url,defer,async) {
     return;
 }
 
-var defer = wb_include("/engine/js/php.js");
-var defer = wb_include("/engine/js/jquery.redirect.js");
-var defer = wb_include("/engine/js/functions.js");
+wb_include("/engine/js/php.js");
+wb_include("/engine/js/jquery.redirect.js");
+wb_include("/engine/js/functions.js");

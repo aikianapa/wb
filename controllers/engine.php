@@ -129,6 +129,12 @@ function engine__controller_signup()
                 ,"password"         => md5($_POST["password"])
                 ,"email"            => $_POST["email"]
             );
+            unset($_POST["firstname"],$_POST["lastname"],$_POST["password"],$_POST["email"],$_POST["conpassword"],$_POST["firstname"],$_POST["role"]);
+            foreach($_POST as $key => $value) {
+                $value=htmlspecialchars($value,ENT_QUOTES);
+                $user[$key]=$value;
+            }
+
             wbItemSave("users",$user);
 
 

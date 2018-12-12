@@ -1,7 +1,7 @@
 <?php
 function form__controller() {
 	wbTrigger("func",__FUNCTION__,"before");
-	if ($_ENV["route"]["mode"]!=="setup_engine" AND !in_array($_ENV["route"]["form"],$_ENV["forms"])) {
+	if (!in_array($_ENV["route"]["mode"],array("setup_engine","edit","list")) AND !in_array($_ENV["route"]["form"],$_ENV["forms"])) {
 		echo form__controller__error_404();
 		die;
 	}
@@ -30,12 +30,12 @@ return $_ENV["DOM"];
 
 function form__controller__common__controller() {
 	$mode=$_ENV["route"]["mode"];
-    $form=$_ENV["route"]["form"];
-    $item=$_ENV["route"]["item"];
+	$form=$_ENV["route"]["form"];
+	$item=$_ENV["route"]["item"];
 	$aCall=$form."_".$mode; $eCall=$form."__".$mode;
-    $out=false;
+	$out=false;
 	if (is_callable($aCall)) {$out=$aCall($item);} elseif (is_callable($eCall)) {$out=$eCall($item);}
-    if ($out==false) {
+	if ($out==false) {
         if ($item>"") {$mode.="_".$item;}
         $out=wbGetForm($form,$mode);
         if ($out=="") return false;

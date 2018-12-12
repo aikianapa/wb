@@ -54,16 +54,17 @@ class wbApp {
 
         public function template($name="default.php") {
                 $this->template=wbGetTpl($name);
-                return $this->template;
+                $this->dom=$this->template->clone();
+                return $this->dom;
         }
 
         public function form($form="pages",$mode="show",$engine=false) {
                 $this->template=wbGetForm($form,$mode,$engine);
-                return $this->template;
+                $this->dom=$this->template->clone();
+                return $this->dom;
         }
 
         public function dom() {
-                $this->dom=$this->template->clone();
                 $this->dom->wbSetData($this->data);
                 return $this->dom;
         }
