@@ -18,43 +18,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group row">
-                      <div class="col-sm-6">
-                        <label class="form-control-label">{{_LANG[client]}}</label>
-                        <input type="text" name="name" class="form-control" placeholder="{{_LANG[client]}}">
-                      </div>
-                      <div class="col-sm-3">
-                        <label class="form-control-label">{{_LANG[phone]}}</label>
-                        <input type="phone" name="phone" class="form-control" placeholder="{{_LANG[phone]}}">
-                      </div>
-                      <div class="col-sm-3">
-                        <label class="form-control-label">{{_LANG[email]}}</label>
-                        <input type="email" name="email" class="form-control" placeholder="{{_LANG[email]}}">
-                      </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-12">
-                        <label class="form-control-label">{{_LANG[comments]}}</label>
-                          <textarea rows="auto" name="comments" class="form-control" placeholder="{{_LANG[comments]}}"></textarea>
-                        </div>
-                    </div>
-
-					<div class="form-group row">
-						<div class="col-2">
-						<label class="form-control-label">{{_LANG[active]}}</label>
-						</div>
-						<div class="col-2"><label class="switch switch-success"><input type="checkbox" name="active"><span></span></label></div>
-
-						<div class="col-2">
-						<label class="form-control-label">{{_LANG[paid]}}</label>
-						</div>
-						<div class="col-2"><label class="switch switch-success"><input type="checkbox" name="payed"><span></span></label></div>
-
-						<div class="col-2">
-						<label class="form-control-label">{{_LANG[shipped]}}</label>
-						</div>
-						<div class="col-2"><label class="switch switch-success"><input type="checkbox" name="shipped"><span></span></label></div>
-					</div>
+		<div data-wb-role="include" src="form" data-wb-name="orders_details" data-wb-hide="*"></div>
 
                     <div class="nav-active-primary">
                         <ul class="nav nav-tabs" role="tablist">
@@ -71,18 +35,29 @@
                             <div data-wb-role="multiinput" name="items">
                                 <div class="cart-item col">
                                   <div class="row">
-                                    <input type="hidden" name="item" class="cart-item-id">
-                                    <input type="hidden" name="form" class="cart-item-form">
-                                    <div class="col-5" role="formdata" data-wb-form="{{form}}" data-wb-item="{{item}}">
+				    <input type="hidden" name="id" class="cart-item-id">
+				    <input type="hidden" name="form" class="cart-item-form">
+                                    <div class="col-12 col-sm-5" role="formdata" data-wb-form="{{form}}" data-wb-item="{{id}}">
                                         <input type="text" class="form-control" value="{{name}}">
                                     </div>
-                                    <div class="col-2">
-                                        <input type="number" name="count" min="0" class="form-control cart-item-count" data-wb-enabled="admin manager">
+                                    <div class="col-4 col-sm-2">
+
+					<div class="input-group">
+					    <style>.wb-cart .btn-sm {line-height:30px;}</style>
+					  <div class="input-group-prepend">
+					    <a class="btn btn-sm btn-primary cart-item-minus"><i class="fa fa-minus"></i></a>
+					  </div>
+					  <input type="number" name="quant" min="0" class="text-center form-control cart-item-quant" data-wb-enabled="admin manager">
+					  <div class="input-group-append">
+					    <a class="btn btn-sm btn-success cart-item-plus"><i class="fa fa-plus"></i></a>
+					  </div>
+					</div>
+
                                     </div>
-                                    <div class="col-2">
+                                    <div class="col-4 col-sm-2">
                                         <input type="number" name="price" min="0" class="form-control cart-item-price" data-wb-enabled="admin manager">
                                     </div>
-                                    <div class="col-3">
+                                    <div class="col-4 col-sm-3">
                                         <input type="number" class="form-control cart-item-total" disabled>
                                     </div>
                                   </div>
@@ -111,3 +86,4 @@
     </div>
 </div>
 <script type="text/locale" data-wb-role="inlclude" src="orders_common"></script>
+<script>$(document).trigger("wbapp");</script>

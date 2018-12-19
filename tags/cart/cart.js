@@ -3,6 +3,7 @@ $(document).on("wb-delegates",function(){
 		if ($(this).data("wb_cart")==undefined) {
 			$(this).wbCart();
 		}
+		console.log("Cart init");
 	});
 	//wb_cart();
 });
@@ -144,10 +145,12 @@ $.fn.wbCart = function(param) {
 
 	}
 
-	$cart.delegate("input:not(.cart-item-quant),select,textarea","change", function() {
-		var item = $(this).parents(".cart-item");
-		$cart.trigger("cart-item-recalc", item);
-		$cart.trigger("cart-total-recalc");
+	$cart.delegate("input,select,textarea","change", function() {
+		if ($(this).parents(".cart-table").length) {
+		    var item = $(this).parents(".cart-item");
+		    $cart.trigger("cart-item-recalc", item);
+		    $cart.trigger("cart-total-recalc");
+		}
 	});
 
 	$cart.delegate("input.cart-item-quant","keyup", function() {
@@ -155,7 +158,6 @@ $.fn.wbCart = function(param) {
 		$cart.trigger("cart-item-recalc", item);
 		$cart.trigger("cart-total-recalc");
 	});
-
 
 	$cart.delegate(".add-to-cart", 		"click", function() {$cart.trigger("cart-add-click",	[this]);});
 	$cart.delegate(".cart-clear", 		"click", function() {$cart.trigger("cart-clear",	[this]);});
@@ -246,9 +248,9 @@ function wb_cart() {
 
   $("[data-wb-role=cart]").find("input,select,textarea").off("change");
   $("[data-wb-role=cart]").find("input,select,textarea").on("change", function() {
-    var item = $(this).parents(".cart-item");
-    $(document).trigger("cart-item-recalc", item);
-    $(document).trigger("cart-total-recalc");
+	var item = $(this).parents(".cart-item");
+	$(document).trigger("cart-item-recalc", item);
+	$(document).trigger("cart-total-recalc");
   });
   $(document).undelegate("[data-wb-role=cart] .cart-item *", "click");
   $(document).delegate("[data-wb-role=cart] .cart-item *", "click", function() {
@@ -269,7 +271,7 @@ function wb_cart() {
 
 function wb_cart_item(item) {
   var arr = {};
-  var fld = new Array("id", "form", "count", "price");
+  var fld = new Array("id", "form", "quant", "price");
   var add = $(this).parents("[data-wb-role=cart]").attr("data-wb-update");
   // можно передать список полей, участвующих в пересчёте
   if (add !== undefined && add !== "") {
@@ -290,7 +292,12 @@ function wb_cart_item(item) {
     arr[fldname] = value;
   };
   $(item).find("[name]:input").each(function() {
-    arr[$(this).attr("name")] = $(this).val();
+    if ($(this).attr("data-wb-field")!==undefined) {
+      field = $(this).attr("data-wb-field");
+    } else {
+      field = $(this).attr("name");
+    }
+    arr[field] = $(this).val();
   });
   return arr;
 }
@@ -308,5 +315,14 @@ function wb_cart_get() {
   });
   return cart;
 }
+
+$(document).on("orders_after_formsave",function(event,name,item,form,res){
+//	$("#modalOrder").modal("hide");
+//	$("#orderCheckout").show();
+//	$("[data-role=cart] .cart-table").hide();
+//	$("[data-role=cart] .cart-success").show();
+	//$(document).trigger("cart-clear");
+	wbapp.merchantModal('show');
+});
 
 $(document).trigger("wb-delegates");

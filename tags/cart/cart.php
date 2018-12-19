@@ -5,35 +5,44 @@ class tagCart extends kiNode  {
         $this->DOM = $that;
     }
 
-	public function tagCart($Item) {
-		include($_ENV["path_engine"]."/wbattributes.php");
-		if ($this->DOM->text()=="" AND !isset($mode)) {
-			$mode="list";
-			$tpl=wbGetTpl("/engine/tags/cart/cart_list.php",true);
-			$l=$tpl->wbSetFormLocale();
-			$this->DOM->html($tpl);
-		} else if ($this->DOM->text()=="" AND isset($mode)) {
-			$this->DOM->html(wbFromFile(__DIR__."/cart_{$mode}.php"));
-		} else if ($this->DOM->text()!=="" AND isset($mode)) {
-			$this->DOM->append(wbFromFile(__DIR__."/cart_{$mode}.php"));
-		}
-		if ($mode=="list") {
-			$Item=wbItemRead("orders",$_SESSION["order_id"]);
-			$tplid=uniqId();
-			$this->DOM->attr("data-template",$tplid);
-			$this->DOM->addTemplate($this->innerHtml());
-			if (!$this->DOM->children("[data-wb-role=multiinput][name=items]")->length) $this->DOM->wbSetData($Item);
-			$items=$this->DOM->find(".cart-item");
-			$idx=0;
-			foreach($items as $i) {
-				if ($i->attr("idx")=="") {
-				    $i->attr("idx",$idx);
-				    $idx++;
-				}
-			}
-		}
-		$this->DOM->append('<script data-wb-append="body">$(document).ready(function(){wb_include("/engine/tags/cart/cart.js")});</script>');
-	}
+    public function tagCart($Item) {
+	    include($_ENV["path_engine"]."/wbattributes.php");
+	    if ($this->DOM->text()=="" AND !isset($mode)) {
+		    $mode="list";
+		    $tpl=wbGetTpl("/engine/tags/cart/cart_list.php",true);
+		    $l=$tpl->wbSetFormLocale();
+		    $this->DOM->html($tpl);
+	    } else if ($this->DOM->text()=="" AND isset($mode)) {
+		    $this->DOM->html(wbFromFile(__DIR__."/cart_{$mode}.php"));
+	    } else if ($this->DOM->text()!=="" AND isset($mode)) {
+		    $this->DOM->append(wbFromFile(__DIR__."/cart_{$mode}.php"));
+	    }
+	    if ($mode=="list") {
+		    $Item=wbItemRead("orders",$_SESSION["order_id"]);
+		    $tplid=uniqId();
+		    $this->DOM->attr("data-template",$tplid);
+		    $this->DOM->addTemplate($this->innerHtml());
+
+		    if ($_SESSION["user_id"]>"") {
+			if ($Item["fullname"]=="") $Item["fullname"] = $_SESSION["user"]["first_name"]." ".$_SESSION["user"]["last_name"];
+			if ($Item["email"]=="") $Item["email"] = $_SESSION["user"]["email"];
+			if ($Item["phone"]=="") $Item["phone"] = $_SESSION["user"]["phone"];
+		    }
+
+
+		    if (!$this->DOM->children("[data-wb-role=multiinput][name=items]")->length) $this->DOM->wbSetData($Item);
+		    $this->DOM->find("input[name=fullname]",0)->wbSetValues($Item);
+		    $items=$this->DOM->find(".cart-item");
+		    $idx=0;
+		    foreach($items as $i) {
+			    if ($i->attr("idx")=="") {
+				$i->attr("idx",$idx);
+				$idx++;
+			    }
+		    }
+	    }
+	    $this->DOM->append('<script data-wb-append="body">$(document).on("wbapp",function(){wb_include("/engine/tags/cart/cart.js")});</script>');
+    }
 }
 
 function ajax__cart() {

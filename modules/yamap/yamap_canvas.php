@@ -1,4 +1,4 @@
-<div class="yamap" zoom="10" width="100%" height="400px" style="display:table;">
+<div class="yamap" zoom="10" width="100%" height="400px">
   <input class="yamap_data" name="yamap" type="hidden">
   <div class="yamap_editor form-group" data-wb-role="multiinput" name="yamap">
       <div class="col-sm-5">
@@ -13,11 +13,13 @@
 
 <script data-wb-append="body" defer>
 $(document).ready(function(){
+var loc="{{_SETT[js_locale]}}";
+if (loc==undefined || loc=="") {loc="en";}
 
 if ($(document).data("yamap")==undefined) {
   var fileref=document.createElement("script");
   fileref.type="text/javascript";
-  fileref.src='https://api-maps.yandex.ru/2.1/?lang=ru_RU';
+  fileref.src='https://api-maps.yandex.ru/2.1/?lang='+loc;
   document.getElementsByTagName("head")[0].appendChild(fileref);
   $(document).data("yamap",true);
   setTimeout(function(){ymaps.ready(yamap);},1000);
@@ -57,9 +59,15 @@ function yamap_canvas(canvas) {
 
     if ($(canvas).attr("zoom")>"") { var zoom=$(canvas).attr("zoom")*1;} else { var zoom=10; $(canvas).attr("zoom",zoom);}
     if ($(canvas).attr("height")>"") {$(canvas).height($(canvas).attr("height"));}
-    if ($(canvas).attr("width")>"") {$(canvas).width($(canvas).attr("width"));}
+    //if ($(canvas).attr("width")>"") {$(canvas).width($(canvas).attr("width"));}
     if ($(canvas).attr("name")>"") {$(canvas).find("[name=yamap]").attr("name",$(canvas).attr("name"));}
     if ($(canvas).attr("editable")==undefined) {$(canvas).find(".yamap_editor").remove();} else {$(canvas).find(".yamap_data").remove(); editor=true;}
+
+    var height = $(canvas).height();
+	$(window).on("resize",function(){
+		$(canvas).height=height;
+	});
+
 
     if (editor==true) {
         $(epoints).each(function(i,item){
@@ -165,11 +173,19 @@ function yamap_geo(canvas) {
         var map=$(canvas).data("map");
         var clusterer=$(canvas).data("clusterer");
         var finder=$(this).val();
-        var geo=$(this).parents(".wb-multiinput").find("[data-wb-field=geopos]");
-        var addr=$(this).parents(".wb-multiinput").find("[data-wb-field=address]");
-        var title=$(this).parents(".wb-multiinput").find("[data-wb-field=title]").val();
+        if ($(this).parents(".yamap_editor").find(".wb-multiinput")) {
+		var geo=$(this).parents(".wb-multiinput").find("[data-wb-field=geopos]");
+		var addr=$(this).parents(".wb-multiinput").find("[data-wb-field=address]");
+		var title=$(this).parents(".wb-multiinput").find("[data-wb-field=title]").val();
+	} else {
+		var geo=$(this).parents(".yamap_editor").find("[data-wb-field=geopos]").val();
+		var addr=$(this).parents(".yamap_editor").find("[data-wb-field=address]").val();
+		var title=$(this).parents(".yamap_editor").find("[data-wb-field=title]").val();
+		var zoom=$(this).parents(".yamap_editor").find("[data-wb-field=zoom]").val();
+	}
         var pos=yamap_pos($(geo).val());
-        var zoom=$(this).parents("[zoom]").attr("zoom");
+        if (zoom==undefined) var zoom=$(this).parents("[zoom]").attr("zoom");
+        if (title==undefined) var title="";
 
 
         ymaps.geocode(finder, {results: 1}).then(function(res) {
@@ -183,7 +199,6 @@ function yamap_geo(canvas) {
               , title: title
               , geofld: geo
             };
-
             var myPlacemark=$(geo).data("placemark");
             if (myPlacemark==undefined) {
               yamap_addPiont(canvas,point);

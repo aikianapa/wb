@@ -5,8 +5,6 @@ $.fn.outerHTML = function (s) {
 };
 
 function wb_include(url,defer,async) {
-    if (defer==undefined) {defer=false;}
-    if (async==undefined) {async=false;}
     if ($(document).data("wb_include")==undefined) {
         $(document).data("wb_include",[]);
     }
@@ -37,8 +35,6 @@ function wb_include(url,defer,async) {
                                     inc.rel = "less"
                                     inc.href = url;
                                 }
-                                    inc.async = async;
-                                    inc.defer = defer;
                                     document.getElementsByTagName('body')[0].appendChild(inc);
                         }
             loaded.push(url);
