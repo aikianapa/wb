@@ -2173,6 +2173,8 @@ function wbGetWords($str, $w)
     return $res;
 }
 
+//include("wb_set_values_str.php");
+
 function wbSetValuesStr($tag = '', $Item = array(), $limit = 2, $vars = null)
 {
     if (is_object($tag)) {
@@ -2325,8 +2327,6 @@ function wbSetValuesStr($tag = '', $Item = array(), $limit = 2, $vars = null)
                                 $temp = strtr($temp, array('{{' => '#~#~', '}}' => '~#~#'));
                                 $text .= $temp;
                             }
-
-
                         } else {
                                 $Item = wbsvRestoreValue($Item,$sub);
                                         $tmp=explode("[",$res[2][$i][0]); $tmp=$tmp[0];
@@ -2409,55 +2409,65 @@ function wbsvRestoreValue($Item,$sub) {
 // добавление кавычек к нечисловым индексам
 function wbSetQuotes($In)
 {
-    $err = false;
-    $mask = '`\[(%*[\w\d]+)\]`u';
-    $nBrackets = preg_match_all($mask, $In, $res, PREG_OFFSET_CAPTURE);				// найти индексы без кавычек
-    if (false !== $nBrackets) {
-        if (0 == $nBrackets) {
-            if ('["' !== substr($In, 0, 2)) {
-                if (!is_numeric($In)) {
-                    $In = '"'.$In.'"';
-                }
-                $In = '['.$In.']';
-            }
-        } else {
-            for ($i = 0; $i < $nBrackets; ++$i) {
-                if (!is_numeric($res[1][$i][0])) {
-                    $In = str_replace('['.$res[1][$i][0].']', '["'.$res[1][$i][0].'"]', $In);
-                }
-            }
-        }
-    }
-
-    return $In;
+	$err = false;
+	$mask = '`\[(%*[\w\d]+)\]`u';
+	$nBrackets = preg_match_all($mask, $In, $res, PREG_OFFSET_CAPTURE);				// найти индексы без кавычек
+	if ($nBrackets === false)
+	{
+		echo 'Ошибка в шаблоне индексов. Обратитесь к разработчику.' . '<br>';
+		$err = true;
+	} else
+	{
+		if ($nBrackets == 0)
+		{
+			if (substr($In, 0, 2) != '["')
+			{
+				if (!is_numeric($In)) $In = '"' . $In . '"';
+				$In = '[' . $In . ']';
+			}
+		} else
+		{
+			for ($i = 0; $i < $nBrackets; $i++)
+			{
+				if (!is_numeric($res[1][$i][0])) $In = str_replace('['.$res[1][$i][0].']', '["'.$res[1][$i][0].'"]', $In);
+			}
+		}
+	}
+	return $In;
 }
 
 // заменяем &quot на "
 function wbChangeQuot($Tag)
 {
-    $mask = '`&quot[^;]`u';
-
-    if (is_string($Tag)) {
-        $nQuot = preg_match_all($mask, $Tag, $res, PREG_OFFSET_CAPTURE);				// найти &quot без последеующего ;
-        if (false !== $nQuot) {
-            if (0 == $nQuot) {
-                $In = $Tag;
-            } else {
-                $In = '';
-                $startIn = 0;		// начальная позиция текста за предыдущей заменой
-                for ($i = 0; $i < $nQuot; ++$i) {
-                    $beforSize = $res[0][$i][1] - $startIn;
-                    $In .= substr($Tag, $startIn, $beforSize).'"';		// исходный текст между предыдущей и текущей &quot
-                    $startIn += $beforSize + 5;
-                    if ($i + 1 == $nQuot) {		// это была последняя &quot
-                        $In .= substr($Tag, $startIn, strlen($Tag) - $startIn);
-                    }
-                }
-            }
-        }
-    }
-
-    return $In;
+	$mask = '`&quot[^;]`u';
+	$nQuot = preg_match_all($mask, $Tag, $res, PREG_OFFSET_CAPTURE);				// найти &quot без последеующего ;
+	if ($nQuot === false)
+	{
+		echo 'Ошибка в шаблоне &quot. Обратитесь к разработчику.' . '<br>';
+		$err = true;
+		$In = $tag;
+	} else
+	{
+		if ($nQuot == 0)
+		{
+			$In = $Tag;
+		} else
+		{
+			$In = '';
+			$startIn = 0;		// начальная позиция текста за предыдущей заменой
+			for ($i = 0; $i < $nQuot; $i++)
+			{
+				$beforSize = $res[0][$i][1] - $startIn;
+				$In .= substr($Tag, $startIn, $beforSize) . '"';		// исходный текст между предыдущей и текущей &quot
+				$startIn += $beforSize + 5;
+				if ($i+1 == $nQuot)		// это была последняя &quot
+				{
+					$In .= substr($Tag,  $startIn, strlen($Tag) - $startIn);
+				}
+			}
+		}
+	}
+	return $In;
 }
 
 function wbRole($role, $userId = null)
@@ -2677,6 +2687,8 @@ function wbArraySort($array = array(), $args = array('votes' => 'd'))
         $a = (object) $a;
         $b = (object) $b;
         foreach ($args as $k => $v) {
+		if (isset($a->$k)) $a->$k=mb_strtolower($a->$k);
+		if (isset($b->$k)) $b->$k=mb_strtolower($b->$k);
             if (isset($a->$k) && isset($b->$k)) {
                 if ($a->$k == $b->$k) {
                     continue;

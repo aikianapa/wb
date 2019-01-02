@@ -1,3 +1,9 @@
+@font-face {font-family: 'wblogo'; src: url('/engine/tpl/img/logo/webbasic.woff') format('woff'); font-weight: normal;  font-style: normal;}
+
+.wblogo {font-family:wblogo; top:-1.3rem; font-weight:normal;}
+
+.kt-logo .wblogo {font-size:2.4rem; }
+
 .cursor-wait {
   cursor: wait;
 }

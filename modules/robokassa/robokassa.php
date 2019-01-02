@@ -34,7 +34,7 @@ function robokassa__checkout() {
 	$mrh["inv_id"] = 0; // номер заказа системный (не принимает шестнатиричные)
 	$mrh["Shp_orderId"] = $order["id"];
     $mrh["ResultURL"]=$result_url;
-	$mrh["inv_desc"] = "Кафе Купон - заказ № {$order['id']}"; // описание заказа
+	$mrh["inv_desc"] = "Order № {$order['id']}"; // описание заказа
 	$mrh["summ"] = $order["total"]; // сумма заказа
 	$mrh["currency"] = ""; // предлагаемая валюта платежа
 	$mrh["culture"] = "ru"; // язык

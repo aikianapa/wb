@@ -18,11 +18,10 @@
                         </div>
                     </div>
 
-		<div data-wb-role="include" src="form" data-wb-name="orders_details" data-wb-hide="*"></div>
-
                     <div class="nav-active-primary">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item"><a class="nav-link active" href="#{{_form}}Descr" data-toggle="tab">{{_LANG[prop]}}</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#{{_form}}Delivery" data-toggle="tab">{{_LANG[delivery]}}</a></li>
                             <li class="nav-item"><a class="nav-link" href="#{{_form}}Text" data-toggle="tab">{{_LANG[content]}}</a></li>
                         </ul>
                     </div>
@@ -73,7 +72,7 @@
                             </div>
                             </div>
                         </div>
-
+			<div id="{{_form}}Delivery" class="tab-pane fade" data-wb-role="include" src="form" data-wb-name="orders_details" data-wb-hide="wb" role="tabpanel"></div>
                         <div id="{{_form}}Text" class="tab-pane fade" data-wb-role="include" src="editor" role="tabpanel"></div>
                     </div>
                 </form>

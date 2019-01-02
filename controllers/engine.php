@@ -18,28 +18,32 @@ function engine__controller_login()
 {
     //$user=array("id"=>"admin","password"=>md5("admin"),"role"=>"admin","point"=>"/admin/","active"=>"on");
     //wbItemSave("users",$user);
-    if (isset($_POST["l"]) AND $_POST["l"]>"") {
-        if (strpos($_POST["l"],"@")) {
-            $users=wbItemList("users",'email="'.$_POST["l"].'"');
-            foreach($users as $key => $item) { $_POST["l"]=$item["id"]; break;}
-        }
+    if (is_callable(wbUserLogin)) {
+	return wbUserLogin();
+    } else {
+	if (isset($_POST["l"]) AND $_POST["l"]>"") {
+		if (strpos($_POST["l"],"@")) {
+		    $users=wbItemList("users",'email="'.$_POST["l"].'"');
+		    foreach($users as $key => $item) { $_POST["l"]=$item["id"]; break;}
+		}
 
-        if ($user=wbItemRead("users", $_POST["l"])) {
-                if (isset($user["lang"]) AND $user["lang"]>"") {
-                        $_SESSION["lang"]=$_ENV["lang"]=$user["lang"];
-                }
+		if ($user=wbItemRead("users", $_POST["l"])) {
+			if (isset($user["lang"]) AND $user["lang"]>"") {
+				$_SESSION["lang"]=$_ENV["lang"]=$user["lang"];
+			}
 
-            if ($user["password"]==md5($_POST["p"]) AND $user["active"]=="on") {
-                wbLog("func",__FUNCTION__,100,$_POST);
-                engine__controller_login_success($user);
-            } else {
-                wbTrigger("func",__FUNCTION__,"false",func_get_args(),$user);
-                wbLog("func",__FUNCTION__,101,$_POST);
-            }
-        }
+		    if ($user["password"]==md5($_POST["p"]) AND $user["active"]=="on") {
+			wbLog("func",__FUNCTION__,100,$_POST);
+			engine__controller_login_success($user);
+		    } else {
+			wbTrigger("func",__FUNCTION__,"false",func_get_args(),$user);
+			wbLog("func",__FUNCTION__,101,$_POST);
+		    }
+		}
+	}
+	$_ENV["DOM"]=wbGetTpl("login.htm");
+	return $_ENV["DOM"];
     }
-    $_ENV["DOM"]=wbGetTpl("login.htm");
-    return $_ENV["DOM"];
 }
 
 function engine__controller_login_success($user) {
