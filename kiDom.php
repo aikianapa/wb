@@ -2322,6 +2322,7 @@ abstract class kiNode
         $idx=0;
         if (is_array($tree)) {
             foreach($tree as $i => $item) {
+		$item=wbItemToArray($item);
                 $lvl++;
                 $item=(array)$srcVal + (array)$item;
                 $item["_idx"]=$idx;

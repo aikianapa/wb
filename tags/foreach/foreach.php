@@ -26,19 +26,20 @@ class tagForeach extends kiNode  {
 		        if (!isset($page) OR 1*$page<=0) {
 			         if (!isset($_GET["page"]) OR $_GET["page"]=="") {$page=1;} else {$page=$_GET["page"]*1;}
 		        } else {$page=$page*1;}
-		if ( isset($from) AND $from > "") {
+		if ( isset($from)) {
 			if (isset($Item[$from]) AND !strpos("[",$from)) {
 				//if (isset($Item["form"])) {$table=$Item["form"];} else {$table="";}
 				//if (isset($Item["id"])) {$item=$Item["id"];} else {$item="";}
-				$Item=wbItemToArray($Item[$from]);
 				if (!is_array($Item)) {$Item=json_decode($Item,true);}
+				$Item=wbItemToArray($Item[$from]);
 				if ($field>"") {
-                    $Item=$Item[$field];
-                    if (!is_array($Item)) {$Item=json_decode($Item,true);}
-                }
+					$Item=$Item[$field];
+					if (!is_array($Item)) {$Item=json_decode($Item,true);}
+				}
 			} else {
-                $Item=wbGetDataWbFrom($Item,$from);
-            }
+				$Item=wbGetDataWbFrom($Item,$from);
+				if ($Item==null) $Item=array();
+			}
 		}
 
         if (isset($json) AND $json> "") {
@@ -75,7 +76,7 @@ class tagForeach extends kiNode  {
       					}
       				}
       			}  else {
-                $Item=wbItemList($table,$where);
+				$Item=wbItemList($table,$where);
       			}
         }
                 if (isset($call) AND is_callable($call)) {$Item=@$call();}

@@ -1,10 +1,23 @@
 <?php
+
+function users__list() {
+	$out=wbGetForm($_ENV["route"]["form"],$_ENV["route"]["mode"]);
+	$flag=""; $where=""; $Item=array();
+	if (isset($_ENV["route"]["item"])) $where='role="'.$_ENV["route"]["item"].'"';
+	$Item["result"]=wbItemList($_ENV["route"]["form"],$where);
+	$Item["result"]=wbArraySort($Item["result"],"id");
+	$Item["_table"]=$_ENV["route"]["form"];
+	$out->wbSetData($Item);
+	//if ($flag=="category") {$out->replaceWith($out->find("#{$_ENV["route"]["form"]}List .list")->html());}
+    return $out;
+}
+
 function _usersAfterItemRead($Item) {
 	if (wbLoopCheck(__FUNCTION__,func_get_args())) {return $Item;} else {wbLoopProtect(__FUNCTION__,func_get_args());}
 	if ($_ENV["route"]["mode"]=="edit") {
 	    if (!isset($Item["roleprop"]) OR $Item["roleprop"]=="" OR $Item["roleprop"]=="[]") {
 		if ($Item["id"]=="admin") {
-			$Item["roleprop"]=wbGetUserUi();
+			$Item=array_merge($Item,wbGetUserUi(true));
 		} else {
 			// read admin menu/dashboard config as default
 			$prop=wbItemRead("users",$_SESSION["user_role"]);

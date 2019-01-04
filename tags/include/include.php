@@ -9,7 +9,7 @@ class tagInclude extends kiNode  {
         unset($this->DOM);
     }
 
-    public function tagInclude($Item=array()) {
+    public function tagInclude($Item = array()) {
 	    $_attributes=$this->DOM->attributes();
 	    if ($_attributes) {
                     $_ENV["attributes"]=array();
@@ -23,7 +23,6 @@ class tagInclude extends kiNode  {
                         }; unset($attrs);
                     }
 	    }
-
         if (!isset($src)) {
             $src=$ssrc=$this->DOM->attr("src");
         }

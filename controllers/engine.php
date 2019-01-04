@@ -13,7 +13,6 @@ function engine__controller()
     return $_ENV["DOM"];
 }
 
-
 function engine__controller_login()
 {
     //$user=array("id"=>"admin","password"=>md5("admin"),"role"=>"admin","point"=>"/admin/","active"=>"on");

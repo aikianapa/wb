@@ -72,7 +72,7 @@
                                 <div class="form-group row">
                                     <label class="col-sm-4 form-control-label">{{_LANG[nickname]}}</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" name="name" placeholder="{{_LANG[nickname]}}">
+                                        <input type="text" class="form-control" name="nickname" placeholder="{{_LANG[nickname]}}">
                                     </div>
                                 </div>
 

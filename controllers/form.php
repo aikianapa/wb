@@ -51,8 +51,8 @@ function form__controller__common__controller() {
 
 function form__controller__show() {
 	$form=$_ENV["route"]["form"];
-    $item=$_ENV["route"]["item"];
-    $mode="show";
+	$item=$_ENV["route"]["item"];
+	$mode="show";
     $Item=$_ENV["ITEM"]=wbItemRead($form,$item);
     if (!$Item) {
         $fid=wbFurlGet($form,$item);

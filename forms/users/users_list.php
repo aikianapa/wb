@@ -1,4 +1,3 @@
-
 <div class="element-wrapper">
     <h6 class="element-header">
      {{_LANG[list]}}
@@ -6,7 +5,26 @@
        <i class="fa fa-plus"></i> {{_LANG[add]}}
      </button>
     </h6>
-    <div class="element-box">
+    <div class="element-box row">
+
+
+		<div class="col-sm-3">
+			<div class="row">
+				<div class="content-left">
+	<label class="content-left-label">{{_LANG[groups]}}</label>
+	<ul id="{{_form}}Catalog" data-wb-role="foreach" data-wb-form="users" data-wb-where='isgroup="on" AND active="on"' class="nav mg-t-1-force">
+		<li class="nav-item">
+			<a class="nav-link" data-wb-ajax="/form/list/users/{{id}}/" title="{{name}}" data-wb-html=".content-box">
+				<div class="clearfix">{{id}}</div>
+			</a>
+		</li>
+	</ul>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-sm-9">
+
       <div class="table-responsive">
         <table class="table table-lightborder">
           <thead>
@@ -17,10 +35,10 @@
               <th class="text-right">{{_LANG[action]}}</th>
             </tr>
           </thead>
-          <tbody data-wb-role="foreach" data-wb-table="{{_GET[form]}}" data-wb-add="true" data-wb-size="{{_ENV[page_size]}}" data-wb-sort="id">
+          <tbody data-wb-role="foreach" data-wb-from="result" data-wb-add="true" data-wb-size="{{_ENV[page_size]}}" data-wb-sort="id">
             <tr>
               <td class="nowrap">{{id}}</td>
-              <td>{{name}}</td>
+              <td>{{nickname}}</td>
               <td class="text-center">
                 <div class="status-pill green" data-title="{{_LANG[enabled]}}" data-wb-role="where" data='active="on"' data-toggle="tooltip"></div>
                 <div class="status-pill red" data-title="{{_LANG[disabled]}}" data-wb-role="where" data='active=""' data-toggle="tooltip"></div>
@@ -31,6 +49,7 @@
             </tr>
           </tbody>
         </table>
+		</div>
       </div>
     </div>
 </div>

@@ -15,9 +15,7 @@
                                                         <div class="card-body pt-3 pb-3">
                                                                 &lt;link data-wb-role="include" src="shortcode" data-wb-name="fonts->font-awesome"&gt;
                                                                 <hr>
-                                                                &lt;link data-wb-role="include" src="shortcode" data-wb-name="javascript->bootstrap4->js"&gt;
-                                                                <hr>
-                                                                &lt;script data-wb-role="include" src="shortcode" data-wb-name="javascript->plugins->somecode"&gt;&lt;/script&gt;
+                                                                &lt;meta data-wb-role="include" src="shortcode" data-wb-name="javascript->bootstrap4->js"&gt;
                                                         </div>
                                                 </div>
                                                 </div>
