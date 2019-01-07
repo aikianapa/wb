@@ -171,12 +171,12 @@ class tagForeach extends kiNode  {
 				$pagination=$this->DOM->tagPagination($size,$page,$pages,$cacheId,$count,$find);
 			}
 
-		if ($step>0) {
-			$this->DOM->replaceWith($steps->html());
-			foreach ($this->DOM->find(".{$tplid}") as $tid) {$tid->removeClass($tplid);}; unset($tid);
-		} else {
-			$this->DOM->html($inner);
-		}
+			if ($step>0) {
+				$this->DOM->replaceWith($steps->html());
+				foreach ($this->DOM->find(".{$tplid}") as $tid) {$tid->removeClass($tplid);}; unset($tid);
+			} else {
+				$this->DOM->html($inner);
+			}
 		}
 		unset($val,$ndx,$t_step,$string,$text,$func,$inner,$tmptpl);
 

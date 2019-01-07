@@ -19,16 +19,19 @@ $.fn.wbCart = function(param) {
 			} else {
 				var ajax = $cart.attr("data-wb-ajax");
 			}
-			$.get(ajax, form, function(data) {
+			$.post(ajax, form, function(data) {
 				$(that).trigger("add-to-cart-done", [getcookie("order_id")]);
 				if ($("[data-wb-role=cart][data-wb-tpl]").length) {
 					wb_setdata("[data-wb-role=cart][data-wb-tpl]", {});
 				}
 				$cart.trigger("cart-total-recalc");
 				$cart.trigger("cart-add-done", data);
+				console.log("trigger: cart-add-done");
+				$cart.wbCartMsg(wbapp.sysmsg.cart_add);
 			});
 			return false;
 		});
+
 		// Cart clear
 		$cart.on("cart-clear",function(e,that){
 			var ajax = "/ajax/cart/cart-clear";
@@ -36,6 +39,9 @@ $.fn.wbCart = function(param) {
 				$("[data-wb-role=cart] .cart-item").remove();
 				$(document).trigger("cart-total-recalc");
 				$(document).trigger("cart-after-clear", [event]);
+				$cart.trigger("cart-clear-done", data);
+				console.log("trigger: cart-clear-done");
+				$cart.wbCartMsg(wbapp.sysmsg.cart_clear);
 			});
 			return false;
 		});
@@ -85,11 +91,12 @@ $.fn.wbCart = function(param) {
 			});
 			$cart.trigger("cart-total-recalc");
 			$cart.trigger("cart-item-remove-done");
+			$cart.wbCartMsg(wbapp.sysmsg.cart_remove);
 		});
 		// Cart item recalc
 		$cart.on("cart-item-recalc", function(event, item) {
 			var total = 0;
-			var arr = wb_cart_item(item);
+			var arr = $cart.wbCartItem(item);
 			if (arr.price !== undefined && arr.quant !== undefined) {
 				total = arr.price * arr.quant;
 			}
@@ -102,26 +109,36 @@ $.fn.wbCart = function(param) {
 		});
 		// Cart total recalc
 		$cart.on("cart-total-recalc", function(event) {
-			var total = 0;
-			var lines = 0;
-			var count = 0;
-			$cart.find(".cart-item").each(function() {
-				$cart.trigger("cart-item-recalc", $(this));
-				if ($(this).find(".cart-item-total").is(":input")) {
-				total = total + $(this).find(".cart-item-total").val() * 1;
-				} else {
-				total = total + $(this).find(".cart-item-total").text() * 1;
-				}
-				if ($(this).find(".cart-item-count").is(":input")) {
-				count = count + $(this).find(".cart-item-count").val() * 1;
-				} else {
-				count = count + $(this).find(".cart-item-count").text() * 1;
-				}
-				lines++;
-			});
-			$cart.find(".cart-count").text(count);
-			$cart.find(".cart-total").text(total);
-			$cart.find(".cart-lines").text(lines);
+			if ($cart.find(".cart-item").length) {
+				var total = 0;
+				var lines = 0;
+				var count = 0;
+				$cart.find(".cart-item").each(function() {
+					$cart.trigger("cart-item-recalc", $(this));
+					if ($(this).find(".cart-item-total").is(":input")) {
+					total = total + $(this).find(".cart-item-total").val() * 1;
+					} else {
+					total = total + $(this).find(".cart-item-total").text() * 1;
+					}
+					if ($(this).find(".cart-item-count").is(":input")) {
+					count = count + $(this).find(".cart-item-count").val() * 1;
+					} else {
+					count = count + $(this).find(".cart-item-count").text() * 1;
+					}
+					lines++;
+				});
+				$("[data-wb-role=cart] .cart-count").text(count);
+				$("[data-wb-role=cart] .cart-total").text(total);
+				$("[data-wb-role=cart] .cart-lines").text(lines);
+			} else {
+				var ajax = "/ajax/cart/getdata";
+				$.post(ajax, {}, function(data) {
+					var data = $.parseJSON(data);
+					$("[data-wb-role=cart] .cart-count").text(data.count);
+					$("[data-wb-role=cart] .cart-total").text(data.total);
+					$("[data-wb-role=cart] .cart-lines").text(data.lines);
+				});
+			}
 			if (!$cart.is("form") && $cart.data("wb_cart")!==undefined) {
 				$cart.trigger("cart-update");
 			}
@@ -133,7 +150,7 @@ $.fn.wbCart = function(param) {
 			var ajax = $cart.attr("data-wb-ajax");
 			var form = {};
 			$cart.find(".cart-item").each(function(i) {
-				form[i] = wb_cart_item(this);
+				form[i] = $cart.wbCartItem(this);
 			});
 			if (ajax == undefined || ajax == "") {
 				var ajax = "/ajax/cart/cart-update";
@@ -168,153 +185,57 @@ $.fn.wbCart = function(param) {
 	$cart.data("wb_cart",true);
 }
 
+	$.fn.wbCartMsg = function(data) {
+		if ($.bootstrapGrowl && data !== false) {
+			$.bootstrapGrowl(data, {
+				ele: 'body',
+				type: 'success',
+				offset: {
+					from: 'top',
+					amount: 20
+				},
+				align: 'right',
+				width: "auto",
+				delay: 4000,
+				allow_dismiss: true,
+				stackup_spacing: 10
+			});
+		}
+	}
 
 
-function wb_cart() {
-
-  $(document).unbind("cart-recalc");
-  $(document).unbind("cart-clear");
-  $(document).unbind("cart-item-recalc");
-  $(document).unbind("cart-item-plus");
-  $(document).unbind("cart-item-minus");
-  $(document).unbind("cart-item-remove");
-  $(document).unbind("cart-total-recalc");
-  $("[data-wb-role=cart]").find("input,select,textarea").unbind("change");
-  $("[data-wb-role=cart] .cart-item").find("*").unbind("click");
-  $("[data-wb-role=cart] .cart-clear").unbind("click");
-  $("[data-wb-role=cart] .add-to-art").unbind("click");
-  $(document).undelegate("form[data-wb-role=cart] .add-to-cart", "click");
-
-
-  $(document).undelegate(".cart-clear", "click");
-  $(document).delegate(".cart-clear", "click", function() {
-    $(this).trigger("cart-clear", [this]);
-    return false;
-  });
-  $(document).off("cart-recalc");
-  $(document).on("cart-recalc", function(event, flag) {
-    $("[data-wb-role=cart] .cart-item").each(function() {
-      $(this).trigger("cart-item-recalc", [this, flag]);
-    });
-    $(document).trigger("cart-total-recalc");
-  });
-
-
-  $(document).off("cart-total-recalc");
-  $(document).on("cart-total-recalc", function(event, item, flag) {
-    $("[data-wb-role=cart]:not(form)").each(function() {
-      var total = 0;
-      var lines = 0;
-      var count = 0;
-      $(this).find(".cart-item").each(function() {
-        $(document).trigger("cart-item-recalc", $(this));
-        if ($(this).find(".cart-item-total").is(":input")) {
-          total = total + $(this).find(".cart-item-total").val() * 1;
-        } else {
-          total = total + $(this).find(".cart-item-total").text() * 1;
-        }
-        if ($(this).find(".cart-item-count").is(":input")) {
-          count = count + $(this).find(".cart-item-count").val() * 1;
-        } else {
-          count = count + $(this).find(".cart-item-count").text() * 1;
-        }
-        lines++;
-      });
-      $(this).find(".cart-count").text(count);
-      $(this).find(".cart-total").text(total);
-      $(this).find(".cart-lines").text(lines);
-      if ($(this).attr("data-wb-writable") == "true") {
-        $(document).trigger("cart-update");
-      }
-    });
-    $(document).trigger("cart-recalc-done");
-  });
-  $(document).off("cart-update");
-  $(document).on("cart-update", function(event) {
-    console.log("cart-update");
-    var cart = $(document).find("[data-wb-role=cart][data-wb-writable=true]:first");
-    var ajax = $(cart).attr("data-wb-ajax");
-    var form = {};
-    $(cart).find(".cart-item").each(function(i) {
-      form[i] = wb_cart_item(this);
-
-    });
-    if (ajax == undefined || ajax == "") {
-      var ajax = "/ajax/cart/cart-update";
-    }
-    var diff = $.post(ajax, form);
-    $(document).trigger("cart-update-done");
-  });
-
-  $("[data-wb-role=cart]").find("input,select,textarea").off("change");
-  $("[data-wb-role=cart]").find("input,select,textarea").on("change", function() {
-	var item = $(this).parents(".cart-item");
-	$(document).trigger("cart-item-recalc", item);
-	$(document).trigger("cart-total-recalc");
-  });
-  $(document).undelegate("[data-wb-role=cart] .cart-item *", "click");
-  $(document).delegate("[data-wb-role=cart] .cart-item *", "click", function() {
-    var item = $(this).parents(".cart-item");
-    if ($(this).hasClass("cart-item-remove")) {
-      $(document).trigger("cart-item-remove", item);
-    }
-    if ($(this).hasClass("cart-item-plus")) {
-      $(document).trigger("cart-item-plus", item);
-    }
-    if ($(this).hasClass("cart-item-minus")) {
-      $(document).trigger("cart-item-minus", item);
-    }
-  });
-  $(document).trigger("cart-recalc", ["noajax"]);
-  wbapp.cart = wb_cart_get();
-};
-
-function wb_cart_item(item) {
-  var arr = {};
-  var fld = new Array("id", "form", "quant", "price");
-  var add = $(this).parents("[data-wb-role=cart]").attr("data-wb-update");
-  // можно передать список полей, участвующих в пересчёте
-  if (add !== undefined && add !== "") {
-    fld = fld + explode(",", add);
-  }
-  for (var i in fld) {
-    var fldname = (fld[i]).trim();
-    var field = $(item).find(".cart-item-" + fldname);
-    if (field.is(":input")) {
-      var value = field.val();
-    } else {
-      var value = field.text();
-    }
-    if (is_numeric(value * 1)) {
-      value = value * 1;
-    }
-    if (fldname == "id") fldname = "item";
-    arr[fldname] = value;
-  };
-  $(item).find("[name]:input").each(function() {
-    if ($(this).attr("data-wb-field")!==undefined) {
-      field = $(this).attr("data-wb-field");
-    } else {
-      field = $(this).attr("name");
-    }
-    arr[field] = $(this).val();
-  });
-  return arr;
-}
-
-function wb_cart_get() {
-  var cart = null;
-  var defer = $.ajax({
-    async: false,
-    type: 'GET',
-    url: "/ajax/cart/getdata",
-    success: function(data) {
-      cart = $.parseJSON(data);
-      return cart;
-    }
-  });
-  return cart;
-}
+	$.fn.wbCartItem = function(item) {
+		var arr = {};
+		var fld = new Array("id", "form", "quant", "price");
+		var add = $(this).parents("[data-wb-role=cart]").attr("data-wb-update");
+		// можно передать список полей, участвующих в пересчёте
+		if (add !== undefined && add !== "") {
+			fld = fld + explode(",", add);
+		}
+		for (var i in fld) {
+			var fldname = (fld[i]).trim();
+			var field = $(item).find(".cart-item-" + fldname);
+			if (field.is(":input")) {
+				var value = field.val();
+			} else {
+				var value = field.text();
+			}
+			if (is_numeric(value * 1)) {
+				value = value * 1;
+			}
+			if (fldname == "id") fldname = "item";
+			arr[fldname] = value;
+		};
+		$(item).find("[name]:input").each(function() {
+			if ($(this).attr("data-wb-field")!==undefined) {
+				field = $(this).attr("data-wb-field");
+			} else {
+				field = $(this).attr("name");
+			}
+			arr[field] = $(this).val();
+		});
+		return arr;
+	}
 
 $(document).on("orders_after_formsave",function(event,name,item,form,res){
 //	$("#modalOrder").modal("hide");

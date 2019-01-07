@@ -17,8 +17,8 @@ class tagCart extends kiNode  {
 	    } else if ($this->DOM->text()!=="" AND isset($mode)) {
 		    $this->DOM->append(wbFromFile(__DIR__."/cart_{$mode}.php"));
 	    }
+		$Item=wbCartGetData();
 	    if ($mode=="list") {
-		    $Item=wbItemRead("orders",$_SESSION["order_id"]);
 		    $tplid=uniqId();
 		    $this->DOM->attr("data-template",$tplid);
 		    $this->DOM->addTemplate($this->innerHtml());
@@ -41,6 +41,9 @@ class tagCart extends kiNode  {
 			    }
 		    }
 	    }
+	    $this->DOM->find(".cart-lines")->html($Item["lines"]);
+	    $this->DOM->find(".cart-count")->html($Item["count"]);
+	    $this->DOM->find(".cart-total")->html($Item["total"]);
 	    $this->DOM->append('<script data-wb-append="body">$(document).on("wbapp",function(){wb_include("/engine/tags/cart/cart.js")});</script>');
     }
 }
@@ -59,12 +62,7 @@ function wbCartAction()
         $new = false;
     }
     $param = wbCartParam();
-    $order = wbItemRead('orders', $_SESSION['order_id']);
-    if (!isset($order['id']) or $new = true) {
-        $order['id'] = $_SESSION['order_id'];
-        $order['user_id'] = $_SESSION['user_id'];
-        $order['date'] = date('Y-m-d H:i:s');
-    }
+	$order=wbCartGetData();
 
     switch ($param['action']) {
         case 'add-to-cart':       wbCartItemAdd($order); break;
@@ -72,22 +70,29 @@ function wbCartAction()
         //case "cart-item-recalc":  wbCartItemRecalc($order); break;
         case 'cart-item-remove':  wbCartItemRemove($order); break;
         case 'cart-clear':        wbCartClear($order); break;
-        case 'getdata':            wbCartGetData($order); break;
+        case 'getdata':           echo json_encode($order); die; break;
     }
 
     return $_SESSION['order_id'];
 }
 
-function wbCartGetData($order)
+function wbCartGetData($order=null)
 {
-    echo json_encode($order);
-    die;
+	if ($order == null ) {$order_id = $_SESSION['order_id'];}
+	$order = wbItemRead('orders', $order_id);
+	if (!isset($order['id']) or $new = true) {
+		$order['id'] = $_SESSION['order_id'];
+		$order['user_id'] = $_SESSION['user_id'];
+		$order['date'] = date('Y-m-d H:i:s');
+	}
+	$order=wbCartCalcTotals($order);
+	return $order;
 }
 
 function wbCartUpdate($order)
 {
     $order['items'] = $_POST;
-    $order['total'] = wbCartCalcTotal($order);
+    $order = wbCartCalcTotals($order);
     wbItemSave('orders', $order);
 }
 
@@ -106,6 +111,7 @@ function wbCartClear($order)
     $order['items'] = array();
     $order['total'] = 0;
     $order['lines'] = 0;
+    $order['count'] = 0;
     wbItemSave('orders', $order);
 }
 
@@ -117,29 +123,32 @@ function wbCartItemAdd($order)
         $line = $param;
         unset($line['mode'],$line['action']);
         $order['items'][$pos] = $line;
-        $order['total'] = wbCartCalcTotal($order);
+        $order = wbCartCalcTotals($order);
         wbItemSave('orders', $order);
     }
 }
 
-function wbCartCalcTotal($order)
+function wbCartCalcTotals($order)
 {
+    $order['lines'] = 0;
+    $order['count'] = 0;
     $order['total'] = 0;
+    if (!isset($order['items'])) $order['items']=array();
     foreach ($order['items'] as $item) {
+	$order['lines'] += 1;
+	$order['count'] += intval($item['quant']);
         $order['total'] += intval($item['quant']) * intval($item['price']);
     }
-    return $order['total'];
+    return $order;
 }
 
 function wbCartItemPos($order)
 {
     $param = wbCartParam();
-    if (!isset($order['items'])) {
-        $order['items'] = array();
-    }
+    if (!isset($order['items'])) $order['items']=array();
     $pos = 0;
     foreach ($order['items'] as $key => $Item) {
-        if ($Item['form'] == $param['form'] and $Item['item'] == $param['id']) {
+        if ($Item['form'] == $param['form'] and $Item['id'] == $param['id']) {
             return $pos;
         }
         ++$pos;
