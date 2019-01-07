@@ -1991,6 +1991,7 @@ function wb_pagination(pid) {
         } else {
           var cache = $source.attr("data-wb-cache");
           var size = $source.attr("data-wb-size");
+          var pages = $source.attr("data-wb-pages");
           var sort = $source.attr("data-wb-sort");
           var idx = $source.attr("data-wb-idx");
           var arr = explode("-", page);
@@ -2008,6 +2009,7 @@ function wb_pagination(pid) {
             tplid: tid,
             idx: idx,
             page: arr[2],
+            pages: pages,
             size: size,
             cache: cache
               //, vars: $("[data-wb-tpl=" + tid + "]").data("variables")

@@ -158,27 +158,28 @@ class tagForeach extends kiNode  {
 		};
 		$count=$n;
 
-			if ($step>0) {
-                $this->DOM->replaceWith($steps->html());
-				foreach ($this->DOM->find(".{$tplid}") as $tid) {$tid->removeClass($tplid);}; unset($tid);
-			} else {
-				$this->DOM->html($inner);
-			}
-			unset($val,$ndx,$t_step,$string,$text,$func,$inner,$tmptpl);
-
 		if ($this->DOM->tag()=="select") {
 			if (isset($result) AND !is_array($result)) {$this->DOM->outerHtml("");}
-            if (isset($srcItem[$this->DOM->attr('name')])) $this->DOM->attr('value',$srcItem[$this->DOM->attr('name')]);
-			$plhr=$this->DOM->attr("placeholder");
-			if ($plhr>"") {$this->DOM->prepend("<option value=''>$plhr</option>");}
+				if (isset($srcItem[$this->DOM->attr('name')])) $this->DOM->attr('value',$srcItem[$this->DOM->attr('name')]);
+				$plhr=$this->DOM->attr("placeholder");
+				if ($plhr>"") {$this->DOM->prepend("<option value=''>$plhr</option>");}
 		} else {
-            if ($this->DOM->attr("data-wb-group")>"" OR $this->DOM->attr("data-wb-total")>"") {$this->DOM->wbTableProcessor(); $size=false;}
+			if ($this->DOM->attr("data-wb-group")>"" OR $this->DOM->attr("data-wb-total")>"") {$this->DOM->wbTableProcessor(); $size=false;}
 			if ($size!==false AND !$this->DOM->hasClass("pagination")) {
 				$cahceId=null; $find=null;
 				$pages=ceil($count/$size);
-                $this->DOM->tagPagination($size,$page,$pages,$cacheId,$count,$find);
+				$pagination=$this->DOM->tagPagination($size,$page,$pages,$cacheId,$count,$find);
 			}
+
+		if ($step>0) {
+			$this->DOM->replaceWith($steps->html());
+			foreach ($this->DOM->find(".{$tplid}") as $tid) {$tid->removeClass($tplid);}; unset($tid);
+		} else {
+			$this->DOM->html($inner);
 		}
+		}
+		unset($val,$ndx,$t_step,$string,$text,$func,$inner,$tmptpl);
+
 		gc_collect_cycles();
 
 	}

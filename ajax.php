@@ -35,7 +35,7 @@ function ajax__pagination() {
     //if (is_callable($call)) {$call($fe->find("[data-wb-tpl={$tplid}]",0) );}
     $res["data"]=$fe->find("[data-wb-tpl={$tplid}]")->html();
     $res["pagr"]=$fe->find("#ajax-{$tplid}")->outerHtml();
-    $res["pages"]=$fe->find("[data-wb-tpl={$tplid}]")->attr("data-wb-pages");
+    $res["pages"]=$fe->find("#ajax-{$tplid}")->attr("data-wb-pages");
     return json_encode($res);
 }
 

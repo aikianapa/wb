@@ -2441,7 +2441,7 @@ abstract class kiNode
             $this->parent("table")->find("thead")->attr("data-wb-size",$size);
             $this->parent("table")->find("thead")->attr("data-wb",$class);
         }
-        if ($pages>"0" OR $this->attr("data-wb-sort")>"") {
+        if (intval($pages)>0 OR $this->attr("data-wb-sort")>"") {
             $find=urlencode($find);
             $pag=wbGetForm("common","pagination");
             //$pag->wrapInner("<div></div>");
@@ -2487,13 +2487,15 @@ abstract class kiNode
             $pag->wbSetData($pagination);
             $pag->find("[data-page={$page}]")->addClass("active");
             $pag->find("ul")->attr("data-wb-route",json_encode($_ENV["route"]));
-            if ($pages<2) {
+            $pag->find("ul")->attr("data-wb-pages",$pages);
+            if (intval($pages) < 2) {
                 $style=$pag->find("ul")->attr("style");
                 $pag->find("ul")->attr("style",$style.";display:none;");
             }
             $this->after($pag->innerHtml());
         }
         $this->removeAttr("data-wb-pagination");
+        return $pag->innerHtml();
     }
 
     public function addTemplate($type="innerHtml") {
