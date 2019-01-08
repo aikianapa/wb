@@ -2008,6 +2008,7 @@ function wb_pagination(pid) {
             tpl: tpl,
             tplid: tid,
             idx: idx,
+            uri: $(this).attr("data-wb-ajaxpage"),
             page: arr[2],
             pages: pages,
             size: size,

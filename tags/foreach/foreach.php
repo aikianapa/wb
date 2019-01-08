@@ -19,7 +19,7 @@ class tagForeach extends kiNode  {
     if ($form>"" AND $table=="") {$table=$form;}
     if (isset($cache)) {$cacheId=$cache;}
     if (isset($tpl) AND $tpl=="flase") {$tplid=false;} else {
-		    if ($tpl=="") {$this->DOM->addTemplate();}
+			$this->DOM->addTemplate();
 			$tplid=$this->DOM->attr("data-wb-tpl");
 		}
 		      if (!isset($size) OR $size=="false") {$size=false;}
@@ -100,8 +100,10 @@ class tagForeach extends kiNode  {
                 }
 		$ndx=0; $n=0; $f=0;
 		$tmptpl=wbFromString($tpl);
+		$empty=$tmptpl->find("empty")->clone();
+		$tmptpl->find("empty")->remove();
         if (isset($rand) AND $rand=="true") {shuffle($Item);}
-        if (!$this->DOM->hasClass("pagination") AND $form=="" AND $table=="" ) {
+        if (!$this->DOM->hasClass("pagination") AND $form=="" AND $table=="" AND $cacheId !== "flase" ) {
             // если список формируется функцией, то используем кэш
             $checkCache=md5($_SESSION["user_id"].$_ENV["lang"].$_SESSION["lang"]).md5($_ENV["route"]["uri"].$sort.$find);
             if ($cacheId==0 OR $cacheId!==$checkCache) {
@@ -135,9 +137,9 @@ class tagForeach extends kiNode  {
 					if ($flag==true AND $limit>"" AND $ndx>=$limit) {$flag=false;}
 						if ($flag==true) {
 							$ndx++;
-                            $val=wbCallFormFunc("BeforeShowItem",$val,$itemform);
-                            $val=wbCallFormFunc("BeforeItemShow",$val,$itemform);
-                            $text->wbSetData($val);
+							    $val=wbCallFormFunc("BeforeShowItem",$val,$itemform);
+							    $val=wbCallFormFunc("BeforeItemShow",$val,$itemform);
+							    $text->wbSetData($val);
 							if ($step>0) { // если степ, то работаем с объектом
 								if ($stepcount==0) {
 									$t_step=$steptpl->clone();
@@ -157,6 +159,11 @@ class tagForeach extends kiNode  {
 				unset($Item[$key]);
 		};
 		$count=$n;
+
+		if ($count==0) {
+			$inner=$empty;
+		}
+
 
 		if ($this->DOM->tag()=="select") {
 			$this->DOM->html($inner);

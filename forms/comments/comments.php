@@ -50,21 +50,19 @@ function _commentsBeforeItemShow($Item,$mode=NULL) {
 			break;
 		case "list"	:
 			$Item["dateshow"]=date("d.m.Y H:i",$time);
-			$Item["text"]=wbGetWords(strip_tags($Item["text"]),50);
-			$Item["smalltext"]=wbGetWords(strip_tags($Item["text"]),10);
-			if ($_SESSION["user_id"]!=="admin" && (!$Item["show"]==1 OR !$Item["show"]=="on") ) {$Item=NULL;}
+			if ($_SESSION["user"]["role"]!=="admin" && (!$Item["show"]==1 OR !$Item["show"]=="on") ) {$Item=NULL;}
 			break;
 		default		:
-            $Item["date"]=date("d.m.Y H:i",$time);
-            $Item["date_d"]=date("d",$time);
-            $Item["date_m"]=date("m",$time);
-            $Item["date_y"]=date("y",$time);
-            $Item["date_Y"]=date("Y",$time);
-            $Item["date_h"]=date("h",$time);
-            $Item["date_H"]=date("H",$time);
-            $Item["date_i"]=date("i",$time);
-            $Item["date_s"]=date("s",$time);
-            $Item["text"]=strip_tags($Item["text"]);
+			    $Item["date"]=date("d.m.Y H:i",$time);
+			    $Item["date_d"]=date("d",$time);
+			    $Item["date_m"]=date("m",$time);
+			    $Item["date_y"]=date("y",$time);
+			    $Item["date_Y"]=date("Y",$time);
+			    $Item["date_h"]=date("h",$time);
+			    $Item["date_H"]=date("H",$time);
+			    $Item["date_i"]=date("i",$time);
+			    $Item["date_s"]=date("s",$time);
+			    $Item["text"]=strip_tags($Item["text"]);
 			break;
 	}
 	return $Item;
@@ -72,8 +70,11 @@ function _commentsBeforeItemShow($Item,$mode=NULL) {
 
 function _commentsBeforeItemSave($Item) {
 	if (!isset($Item["id"]) OR $Item["id"]=="_new") {$Item["id"]=wbNewId();}
+	if (!isset($Item["ip"])) {$Item["ip"]=$_SERVER["REMOTE_ADDR"];}
+	if (!isset($Item["active"])) {$Item["active"]="on";}
+	if (!isset($Item["reply"])) {$Item["reply"]="";}
 	if (!isset($Item["date"]) OR $Item["date"]=="") {$Item["date"]=date("Y-m-d H:i:s");}
-    $Item["text"]=htmlentities($Item["text"]);
+	$Item["text"]=htmlentities($Item["text"]);
 	return $Item;
 }
 

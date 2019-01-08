@@ -12,6 +12,12 @@
 		if (strpos($tmp,"ata-wb-")) {$tmp=str_replace("data-wb-","",$tmp); $$tmp=$attr->value()."";} else {
 			$$tmp=$attr->value();
 		}
+		if ($tmp == "data-wb") {
+			$json=json_decode($this->DOM->attr("data-wb"),true);
+			foreach($json as $key => $val) {
+				$$key = $val;
+			}
+		}
 	}; unset($attrs);
     }
 ?>

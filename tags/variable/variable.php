@@ -23,38 +23,35 @@ class tagVariable extends kiNode  {
     public function tagVariable_set($Item) {
 	include($_ENV["path_engine"]."/wbattributes.php");
         if ($var>"") {
-            if (strtoupper(substr($var,0,5))=="_SESS") {
-                $var=str_replace(array('[',']','_SESS'),array('["','"]','_SESSION'),$var);
-                eval('$'.$var.' = "'.$this->DOM->attr("value").'";');
-            } else {
-                $_ENV["variables"][$var]="";
-                if (!isset($where)) $where=$if;
-            if ($where=="") {
-                    $_ENV["variables"][$var]=wbSetValuesStr($this->DOM->attr("value"),$Item);
-                } else {
-                    if (wbWhereItem($Item,$where)) {
-                        $_ENV["variables"][$var]=wbSetValuesStr($this->DOM->attr("value"),$Item);
-                    } else {
-                        $_ENV["variables"][$var]=wbSetValuesStr($this->DOM->attr("else"),$Item);
-                    }
-                }
-                $tmp=substr($_ENV["variables"][$var],0,1);
-                if ($tmp=="{" OR $tmp=="]" AND is_array(json_decode($_ENV["variables"][$var],true))) {
-                    $array=json_decode($_ENV["variables"][$var],true);
-                    if (is_array($array)) {
-                        $_ENV["variables"][$var]=$array;
-                    }
-                }
-                unset($array,$tmp);
+		if (isset($_ENV["variables"][$var])) {unset($_ENV["variables"][$var]);}
+		if (!isset($where) OR (isset($where) AND wbWhereItem($Item,$where))) {
+			if (isset($value)) {$value=wbSetValuesStr($value,$Item);}
+			if (isset($else)) {$else=wbSetValuesStr($else,$Item);}
+			if (!isset($if) OR (isset($if) AND wbWhereItem($Item,$if))) {
+				$_ENV["variables"][$var]=$value;
+			} else {
+				$_ENV["variables"][$var]=$else;
+			}
 
-                if (isset($oconv) AND $oconv>"") {
-                    $_ENV["variables"][$var]=wbOconv($_ENV["variables"][$var],$oconv);
-                }
-            }
-        }
-        if ($this->DOM->attr("data-wb-hide")!=="false") {
-            $this->DOM->remove();
+			if (isset($_ENV["variables"][$var])) {
+				$tmp=substr($_ENV["variables"][$var],0,1);
+				if ($tmp=="{" OR $tmp=="]" AND is_array(json_decode($_ENV["variables"][$var],true))) {
+					$array=json_decode($_ENV["variables"][$var],true);
+					if (is_array($array)) {
+						$_ENV["variables"][$var]=$array;
+					}
+				}
+				unset($array,$tmp);
+			}
+
+			if (isset($oconv) AND $oconv>"") {
+				$_ENV["variables"][$var]=wbOconv($_ENV["variables"][$var],$oconv);
+			}
+		} else {
+			$this->DOM->remove();
+		}
         }
     }
+
 
 }

@@ -2136,6 +2136,26 @@ function wbRouterRead($file = null)
     return $route;
 }
 
+
+function wbAuthGetContents($url,$username,$password){
+	$cred = sprintf('Authorization: Basic %s',
+	base64_encode("$username:$password") );
+	$opts = array(
+	    'http'=>array(
+		    'method'=>'GET',
+		    'header'=>$cred
+		)
+	);
+	$ctx = stream_context_create($opts);
+	$handle = @fopen($url, 'r', false,$ctx);
+
+	 if (!$handle) {
+	      die($http_response_header[0]);
+	 }
+
+	return stream_get_contents($handle);
+}
+
 function wbRouterGet($requestedUrl = null)
 {
     return wbRouter::getRoute($requestedUrl);
@@ -2533,7 +2553,7 @@ function wbRole($role, $userId = null)
         $allow = '[data-wb-allow], [data-wb-disallow], [data-wb-disabled], [data-wb-enabled], [data-wb-readonly], [data-wb-writable]';
         $target = '[data-wb-prepend], [data-wb-append], [data-wb-remove], [data-wb-before], [data-wb-after], [data-wb-html], [data-wb-replace], [data-wb-selector], [data-wb-addclass], [data-wb-removeclass], [data-wb-removeattr], [data-wb-attr]';
         $tags = array('module', 'formdata', 'foreach', 'dict', 'tree', 'gallery', 'include', 'imageloader', 'thumbnail', 'uploader',
-                    'multiinput', 'where');
+                    'multiinput', 'where','variable');
         $tags = array_merge($tags,array_keys($_ENV["tags"]));
 
         if ('' !== $set) {

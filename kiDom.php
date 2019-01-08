@@ -1625,15 +1625,9 @@ abstract class kiNode
                         if ($$attribute>""  AND $com>"" AND $com!=="selector") {
                             $res=$this->find($selector);
                             if ($res->length) {
-				switch($com) {
-					case "attr" :
-						foreach($res as $s) {$s->$com($$attribute,$inc->attr("value"));}
-						break;
-					default:
-					        foreach($res as $s) {$s->$com($$attribute);}
-						break;
-
-				}
+                                foreach($res as $s) {
+                                    $s->$com($$attribute);
+                                }
                                 $inc->remove();
                             }
                         }
@@ -2043,7 +2037,6 @@ abstract class kiNode
         $this->replaceWith($out);
     }
 
-
     public function tagMultiInput($Item) {
         $len=count($this->find("input,select,textarea"));
         if ($len==0) {
@@ -2328,7 +2321,6 @@ abstract class kiNode
         $idx=0;
         if (is_array($tree)) {
             foreach($tree as $i => $item) {
-		$item=wbItemToArray($item);
                 $lvl++;
                 $item=(array)$srcVal + (array)$item;
                 $item["_idx"]=$idx;
@@ -2447,7 +2439,7 @@ abstract class kiNode
             $this->parent("table")->find("thead")->attr("data-wb-size",$size);
             $this->parent("table")->find("thead")->attr("data-wb",$class);
         }
-        if (intval($pages)>0 OR $this->attr("data-wb-sort")>"") {
+        if ($pages>"0" OR $this->attr("data-wb-sort")>"") {
             $find=urlencode($find);
             $pag=wbGetForm("common","pagination");
             //$pag->wrapInner("<div></div>");
@@ -2493,19 +2485,18 @@ abstract class kiNode
             $pag->wbSetData($pagination);
             $pag->find("[data-page={$page}]")->addClass("active");
             $pag->find("ul")->attr("data-wb-route",json_encode($_ENV["route"]));
-            $pag->find("ul")->attr("data-wb-pages",$pages);
-            if (intval($pages) < 2) {
+            if ($pages<2) {
                 $style=$pag->find("ul")->attr("style");
                 $pag->find("ul")->attr("style",$style.";display:none;");
             }
             $this->after($pag->innerHtml());
         }
         $this->removeAttr("data-wb-pagination");
-        return $pag->innerHtml();
     }
 
     public function addTemplate($type="innerHtml") {
-        $tplid=wbNewId();
+	include($_ENV["path_engine"]."/wbattributes.php");
+	if (isset($tpl) AND $tpl > "") {$tplid=$tpl;} else {$tplid=wbNewId();}
         $this->attr("data-wb-tpl",$tplid);
         $that=$this->clone();
         $that->removeClass("wb-done");
