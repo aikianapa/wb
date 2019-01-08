@@ -1625,9 +1625,15 @@ abstract class kiNode
                         if ($$attribute>""  AND $com>"" AND $com!=="selector") {
                             $res=$this->find($selector);
                             if ($res->length) {
-                                foreach($res as $s) {
-                                    $s->$com($$attribute);
-                                }
+				switch($com) {
+					case "attr" :
+						foreach($res as $s) {$s->$com($$attribute,$inc->attr("value"));}
+						break;
+					default:
+					        foreach($res as $s) {$s->$com($$attribute);}
+						break;
+
+				}
                                 $inc->remove();
                             }
                         }

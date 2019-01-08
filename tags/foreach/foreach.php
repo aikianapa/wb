@@ -159,6 +159,7 @@ class tagForeach extends kiNode  {
 		$count=$n;
 
 		if ($this->DOM->tag()=="select") {
+			$this->DOM->html($inner);
 			if (isset($result) AND !is_array($result)) {$this->DOM->outerHtml("");}
 				if (isset($srcItem[$this->DOM->attr('name')])) $this->DOM->attr('value',$srcItem[$this->DOM->attr('name')]);
 				$plhr=$this->DOM->attr("placeholder");

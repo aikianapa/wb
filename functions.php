@@ -2531,11 +2531,9 @@ function wbRole($role, $userId = null)
         $res = '*';
         $controls = '[data-wb-role]';
         $allow = '[data-wb-allow], [data-wb-disallow], [data-wb-disabled], [data-wb-enabled], [data-wb-readonly], [data-wb-writable]';
-        $target = '[data-wb-prepend], [data-wb-append], [data-wb-remove], [data-wb-before], [data-wb-after], [data-wb-html], [data-wb-replace], [data-wb-selector], [data-wb-addclass], [data-wb-removeclass], [data-wb-removeattr]';
-        $tags = array('module', 'formdata', 'foreach', 'dict', 'tree', 'gallery',
-                    'include', 'imageloader', 'thumbnail', 'uploader',
-                    'multiinput', 'where'
-        );
+        $target = '[data-wb-prepend], [data-wb-append], [data-wb-remove], [data-wb-before], [data-wb-after], [data-wb-html], [data-wb-replace], [data-wb-selector], [data-wb-addclass], [data-wb-removeclass], [data-wb-removeattr], [data-wb-attr]';
+        $tags = array('module', 'formdata', 'foreach', 'dict', 'tree', 'gallery', 'include', 'imageloader', 'thumbnail', 'uploader',
+                    'multiinput', 'where');
         $tags = array_merge($tags,array_keys($_ENV["tags"]));
 
         if ('' !== $set) {
@@ -2897,7 +2895,6 @@ function wbTranslit($textcyr = null, $textlat = null)
 function wbBr2nl($str)
 {
     $str = preg_replace('/(rn|n|r)/', '', $str);
-
     return preg_replace('=<br */?>=i', 'n', $str);
 }
 ?>

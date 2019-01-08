@@ -25,13 +25,13 @@ if ($cache["check"] === false OR $cache["check"] === null) {
 	}
 	$_ENV["DOM"]->wbTargeter();
 	$_ENV["DOM"]->wbClearClass();
-
-	 if ( isset($_ENV["settings"]["beautifyHtml"]) AND $_ENV["settings"]["beautifyHtml"]=="on" ) {
+	if ( isset($_ENV["settings"]["beautifyHtml"]) AND $_ENV["settings"]["beautifyHtml"]=="on" ) {
 		$html = $_ENV["DOM"]->beautyHtml();
-	 } else {
+	} else {
 		$html = $_ENV["DOM"]->outerHtml();
-	 }
+	}
 }
+if ($_ENV["route"]["mode"]=="show") $html=wbClearValues($html);
 if ($cache["check"]===null) {
 	file_put_contents($cache["path"],$html);
 } else if ($cache["check"]===true) {
