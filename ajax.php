@@ -4,6 +4,7 @@ if (isset($_GET["getsysmsg"])) {
         wbInitEnviroment();
         echo ajax__getsysmsg();
 }
+require_once $_SERVER["DOCUMENT_ROOT"]."/functions.php";
 
 function ajax__pagination() {
     if (isset($_REQUEST["route"])) {
@@ -35,7 +36,8 @@ function ajax__pagination() {
     //if (is_callable($call)) {$call($fe->find("[data-wb-tpl={$tplid}]",0) );}
     $res["data"]=$fe->find("[data-wb-tpl={$tplid}]")->html();
     $res["pagr"]=$fe->find("#ajax-{$tplid}")->outerHtml();
-    $res["pages"]=$fe->find("#ajax-{$tplid}")->attr("data-wb-pages");
+    $res["pages"]=$fe->find("[data-wb-tpl={$tplid}]")->attr("data-wb-pages");
+    //$res["pages"]=$fe->find("#ajax-{$tplid}")->attr("data-wb-pages");
     return json_encode($res);
 }
 
@@ -67,6 +69,7 @@ function ajax__alive() {
             $ret["mode"]="wb_set_user_role";
             $out=wbGetForm("common","modal");
             $out->find(".modal")->attr("id","wb_session_die");
+            $out->find(".modal")->addClass("in show");
             $out->find(".modal-header")->html("<h6 class='text-danger'><i class='fa fa-exclamation-triangle'></i> Сессия завершена</h6>");
             $out->find(".modal-body")->html("<center>Истёк период ожидания сессиии!<br>Пожалуйста, выполните <a href='/login'>вход в систему</a> заново.</center>");
             $out->find(".modal-footer")->html("<a class='btn btn-primary' href='/login'><i class='fa fa-sign-in'></i> Войти в систему</a>");

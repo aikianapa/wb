@@ -1324,7 +1324,74 @@ abstract class kiNode
         }
 
 
-    public function wbSetData($Item=array()) {
+	public function wbSetData($Item=array()) {
+		$this->wbSetFormLocale();
+		$this->wbExcludeTags($Item);
+		$this->wbSetAttributes($Item);
+		$this->wbUserAllow();
+		$exit=false;
+		while($exit !== true) {
+			$nodes=new IteratorIterator($this->find("*:not(.wb-done)"));
+			$this->addClass("wb-done");
+			foreach($nodes as $inc) {
+			    if (!$inc->parents("[type=text/template]")->length AND !$inc->parents("script")->length) {
+				$inc->addClass("wb-done");
+				$inc->wbUserAllow();
+				$inc->wbWhere($Item);
+				$tag=$inc->wbCheckTag();
+				if (!$tag == FALSE) {
+					$inc->wbSetAttributes($Item);
+					if ($inc->has("[data-wb-json]")) {
+						$inc->attr("data-wb-json",wbSetValuesStr($inc->attr("data-wb-json"),$Item));
+					}
+					if ($inc->is("[data-wb-tpl=true]")) {
+						$inc->addTemplate();
+					}
+
+					    $func="tag".$tag;
+					    //if ($inc->attr("src")>"" AND strpos($inc->attr("src"),"/")) {
+						//    echo $inc->attr("src");
+						//$inc->attr("src",wbNormalizePath($this->attr("src")));
+					    //}
+					    if ($tag>"") {$inc->$func($Item);}
+				    //$inc->tagHideAttrs();
+//				} else if (!$tag==FALSE && !$inc->is(".wb-done") AND in_array($tag,array_keys($_ENV['tags']))) {
+//					$inc->wbProcess($Item,$tag);
+					$inc->tagHideAttrs();
+					$inc->addClass("wb-done");
+				}
+
+			    }
+			};
+//in_array($tag,array_keys($_ENV['tags']))
+			$this->tagInclude_inc($Item);
+			$this->wbSetValues($Item);
+			$this->wbPlugins($Item);
+			$this->wbIncludeTags($Item);
+			$this->wbTargeter($Item);
+			$this->tagHideAttrs();
+			$this->find(".wb-value")->removeClass("wb-value");
+
+			$check=$this->find("[data-wb-role]:not(.wb-done),[role]:not(.wb-done)");
+			if ($check->length) {
+				$exit=true;
+				foreach($check as $inc) {
+					if ((!$inc->parents("[type=text/template]")->length
+					OR !$inc->parents("script")->length)
+					AND $inc->wbCheckTag() ) {
+						$exit=false;
+					}
+				}
+			} else {
+				$exit=true;
+			}
+		}
+		gc_collect_cycles();
+		return $this;
+	}
+
+
+    public function wbSetData1($Item=array()) {
         $this->wbSetFormLocale();
         $this->wbExcludeTags($Item);
         $this->wbSetAttributes($Item);
@@ -1383,7 +1450,7 @@ abstract class kiNode
 
 
     public function wbPlugins() {
-        $script=$this->find("[data-wb-src]:not(.wb-done)");
+        $script=$this->find("[data-wb-src]");
         foreach($script as $sc) {
                 switch( $sc->attr("data-wb-src") ) {
                     case "jquery" :
@@ -1576,19 +1643,6 @@ abstract class kiNode
     }
 
 
-    public function wbProcess($Item,$tag) {
-        if (!$this->parents("script")->length) {
-            $this->addClass("wb-done");
-            $func="tag".$tag;
-            $this->wbSetAttributes($Item);
-            if ($this->attr("src")>"") {
-                $this->attr("src",wbNormalizePath($this->attr("src")));
-            }
-            if ($tag>"") {$this->$func($Item);}
-            $this->tagHideAttrs($Item);
-        }
-    }
-
     function wbTargeter($Item=array()) {
         $controls=wbControls("target");
         $tar=$this->find($controls);
@@ -1639,17 +1693,6 @@ abstract class kiNode
         $this->find("[data-wb-remove]")->remove();
     }
 
-    public function contentLoop($Item) {
-        $res=0;
-        $list=new IteratorIterator($this->find("[role],[data-wb-role]"));
-        foreach($list as $inc) {
-            $tag=$inc->wbCheckTag();
-            if (!$tag==FALSE && !$inc->hasClass("wb-done")) {
-                $inc->wbProcess($Item,$tag);
-            }
-        };
-        unset($inc,$list);
-    }
 
     public function wbExcludeTags($Item=array()) {
         if (!isset($_ENV["ta_save"])) {

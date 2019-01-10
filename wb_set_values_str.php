@@ -283,7 +283,17 @@ function wbSetValuesStr($tag = "",$Item = array(), $limit = 0, $vars = null)
 						$text .= '{{' . $res[2][$i][0] . '}}';
 					}
 				    } else {
-					$text .= '{{' . $res[2][$i][0] . '}}';
+						$e=trim(wbSetQuotes($sub));
+						$e=str_replace(array('["$','"]"]'),array('$','"]'),$e);
+						if (substr($e,0,1)=='$') {
+							if (eval('return isset( '.$e.' );')) {
+								eval('$text .= '.$e.' ;');
+							} else {
+								$text .= '{{' . $res[2][$i][0] . '}}';
+							}
+						} else {
+							$text .= '{{' . $res[2][$i][0] . '}}';
+						}
 				    }
                             }
 

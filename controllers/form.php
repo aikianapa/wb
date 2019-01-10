@@ -166,11 +166,11 @@ function form__controller__edit() {
 		$_ENV["DOM"]=wbGetForm($form,$mode);
 		$data=wbItemRead(wbTable($form),$item);
 		if (!$data) {$data=array("id"=>wbNewId());}
-		$_ENV["DOM"]->wbSetData($data);
 	} else {
 		if (is_string($out)) {$out=wbFromString($out);}
 		$_ENV["DOM"]=$out;
 	}
+	$_ENV["DOM"]->wbSetData($data);
 	return $_ENV["DOM"];
 }
 

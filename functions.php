@@ -328,6 +328,7 @@ function wbGetUserUiConfig($prop=null) {
 function wbItemToArray($Item = array())
 {
     if (is_array($Item)) {
+	$tmpItem=array();
         foreach ($Item as $i => $item) {
             if (is_string($item) AND ( substr($item,0,1)=="{" OR substr($item,0,1)=="[") )  {
                         $tmp = json_decode($item, true);
@@ -338,12 +339,12 @@ function wbItemToArray($Item = array())
             }
             $item = wbItemToArray($item);
                  if (is_array($item) AND isset($item['id'])) {
-                        unset($Item[$i]);
-                        $Item[$item['id']] = $item;
+                        $tmpItem[$item['id']] = $item;
                 } else {
-                        $Item[$i] = $item;
+                        $tmpItem[$i] = $item;
                 }
         }
+        $Item=$tmpItem; unset($tmpItem);
     } else if (is_string($item) AND substr($Item,0,1)=="{" OR substr($Item,0,1)=="[") {
         $tmp = json_decode($Item, true);
         if (is_array($tmp)) {
@@ -358,8 +359,15 @@ function wbItemToArray($Item = array())
 
 function wbGetDataWbFrom($Item, $str)
 {
-    $str = trim($str);
+	$str = trim($str);
+	$str_1=wbSetValuesStr("{{".$str."}}",$Item);
+	if (substr($str,0,1)=="_" AND $str !== $str_1) {
+		// если в атрибуте data-wb-from указанна общая переменная (типа _ENV, _SESS)
+		$tmp=json_encode($str_1,true);
+		if (is_array($tmp)) {return $tmp;} else {return $str_1;}
+	}
     $str = wbSetValuesStr($str, $Item);
+
     //$Item = wbItemToArray($Item);
     $pos = strpos($str, '[');
     if ($pos) {
@@ -962,6 +970,8 @@ function wbItemRead($table = null, $id = null)
             }
         }
         $item = wbTrigger('form', __FUNCTION__, 'AfterItemRead', func_get_args(), $item);
+    } else {
+	$item = wbTrigger('form', __FUNCTION__, 'EmptyItemRead', func_get_args(), $item);
     }
 
     return $item;
@@ -1635,7 +1645,7 @@ function wbImagesToText($Item, $fld = 'text', $imgs = 'images')
                         ";
                         $Item[$fld] = $img.$Item[$fld];
                 }
-            if (isset($Item['images_position']) and $Item['images_position']['pos'] > '') {
+            if (isset($Item['images_position']) and isset($Item['images_position']['pos']) and $Item['images_position']['pos'] > '') {
                 $gal = wbGetForm('common', 'gallery');
                 $gal->wbSetData($Item);
                 if ($image > '' and $Item['intext_position']['pos'] > '') {
@@ -1818,6 +1828,7 @@ function wbWhereItem($item, $where = null)
         if ($phpif > '') {
                // echo $where."<br>";
                // echo $phpif."<br>";
+
             @eval('if ( '.$phpif.' ) { $res=1; } else { $res=0; } ;');
         }
     }
@@ -1890,6 +1901,7 @@ function wbWherePhp_NEW($str = '', $item = array()) {
         }
         if ($last!=="" AND $flag_f==false) {$where .= $last; $last="";}
 
+	$where=preg_replace("~\{\{([^(}})]*)\}\}~","",$where); // чистим "хвосты" если переменные не определены {{some}} заменяем на пусто
         return $where;
 }
 
@@ -1960,7 +1972,7 @@ function wbWherePhp($str = '', $item = array())
             }
         }
     }
-
+	$str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);
     return $str;
 }
 
@@ -2138,23 +2150,39 @@ function wbRouterRead($file = null)
 
 
 function wbAuthGetContents($url,$username,$password){
-	$cred = sprintf('Authorization: Basic %s',
-	base64_encode("$username:$password") );
+	$cred = sprintf('Authorization: Basic %s', base64_encode("$username:$password") );
 	$opts = array(
 	    'http'=>array(
 		    'method'=>'GET',
 		    'header'=>$cred
 		)
 	);
-	$ctx = stream_context_create($opts);
-	$handle = @fopen($url, 'r', false,$ctx);
+	$context = stream_context_create($opts);
+	$handle = @fopen($url, 'r', false, $context);
 
-	 if (!$handle) {
-	      die($http_response_header[0]);
-	 }
+	if (!$handle) {
+		echo ($http_response_header[0]);
+		return false;
+	}
 
 	return stream_get_contents($handle);
 }
+
+function wbAuthPostContents($url, $post, $username,$password){
+	$cred = sprintf('Authorization: Basic %s', base64_encode("$username:$password") );
+	$post=http_build_query($post);
+	$opts = array(
+	    'http'=>array(
+		    'method'=>'POST',
+		    'header'=>$cred,
+		    'content'=>$post
+		)
+	);
+	$context = stream_context_create($opts);
+	$result = file_get_contents($_ENV["ajax_update"], false, $context);
+	return $result;
+}
+
 
 function wbRouterGet($requestedUrl = null)
 {
@@ -2551,10 +2579,11 @@ function wbRole($role, $userId = null)
         $res = '*';
         $controls = '[data-wb-role]';
         $allow = '[data-wb-allow], [data-wb-disallow], [data-wb-disabled], [data-wb-enabled], [data-wb-readonly], [data-wb-writable]';
-        $target = '[data-wb-prepend], [data-wb-append], [data-wb-remove], [data-wb-before], [data-wb-after], [data-wb-html], [data-wb-replace], [data-wb-selector], [data-wb-addclass], [data-wb-removeclass], [data-wb-removeattr], [data-wb-attr]';
-        $tags = array('module', 'formdata', 'foreach', 'dict', 'tree', 'gallery', 'include', 'imageloader', 'thumbnail', 'uploader',
-                    'multiinput', 'where','variable');
-        $tags = array_merge($tags,array_keys($_ENV["tags"]));
+        $target = '[data-wb-prepend], [data-wb-append], [data-wb-remove], [data-wb-before], [data-wb-after], [data-wb-html], [data-wb-replace], [data-wb-selector], [data-wb-addclass], [data-wb-removeclass], [data-wb-removeattr], [data-wb-attr], [data-wb-src]';
+        $tags = array('dict', 'tree', 'gallery', 'imageloader', 'thumbnail', 'uploader','multiinput', 'where');
+        foreach(array_keys($_ENV["tags"]) as $tag) {
+		if (!in_array($tag,$tags)) $tags[]=$tag;
+	}
 
         if ('' !== $set) {
             $res = $$set;

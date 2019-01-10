@@ -14,8 +14,6 @@ class tagForeach extends kiNode  {
 		$field=""; $sort=""; $add=""; $step=""; $id=""; $limit=""; $table=""; $cacheId=0; $form=""; $where="";
 
 		include($_ENV["path_engine"]."/wbattributes.php");
-
-
     if ($form>"" AND $table=="") {$table=$form;}
     if (isset($cache)) {$cacheId=$cache;}
     if (isset($tpl) AND $tpl=="flase") {$tplid=false;} else {
@@ -42,8 +40,9 @@ class tagForeach extends kiNode  {
 			}
 		}
 
+
         if (isset($json) AND $json> "") {
-            $Item=json_decode($json,true);
+		$Item=json_decode($json,true);
         }
 
         if (isset($count) AND $count>"") {
@@ -159,9 +158,8 @@ class tagForeach extends kiNode  {
 				unset($Item[$key]);
 		};
 		$count=$n;
-
-		if ($count==0) {
-			$inner=$empty;
+		if ($count==0 AND is_object($empty)) {
+			$inner=$empty->html();
 		}
 
 
@@ -172,25 +170,23 @@ class tagForeach extends kiNode  {
 				$plhr=$this->DOM->attr("placeholder");
 				if ($plhr>"") {$this->DOM->prepend("<option value=''>$plhr</option>");}
 		} else {
-			if ($this->DOM->attr("data-wb-group")>"" OR $this->DOM->attr("data-wb-total")>"") {$this->DOM->wbTableProcessor(); $size=false;}
-			if ($size!==false AND !$this->DOM->hasClass("pagination")) {
-				$cahceId=null; $find=null;
-				$pages=ceil($count/$size);
-				$pagination=$this->DOM->tagPagination($size,$page,$pages,$cacheId,$count,$find);
-			}
-
 			if ($step>0) {
 				$this->DOM->replaceWith($steps->html());
 				foreach ($this->DOM->find(".{$tplid}") as $tid) {$tid->removeClass($tplid);}; unset($tid);
 			} else {
 				$this->DOM->html($inner);
 			}
+			if ($this->DOM->attr("data-wb-group")>"" OR $this->DOM->attr("data-wb-total")>"") {
+				$this->DOM->wbTableProcessor(); $size=false;
+			}
+			if ($size!==false AND !$this->DOM->hasClass("pagination")) {
+				$cahceId=null; $find=null;
+				$pages=ceil($count/$size);
+				$pagination=$this->DOM->tagPagination($size,$page,$pages,$cacheId,$count,$find);
+			}
 		}
 		unset($val,$ndx,$t_step,$string,$text,$func,$inner,$tmptpl);
-
 		gc_collect_cycles();
-
 	}
-
 
 }

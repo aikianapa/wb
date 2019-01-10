@@ -2000,9 +2000,10 @@ function wb_pagination(pid) {
           $(foreach).find("[data-wb-tpl=" + tid + "]").html("");
           $(foreach).find("[data-wb-tpl=" + tid + "]").attr("data-wb-sort", sort);
           $(foreach).find("[data-wb-tpl=" + tid + "]").removeAttr("data-wb-desc");
+          if (pages == undefined) {pages}
           var loader = $(foreach).find("[data-wb-tpl=" + tid + "]").attr("data-wb-loader");
           var offset = $(foreach).find("[data-wb-tpl=" + tid + "]").attr("data-wb-offset");
-          if (offset == undefined) {}
+          if (pages == undefined) { pages = $("[data-wb-tpl=" + tid + "]").attr("data-wb-pages");}
           var foreach = $(foreach).html();
           var param = {
             tpl: tpl,

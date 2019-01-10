@@ -29,6 +29,9 @@ class tagInclude extends kiNode  {
         else {
             $ssrc=$src;
         }
+
+	if (isset($src) AND strpos($src,"/")) $src=wbNormalizePath($src);
+
         $res=0;
         if (isset($id)) {
             $did=$id;
@@ -237,8 +240,10 @@ class tagInclude extends kiNode  {
             }
 
         }
+        $this_content->tagInclude_inc($Item);
         $this_content->wbSetData($Item);
         $this->DOM->append($this_content);
+
         if ($this->DOM->find("include")->length) {
             $this->DOM->tagInclude_inc($Item);
         }

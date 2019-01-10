@@ -544,6 +544,13 @@ th.wb-asc[data-wb-sort]:before {
         content: "\f0de";
 }
 
+.bootstrap-growl.alert-dismissible .close {
+    top: auto;
+    bottom: auto;
+    right: -0.5rem;
+    padding: 0;
+}
+
 
 @media screen {
   .wb-print-box {
