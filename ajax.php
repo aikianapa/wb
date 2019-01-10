@@ -158,7 +158,32 @@ function ajax__save($form=null) {
         } else {
             $ret["error"]=1;
             $ret["text"]=$res;
-            header("HTTP/1.0 404 Not Found");
+        }
+    }
+    return json_encode($ret);
+}
+
+function ajax__rmitem($form=null) {
+    if ($form==null) {
+        $form=$_ENV["route"]["form"];
+    }
+
+    $aFunc="{$form}_rmitem";
+    if	(is_callable($aFunc)) {
+        $ret=$aFunc();
+    } else {
+        if (isset($_POST["id"])) {
+		$item=$_POST["id"];
+        } else {
+		$item=$_ENV["route"]["item"];
+	}
+        $res=wbItemRemove($form,$item);
+        $ret=array();
+        if ($res) {
+            $ret["error"]=0;
+        } else {
+            $ret["error"]=1;
+            $ret["text"]=$res;
         }
     }
     return json_encode($ret);

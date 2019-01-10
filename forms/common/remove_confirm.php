@@ -20,11 +20,11 @@
       </div>
 
 		  <div class="modal-footer">
-			<button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> {{_LANG[cancel]}}</button>
+			<button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-close"></span> {{_LANG[cancel]}}</button>
 			<button type="button" class="btn btn-danger wb-remove-confirm" data-dismiss="modal"
-					 data-wb-ajax="/form/remove/{{_GET[form]}}/{{_GET[item]}}/"
+					 data-wb-ajax="/ajax/rmitem/{{_GET[form]}}/{{_GET[item]}}/"
 					 data-wb-append="body">
-					 <span class="glyphicon glyphicon-ok"></span> {{_LANG[remove]}}
+					 <span class="fa fa-trash"></span> {{_LANG[remove]}}
 			</button>
 		  </div>
 		</div>

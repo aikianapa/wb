@@ -2,6 +2,7 @@
 session_start();
 require_once __DIR__."/functions.php";
 wbInit();
+if (is_callable("wbAfterInit")) {wbAfterInit();}
 $cache=wbCacheCheck();
 if ($cache["check"] === false OR $cache["check"] === null) {
 	$_ENV["ITEM"]=array();

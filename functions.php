@@ -1065,6 +1065,7 @@ function wbItemRemove($table = null, $id = null, $flush = true)
                 if ($flush==true) {wbTableFlush($table);}
             } else {
                 $item = wbItemRead($table, $id);
+                if ($item == null)  return;
                 wbTrigger('form', __FUNCTION__, 'BeforeItemRemove', func_get_args(), $item);
                 if (is_array($item)) {
                     $item['_removed'] = true;
