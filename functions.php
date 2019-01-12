@@ -1827,9 +1827,8 @@ function wbWhereItem($item, $where = null)
             $phpif = wbWherePhp($where, $item);
         }
         if ($phpif > '') {
-               // echo $where."<br>";
-               // echo $phpif."<br>";
-
+                //echo $where."<br>";
+                //echo $phpif."<br>";
             @eval('if ( '.$phpif.' ) { $res=1; } else { $res=0; } ;');
         }
     }
@@ -1837,6 +1836,75 @@ function wbWhereItem($item, $where = null)
     return $res;
 }
 
+
+function wbWherePhp($str = '', $item = array())
+{
+    $str = wbSetValuesStr($str, $item);
+    $str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);
+    $str = ' '.trim(strtr($str, array(
+                    '(' => '(',
+                    ')' => ')',
+                    '=' => ' == ',
+                    '>' => '>',
+                    '<' => ' < ',
+                    '>=' => ' >= ',
+                    '<=' => ' <= ',
+                    '<>' => ' !== ',
+                    '!=' => ' !== ',
+                    '!==' => ' !== ',
+                    '#' => ' !== ',
+                    '==' => ' == ',
+    ))).' ';
+    $exclude = array('AND', 'OR', 'LIKE', 'NOT_LIKE', 'IN_ARRAY');
+
+    $context = '';
+    preg_match_all('/\w+(?!\")\b/iu', $str, $arr); // возникают ошибки если в тексте пробел
+    $flag = true;
+    foreach ($arr[0] as $a => $fld) {
+        if (!in_array(strtoupper($fld), $exclude, true)) {
+            if (isset($item[$fld]) and true == $flag) {
+                //if ($flag==true) {
+                if (is_array($item[$fld])) {
+                        $res=wbJsonEncode($Item[$fld]);
+                        if ($res=="null") {$res='"[]"';} else {$res=htmlentities($res);}
+                        $str = str_replace(" {$fld} ", $res , $str);
+                } else {
+                        $str = str_replace(" {$fld} ", ' $item["'.$fld.'"] ', $str);
+                }
+                $flag = false;
+            }
+        } else {
+            $flag = true;
+        }
+    }
+
+    preg_match_all('/in_array\s\(\s(.*),array \(/', $str, $arr);
+    foreach ($arr[1] as $a => $fld) {
+        $str = str_replace("in_array ( {$fld},array (", 'in_array ($item["'.$fld.'"],array(', $str);
+    }
+
+    if (strpos(strtolower($str), ' like ')) {
+        preg_match_all('/\S*\slike\s\S*/iu', $str, $arr);
+        foreach ($arr[0] as $a => $cls) {
+            $tmp = explode(' like ', $cls);
+            if (2 == count($tmp)) {
+                $str = str_replace($cls, 'wbWhereLike('.$tmp[0].','.$tmp[1].')', $str);
+            }
+        }
+    }
+
+    if (strpos(strtolower($str), ' not_like ')) {
+        preg_match_all('/\S*\snot_like\s\S*/iu', $str, $arr);
+        foreach ($arr[0] as $a => $cls) {
+            $tmp = explode(' not_like ', $cls);
+            if (2 == count($tmp)) {
+                $str = str_replace($cls, 'wbWhereNotLike('.$tmp[0].','.$tmp[1].')', $str);
+            }
+        }
+    }
+	$str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);
+    return $str;
+}
 
 function wbWherePhp_NEW($str = '', $item = array()) {
         $str = wbSetValuesStr($str, $item);
@@ -1906,76 +1974,6 @@ function wbWherePhp_NEW($str = '', $item = array()) {
         return $where;
 }
 
-
-
-
-function wbWherePhp($str = '', $item = array())
-{
-
-    $str = ' '.trim(strtr($str, array(
-                    '(' => ' ( ',
-                    ')' => ' ) ',
-                    '=' => ' == ',
-                    '>' => ' > ',
-                    '<' => ' < ',
-                    '>=' => ' >= ',
-                    '<=' => ' <= ',
-                    '<>' => ' !== ',
-                    '!=' => ' !== ',
-                    '!==' => ' !== ',
-                    '#' => ' !== ',
-                    '==' => ' == ',
-    ))).' ';
-    $exclude = array('AND', 'OR', 'LIKE', 'NOT_LIKE', 'IN_ARRAY');
-    $str = wbSetValuesStr($str, $item);
-    $context = '';
-    preg_match_all('/\w+(?!\")\b/iu', $str, $arr); // возникают ошибки если в тексте пробел
-    $flag = true;
-    foreach ($arr[0] as $a => $fld) {
-        if (!in_array(strtoupper($fld), $exclude, true)) {
-            if (isset($item[$fld]) and true == $flag) {
-                //if ($flag==true) {
-                if (is_array($item[$fld])) {
-                        $res=wbJsonEncode($Item[$fld]);
-                        if ($res=="null") {$res='"[]"';} else {$res=htmlentities($res);}
-                        $str = str_replace(" {$fld} ", $res , $str);
-                } else {
-                        $str = str_replace(" {$fld} ", ' $item["'.$fld.'"] ', $str);
-                }
-                $flag = false;
-            }
-        } else {
-            $flag = true;
-        }
-    }
-
-    preg_match_all('/in_array\s\(\s(.*),array \(/', $str, $arr);
-    foreach ($arr[1] as $a => $fld) {
-        $str = str_replace("in_array ( {$fld},array (", 'in_array ($item["'.$fld.'"],array(', $str);
-    }
-
-    if (strpos(strtolower($str), ' like ')) {
-        preg_match_all('/\S*\slike\s\S*/iu', $str, $arr);
-        foreach ($arr[0] as $a => $cls) {
-            $tmp = explode(' like ', $cls);
-            if (2 == count($tmp)) {
-                $str = str_replace($cls, 'wbWhereLike('.$tmp[0].','.$tmp[1].')', $str);
-            }
-        }
-    }
-
-    if (strpos(strtolower($str), ' not_like ')) {
-        preg_match_all('/\S*\snot_like\s\S*/iu', $str, $arr);
-        foreach ($arr[0] as $a => $cls) {
-            $tmp = explode(' not_like ', $cls);
-            if (2 == count($tmp)) {
-                $str = str_replace($cls, 'wbWhereNotLike('.$tmp[0].','.$tmp[1].')', $str);
-            }
-        }
-    }
-	$str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);
-    return $str;
-}
 
 function wbt_where($table, $where)
 {

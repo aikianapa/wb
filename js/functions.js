@@ -1502,19 +1502,21 @@ function wb_formsave_obj(formObj) {
       });
     }
   } else {
-    $.bootstrapGrowl(wbapp.sysmsg.save_failed+"!", {
-      ele: 'body',
-      type: 'danger',
-      offset: {
-        from: 'top',
-        amount: 20
-      },
-      align: 'right',
-      width: "auto",
-      delay: 4000,
-      allow_dismiss: true,
-      stackup_spacing: 10
-    });
+	if ($.bootstrapGrowl) {
+		    $.bootstrapGrowl(wbapp.sysmsg.save_failed+"!", {
+		      ele: 'body',
+		      type: 'danger',
+		      offset: {
+			from: 'top',
+			amount: 20
+		      },
+		      align: 'right',
+		      width: "auto",
+		      delay: 4000,
+		      allow_dismiss: true,
+		      stackup_spacing: 10
+		    });
+	}
   }
 }
 
@@ -1586,6 +1588,7 @@ function wb_ajax() {
     var src = $(that).attr("data-wb-ajax");
     var start = $(that).attr("data-wb-ajax-start");
     var done = $(that).attr("data-wb-ajax-done");
+    $(that).removeAttr("data-wb-ajax-done");
     if ($(that).parents("[data-wb-add=true][data-wb-tpl]").length) {
             ptpl = $(that).parents("[data-wb-add=true][data-wb-tpl]").attr("data-wb-tpl");
     }
@@ -1659,7 +1662,7 @@ function wb_ajax() {
               $("#" + $(this).attr("id")).modal();
             }
           });
-          if (done !== undefined && is_callable(done)) {
+          if (done !== undefined) {
             (eval(done))(link, src, data);
           }
           var navlink = $(link).attr("data-wb-ajax");
@@ -1697,7 +1700,7 @@ function wb_ajax() {
 	});
 
     if ($(this).is(":not(:input)") || $(this).is("button")) {
-      wb_ajax_process(this);
+		wb_ajax_process(this);
     }
   });
 
@@ -1767,7 +1770,7 @@ $(document).on("wb_required_false", function(event, that, text) {
   if (wb_plugins_loaded()) {
     $.bootstrapGrowl(text, {
       ele: 'body',
-      type: 'warning',
+      type: 'danger',
       offset: {
         from: 'top',
         amount: 20

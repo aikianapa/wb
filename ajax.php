@@ -167,26 +167,21 @@ function ajax__rmitem($form=null) {
     if ($form==null) {
         $form=$_ENV["route"]["form"];
     }
-
     $aFunc="{$form}_rmitem";
     if	(is_callable($aFunc)) {
         $ret=$aFunc();
     } else {
-        if (isset($_POST["id"])) {
-		$item=$_POST["id"];
-        } else {
-		$item=$_ENV["route"]["item"];
+	if (isset($_SESSION["user_id"])) {
+		$_ENV["DOM"]=wbGetForm("common","remove_confirm");
+		if (isset($_REQUEST["confirm"]) AND $_REQUEST["confirm"]=="true") {
+				$_ENV["DOM"]->find("script[data-wb-tag=success]")->remove();
+			} else {
+				wbItemRemove($_ENV["route"]["form"],$_ENV["route"]["item"]);
+				$_ENV["DOM"]->find(".modal")->remove();
+			}
+			return $_ENV["DOM"];
+		}
 	}
-        $res=wbItemRemove($form,$item);
-        $ret=array();
-        if ($res) {
-            $ret["error"]=0;
-        } else {
-            $ret["error"]=1;
-            $ret["text"]=$res;
-        }
-    }
-    return json_encode($ret);
 }
 
 function ajax__getlocale($type="tpl",$name="default.php") {

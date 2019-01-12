@@ -5,13 +5,15 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
                 </button>
-                <h5 class="modal-title">{{_LANG[header]}}</h5></div>
+                <h5 class="modal-title">
+			{{_LANG[header]}}
+		</h5></div>
             <div class="modal-body">
                 <form id="{{_GET[form]}}EditForm" data-wb-form="{{_GET[form]}}" data-wb-item="{{id}}"
                       class="form-horizontal" role="form" data-wb-allow="admin moder">
                     <div class="form-group row">
                         <div class="col-sm-4">
-                            <label class="form-control-label">{{_LANG[login]}}</label>
+                            <label class="form-control-label">{{_LANG[login]}} [<span class="text-danger" data-wb-where='super == "on"'>superuser</span>]</label>
                             <div class="input-group">
                                 <input type="text" class="form-control" name="id" placeholder="{{_LANG[login]}}"
                                        required data-wb-enabled="admin">
@@ -28,14 +30,22 @@
                                 <option value="{{id}}">{{id}}</option>
                             </select>
                         </div>
-                        <div class="col-sm-4">
-                            <label class="form-control-label">{{_LANG[active]}}</label>
-                            <div class="col">
+                    </div>
+                <div class="form-group row">
+                            <label class="form-control-label col-sm-3">{{_LANG[active]}}</label>
+                            <div class="col-sm-3">
                                 <label class="switch switch-success">
                                     <input type="checkbox" name="active"><span></span></label>
                             </div>
-                        </div>
-                    </div>
+                            <label data-wb-where='super !== "on"' class="form-control-label col-sm-3">{{_LANG[use_as_group]}}</label>
+                            <div class="col-sm-3" data-wb-where='super !== "on"'>
+                                <label class="switch switch-success">
+                                    <input type="checkbox" name="isgroup"><span></span></label>
+                            </div>
+                            <input type="hidden" name="isgroup" data-wb-where='super == "on"'>
+
+		</div>
+
                     <div class="nav-active-primary">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item"><a class="nav-link active" href="#{{_GET[form]}}Descr"
@@ -96,13 +106,6 @@
                             </div>
                         </div>
                         <div id="{{_GET[form]}}Group" class="tab-pane fade" role="tabpanel" data-wb-allow="admin">
-                            <div class="form-group row">
-                                <label class="col-5 form-control-label">{{_LANG[use_as_group]}}</label>
-                                <div class="col-2">
-                                    <label class="switch switch-success">
-                                        <input type="checkbox" name="isgroup"><span></span></label>
-                                </div>
-                            </div>
                             <div class="form-group row" data-wb-allow="admin">
 
                                 <div class="col-sm-6">
@@ -142,3 +145,22 @@
 <div data-wb-role="include" src="form" data-wb-name="common_changePassword_modal" data-wb-hide="*"></div>
 
 <script type="text/locale" data-wb-role="include" src="users_common"></script>
+<script>
+	$("#{{_GET[form]}}_{{_GET[mode]}} [name=isgroup]").on("change",function(){
+		console.log($("#{{_GET[form]}}_{{_GET[mode]}} [name=isgroup]").val());
+		if ( $("#{{_GET[form]}}_{{_GET[mode]}} [name=isgroup]").val() !== "on" ) {
+			$("#{{_GET[form]}}Group").parents("form").find(".nav-tabs	").find(".nav-link").removeClass("active");
+			$("#{{_GET[form]}}Group").parents(".tab-content").find(".tab-pane").removeClass("show active");
+			if ($(this).is(":checked")) {
+				$("#{{_GET[form]}}Group").addClass("show active");
+				$("[href='#{{_GET[form]}}Group']").show().addClass("active");
+			} else {
+				$("[href='#{{_GET[form]}}Group']").hide().removeClass("active");
+				$("#{{_GET[form]}}Descr").addClass("show active");
+				$("[href='#{{_GET[form]}}Descr']").show().addClass("active");
+			}
+		}
+	});
+
+	$("#{{_GET[form]}}_{{_GET[mode]}} [name=isgroup]").trigger("change");
+</script>

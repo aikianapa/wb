@@ -16,7 +16,7 @@ class tagForeach extends kiNode  {
 		include($_ENV["path_engine"]."/wbattributes.php");
     if ($form>"" AND $table=="") {$table=$form;}
     if (isset($cache)) {$cacheId=$cache;}
-    if (isset($tpl) AND $tpl=="flase") {$tplid=false;} else {
+    if (isset($tpl) AND $tpl=="false") {$tplid=false;} else {
 			$this->DOM->addTemplate();
 			$tplid=$this->DOM->attr("data-wb-tpl");
 		}

@@ -129,8 +129,13 @@ label.switch-primary input:checked+span {
   display: none;
 }
 
-.modal-max, .modal-xl {
-  min-width: 100vw;
+
+.modal-xl {
+  min-width: 80vw;
+}
+
+.modal-xxl, .modal-max {
+	max-width:100vw;
 }
 
 .wb-multiinput.row {

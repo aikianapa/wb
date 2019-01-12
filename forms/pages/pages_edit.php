@@ -28,7 +28,7 @@
 <ul class="nav nav-tabs" role="tablist">
 	<li class="nav-item"><a class="nav-link active" href="#pageDescr" data-toggle="tab">{{_lang[prop]}}</a></li>
 	<li class="nav-item"><a class="nav-link" href="#pageText" data-toggle="tab" >{{_lang[content]}}</a></li>
-	<li class="nav-item"><a class="nav-link" href="#pageSource" data-toggle="tab" >{{_lang[source]}}</a></li>
+	<!--li class="nav-item"><a class="nav-link" href="#pageSource" data-toggle="tab" >{{_lang[source]}}</a></li-->
 	<li class="nav-item"><a class="nav-link" href="#pageImages" data-toggle="tab">{{_lang[images]}}</a></li>
     <li class="nav-item"><a class="nav-link" href="#pageSeo" data-toggle="tab">{{_lang[seo]}}</a></li>
 </ul>
@@ -63,7 +63,7 @@
 </div>
 
 <div id="pageText" class="tab-pane fade" data-wb-role="include" src="editor" role="tabpanel"></div>
-<div id="pageSource" class="tab-pane fade" data-wb-role="module" src="editarea" name="text" role="tabpanel"></div>
+<!--div id="pageSource" class="tab-pane fade" data-wb-role="module" src="editarea" name="text" role="tabpanel"></div-->
 <div id="pageImages" class="tab-pane fade" data-wb-role="include" src="uploader" role="tabpanel"></div>
 <div id="pageSeo" class="tab-pane fade" data-wb-role="include" src="seo" role="tabpanel"></div>
 </div>
