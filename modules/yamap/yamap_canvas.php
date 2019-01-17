@@ -54,14 +54,14 @@ function yamap_canvas(canvas) {
     var points=[];
     var cc=[];
     if ($(canvas).find(".yamap_data").val()>"") {var epoints=json_decode($(canvas).find(".yamap_data").val());} else {var epoints=[];}
-    if ($(canvas).attr("geopos")>"") { var ll=yamap_pos($(canvas).attr("value"));}
+    if ($(canvas).attr("geopos")>"") { var ll=yamap_pos($(canvas).attr("geopos"));}
     if ($(canvas).attr("center")>"") {var cc=yamap_pos($(canvas).attr("center"));}
 
     if ($(canvas).attr("zoom")>"") { var zoom=$(canvas).attr("zoom")*1;} else { var zoom=10; $(canvas).attr("zoom",zoom);}
     if ($(canvas).attr("height")>"") {$(canvas).height($(canvas).attr("height"));}
     //if ($(canvas).attr("width")>"") {$(canvas).width($(canvas).attr("width"));}
-    if ($(canvas).attr("name")>"") {$(canvas).find("[name=yamap]").attr("name",$(canvas).attr("name"));}
-    if ($(canvas).attr("editable")==undefined) {$(canvas).find(".yamap_editor").remove();} else {$(canvas).find(".yamap_data").remove(); editor=true;}
+    if ($(canvas).attr("name")>"") {$(canvas).find(".yamap_data").attr("name",$(canvas).attr("name"));}
+    if ($(canvas).attr("editable")==undefined || $(canvas).attr("editable")=="false" || $(canvas).attr("editable")==false) {$(canvas).find(".yamap_editor").remove();} else {$(canvas).find(".yamap_data").remove(); editor=true;}
 
     var height = $(canvas).height();
 	$(window).on("resize",function(){
@@ -81,14 +81,23 @@ function yamap_canvas(canvas) {
             if (point.pos.length==2) {points.push(point); if (i==0) {cc=point.pos;}}
         });
     } else {
-        $(canvas).find("[role=geopos]").each(function(i){
-          var point={
-              pos: yamap_pos($(this).attr("value"))
-            , content: $(this).html()
-            , title: $(this).attr("title")
-          };
-          if (point.pos.length==2) {points.push(point);if (i==0) {cc=point.pos;}}
-        });
+	if ($(canvas).find("[role=geopos]").length) {
+		$(canvas).find("[role=geopos]").each(function(i){
+		  var point={
+		      pos: yamap_pos($(this).attr("value"))
+		    , content: $(this).html()
+		    , title: $(this).attr("title")
+		  };
+		  if (point.pos.length==2) {points.push(point);if (i==0) {cc=point.pos;}}
+		});
+	} else if (ll !== undefined && ll > "") {
+		  var point={
+		      pos: yamap_pos(ll)
+		    , content: $(this).html()
+		    , title: $(this).attr("title")
+		  };
+	}
+
     }
     var map = new ymaps.Map(mid, {
       center: cc,

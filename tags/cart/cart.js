@@ -37,8 +37,8 @@ $.fn.wbCart = function(param) {
 			var ajax = "/ajax/cart/cart-clear";
 			$.get(ajax, function(data) {
 				$("[data-wb-role=cart] .cart-item").remove();
-				$(document).trigger("cart-total-recalc");
-				$(document).trigger("cart-after-clear", [event]);
+				$("[data-wb-role=cart]").trigger("cart-total-recalc");
+				$("[data-wb-role=cart]").trigger("cart-after-clear", [event]);
 				$cart.trigger("cart-clear-done", data);
 				console.log("trigger: cart-clear-done");
 				$cart.wbCartMsg(wbapp.sysmsg.cart_clear);
@@ -86,11 +86,11 @@ $.fn.wbCart = function(param) {
 		// Cart remove
 		$cart.on("cart-item-remove", function(event, that) {
 			$(that).parents(".cart-item").remove();
-			$cart.find(".cart-item").each(function(i) {
+			$("[data-wb-role=cart]").find(".cart-item").each(function(i) {
 				$(this).attr("idx", i);
 			});
-			$cart.trigger("cart-total-recalc");
-			$cart.trigger("cart-item-remove-done");
+			$("[data-wb-role=cart]").trigger("cart-total-recalc");
+			$("[data-wb-role=cart]").trigger("cart-item-remove-done");
 			$cart.wbCartMsg(wbapp.sysmsg.cart_remove);
 		});
 		// Cart item recalc

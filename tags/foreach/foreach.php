@@ -25,7 +25,7 @@ class tagForeach extends kiNode  {
 			         if (!isset($_GET["page"]) OR $_GET["page"]=="") {$page=1;} else {$page=$_GET["page"]*1;}
 		        } else {$page=$page*1;}
 		if ( isset($from)) {
-			if (isset($Item[$from]) AND !strpos("[",$from)) {
+			if (isset($Item[$from]) AND !strpos("[",$from) AND  !strpos(".",$from)) {
 				//if (isset($Item["form"])) {$table=$Item["form"];} else {$table="";}
 				//if (isset($Item["id"])) {$item=$Item["id"];} else {$item="";}
 				if (!is_array($Item)) {$Item=json_decode($Item,true);}
@@ -188,5 +188,4 @@ class tagForeach extends kiNode  {
 		unset($val,$ndx,$t_step,$string,$text,$func,$inner,$tmptpl);
 		gc_collect_cycles();
 	}
-
 }

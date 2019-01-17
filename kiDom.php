@@ -1657,9 +1657,7 @@ abstract class kiNode
                         if ($$attribute>"" ) {
                             if ($this->find($$attribute)->length) {
                                 $inc->removeAttr($attribute);
-                                if ($com=="replace") {
-                                    $com="replaceWith";
-                                }
+                                if ($com=="replace") $com="replaceWith";
                                 if ($com>"") {
                                     $this->find($$attribute)->$com($inc);
                                     $res=true;
@@ -1667,20 +1665,23 @@ abstract class kiNode
                             }
                         }
                     };
-                    if ($res) {
-                        $inc->addClass("wb-done");
-                        $inc->attr("data-wb-done",true);
-                    }
+                    if ($res) $inc->addClass("wb-done");
                 } else if ($inc->is("[data-wb-selector]")) {
                     $selector=$inc->attr("data-wb-selector");
                     foreach ($attr as $key => $attribute) {
                         $$attribute=$inc->attr($attribute);
                         $com=str_replace("data-wb-","",$attribute);
+                        if ($com=="replace") $com="replaceWith";
                         if ($$attribute>""  AND $com>"" AND $com!=="selector") {
                             $res=$this->find($selector);
                             if ($res->length) {
                                 foreach($res as $s) {
-                                    $s->$com($$attribute);
+					if ($com == "attr") {
+						$s->$com($$attribute,$inc->attr("value"));
+					} else {
+						$s->$com($$attribute);
+					}
+
                                 }
                                 $inc->remove();
                             }
@@ -1703,14 +1704,14 @@ abstract class kiNode
             $id=wbNewId();
             if (!$ta->is(".wb-attrs")) $ta->wbSetAttributes($Item);
             $ta->attr("taid",$id);
-            $ta->replaceWith(strtr($ta->outerHtml(),array("{{"=>"#~#~","}}"=>"~#~#")));
+            //$ta->replaceWith(strtr($ta->outerHtml(),array("{{"=>"#~#~","}}"=>"~#~#")));
         };
     }
     function wbIncludeTags($Item=array()) {
         $list=$this->find("[taid]");
         foreach ($list as $ta) {
             $ta->removeAttr("taid");
-            $ta->replaceWith(strtr($ta->outerHtml(),array("#~#~"=>"{{","~#~#"=>"}}")));
+            //$ta->replaceWith(strtr($ta->outerHtml(),array("#~#~"=>"{{","~#~#"=>"}}")));
         };
     }
 
@@ -2198,6 +2199,7 @@ abstract class kiNode
         if (in_array("*",$list)) {
             $this->after($this->innerHtml());
             $this->remove();
+            return;
         }
         $list=explode(" ",trim($hide));
         foreach($list as $attr) {
@@ -2206,8 +2208,6 @@ abstract class kiNode
         if (!$this->is("[data-wb-role]") AND !$this->is("[role]") AND $this->is("[data-wb-done=true]")) {
             $this->removeAttr("data-wb-done");
         }
-        $this->removeClass("wb-done");
-        $this->removeAttr("data-wb-hide");
     }
 
     public function tagTree($Item=array()) {

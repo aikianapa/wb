@@ -253,7 +253,7 @@ function wbSetValuesStr($tag = "",$Item = array(), $limit = 0, $vars = null)
                             if (eval('return isset($Item["'.$res[4][$i][0].'"]);')) {
                                 $temp = '';
                                 eval('$temp .= '.$sub.';');
-                                $temp = strtr($temp, array('{{'=> '#~#~','}}'=> '~#~#'));
+                                //$temp = strtr($temp, array('{{'=> '#~#~','}}'=> '~#~#'));
                                 $text .= $temp;
                             } else {
 				     if ($res[12][$i][1]>-1 and $res[13][$i][1]>-1)        // есть -> и функция

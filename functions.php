@@ -435,7 +435,11 @@ function wbFieldBuild($param, $data = array(),$locale=array())
 
     $set = wbGetForm('common', 'tree_fldset');
     $tpl = wbGetForm('snippets', $param['type']);
-    $opt = json_decode($param['prop'], true);
+	if (is_array($param["prop"])) {
+		$opt=$param["prop"];
+	} else {
+		$opt = json_decode($param["prop"], true);
+	}
     $options = '';
     if (isset($opt['required']) and true == $opt['required']) {
         $options .= ' required ';
@@ -500,6 +504,14 @@ function wbFieldBuild($param, $data = array(),$locale=array())
             $tpl->wbSetValues($param);
             $tpl->wbSetData($data);
             break;
+        case 'module':
+		if (!is_array($opt)) break;
+		foreach($opt as $key => $val) {
+			$tpl->find("[data-wb-role]:first")->attr($key,$val);
+		}
+		    $tpl->wbSetValues($param);
+		    $tpl->wbSetData($data);
+		break;
         case 'multiinput':
             $flds = wbFromString('');
 

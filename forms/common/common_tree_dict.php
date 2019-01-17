@@ -20,16 +20,17 @@
 					<option value="image">image</option>
 					<option value="multiinput">multiinput</option>
 					<option value="switch">switch</option>
-					<option value="call">call</option>
 					<option value="enum">enum</option>
 					<option value="tree">tree</option>
 					<option value="snippet">snippet</option>
 					<option value="tags">tags</option>
 					<option value="phone">phone</option>
 					<option value="mask">mask</option>
+					<option value="module">module</option>
 					<option value="datepicker">datepicker</option>
 					<option value="datetimepicker">datetimepicker</option>
 					<option disabled>--== {{_LANG[other]}} ==--</option>
+					<option value="tel">tel</option>
 					<option value="date">date</option>
 					<option value="week">week</option>
 					<option value="month">month</option>

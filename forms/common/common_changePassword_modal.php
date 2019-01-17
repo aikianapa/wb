@@ -3,7 +3,7 @@
         <div class="modal-content">
         <div class="modal-header"><h5 class="modal-title">{{_LANG[title]}}</h5></div>
         <div class="modal-body">
-            <form id="{{_GET[form]}}_{{_GET[mode]}}_pswdForm">
+            <form id="{{_GET[form]}}_{{_GET[mode]}}_pswdForm" data-wb-prefix data-wb-suffix>
                 <div class="form-group">
                         <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-lock"></i></span>
@@ -25,13 +25,16 @@
     </div>
     </div>
     <script>
+	var prefix = suffix = "";
         var parent=$("#{{_GET[form]}}_{{_GET[mode]}}");
         var modal=$("#{{_GET[form]}}_{{_GET[mode]}}_pswd");
         var form=$("#{{_GET[form]}}_{{_GET[mode]}}_pswdForm");
+        if ($(form).attr("data-wb-prefix")!==undefined) prefix=$(form).attr("data-wb-prefix");
+        if ($(form).attr("data-wb-suffix")!==undefined) suffix=$(form).attr("data-wb-suffix");
         $(modal).find(".btn-primary").off("click");
         $(modal).find(".btn-primary").on("click",function(){
                 if (wb_check_required(form)) {
-                   $(parent).find("input[name=password]").val(md5($(form).find("input[name=newpassword]").val()));
+                   $(parent).find("input[name=password]").val(md5( prefix + $(form).find("input[name=newpassword]").val() + suffix ));
                     $(form).find("input").val("");
                     $(modal).modal('hide');
                 }
