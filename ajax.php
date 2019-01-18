@@ -4,7 +4,7 @@ if (isset($_GET["getsysmsg"])) {
         wbInitEnviroment();
         echo ajax__getsysmsg();
 }
-require_once $_SERVER["DOCUMENT_ROOT"]."/functions.php";
+if (is_file($_SERVER["DOCUMENT_ROOT"]."/functions.php")) require_once $_SERVER["DOCUMENT_ROOT"]."/functions.php";
 
 function ajax__pagination() {
     if (isset($_REQUEST["route"])) {

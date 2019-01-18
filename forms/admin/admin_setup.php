@@ -1,5 +1,5 @@
 <div id="setup" class="wbengine">
-	<h6 class="card-body-title"><img src="/engine/tpl/img/logo/logo.svg" style="height:2.9rem"></h6>
+	<h6 class="card-body-title"><h1 class="wblogo"><i class="text-dark">Web</i><i class="text-primary">Basic</i></h1></h6>
         <p class="mg-b-20 mg-sm-b-30">{{_LANG[slogan]}}</p>
         <form id="setup" method="post">
 		<input type="hidden" name="setup" value="done" />
@@ -40,11 +40,10 @@
                                 <h3>{{_LANG[step3]}}</h3>
                                 <section>
                                     <div class="form-group">
-                                        <label>Base template</label>
+                                        <label>Demo template</label>
                                         <select class="form-control" placeholder="Base template" required>
                                             <option value=""> Select Base template </option>
-                                            <option value="single"> Landing page </option>
-                                            <option value="multi"> Traditional site </option>
+                                            <option value="single"> Online Store Demo </option>
                                         </select>
                                     </div>
                                 </section>

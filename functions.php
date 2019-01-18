@@ -1890,9 +1890,9 @@ function wbWherePhp($str = '', $item = array())
         }
     }
 
-    preg_match_all('/in_array\s\(\s(.*),array \(/', $str, $arr);
+    preg_match_all('/\(in_array\((.*),array\(/', $str, $arr);
     foreach ($arr[1] as $a => $fld) {
-        $str = str_replace("in_array ( {$fld},array (", 'in_array ($item["'.$fld.'"],array(', $str);
+        $str = str_replace("in_array({$fld},array(", 'in_array ($item["'.$fld.'"],array(', $str);
     }
 
     if (strpos(strtolower($str), ' like ')) {
