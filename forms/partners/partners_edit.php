@@ -1,4 +1,4 @@
-<div class="modal fade" id="{{_GET[form]}}_{{_GET[mode]}}" data-keyboard="false" data-backdrop="true" role="dialog" aria-hidden="true">
+<div class="modal fade" id="{{_form}}_{{_mode}}" data-keyboard="false" data-backdrop="true" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
 	<div class="modal-content">
       <div class="modal-header">
@@ -9,7 +9,7 @@
       </div>
       <div class="modal-body">
 
-<form id="{{_GET[form]}}EditForm" data-wb-form="{{_GET[form]}}" data-wb-item="{{_GET[item]}}"  class="form-horizontal" role="form">
+<form id="{{_form}}EditForm" data-wb-form="{{_form}}" data-wb-item="{{_item}}"  class="form-horizontal" role="form">
     <input type="hidden" name="id" placeholder="Имя записи"  >
     <input type="hidden" name="user_id" placeholder="ID в Users"  >
 	<div class="form-group row">
@@ -96,7 +96,7 @@
             <label class="col-sm-2 form-control-label">Логотип</label>
             <div class="col-sm-3">
                 <input type="hidden" name="logo" data-wb-role="uploader"> </div>
-        </div>  
+        </div>
     </div>
   </div>
 </form>
@@ -105,7 +105,7 @@
     </div>
 		  <div class="modal-footer">
 			<button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Закрыть</button>
-			<button type="button" class="btn btn-primary" data-wb-formsave="#{{_GET[form]}}EditForm"><span class="glyphicon glyphicon-ok"></span> Сохранить изменения</button>
+			<button type="button" class="btn btn-primary" data-wb-formsave="#{{_form}}EditForm"><span class="glyphicon glyphicon-ok"></span> Сохранить изменения</button>
 		  </div>
 
 		</div>
@@ -116,8 +116,8 @@
     jQuery.fn.bankBikSearch = function() {
         $.get("http://www.bik-info.ru/api.html?type=json&bik="+$(this).val(),function(data){
             if (data!==undefined && data.error==undefined) {
-                $("#{{_GET[form]}}_{{_GET[mode]}} form [name=bank]").val(data.namemini+" Г."+data.city);
-                $("#{{_GET[form]}}_{{_GET[mode]}} form [name=ks]").val(data.ks);
+                $("#{{_form}}_{{_mode}} form [name=bank]").val(data.namemini+" Г."+data.city);
+                $("#{{_form}}_{{_mode}} form [name=ks]").val(data.ks);
             }
         });
 

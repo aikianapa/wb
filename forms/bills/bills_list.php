@@ -1,7 +1,7 @@
 <div class="element-wrapper">
                     <h6 class="element-header">
                      Список счетов
-                     <button class="btn btn-sm btn-success pull-right" data-wb-ajax="/form/edit/{{_GET[form]}}/_new" data-wb-append="body">
+                     <button class="btn btn-sm btn-success pull-right" data-wb-ajax="/form/edit/{{_form}}/_new" data-wb-append="body">
                        <i class="fa fa-plus"></i> Добавить счёт
                      </button>
                     </h6>

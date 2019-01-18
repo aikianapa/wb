@@ -41,7 +41,6 @@ function form__controller__common__controller() {
         if ($out=="") return false;
         $out=wbFromString($out);
         $_ENV["DOM"]=$out;
-
     }
     if (!is_object($out)) {$out=wbFromString($out);}
     $_ENV["DOM"]=$out;

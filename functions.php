@@ -801,7 +801,7 @@ function wbTreeRead($name)
     } else {
         $tree['dict'] = json_decode($tree['_tree__dict_'], true);
     }
-    $tree["assoc"] = wbTreeToArray($tree['tree']);
+    $tree["assoc"] = wbItemToArray(wbTreeToArray($tree['tree']));
     $tree = wbTrigger('form', __FUNCTION__, 'AfterTreeRead', func_get_args(), $tree);
 
     return $tree;
@@ -1477,7 +1477,7 @@ function wbGetForm($form = null, $mode = null, $engine = null)
                 $out = wbFromFile($current);
                 $ini = substr($current,0,-4).".ini";
             } else {
-		$cur = wbNormalizePath("/forms/{$form}_{$mode}.php");
+		$cur = wbNormalizePath("/forms/{$_ENV["route"]["form"]}_{$_ENV["route"]["mode"]}.php");
                 $out = wbErrorOut(wbError('func', __FUNCTION__, 1012, array($cur)), true);
                 $_ENV['error'][__FUNCTION__] = 'noform';
             }
@@ -1890,7 +1890,7 @@ function wbWherePhp($str = '', $item = array())
         }
     }
 
-    preg_match_all('/\(in_array\((.*),array\(/', $str, $arr);
+    preg_match_all('/in_array\((.*),array\(/', $str, $arr);
     foreach ($arr[1] as $a => $fld) {
         $str = str_replace("in_array({$fld},array(", 'in_array ($item["'.$fld.'"],array(', $str);
     }

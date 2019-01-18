@@ -1,4 +1,4 @@
-<div class="modal fade" id="{{_GET[form]}}_{{_GET[mode]}}" data-keyboard="false" data-backdrop="true" role="dialog"
+<div class="modal fade" id="{{_form}}_{{_mode}}" data-keyboard="false" data-backdrop="true" role="dialog"
      aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -9,17 +9,17 @@
 			{{_LANG[header]}}
 		</h5></div>
             <div class="modal-body">
-                <form id="{{_GET[form]}}EditForm" data-wb-form="{{_GET[form]}}" data-wb-item="{{id}}"
+                <form id="{{_form}}EditForm" data-wb-form="{{_form}}" data-wb-item="{{_item}}"
                       class="form-horizontal" role="form" data-wb-allow="admin moder">
                     <div class="form-group row">
                         <div class="col-sm-4">
-                            <label class="form-control-label">{{_LANG[login]}} [<span class="text-danger" data-wb-where='super == "on"'>superuser</span>]</label>
+                            <label class="form-control-label">{{_LANG[login]}} <span class="text-danger" data-wb-where='super == "on"'>[superuser]</span></label>
                             <div class="input-group">
                                 <input type="text" class="form-control" name="id" placeholder="{{_LANG[login]}}"
                                        required data-wb-enabled="admin">
                                 <input type="hidden" class="form-control" name="password">
                                 <div class="input-group-addon btn btn-warning fa fa-key" data-toggle="modal"
-                                     data-target="#{{_GET[form]}}_{{_GET[mode]}}_pswd" data-wb-allow="admin"></div>
+                                     data-target="#{{_form}}_{{_mode}}_pswd" data-wb-allow="admin"></div>
                             </div>
                         </div>
                         <div class="col-sm-4">
@@ -48,17 +48,17 @@
 
                     <div class="nav-active-primary">
                         <ul class="nav nav-tabs" role="tablist">
-                            <li class="nav-item"><a class="nav-link active" href="#{{_GET[form]}}Descr"
+                            <li class="nav-item"><a class="nav-link active" href="#{{_form}}Descr"
                                                     data-toggle="tab">{{_LANG[properties]}}</a></li>
-                            <li class="nav-item" data-wb-allow="admin"><a class="nav-link" href="#{{_GET[form]}}Group"
+                            <li class="nav-item" data-wb-allow="admin"><a class="nav-link" href="#{{_form}}Group"
                                                                           data-toggle="tab">{{_LANG[group]}}</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#{{_GET[form]}}Text" data-toggle="tab">{{_LANG[content]}}</a>
+                            <li class="nav-item"><a class="nav-link" href="#{{_form}}Text" data-toggle="tab">{{_LANG[content]}}</a>
                             </li>
                         </ul>
                     </div>
                     <div class="tab-content  p-a m-b-md">
                         <br/>
-                        <div id="{{_GET[form]}}Descr" class="tab-pane fade show active" role="tabpanel">
+                        <div id="{{_form}}Descr" class="tab-pane fade show active" role="tabpanel">
                             <div class="row">
                             <div class="col-sm-7">
                                 <div class="form-group row">
@@ -105,7 +105,7 @@
                             </div>
                             </div>
                         </div>
-                        <div id="{{_GET[form]}}Group" class="tab-pane fade" role="tabpanel" data-wb-allow="admin">
+                        <div id="{{_form}}Group" class="tab-pane fade" role="tabpanel" data-wb-allow="admin">
                             <div class="form-group row" data-wb-allow="admin">
 
                                 <div class="col-sm-6">
@@ -123,7 +123,7 @@
                             </div>
                         </div>
 
-                        <div id="{{_GET[form]}}Text" class="tab-pane fade" role="tabpanel">
+                        <div id="{{_form}}Text" class="tab-pane fade" role="tabpanel">
 
                                 <div class="form-group row">
                                   <label class="col-12 form-control-label">{{_LANG[about]}}:</label>
@@ -146,21 +146,21 @@
 
 <script type="text/locale" data-wb-role="include" src="users_common"></script>
 <script>
-	$("#{{_GET[form]}}_{{_GET[mode]}} [name=isgroup]").on("change",function(){
-		console.log($("#{{_GET[form]}}_{{_GET[mode]}} [name=isgroup]").val());
-		if ( $("#{{_GET[form]}}_{{_GET[mode]}} [name=isgroup]").val() !== "on" ) {
-			$("#{{_GET[form]}}Group").parents("form").find(".nav-tabs	").find(".nav-link").removeClass("active");
-			$("#{{_GET[form]}}Group").parents(".tab-content").find(".tab-pane").removeClass("show active");
+	$("#{{_form}}_{{_mode}} [name=isgroup]").on("change",function(){
+		console.log($("#{{_form}}_{{_mode}} [name=isgroup]").val());
+		if ( $("#{{_form}}_{{_mode}} [name=isgroup]").val() !== "on" ) {
+			$("#{{_form}}Group").parents("form").find(".nav-tabs	").find(".nav-link").removeClass("active");
+			$("#{{_form}}Group").parents(".tab-content").find(".tab-pane").removeClass("show active");
 			if ($(this).is(":checked")) {
-				$("#{{_GET[form]}}Group").addClass("show active");
-				$("[href='#{{_GET[form]}}Group']").show().addClass("active");
+				$("#{{_form}}Group").addClass("show active");
+				$("[href='#{{_form}}Group']").show().addClass("active");
 			} else {
-				$("[href='#{{_GET[form]}}Group']").hide().removeClass("active");
-				$("#{{_GET[form]}}Descr").addClass("show active");
-				$("[href='#{{_GET[form]}}Descr']").show().addClass("active");
+				$("[href='#{{_form}}Group']").hide().removeClass("active");
+				$("#{{_form}}Descr").addClass("show active");
+				$("[href='#{{_form}}Descr']").show().addClass("active");
 			}
 		}
 	});
 
-	$("#{{_GET[form]}}_{{_GET[mode]}} [name=isgroup]").trigger("change");
+	$("#{{_form}}_{{_mode}} [name=isgroup]").trigger("change");
 </script>

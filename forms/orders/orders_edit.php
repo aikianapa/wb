@@ -9,7 +9,7 @@
             </div>
             <div class="modal-body">
 
-                <form id="{{_form}}EditForm" data-wb-form="{{_form}}" data-wb-item="{{_GET[item]}}" class="form-horizontal" role="form">
+                <form id="{{_form}}EditForm" data-wb-form="{{_form}}" data-wb-item="{{_item}}" class="form-horizontal" role="form">
                     <input type="hidden" name="id">
                     <div class="form-group row">
                         <label class="col-sm-3 form-control-label">{{_LANG[datetime]}}</label>

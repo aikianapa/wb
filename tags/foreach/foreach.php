@@ -99,8 +99,8 @@ class tagForeach extends kiNode  {
                 }
 		$ndx=0; $n=0; $f=0;
 		$tmptpl=wbFromString($tpl);
-		$empty=$tmptpl->find("empty")->clone();
-		$tmptpl->find("empty")->remove();
+		$empty=$tmptpl->children("empty")->clone();
+		$tmptpl->children("empty")->remove();
         if (isset($rand) AND $rand=="true") {shuffle($Item);}
         if (!$this->DOM->hasClass("pagination") AND $form=="" AND $table=="" AND $cacheId !== "flase" ) {
             // если список формируется функцией, то используем кэш
@@ -158,7 +158,7 @@ class tagForeach extends kiNode  {
 				unset($Item[$key]);
 		};
 		$count=$n;
-		if ($count==0 AND is_object($empty)) {
+		if ($ndx==0 AND is_object($empty)) {
 			$inner=$empty->html();
 		}
 

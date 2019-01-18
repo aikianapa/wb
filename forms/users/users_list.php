@@ -1,7 +1,7 @@
 <div class="element-wrapper">
     <h6 class="element-header">
      {{_LANG[list]}}
-     <button class="btn btn-sm btn-success pull-right" data-wb-ajax="/form/edit/{{_GET[form]}}/_new" data-wb-append="body">
+     <button class="btn btn-sm btn-success pull-right" data-wb-ajax="/form/edit/{{_form}}/_new" data-wb-append="body">
        <i class="fa fa-plus"></i> {{_LANG[add]}}
      </button>
     </h6>
@@ -40,7 +40,7 @@
               <td class="nowrap">{{id}}</td>
               <td>{{nickname}}</td>
               <td class="text-center">
-                <div class="status-pill green" data-title="{{_LANG[enabled]}}" data-wb-role="where" data='active="on"' data-toggle="tooltip"></div>
+                <div class="status-pill green" data-title="{{_LANG[enabled]}}" data-wb-where='active="on"' data-toggle="tooltip"></div>
                 <div class="status-pill red" data-title="{{_LANG[disabled]}}" data-wb-role="where" data='active=""' data-toggle="tooltip"></div>
                 <div class="status-pill yellow" data-title="{{_LANG[group]}}" data-wb-role="where" data='isgroup="on"' data-toggle="tooltip"></div>
               </td>

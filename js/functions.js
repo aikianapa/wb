@@ -1548,6 +1548,10 @@ function wb_check_required(form) {
         }
       }
     }
+	if ($(this).is("[type=checkbox]") && $(this).is(":not(:checked)")) {
+		res = false;
+		$(document).trigger("wb_required_false", [this]);
+        }
     if ($(this).is("[type=password]")) {
       var pcheck = $(this).attr("name") + "_check";
       if ($("input[type=password][name=" + pcheck + "]").length) {
@@ -1712,7 +1716,7 @@ function wb_ajax() {
   $("[data-wb-ajax]").each(function() {
     $(this).attr("data-wb-href", $(this).attr("href"));
     $(this).removeAttr("href");
-    if ($(this).attr("data-wb-autoload") == true) {
+    if ($(this).attr("data-wb-autoload") == "true") {
       $(this).trigger("click");
       $(this).removeAttr("data-wb-autoload");
     }

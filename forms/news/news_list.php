@@ -1,7 +1,7 @@
 <div class="element-wrapper">
     <h6 class="element-header">
                      {{_LANG[list]}}
-                     <button class="btn btn-sm btn-success pull-right" data-wb-ajax="/form/edit/{{_GET[form]}}/_new" data-wb-append="body">
+                     <button class="btn btn-sm btn-success pull-right" data-wb-ajax="/form/edit/{{_form}}/_new" data-wb-append="body">
                        <i class="fa fa-plus"></i> {{_LANG[add]}}
                      </button>
     </h6>
@@ -17,7 +17,7 @@
                         <th class="text-right">{{_LANG[action]}}</th>
                     </tr>
                 </thead>
-                <tbody data-wb-role="foreach" data-wb-table="{{_GET[form]}}" data-wb-add="true" data-wb-size="{{_ENV[page_size]}}" data-wb-sort="date:d">
+                <tbody data-wb-role="foreach" data-wb-table="{{_form}}" data-wb-add="true" data-wb-size="{{_ENV[page_size]}}" data-wb-sort="date:d">
                     <tr>
                         <td class="nowrap"> {{datetime}} </td>
                         <td class="nowrap"> {{header}} </td>

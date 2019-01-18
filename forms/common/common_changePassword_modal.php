@@ -1,9 +1,9 @@
-<div class="modal fadeLeft" id="{{_GET[form]}}_{{_GET[mode]}}_pswd" data-keyboard="false" data-backdrop="true" data-show="false" role="dialog" data-wb-allow="admin">
+<div class="modal fadeLeft" id="{{_form}}_{{_mode}}_pswd" data-keyboard="false" data-backdrop="true" data-show="false" role="dialog" data-wb-allow="admin">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
         <div class="modal-header"><h5 class="modal-title">{{_LANG[title]}}</h5></div>
         <div class="modal-body">
-            <form id="{{_GET[form]}}_{{_GET[mode]}}_pswdForm" data-wb-prefix data-wb-suffix>
+            <form id="{{_form}}_{{_mode}}_pswdForm" data-wb-prefix data-wb-suffix>
                 <div class="form-group">
                         <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-lock"></i></span>
@@ -26,9 +26,9 @@
     </div>
     <script>
 	var prefix = suffix = "";
-        var parent=$("#{{_GET[form]}}_{{_GET[mode]}}");
-        var modal=$("#{{_GET[form]}}_{{_GET[mode]}}_pswd");
-        var form=$("#{{_GET[form]}}_{{_GET[mode]}}_pswdForm");
+        var parent=$("#{{_form}}_{{_mode}}");
+        var modal=$("#{{_form}}_{{_mode}}_pswd");
+        var form=$("#{{_form}}_{{_mode}}_pswdForm");
         if ($(form).attr("data-wb-prefix")!==undefined) prefix=$(form).attr("data-wb-prefix");
         if ($(form).attr("data-wb-suffix")!==undefined) suffix=$(form).attr("data-wb-suffix");
         $(modal).find(".btn-primary").off("click");

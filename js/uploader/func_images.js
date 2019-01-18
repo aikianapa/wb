@@ -289,6 +289,7 @@ function wbImagesAddToList(id,name,vis) {
 	var thumbnail=wb_setdata("#"+tplid,{form:form,id:item,"%path":path,img:name},true);
 	if (single==true) {$("#"+id+" ul.gallery").find("li").remove();}
 	if (!$("#"+id+" ul.gallery li[data-name='"+name+"']").length) {$("#"+id+" ul.gallery").append(thumbnail);}
+	$("#"+id+" ul.gallery").find("empty").remove();
 	if (single==true) {wbImagesToField(id);}
 	$("#"+id).wbImagesEvents();
 }

@@ -1,4 +1,4 @@
-<div class="modal fade" id="{{_GET[form]}}_{{_GET[item]}}" data-keyboard="false" data-backdrop="true" role="dialog" aria-hidden="true">
+<div class="modal fade" id="{{_form}}_{{_item}}" data-keyboard="false" data-backdrop="true" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
 	<div class="modal-content">
       <div class="modal-header">
@@ -22,7 +22,7 @@
 		  <div class="modal-footer">
 			<button type="button" class="btn btn-default" data-dismiss="modal"><span class="fa fa-close"></span> {{_LANG[cancel]}}</button>
 			<button type="button" class="btn btn-danger wb-remove-confirm" data-dismiss="modal"
-					 data-wb-ajax="/ajax/rmitem/{{_GET[form]}}/{{_GET[item]}}/"
+					 data-wb-ajax="/ajax/rmitem/{{_form}}/{{_item}}/"
 					 data-wb-append="body">
 					 <span class="fa fa-trash"></span> {{_LANG[remove]}}
 			</button>
@@ -31,10 +31,10 @@
 </div>
 </div>
 <script data-wb-tag="success" language="javascript">
-	if ($("[data-wb-table='{{_GET[form]}}']").length) {
-		$("[data-wb-table='{{_GET[form]}}'] [idx='{{_GET[item]}}']").remove();
+	if ($("[data-wb-table='{{_form}}']").length) {
+		$("[data-wb-table='{{_form}}'] [idx='{{_item}}']").remove();
 	} else {
-		$(document).find("[idx='{{_GET[item]}}']").remove();
+		$(document).find("[idx='{{_item}}']").remove();
 	}
 </script>
 <script type="text/locale">
@@ -43,11 +43,11 @@
 	error 		= "WARNING! Remove item error."
 	remove		= "Remove"
 	cancel		= "Cancel"
-	confirm		= "Confirm item remove with ID <b>{{_GET[item]}}</b> in table <b>{{_GET[form]}}</b>.<br>This action is irreversible."
+	confirm		= "Confirm item remove with ID <b>{{_item}}</b> in table <b>{{_form}}</b>.<br>This action is irreversible."
 [rus]
 	title		= "Удаление записи"
 	error 		= "ВНИМАНИЕ! Ошибка удаления записи"
 	remove		= "Удалить"
 	cancel		= "Отмена"
-	confirm		= "Пожалуйста, подтвердите удаление записи с идентификатором <b>{{_GET[item]}}</b> из таблицы <b>{{_GET[form]}}</b>.<br>Данное действие необратимо."
+	confirm		= "Пожалуйста, подтвердите удаление записи с идентификатором <b>{{_item}}</b> из таблицы <b>{{_form}}</b>.<br>Данное действие необратимо."
 </script>

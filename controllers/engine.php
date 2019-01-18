@@ -119,27 +119,28 @@ function engine__controller_signup()
             $out->find(".signpanel-wrapper")->html($out->find(".signbox.exist"));
             $out->find(".signbox.exist")->removeClass("d-none");
 
-    } elseif (isset($_POST["password"]) AND isset($_POST["conpassword"])) {
-        if ($_POST["password"]==$_POST["conpassword"] ) {
-            $nick=$_POST["firstname"]." ".$_POST["lastname"];
+    } elseif (isset($_POST["password"]) AND isset($_POST["password_check"])) {
+        if ($_POST["password"]==$_POST["password_check"] ) {
+		unset($_POST["password_check"]);
+            $nick=$_POST["first_name"]." ".$_POST["last_name"];
             $user=array(
                  "id"               => wbNewId()
                 ,"active"           => ""
-                ,"role"             => "user"
-                ,"first_name"       => $_POST["firstname"]
-                ,"last_name"        => $_POST["lastname"]
+                ,"first_name"       => $_POST["first_name"]
+                ,"last_name"        => $_POST["last_name"]
                 ,"name"             => $nick
                 ,"password"         => md5($_POST["password"])
                 ,"email"            => $_POST["email"]
             );
-            unset($_POST["firstname"],$_POST["lastname"],$_POST["password"],$_POST["email"],$_POST["conpassword"],$_POST["firstname"],$_POST["role"]);
+		$unsave=array_keys($user);
             foreach($_POST as $key => $value) {
-                $value=htmlspecialchars($value,ENT_QUOTES);
-                $user[$key]=$value;
+                if (!in_array($key,$unsave)) {
+			$value=htmlspecialchars($value,ENT_QUOTES);
+			$user[$key]=$value;
+		}
             }
-
+            if (!isset($user["role"])) $user["role"]="user";
             wbItemSave("users",$user);
-
 
             $msg=$out->find(".signbox.mail",0);
             $msg->wbSetData($user);
@@ -150,7 +151,7 @@ function engine__controller_signup()
             $out->find(".signbox.check")->removeClass("d-none");
         } else {
             $out->find("[name=password]",0)->prev("label",0)->addClass("text-danger");
-            $out->find("[name=conpassword]",0)->prev("label",0)->addClass("text-danger");
+            $out->find("[name=password_check]",0)->prev("label",0)->addClass("text-danger");
         }
     }
     $out->find(".signbox.d-none")->remove();

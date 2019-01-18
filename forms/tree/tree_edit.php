@@ -1,4 +1,4 @@
-<div class="modal fade" id="{{_GET[form]}}_{{_GET[mode]}}" data-keyboard="false" data-backdrop="static" role="dialog" aria-hidden="true">
+<div class="modal fade" id="{{_form}}_{{_mode}}" data-keyboard="false" data-backdrop="static" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
           <div class="modal-header pb-0 pt-1" data-wb-role="include" src="/engine/forms/common/common_tree_edit_nav.php">
@@ -11,7 +11,7 @@
         <h5 class="modal-title">{{header}}</h5>
       </div-->
             <div class="modal-body">
-                <form id="{{_GET[form]}}EditForm" data-wb-form="{{_GET[form]}}" data-wb-item="{{_GET[item]}}" class="form-horizontal" role="form">
+                <form id="{{_form}}EditForm" data-wb-form="{{_form}}" data-wb-item="{{_item}}" class="form-horizontal" role="form">
                     <div class="row">
                         <div class="col-md-5 col-12 tree-view">
                             <div class="form-group row">
