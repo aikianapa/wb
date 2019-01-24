@@ -1704,14 +1704,14 @@ abstract class kiNode
             $id=wbNewId();
             if (!$ta->is(".wb-attrs")) $ta->wbSetAttributes($Item);
             $ta->attr("taid",$id);
-            //$ta->replaceWith(strtr($ta->outerHtml(),array("{{"=>"#~#~","}}"=>"~#~#")));
+            $ta->replaceWith(strtr($ta->outerHtml(),array("{{"=>"#~#~","}}"=>"~#~#")));
         };
     }
     function wbIncludeTags($Item=array()) {
         $list=$this->find("[taid]");
         foreach ($list as $ta) {
             $ta->removeAttr("taid");
-            //$ta->replaceWith(strtr($ta->outerHtml(),array("#~#~"=>"{{","~#~#"=>"}}")));
+            $ta->replaceWith(strtr($ta->outerHtml(),array("#~#~"=>"{{","~#~#"=>"}}")));
         };
     }
 
