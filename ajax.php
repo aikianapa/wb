@@ -26,7 +26,7 @@ function ajax__pagination() {
     $fe=wbFromString("<div>".$foreach."</div>");
     $fe->wbClearClass();
     $fe->find("[data-wb-tpl={$tplid}]")->attr("data-wb-find",$find);
-    $fe->find("[data-wb-tpl={$tplid}]")->attr("data-wb-cache",$cache);
+    //$fe->find("[data-wb-tpl={$tplid}]")->attr("data-wb-cache",$cache);
     $fe->find("[data-wb-tpl={$tplid}]")->attr("data-wb-page",$page);
     $fe->find("[data-wb-tpl={$tplid}]")->removeClass("wb-done");
     $fe->find("[data-wb-tpl={$tplid}]")->append($tpl);
@@ -336,7 +336,7 @@ function ajax__mailer() {
 
 function ajax__mail() {
     if (!isset($_POST["_subject"])) {
-        $_POST["_subject"]="Письмо с сайта";
+        $_POST["_subject"]=$_ENV['sysmsg']["mail_from_site"];
     }
     if (isset($_POST["_tpl"])) {
         $out=wbGetTpl($_POST["_tpl"]);
@@ -373,9 +373,9 @@ function ajax__mail() {
         $res=wbMail("{$_POST["email"]};{$_POST["name"]}","{$mailto};{$_ENV["settings"]["header"]}", $_POST["subject"], $out);
     }
     if (!$res) {
-        $result=json_encode(array("error"=>true,"msg"=>"Ошибка отправки сообщения: ".$_ENV["error"]));
+        $result=json_encode(array("error"=>true,"msg"=>$_ENV['sysmsg']["mail_sent_error"].": ".$_ENV["error"]));
     } else {
-        $result=json_encode(array("error"=>false,"msg"=>"Сообщение отправлено!"));
+        $result=json_encode(array("error"=>false,"msg"=>$_ENV['sysmsg']["mail_sent_success"]."!"));
     }
     if (isset($_POST["callback"]) AND is_callable($_POST["_callback"])) {
         @$_POST["_callback"]($result);

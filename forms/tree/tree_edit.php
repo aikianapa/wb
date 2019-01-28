@@ -1,5 +1,5 @@
 <div class="modal fade" id="{{_form}}_{{_mode}}" data-keyboard="false" data-backdrop="static" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-dialog modal-xxl" role="document">
         <div class="modal-content">
           <div class="modal-header pb-0 pt-1" data-wb-role="include" src="/engine/forms/common/common_tree_edit_nav.php">
     		  </div>

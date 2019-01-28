@@ -1155,21 +1155,6 @@ protected function debug()
 }
 }
 
-class tagForeachFilter extends FilterIterator {
-    private $data;
-    public function __construct(Iterator $iterator, $data ) {
-        parent::__construct($iterator);
-        $this->data = $data;
-    }
-
-    public function accept() {
-        $data = $this->getInnerIterator()->current();
-        if ( 0!== 0 ) {
-            return false;
-        }
-        return true;
-    }
-}
 
 /**
  * Base ki node
@@ -2464,78 +2449,78 @@ abstract class kiNode
     }
 
 
-    public function tagPagination($size=10,$page=1,$pages=1,$cacheId,$count=0,$find="") {
-        $this->attr("data-wb-pages",$pages);
-        $this->attr("data-wb-cache",$cacheId);
-        $tplId=$this->attr("data-wb-tpl");
-        $class="ajax-".$tplId;
-        if (!isset($_SESSION["temp"])) {
-            $_SESSION["temp"]=array();
-        }
-        $_SESSION["temp"][$class]=$_ENV;
-        unset($_SESSION["temp"][$class]["DOM"],
-              $_SESSION["temp"][$class]["cache"],
-              $_SESSION["temp"][$class]["error"],
-              $_SESSION["temp"][$class]["errors"]
-             );
-        if (is_object($this->parent("table")) && $this->parent("table")->find("thead th[data-wb-sort]")->length) {
-            $this->parent("table")->find("thead")->attr("data-wb-size",$size);
-            $this->parent("table")->find("thead")->attr("data-wb",$class);
-        }
-        if ($pages>"0" OR $this->attr("data-wb-sort")>"") {
-            $find=urlencode($find);
-            $pag=wbGetForm("common","pagination");
-            //$pag->wrapInner("<div></div>");
-            $step=1;
-            $flag=floor($page/10);
-            if ($flag<=1) {
-                $flag=0;
-            }
-            else {
-                $flag*=10;
-            }
-            //$inner="";
-            $pagination=array("id"=>$class,"size"=>$size,"count"=>$count,"cache"=>$cacheId,"find"=>$find,"pages"=>array());
-            if (!isset($_ENV["route"]["params"]["form"]) OR $_ENV["route"]["params"]["form"]=="") {
-                $form=$tplId;
-            }
-            else {
-                $form=$_ENV["route"]["params"]["form"];
-            }
-            for($i=1; $i<=$pages; $i+=$step) {
-                $href=$_ENV["route"]["controller"]."/".$_ENV["route"]["mode"]."/".$form."/".$i;
-                $pagination["pages"][$i]=array(
-                                             "page"=>$i,
-                                             "href"=>$href,
-                                             "flag"=>$flag,
-                                             "data"=>"{$class}-{$i}"
-                                         );
-                //$inner.="<li data-page='{$i}'><a flag='{$flag}' data-wb-ajaxpage='/{$href}/' data='{$class}-{$i}'>{$i}</a></li>";
-                if ($i>=10 ) {
-                    $step=10;
-                }
-                if ($page>=10 && $i<10) {
-                    $i=10-1;
-                    $step=1;
-                }
-                if ($flag>0 && $i>=$flag && $i<=$flag+9) {
-                    $step=1;
-                }
-                if ($page>=10 && $page<20 && $i<20) {
-                    $step=1;
-                }
-            }
-            $pag->wbSetData($pagination);
-            $pag->find("[data-page={$page}]")->addClass("active");
-            $pag->find("ul")->attr("data-wb-route",json_encode($_ENV["route"]));
-            if ($pages<2) {
-                $style=$pag->find("ul")->attr("style");
-                $pag->find("ul")->attr("style",$style.";display:none;");
-            }
-            $this->after($pag->innerHtml());
-        }
-        $this->removeAttr("data-wb-pagination");
+public function tagPagination($size=10,$page=1,$pages=1,$cacheId,$count=0,$find="") {
+	ini_set('max_execution_time', 900);
+	ini_set('memory_limit', '1024M');
+    $this->attr("data-wb-pages",$pages);
+    $this->attr("data-wb-cache",$cacheId);
+    $tplId=$this->attr("data-wb-tpl");
+    $class="ajax-".$tplId;
+    if (!isset($_SESSION["temp"])) {
+        $_SESSION["temp"]=array();
     }
+    $_SESSION["temp"][$class]=$_ENV;
+    unset($_SESSION["temp"][$class]["DOM"],
+          $_SESSION["temp"][$class]["cache"],
+          $_SESSION["temp"][$class]["error"],
+          $_SESSION["temp"][$class]["errors"]
+         );
+    if (is_object($this->parent("table")) && $this->parent("table")->find("thead th[data-wb-sort]")->length) {
+        $this->parent("table")->find("thead")->attr("data-wb-size",$size);
+        $this->parent("table")->find("thead")->attr("data-wb",$class);
+    }
+    if ($pages>"0" OR $this->attr("data-wb-sort")>"") {
+        $find=urlencode($find);
+        $pag=wbGetForm("common","pagination");
+        //$pag->wrapInner("<div></div>");
+        $step=1;
+        $flag=floor($page/10);
+        if ($flag<=1) {
+            $flag=0;
+        }
+        else {
+            $flag*=10;
+        }
+        //$inner="";
+        $pagination=array("id"=>$class,"size"=>$size,"count"=>$count,"cache"=>$cacheId,"find"=>$find,"pages"=>array());
+        if (!isset($_ENV["route"]["params"]["form"]) OR $_ENV["route"]["params"]["form"]=="") {
+            $form=$tplId;
+        }
+        else {
+            $form=$_ENV["route"]["params"]["form"];
+        }
+
+        $pagarr=wbPagination($page,$pages);
+        foreach($pagarr as $i => $p) {
+
+            $pn=$p;
+            if ($p=="..." AND $pagarr[$i-1]<$page) {
+                $pn=intval($page/2);
+            }
+            if ($p=="..." AND $pagarr[$i-1]>=$page) {
+                $pn=intval($page+($pages-$page)/2);
+            }
+
+
+            $href=$_ENV["route"]["controller"]."/".$_ENV["route"]["mode"]."/".$form."/".$pn;
+            $pagination["pages"][$i]=array(
+                                         "page"=>$p,
+                                         "href"=>$href,
+                                         "flag"=>$flag,
+                                         "data"=>"{$class}-{$pn}"
+                                     );
+        }
+        $pag->wbSetData($pagination);
+        $pag->find("[data-page={$page}]")->addClass("active");
+        $pag->find("ul")->attr("data-wb-route",json_encode($_ENV["route"]));
+        if ($pages<2) {
+            $style=$pag->find("ul")->attr("style");
+            $pag->find("ul")->attr("style",$style.";display:none;");
+        }
+        $this->after($pag->innerHtml());
+    }
+    $this->removeAttr("data-wb-pagination");
+}
 
     public function addTemplate($type="innerHtml") {
 	include($_ENV["path_engine"]."/wbattributes.php");

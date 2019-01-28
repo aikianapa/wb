@@ -504,6 +504,26 @@ function wbFieldBuild($param, $data = array(),$locale=array())
             $tpl->wbSetValues($param);
             $tpl->wbSetData($data);
             break;
+        case 'forms':
+		$env=$_ENV;
+		$get=$_GET;
+		$par=$param;
+		$names=explode(";",$param["value"]);
+		$form=$names[0];
+		$mode=$names[1];
+		$item=$names[2];
+		$_ENV["route"]["form"]=$param["_form"]=$_GET["form"]=$form;
+		$_ENV["route"]["mode"]=$param["_mode"]=$_GET["mode"]=$mode;
+		$_ENV["route"]["item"]=$param["_item"]=$_GET["item"]=$item;
+		$tpl=wbGetForm($form,$mode);
+		$tpl->wbSetValues($param);
+		$tpl->wbSetData($data);
+		$tpl->find(".nav-tabs .nav-item:first-child")->addClass("active");
+		$_ENV=$env;
+		$_GET=$get;
+		$param=$par;
+		unset($env,$get,$par);
+		break;
         case 'module':
 		if (!is_array($opt)) break;
 		foreach($opt as $key => $val) {
@@ -735,6 +755,8 @@ function wbListItems($table = 'pages', $where = '', $sort = null)
 }
 function wbItemList($table = 'pages', $where = '', $sort = null)
 {
+	ini_set('max_execution_time', 900);
+	ini_set('memory_limit', '1024M');
     $list = array();
     $table = wbTable($table);
     $tname = wbTableName($table);
@@ -1683,6 +1705,48 @@ function wbImagesToText($Item, $fld = 'text', $imgs = 'images')
 
     return $Item;
 }
+
+
+
+	function wbPagination($c, $m)
+	{
+	    $current = $c;
+	    $last = $m;
+	    $delta = 4;
+	    $left = $current - $delta;
+	    $right = $current + $delta + 1;
+	    $range = array();
+	    $rangeWithDots = array();
+	    $l = -1;
+
+	    for ($i = 1; $i <= $last; $i++)
+	    {
+		if ($i == 1 || $i == $last || $i >= $left && $i < $right)
+		{
+		    array_push($range, $i);
+		}
+	    }
+
+	    for($i = 0; $i<count($range); $i++)
+	    {
+		if ($l != -1)
+		{
+		    if ($range[$i] - $l === 2)
+		    {
+			array_push($rangeWithDots, $l + 1);
+		    }
+		    else if ($range[$i] - $l !== 1)
+		    {
+			array_push($rangeWithDots, '...');
+		    }
+		}
+
+		array_push($rangeWithDots, $range[$i]);
+		$l = $range[$i];
+	    }
+
+	    return $rangeWithDots;
+	}
 
 function wbListFiles($dir)
 {

@@ -72,5 +72,13 @@ class wbApp {
         public function html() {
                 return $this->dom()->outerHtml();
         }
+
+        public function outerhtml() {
+                return $this->dom()->outerHtml();
+        }
+
+        public function innerhtml() {
+                return $this->dom()->innerHtml();
+        }
 }
 ?>

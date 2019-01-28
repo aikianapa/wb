@@ -625,6 +625,7 @@ function wb_tree() {
     $(this).data("data")["_form"] = form;
     $(this).data("data")["_item"] = formitem;
     var tpl = $(tree).treeEditModal($(this).data("data"));
+    $(tpl).find("#treeDict_tree_tree").remove();
     $(this).find(".treeData").children("form").html($(tpl).find(".treeData form").html());
     $(this).treeContentEditEvents();
     wb_plugins();

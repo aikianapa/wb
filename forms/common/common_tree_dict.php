@@ -14,6 +14,7 @@
 					<option value="number">number</option>
 					<option value="checkbox">checkbox</option>
 					<option disabled>--== {{_LANG[plugins]}} ==--</option>
+					<option value="forms">forms</option>
 					<option value="editor">editor</option>
 					<option value="source">source</option>
 					<option value="gallery">gallery</option>
