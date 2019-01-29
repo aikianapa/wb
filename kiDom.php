@@ -555,7 +555,9 @@ class ki extends CLexer
         if ($file=="") {
             return ki::fromString("");
         } else {
-                if (!session_id()) {session_start();}
+            if (!session_id()) {
+                session_start();
+            }
             $context = stream_context_create(array(
                                                  'http'=>array(
                                                          'method'=>"POST",
@@ -1267,113 +1269,126 @@ abstract class kiNode
         return $this;
     }
 
-        public function wbGetFormLocale($ini=null) {
-                $locale=null;
-                if ($this->find("[type='text/locale']")->length OR $ini!==null) {
-                        $obj=$this->find("[type='text/locale']");
-                        if ( $ini!==null AND is_file($ini) ) {
-                                $loc=parse_ini_string(file_get_contents($ini),true);
-                        } else {
-                                if ($obj->is("[data-wb-role=include]") AND $ini!==null) {
-                                        $obj->tagInclude();
-                                        $obj->html("\n\r".$obj->html());
-                                }
-                                $loc=parse_ini_string($obj->html(),true);
-                        }
-                        if (count($loc)) {
-                                $locale=array();
-                                if (isset($loc["_global"]) AND $loc["_global"]==false) {$global=false;} else {$global=true;}
-                                foreach($loc as $lang => $variables) {
-                                        if (!isset($locale[$lang])) {$locale[$lang]=array();}
-                                        if (!isset($_ENV["locale"][$lang])) {$_ENV["locale"][$lang]=array();}
-                                        foreach($variables as $var => $val) {
-                                                $locale[$lang][$var]=$val;
-                                                if ($global==true) {$_ENV["locale"][$lang][$var]=$val;}
-                                        }
-                                }
-                        }
-                        if (is_object($obj)) $obj->remove();
+    public function wbGetFormLocale($ini=null) {
+        $locale=null;
+        if ($this->find("[type='text/locale']")->length OR $ini!==null) {
+            $obj=$this->find("[type='text/locale']");
+            if ( $ini!==null AND is_file($ini) ) {
+                $loc=parse_ini_string(file_get_contents($ini),true);
+            } else {
+                if ($obj->is("[data-wb-role=include]") AND $ini!==null) {
+                    $obj->tagInclude();
+                    $obj->html("\n\r".$obj->html());
                 }
-                return $locale;
-        }
-
-        public function wbSetFormLocale($ini=null) {
-                $locale=$this->wbGetFormLocale($ini);
-                if ($locale!==null AND count($locale)) {
-                        $this->wrap("div");
-                        $loc=wbFromString(wbSetValuesStr($this,$locale,2,"_LANG"));
-                        $this->html($loc);
-                        $this->unwrap("div");
+                $loc=parse_ini_string($obj->html(),true);
+            }
+            if (count($loc)) {
+                $locale=array();
+                if (isset($loc["_global"]) AND $loc["_global"]==false) {
+                    $global=false;
                 }
-                return $locale;
+                else {
+                    $global=true;
+                }
+                foreach($loc as $lang => $variables) {
+                    if (!isset($locale[$lang])) {
+                        $locale[$lang]=array();
+                    }
+                    if (!isset($_ENV["locale"][$lang])) {
+                        $_ENV["locale"][$lang]=array();
+                    }
+                    foreach($variables as $var => $val) {
+                        $locale[$lang][$var]=$val;
+                        if ($global==true) {
+                            $_ENV["locale"][$lang][$var]=$val;
+                        }
+                    }
+                }
+            }
+            if (is_object($obj)) $obj->remove();
         }
+        return $locale;
+    }
+
+    public function wbSetFormLocale($ini=null) {
+        $locale=$this->wbGetFormLocale($ini);
+        if ($locale!==null AND count($locale)) {
+            $this->wrap("div");
+            $loc=wbFromString(wbSetValuesStr($this,$locale,2,"_LANG"));
+            $this->html($loc);
+            $this->unwrap("div");
+        }
+        return $locale;
+    }
 
 
-	public function wbSetData($Item=array()) {
-		$this->wbSetFormLocale();
-		$this->wbExcludeTags($Item);
-		$this->wbSetAttributes($Item);
-		$this->wbUserAllow();
-		$exit=false;
-		while($exit !== true) {
-			$nodes=new IteratorIterator($this->find("*:not(.wb-done)"));
-			$this->addClass("wb-done");
-			foreach($nodes as $inc) {
-			    if (!$inc->parents("[type=text/template]")->length AND !$inc->parents("script")->length) {
-				$inc->addClass("wb-done");
-				$inc->wbUserAllow();
-				$inc->wbWhere($Item);
-				$tag=$inc->wbCheckTag();
-				if (!$tag == FALSE) {
-					$inc->wbSetAttributes($Item);
-					if ($inc->has("[data-wb-json]")) {
-						$inc->attr("data-wb-json",wbSetValuesStr($inc->attr("data-wb-json"),$Item));
-					}
-					if ($inc->is("[data-wb-tpl=true]")) {
-						$inc->addTemplate();
-					}
+    public function wbSetData($Item=array()) {
+        $this->wbSetFormLocale();
+        $this->wbExcludeTags($Item);
+        $this->wbSetAttributes($Item);
+        $this->wbUserAllow();
+        $exit=false;
+        while($exit !== true) {
+            $nodes=new IteratorIterator($this->find("*:not(.wb-done)"));
+            $this->addClass("wb-done");
+            foreach($nodes as $inc) {
+                if (!$inc->parents("[type=text/template]")->length AND !$inc->parents("script")->length) {
+                    $inc->addClass("wb-done");
+                    $inc->wbUserAllow();
+                    $inc->wbWhere($Item);
+                    $tag=$inc->wbCheckTag();
+                    if (!$tag == FALSE) {
+                        $inc->wbSetAttributes($Item);
+                        if ($inc->has("[data-wb-json]")) {
+                            $inc->attr("data-wb-json",wbSetValuesStr($inc->attr("data-wb-json"),$Item));
+                        }
+                        if ($inc->is("[data-wb-tpl=true]")) {
+                            $inc->addTemplate();
+                        }
 
-					    $func="tag".$tag;
-					    //if ($inc->attr("src")>"" AND strpos($inc->attr("src"),"/")) {
-						//    echo $inc->attr("src");
-						//$inc->attr("src",wbNormalizePath($this->attr("src")));
-					    //}
-					    if ($tag>"") {$inc->$func($Item);}
-				    //$inc->tagHideAttrs();
+                        $func="tag".$tag;
+                        //if ($inc->attr("src")>"" AND strpos($inc->attr("src"),"/")) {
+                        //    echo $inc->attr("src");
+                        //$inc->attr("src",wbNormalizePath($this->attr("src")));
+                        //}
+                        if ($tag>"") {
+                            $inc->$func($Item);
+                        }
+                        //$inc->tagHideAttrs();
 //				} else if (!$tag==FALSE && !$inc->is(".wb-done") AND in_array($tag,array_keys($_ENV['tags']))) {
 //					$inc->wbProcess($Item,$tag);
-					$inc->tagHideAttrs();
-					$inc->addClass("wb-done");
-				}
+                        $inc->tagHideAttrs();
+                        $inc->addClass("wb-done");
+                    }
 
-			    }
-			};
+                }
+            };
 //in_array($tag,array_keys($_ENV['tags']))
-			$this->tagInclude_inc($Item);
-			$this->wbSetValues($Item);
-			$this->wbPlugins($Item);
-			$this->wbIncludeTags($Item);
-			$this->wbTargeter($Item);
-			$this->tagHideAttrs();
-			$this->find(".wb-value")->removeClass("wb-value");
+            $this->tagInclude_inc($Item);
+            $this->wbSetValues($Item);
+            $this->wbPlugins($Item);
+            $this->wbIncludeTags($Item);
+            $this->wbTargeter($Item);
+            $this->tagHideAttrs();
+            $this->find(".wb-value")->removeClass("wb-value");
 
-			$check=$this->find("[data-wb-role]:not(.wb-done),[role]:not(.wb-done)");
-			if ($check->length) {
-				$exit=true;
-				foreach($check as $inc) {
-					if ((!$inc->parents("[type=text/template]")->length
-					OR !$inc->parents("script")->length)
-					AND $inc->wbCheckTag() ) {
-						$exit=false;
-					}
-				}
-			} else {
-				$exit=true;
-			}
-		}
-		gc_collect_cycles();
-		return $this;
-	}
+            $check=$this->find("[data-wb-role]:not(.wb-done),[role]:not(.wb-done)");
+            if ($check->length) {
+                $exit=true;
+                foreach($check as $inc) {
+                    if ((!$inc->parents("[type=text/template]")->length
+                            OR !$inc->parents("script")->length)
+                            AND $inc->wbCheckTag() ) {
+                        $exit=false;
+                    }
+                }
+            } else {
+                $exit=true;
+            }
+        }
+        gc_collect_cycles();
+        return $this;
+    }
 
 
     public function wbSetData1($Item=array()) {
@@ -1397,8 +1412,8 @@ abstract class kiNode
                     $inc->wbProcess($Item,$tag);
                     $inc->tagHideAttrs();
                 } else if (!$tag==FALSE && !$inc->is(".wb-done") AND in_array($tag,array_keys($_ENV['tags']))) {
-                        $inc->wbProcess($Item,$tag);
-                        $inc->tagHideAttrs();
+                    $inc->wbProcess($Item,$tag);
+                    $inc->tagHideAttrs();
                 }
             }
         };
@@ -1437,111 +1452,111 @@ abstract class kiNode
     public function wbPlugins() {
         $script=$this->find("[data-wb-src]");
         foreach($script as $sc) {
-                switch( $sc->attr("data-wb-src") ) {
-                    case "jquery" :
-                        $sc->after('<script src="/engine/js/jquery.min.js" ></script>');
-                        $sc->remove();
-                        break;
-                    case "bootstrap3" :
-                        $sc->before('<link href="/engine/js/bootstrap3/bootstrap.min.css" rel="stylesheet">');
-                        $sc->after('<script src="/engine/js/bootstrap3/bootstrap.min.js" ></script>');
-                        $sc->remove();
-                        break;
-                    case "bootstrap3css" :
-                        $sc->before('<link href="/engine/js/bootstrap3/bootstrap.min.css" rel="stylesheet">');
-                        $sc->remove();
-                        break;
-                    case "bootstrap3js" :
-                        $sc->after('<script src="/engine/js/bootstrap3/bootstrap.min.js" ></script>');
-                        $sc->remove();
-                        break;
-                    case "bootstrap4" :
-                        $sc->before('<link href="/engine/js/bootstrap/bootstrap.min.css" rel="stylesheet">');
-                        $sc->after('<script src="/engine/js/bootstrap/bootstrap.min.js" ></script>');
-                        $sc->remove();
-                        break;
-                    case "bootstrap" :
-                        $sc->before('<link href="/engine/js/bootstrap/bootstrap.min.css" rel="stylesheet">');
-                        $sc->after('<script src="/engine/js/bootstrap/bootstrap.min.js" ></script>');
-                        $sc->remove();
-                        break;
-                    case "bootstrap4css" :
-                        $sc->before('<link href="/engine/js/bootstrap/bootstrap.min.css" rel="stylesheet">');
-                        $sc->remove();
-                        break;
-                    case "bootstrap4js" :
-                        $sc->after('<script src="/engine/js/bootstrap/bootstrap.min.js" ></script>');
-                        $sc->remove();
-                        break;
-                    case "datepicker" :
-                        $lang=$_ENV["settings"]["js_locale"];
-                        if ($sc->attr("data-wb-lang")>"") {
-                            $lang=$sc->attr("data-wb-lang");
-                        }
-                        $sc->before('<link href="/engine/js/datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet">');
-                        if ($lang>"") $sc->after("<script src='/engine/js/datetimepicker/locales/bootstrap-datetimepicker.{$lang}.js' type='text/javascript' charset='UTF-8'></script>");
-                        $sc->after('<script src="/engine/js/datetimepicker/bootstrap-datetimepicker.min.js" ></script>');
-                        $sc->remove();
-                        break;
-                    case "plugins" :
-                        $sc->before('<link href="/engine/js/plugins/plugins.css" rel="stylesheet">');
-                        $sc->after('<script src="/engine/js/plugins/plugins.js"></script>');
-                        $lang=$_ENV["settings"]["js_locale"];
-                        if ($sc->attr("data-wb-lang")>"") {
-                            $lang=$sc->attr("data-wb-lang");
-                        }
-                        $sc->before('<link href="/engine/js/datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet">');
-                        if ($lang>"") $sc->after("<script src='/engine/js/datetimepicker/locales/bootstrap-datetimepicker.{$lang}.js' type='text/javascript' charset='UTF-8'></script>");
-                        $sc->after('<script src="/engine/js/datetimepicker/bootstrap-datetimepicker.min.js" ></script>');
-                        $sc->remove();
-                        break;
-                    case "ckeditor" :
-                        //$sc->before('<link href="/engine/js/ckeditor/style.css" rel="stylesheet">');
-                        $sc->after('<script src="/engine/js/ckeditor/adapters/jquery.js"></script>');
-                        $sc->after('<script src="/engine/js/ckeditor/bootstrap-ckeditor-fix.js"></script>');
-                        $sc->after('<script src="/engine/js/ckeditor/ckeditor.js"></script>');
-                        $sc->remove();
-                        break;
-                    case "source" :
-                        $sc->after('<script language="javascript" src="/engine/js/ace/ace.js"></script>');
-                        $sc->remove();
-                        break;
-                    case "uploader" :
-                        $sc->after(wb_file_get_contents(__DIR__ ."/js/uploader/uploader.php"));
-                        $sc->remove();
-                        break;
-
-                    case "imgviewer" :
-                        $sc->after(wb_file_get_contents(__DIR__ ."/js/fancybox/fancybox.php"));
-                        $sc->remove();
-                        break;
-
-                    case "font" :
-                        switch ($name) {
-                                case "font-awesome":
-                                        $sc->after('<link href="/engine/lib/fonts/font-awesome/css/font-awesome.min.css" rel="stylesheet">');
-                                        break;
-                                case "open-sans":
-                                        $sc->after('<link href="/engine/lib/fonts/open-sans/stylesheet.css" rel="stylesheet">');
-                                        break;
-                                case "simple-line-icons":
-                                        $sc->after('<link href="/engine/lib/fonts/simple-line-icons/css/simple-line-icons.css" rel="stylesheet">');
-                                        break;
-                                case "weather-icons":
-                                        $sc->after('<link href="/engine/lib/fonts/weather-icons/css/weather-icons.min.css" rel="stylesheet">');
-                                        $sc->after('<link href="/engine/lib/fonts/weather-icons/css/weather-icons-wind.min.css" rel="stylesheet">');
-                                        break;
-                        }
-                        $sc->remove();
-                        break;
-
-                    case "engine" :
-                        $sc->after('<script src="/engine/js/wbengine.js" ></script>');
-                        //$sc->before('<link href="/engine/tpl/css/custom.css" rel="stylesheet">');
-                        $sc->remove();
-                        break;
-
+            switch( $sc->attr("data-wb-src") ) {
+            case "jquery" :
+                $sc->after('<script src="/engine/js/jquery.min.js" ></script>');
+                $sc->remove();
+                break;
+            case "bootstrap3" :
+                $sc->before('<link href="/engine/js/bootstrap3/bootstrap.min.css" rel="stylesheet">');
+                $sc->after('<script src="/engine/js/bootstrap3/bootstrap.min.js" ></script>');
+                $sc->remove();
+                break;
+            case "bootstrap3css" :
+                $sc->before('<link href="/engine/js/bootstrap3/bootstrap.min.css" rel="stylesheet">');
+                $sc->remove();
+                break;
+            case "bootstrap3js" :
+                $sc->after('<script src="/engine/js/bootstrap3/bootstrap.min.js" ></script>');
+                $sc->remove();
+                break;
+            case "bootstrap4" :
+                $sc->before('<link href="/engine/js/bootstrap/bootstrap.min.css" rel="stylesheet">');
+                $sc->after('<script src="/engine/js/bootstrap/bootstrap.min.js" ></script>');
+                $sc->remove();
+                break;
+            case "bootstrap" :
+                $sc->before('<link href="/engine/js/bootstrap/bootstrap.min.css" rel="stylesheet">');
+                $sc->after('<script src="/engine/js/bootstrap/bootstrap.min.js" ></script>');
+                $sc->remove();
+                break;
+            case "bootstrap4css" :
+                $sc->before('<link href="/engine/js/bootstrap/bootstrap.min.css" rel="stylesheet">');
+                $sc->remove();
+                break;
+            case "bootstrap4js" :
+                $sc->after('<script src="/engine/js/bootstrap/bootstrap.min.js" ></script>');
+                $sc->remove();
+                break;
+            case "datepicker" :
+                $lang=$_ENV["settings"]["js_locale"];
+                if ($sc->attr("data-wb-lang")>"") {
+                    $lang=$sc->attr("data-wb-lang");
                 }
+                $sc->before('<link href="/engine/js/datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet">');
+                if ($lang>"") $sc->after("<script src='/engine/js/datetimepicker/locales/bootstrap-datetimepicker.{$lang}.js' type='text/javascript' charset='UTF-8'></script>");
+                $sc->after('<script src="/engine/js/datetimepicker/bootstrap-datetimepicker.min.js" ></script>');
+                $sc->remove();
+                break;
+            case "plugins" :
+                $sc->before('<link href="/engine/js/plugins/plugins.css" rel="stylesheet">');
+                $sc->after('<script src="/engine/js/plugins/plugins.js"></script>');
+                $lang=$_ENV["settings"]["js_locale"];
+                if ($sc->attr("data-wb-lang")>"") {
+                    $lang=$sc->attr("data-wb-lang");
+                }
+                $sc->before('<link href="/engine/js/datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet">');
+                if ($lang>"") $sc->after("<script src='/engine/js/datetimepicker/locales/bootstrap-datetimepicker.{$lang}.js' type='text/javascript' charset='UTF-8'></script>");
+                $sc->after('<script src="/engine/js/datetimepicker/bootstrap-datetimepicker.min.js" ></script>');
+                $sc->remove();
+                break;
+            case "ckeditor" :
+                //$sc->before('<link href="/engine/js/ckeditor/style.css" rel="stylesheet">');
+                $sc->after('<script src="/engine/js/ckeditor/adapters/jquery.js"></script>');
+                $sc->after('<script src="/engine/js/ckeditor/bootstrap-ckeditor-fix.js"></script>');
+                $sc->after('<script src="/engine/js/ckeditor/ckeditor.js"></script>');
+                $sc->remove();
+                break;
+            case "source" :
+                $sc->after('<script language="javascript" src="/engine/js/ace/ace.js"></script>');
+                $sc->remove();
+                break;
+            case "uploader" :
+                $sc->after(wb_file_get_contents(__DIR__ ."/js/uploader/uploader.php"));
+                $sc->remove();
+                break;
+
+            case "imgviewer" :
+                $sc->after(wb_file_get_contents(__DIR__ ."/js/fancybox/fancybox.php"));
+                $sc->remove();
+                break;
+
+            case "font" :
+                switch ($name) {
+                case "font-awesome":
+                    $sc->after('<link href="/engine/lib/fonts/font-awesome/css/font-awesome.min.css" rel="stylesheet">');
+                    break;
+                case "open-sans":
+                    $sc->after('<link href="/engine/lib/fonts/open-sans/stylesheet.css" rel="stylesheet">');
+                    break;
+                case "simple-line-icons":
+                    $sc->after('<link href="/engine/lib/fonts/simple-line-icons/css/simple-line-icons.css" rel="stylesheet">');
+                    break;
+                case "weather-icons":
+                    $sc->after('<link href="/engine/lib/fonts/weather-icons/css/weather-icons.min.css" rel="stylesheet">');
+                    $sc->after('<link href="/engine/lib/fonts/weather-icons/css/weather-icons-wind.min.css" rel="stylesheet">');
+                    break;
+                }
+                $sc->remove();
+                break;
+
+            case "engine" :
+                $sc->after('<script src="/engine/js/wbengine.js" ></script>');
+                //$sc->before('<link href="/engine/tpl/css/custom.css" rel="stylesheet">');
+                $sc->remove();
+                break;
+
+            }
         }
     }
 
@@ -1661,11 +1676,11 @@ abstract class kiNode
                             $res=$this->find($selector);
                             if ($res->length) {
                                 foreach($res as $s) {
-					if ($com == "attr") {
-						$s->$com($$attribute,$inc->attr("value"));
-					} else {
-						$s->$com($$attribute);
-					}
+                                    if ($com == "attr") {
+                                        $s->$com($$attribute,$inc->attr("value"));
+                                    } else {
+                                        $s->$com($$attribute);
+                                    }
 
                                 }
                                 $inc->remove();
@@ -2032,31 +2047,50 @@ abstract class kiNode
         };
         unset($attrs);
         if (isset($form) AND isset($item) AND !isset($path)) {
-                $Item["path"]="/uploads/{$form}/{$item}";
-                $out->find(".wb-uploader")->attr("data-wb-path",$Item["path"]);
+            $Item["path"]="/uploads/{$form}/{$item}";
+            $out->find(".wb-uploader")->attr("data-wb-path",$Item["path"]);
         } else if (!isset($path)) {
-                if (isset($Item['_form']) AND isset($Item['_item']) AND isset($Item['_id'])) {
-                        // this branch work in wbFieldBuild
-                        $data["path"]="/uploads/{$Item['_form']}/{$Item['_item']}/{$Item['_id']}/";
-                        $out->find(".wb-uploader")->attr("data-wb-path",$data["path"]);
-                        $out->find(".wb-uploader")->attr("data-wb-form",$form);
-                        $out->find(".wb-uploader")->attr("data-wb-item",$item);
-                } else {
-                        $Item["path"]=wbFormUploadPath();
-                        if (!isset($form)) {$form=$_ENV["route"]["form"];}
-                        if (!isset($item)) {$item=$_ENV["route"]["item"];}
-                        $out->find(".wb-uploader")->attr("data-wb-form",$form);
-                        $out->find(".wb-uploader")->attr("data-wb-item",$item);
-                        $out->find(".wb-uploader")->attr("data-wb-path",$Item["path"]);
+            if (isset($Item['_form']) AND isset($Item['_item']) AND isset($Item['_id'])) {
+                // this branch work in wbFieldBuild
+                $data["path"]="/uploads/{$Item['_form']}/{$Item['_item']}/{$Item['_id']}/";
+                $out->find(".wb-uploader")->attr("data-wb-path",$data["path"]);
+                $out->find(".wb-uploader")->attr("data-wb-form",$form);
+                $out->find(".wb-uploader")->attr("data-wb-item",$item);
+            } else {
+                $Item["path"]=wbFormUploadPath();
+                if (!isset($form)) {
+                    $form=$_ENV["route"]["form"];
                 }
+                if (!isset($item)) {
+                    $item=$_ENV["route"]["item"];
+                }
+                $out->find(".wb-uploader")->attr("data-wb-form",$form);
+                $out->find(".wb-uploader")->attr("data-wb-item",$item);
+                $out->find(".wb-uploader")->attr("data-wb-path",$Item["path"]);
+            }
         } else {
-                $out->find(".wb-uploader")->attr("data-wb-path",$path);
-                $Item["path"]=$path;
+            $out->find(".wb-uploader")->attr("data-wb-path",$path);
+            $Item["path"]=$path;
         }
 
-        if (!isset($width) AND $this->attr("width")!==NULL) {$width=$this->attr("width");} else if (!isset($width)) {$width=$_ENV['thumb_width'];}
-        if (!isset($height) AND $this->attr("height")!==NULL) {$height=$this->attr("height");} else if (!isset($height)) {$height=$_ENV['thumb_height'];}
-        if (!isset($size) AND $this->attr("size")!==NULL) {$size=$this->attr("size");} else if (!isset($size)) {$size="cover";}
+        if (!isset($width) AND $this->attr("width")!==NULL) {
+            $width=$this->attr("width");
+        }
+        else if (!isset($width)) {
+            $width=$_ENV['thumb_width'];
+        }
+        if (!isset($height) AND $this->attr("height")!==NULL) {
+            $height=$this->attr("height");
+        }
+        else if (!isset($height)) {
+            $height=$_ENV['thumb_height'];
+        }
+        if (!isset($size) AND $this->attr("size")!==NULL) {
+            $size=$this->attr("size");
+        }
+        else if (!isset($size)) {
+            $size="cover";
+        }
 
         $out->find(".wb-uploader [data-wb-role=thumbnail]")->attr($size,"true");
         $out->find(".wb-uploader [data-wb-role=thumbnail]")->attr("size","{$width};{$height}");
@@ -2217,9 +2251,9 @@ abstract class kiNode
         $type=$this->attr("type");
         if (isset($dict)) {
             $dictdata=wbItemRead("tree",$dict);
-                if (!isset($Item["_{$name}__dict_"])) {
-                        $Item["_{$name}__dict_"]=$dictdata["_tree__dict_"];
-                }
+            if (!isset($Item["_{$name}__dict_"])) {
+                $Item["_{$name}__dict_"]=$dictdata["_tree__dict_"];
+            }
             if (!isset($Item[$name])) {
                 $Item[$name]=$dictdata["tree"];
             }
@@ -2300,9 +2334,9 @@ abstract class kiNode
             else {
                 $tree=$Item[$name];
             }
-        if (isset($call) AND $call > "" AND is_callable($call)) {
+            if (isset($call) AND $call > "" AND is_callable($call)) {
                 $tree=@$call();
-        }
+            }
             $tag=$this->tag();
             if (!isset($limit) OR $limit=="false" OR $limit*1<0) {
                 $limit=-1;
@@ -2449,82 +2483,87 @@ abstract class kiNode
     }
 
 
-public function tagPagination($size=10,$page=1,$pages=1,$cacheId,$count=0,$find="") {
-	ini_set('max_execution_time', 900);
-	ini_set('memory_limit', '1024M');
-    $this->attr("data-wb-pages",$pages);
-    $this->attr("data-wb-cache",$cacheId);
-    $tplId=$this->attr("data-wb-tpl");
-    $class="ajax-".$tplId;
-    if (!isset($_SESSION["temp"])) {
-        $_SESSION["temp"]=array();
-    }
-    $_SESSION["temp"][$class]=$_ENV;
-    unset($_SESSION["temp"][$class]["DOM"],
-          $_SESSION["temp"][$class]["cache"],
-          $_SESSION["temp"][$class]["error"],
-          $_SESSION["temp"][$class]["errors"]
-         );
-    if (is_object($this->parent("table")) && $this->parent("table")->find("thead th[data-wb-sort]")->length) {
-        $this->parent("table")->find("thead")->attr("data-wb-size",$size);
-        $this->parent("table")->find("thead")->attr("data-wb",$class);
-    }
-    if ($pages>"0" OR $this->attr("data-wb-sort")>"") {
-        $find=urlencode($find);
-        $pag=wbGetForm("common","pagination");
-        //$pag->wrapInner("<div></div>");
-        $step=1;
-        $flag=floor($page/10);
-        if ($flag<=1) {
-            $flag=0;
+    public function tagPagination($size=10,$page=1,$pages=1,$cacheId,$count=0,$find="") {
+        ini_set('max_execution_time', 900);
+        ini_set('memory_limit', '1024M');
+        $this->attr("data-wb-pages",$pages);
+        $this->attr("data-wb-cache",$cacheId);
+        $tplId=$this->attr("data-wb-tpl");
+        $class="ajax-".$tplId;
+        if (!isset($_SESSION["temp"])) {
+            $_SESSION["temp"]=array();
         }
-        else {
-            $flag*=10;
+        $_SESSION["temp"][$class]=$_ENV;
+        unset($_SESSION["temp"][$class]["DOM"],
+              $_SESSION["temp"][$class]["cache"],
+              $_SESSION["temp"][$class]["error"],
+              $_SESSION["temp"][$class]["errors"]
+             );
+        if (is_object($this->parent("table")) && $this->parent("table")->find("thead th[data-wb-sort]")->length) {
+            $this->parent("table")->find("thead")->attr("data-wb-size",$size);
+            $this->parent("table")->find("thead")->attr("data-wb",$class);
         }
-        //$inner="";
-        $pagination=array("id"=>$class,"size"=>$size,"count"=>$count,"cache"=>$cacheId,"find"=>$find,"pages"=>array());
-        if (!isset($_ENV["route"]["params"]["form"]) OR $_ENV["route"]["params"]["form"]=="") {
-            $form=$tplId;
-        }
-        else {
-            $form=$_ENV["route"]["params"]["form"];
-        }
-
-        $pagarr=wbPagination($page,$pages);
-        foreach($pagarr as $i => $p) {
-
-            $pn=$p;
-            if ($p=="..." AND $pagarr[$i-1]<$page) {
-                $pn=intval($page/2);
+        if ($pages>"0" OR $this->attr("data-wb-sort")>"") {
+            $find=urlencode($find);
+            $pag=wbGetForm("common","pagination");
+            //$pag->wrapInner("<div></div>");
+            $step=1;
+            $flag=floor($page/10);
+            if ($flag<=1) {
+                $flag=0;
             }
-            if ($p=="..." AND $pagarr[$i-1]>=$page) {
-                $pn=intval($page+($pages-$page)/2);
+            else {
+                $flag*=10;
+            }
+            //$inner="";
+            $pagination=array("id"=>$class,"size"=>$size,"count"=>$count,"cache"=>$cacheId,"find"=>$find,"pages"=>array());
+            if (!isset($_ENV["route"]["params"]["form"]) OR $_ENV["route"]["params"]["form"]=="") {
+                $form=$tplId;
+            }
+            else {
+                $form=$_ENV["route"]["params"]["form"];
             }
 
+            $pagarr=wbPagination($page,$pages);
+            foreach($pagarr as $i => $p) {
 
-            $href=$_ENV["route"]["controller"]."/".$_ENV["route"]["mode"]."/".$form."/".$pn;
-            $pagination["pages"][$i]=array(
-                                         "page"=>$p,
-                                         "href"=>$href,
-                                         "flag"=>$flag,
-                                         "data"=>"{$class}-{$pn}"
-                                     );
+                $pn=$p;
+                if ($p=="..." AND $pagarr[$i-1]<$page) {
+                    $pn=intval($page/2);
+                }
+                if ($p=="..." AND $pagarr[$i-1]>=$page) {
+                    $pn=intval($page+($pages-$page)/2);
+                }
+
+
+                $href=$_ENV["route"]["controller"]."/".$_ENV["route"]["mode"]."/".$form."/".$pn;
+                $pagination["pages"][$i]=array(
+                                             "page"=>$p,
+                                             "href"=>$href,
+                                             "flag"=>$flag,
+                                             "data"=>"{$class}-{$pn}"
+                                         );
+            }
+            $pag->wbSetData($pagination);
+            $pag->find("[data-page={$page}]")->addClass("active");
+            $pag->find("ul")->attr("data-wb-route",json_encode($_ENV["route"]));
+            if ($pages<2) {
+                $style=$pag->find("ul")->attr("style");
+                $pag->find("ul")->attr("style",$style.";display:none;");
+            }
+            $this->after($pag->innerHtml());
         }
-        $pag->wbSetData($pagination);
-        $pag->find("[data-page={$page}]")->addClass("active");
-        $pag->find("ul")->attr("data-wb-route",json_encode($_ENV["route"]));
-        if ($pages<2) {
-            $style=$pag->find("ul")->attr("style");
-            $pag->find("ul")->attr("style",$style.";display:none;");
-        }
-        $this->after($pag->innerHtml());
+        $this->removeAttr("data-wb-pagination");
     }
-    $this->removeAttr("data-wb-pagination");
-}
 
     public function addTemplate($type="innerHtml") {
-	include($_ENV["path_engine"]."/wbattributes.php");
-	if (isset($tpl) AND $tpl > "") {$tplid=$tpl;} else {$tplid=wbNewId();}
+        include($_ENV["path_engine"]."/wbattributes.php");
+        if (isset($tpl) AND $tpl > "") {
+            $tplid=$tpl;
+        }
+        else {
+            $tplid=wbNewId();
+        }
         $this->attr("data-wb-tpl",$tplid);
         $that=$this->clone();
         $that->removeClass("wb-done");
@@ -2683,12 +2722,13 @@ public function tagPagination($size=10,$page=1,$pages=1,$cacheId,$count=0,$find=
         else if (property_exists($this, $name)) {
             return $this->$name;
         }
-        $class=explode("_",$name); $class=$class[0];
+        $class=explode("_",$name);
+        $class=$class[0];
         $tag=substr(strtolower($class),3);
 
         if (in_array($tag,array_keys($_ENV['tags']))) {
-                $node = new $class($this);
-                return $node->$name($arguments[0]);
+            $node = new $class($this);
+            return $node->$name($arguments[0]);
         }
 
 

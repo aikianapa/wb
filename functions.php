@@ -70,29 +70,32 @@ function wbInitEnviroment()
     $settings = array_merge($settings, $variables);
     $_ENV['settings'] = $settings;
 
-    if ($_SERVER["REQUEST_URI"]=="/engine/") {unset($_SESSION["lang"]);} else {
+    if ($_SERVER["REQUEST_URI"]=="/engine/") {
+        unset($_SESSION["lang"]);
+    }
+    else {
         if (isset($_SESSION["user_lang"]) AND $_SESSION["user_lang"]>"") {
-                        //
+            //
         } else {
             if ((!isset($_SESSION['lang']) OR $_SESSION['lang']=="") AND (!isset($_ENV['lang']) OR $_ENV['lang']=="")) {
-                    if (isset($_ENV['settings']["lang"])) {
-                        $_SESSION['lang'] = $_ENV["lang"] = $_ENV['settings']["lang"];
-                    } else {
-                        $_SESSION['lang'] = $_ENV["lang"] = 'eng';
-                    }
+                if (isset($_ENV['settings']["lang"])) {
+                    $_SESSION['lang'] = $_ENV["lang"] = $_ENV['settings']["lang"];
+                } else {
+                    $_SESSION['lang'] = $_ENV["lang"] = 'eng';
+                }
             } else {
                 if (isset($_SESSION['lang'])) {
-                        $_ENV['lang']=$_SESSION["lang"];
+                    $_ENV['lang']=$_SESSION["lang"];
                 } else if (isset($_ENV['lang'])) {
-                        $_SESSION["lang"]=$_ENV['lang'];
+                    $_SESSION["lang"]=$_ENV['lang'];
                 } else {
-                        $_SESSION['lang'] = $_ENV["lang"] = 'eng';
+                    $_SESSION['lang'] = $_ENV["lang"] = 'eng';
                 }
             }
         }
     }
 
-        $_ENV["settings"]["js_locale"]=substr($_SESSION["lang"],0,2);
+    $_ENV["settings"]["js_locale"]=substr($_SESSION["lang"],0,2);
 
 
     if (isset($_ENV['settings']['path_tpl']) and $_ENV['settings']['path_tpl'] > '') {
@@ -115,78 +118,97 @@ function wbInitEnviroment()
     }
     $_ENV['sysmsg'] = wbGetSysMsg();
 
-        // Load tags
-        $_ENV['tags'] = wbListTags();
-        foreach(array_keys($_ENV['tags']) as $name) {
-                require_once $_ENV['tags'][$name];
-        }
+    // Load tags
+    $_ENV['tags'] = wbListTags();
+    foreach(array_keys($_ENV['tags']) as $name) {
+        require_once $_ENV['tags'][$name];
+    }
 
 }
 
 function wbGetSysMsg() {
-        $locale=array();
-        if (is_file($_ENV["path_app"]."/forms/common/system_messages.ini")) {
-                $locale=parse_ini_file($_ENV["path_app"]."/forms/common/system_messages.ini",true);
-        } else if (is_file($_ENV["path_engine"]."/forms/common/system_messages.ini")) {
-                $locale=parse_ini_file($_ENV["path_engine"]."/forms/common/system_messages.ini",true);
-        }
-        if (isset($locale[$_SESSION["lang"]])) {$locale=$locale[$_SESSION["lang"]];}
-        return $locale;
+    $locale=array();
+    if (is_file($_ENV["path_app"]."/forms/common/system_messages.ini")) {
+        $locale=parse_ini_file($_ENV["path_app"]."/forms/common/system_messages.ini",true);
+    } else if (is_file($_ENV["path_engine"]."/forms/common/system_messages.ini")) {
+        $locale=parse_ini_file($_ENV["path_engine"]."/forms/common/system_messages.ini",true);
+    }
+    if (isset($locale[$_SESSION["lang"]])) {
+        $locale=$locale[$_SESSION["lang"]];
+    }
+    return $locale;
 }
 
 
 function wbMailer(
-        $from = null, $sent = null, $subject = null, $message = null, $attach = null
-        ) {
-        return wbMail($from, $sent, $subject, $message, $attach);
+    $from = null, $sent = null, $subject = null, $message = null, $attach = null
+) {
+    return wbMail($from, $sent, $subject, $message, $attach);
 }
 
 
 function wbMail(
-         $from = null, $sent = null, $subject = null, $message = null, $attach = null
-    ) {
-        require $_ENV["path_engine"].'/lib/phpmailer/PHPMailerAutoload.php';
-        $mail = new PHPMailer(); // for mail
-        // $mail = new PHPMailer(true); // for sendmail
+    $from = null, $sent = null, $subject = null, $message = null, $attach = null
+) {
+    require $_ENV["path_engine"].'/lib/phpmailer/PHPMailerAutoload.php';
+    $mail = new PHPMailer(); // for mail
+    // $mail = new PHPMailer(true); // for sendmail
 
-/*
-    $mail->SMTPDebug = 2;                                 // Enable verbose debug output
-    $mail->isSMTP();                                      // Set mailer to use SMTP
-    $mail->Host = 'smtp1.example.com;smtp2.example.com';  // Specify main and backup SMTP servers
-    $mail->SMTPAuth = true;                               // Enable SMTP authentication
-    $mail->Username = 'user@example.com';                 // SMTP username
-    $mail->Password = 'secret';                           // SMTP password
-    $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
-    $mail->Port = 587;                                    // TCP port to connect to
-*/
+    /*
+        $mail->SMTPDebug = 2;                                 // Enable verbose debug output
+        $mail->isSMTP();                                      // Set mailer to use SMTP
+        $mail->Host = 'smtp1.example.com;smtp2.example.com';  // Specify main and backup SMTP servers
+        $mail->SMTPAuth = true;                               // Enable SMTP authentication
+        $mail->Username = 'user@example.com';                 // SMTP username
+        $mail->Password = 'secret';                           // SMTP password
+        $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
+        $mail->Port = 587;                                    // TCP port to connect to
+    */
 
-        if (strpos($from,";")) {$from=explode(";",$from);} else {$from=array($from,strip_tags($_ENV['settings']['header']));}
-        if (!is_array($sent) AND is_string($sent) AND strpos($sent,";")) {$sent=array(explode(";",$sent));} else {$sent=array(array($sent,$sent));}
+    if (strpos($from,";")) {
+        $from=explode(";",$from);
+    }
+    else {
+        $from=array($from,strip_tags($_ENV['settings']['header']));
+    }
+    if (!is_array($sent) AND is_string($sent) AND strpos($sent,";")) {
+        $sent=array(explode(";",$sent));
+    }
+    else {
+        $sent=array(array($sent,$sent));
+    }
 
-        $mail->setFrom($from[0], $from[1]);
-        $mail->addReplyTo($from[0], $from[1]);
+    $mail->setFrom($from[0], $from[1]);
+    $mail->addReplyTo($from[0], $from[1]);
 
-        foreach($sent as $s) {
-             $mail->addAddress($s[0], $s[1]);
-        }
+    foreach($sent as $s) {
+        $mail->addAddress($s[0], $s[1]);
+    }
 
-	$mail->Subject = $subject;
-	//Read an HTML message body from an external file, convert referenced images to embedded,
-	//convert HTML into a basic plain-text alternative body
-	$mail->msgHTML($message, dirname(__FILE__));
-	$mail->CharSet = 'utf-8';
-	//Replace the plain text body with one created manually
-	$mail->AltBody = strip_tags($message);
-	//Attach an image file
+    $mail->Subject = $subject;
+    //Read an HTML message body from an external file, convert referenced images to embedded,
+    //convert HTML into a basic plain-text alternative body
+    $mail->msgHTML($message, dirname(__FILE__));
+    $mail->CharSet = 'utf-8';
+    //Replace the plain text body with one created manually
+    $mail->AltBody = strip_tags($message);
+    //Attach an image file
 
-        if (!is_array($attach) AND is_string($attach)) {$attach=array($attach);}
-        foreach($attach as $a) {
-                $mail->addAttachment($attach);
-        }
-	//send the message, check for errors
-	$mail->send();
-        $_ENV["error"]=$mail->ErrorInfo;
-        if ($error>"") {return false;} else {return true;}
+    if (!is_array($attach) AND is_string($attach)) {
+        $attach=array($attach);
+    }
+    foreach($attach as $a) {
+        $mail->addAttachment($attach);
+    }
+    //send the message, check for errors
+    $mail->send();
+    $_ENV["error"]=$mail->ErrorInfo;
+    if ($error>"") {
+        return false;
+    }
+    else {
+        return true;
+    }
 }
 
 function wbCheckWorkspace()
@@ -219,7 +241,8 @@ function wbFormUploadPath()
         } else {
             $path .= '/undefined';
         }
-    } elseif ('ajax' == $_ENV['route']['controller'] and 'buildfields' == $_ENV['route']['mode'] and isset($_POST['data'])) {
+    }
+    elseif ('ajax' == $_ENV['route']['controller'] and 'buildfields' == $_ENV['route']['mode'] and isset($_POST['data'])) {
         if (isset($_POST['data']['_form']) and $_POST['data']['_form'] > '') {
             $path .= '/'.$_POST['data']['_form'];
         } else {
@@ -245,9 +268,9 @@ function wbInitFunctions()
     }
     foreach ($_ENV['forms'] as $form) {
         $inc = array(
-                "{$_ENV['path_engine']}/forms/{$form}.php", "{$_ENV['path_engine']}/forms/{$form}/{$form}.php",
-                "{$_ENV['path_app']}/forms/{$form}.php", "{$_ENV['path_app']}/forms/{$form}/{$form}.php",
-            );
+                   "{$_ENV['path_engine']}/forms/{$form}.php", "{$_ENV['path_engine']}/forms/{$form}/{$form}.php",
+                   "{$_ENV['path_app']}/forms/{$form}.php", "{$_ENV['path_app']}/forms/{$form}/{$form}.php",
+               );
         foreach ($inc as $k => $file) {
             if (is_file("{$file}")) {
                 include_once "{$file}";
@@ -256,9 +279,9 @@ function wbInitFunctions()
     }
     foreach ($_ENV['modules'] as $module) {
         $inc = array(
-                "{$_ENV['path_engine']}/modules/{$module}.php", "{$_ENV['path_engine']}/modules/{$module}/{$module}.php",
-                "{$_ENV['path_app']}/modules/{$module}.php", "{$_ENV['path_app']}/modules/{$module}/{$module}.php",
-            );
+                   "{$_ENV['path_engine']}/modules/{$module}.php", "{$_ENV['path_engine']}/modules/{$module}/{$module}.php",
+                   "{$_ENV['path_app']}/modules/{$module}.php", "{$_ENV['path_app']}/modules/{$module}/{$module}.php",
+               );
         foreach ($inc as $k => $file) {
             if (!is_callable($module.'__init') && !is_callable($module.'_init') && is_file($file)) {
                 include_once $file;
@@ -268,88 +291,91 @@ function wbInitFunctions()
 }
 
 function wbGetUserUi($details=false) {
-        $prop=wbGetUserUiConfig();
-        if ($prop==null) {
-                $conf=wbItemRead("users",$_SESSION["user_role"]);
-                if (!$_ENV["last_error"] AND isset($conf["roleprop"]) AND $conf["roleprop"] !== "") {
-			if ($details) {
-				$prop=array();
-				$prop["roleprop"]=wbItemToArray($conf["roleprop"]);
-				$prop["_roleprop__dict_"]=wbItemToArray($conf["_roleprop__dict_"]);
-			} else {
-				$prop=wbItemToArray($conf["roleprop"]);
-			}
+    $prop=wbGetUserUiConfig();
+    if ($prop==null) {
+        $conf=wbItemRead("users",$_SESSION["user_role"]);
+        if (!$_ENV["last_error"] AND isset($conf["roleprop"]) AND $conf["roleprop"] !== "") {
+            if ($details) {
+                $prop=array();
+                $prop["roleprop"]=wbItemToArray($conf["roleprop"]);
+                $prop["_roleprop__dict_"]=wbItemToArray($conf["_roleprop__dict_"]);
+            } else {
+                $prop=wbItemToArray($conf["roleprop"]);
+            }
 
-                }
         }
-        if ($prop==null) {
-                $conf=wbItemRead("users:engine","admin");
-                if (!$_ENV["last_error"]) {
-			if ($details) {
-				$prop=array();
-				$prop["roleprop"]=wbItemToArray($conf["roleprop"]);
-				$prop["_roleprop__dict_"]=wbItemToArray($conf["_roleprop__dict_"]);
-			} else {
-				$prop=wbItemToArray($conf["roleprop"]);
-			}
-                } else {
-			if ($details) {
-				$prop=array();
-				$prop["roleprop"]=array();
-				$prop["_roleprop__dict_"]=array();
-			} else {
-				$prop=array();
-			}
-                }
+    }
+    if ($prop==null) {
+        $conf=wbItemRead("users:engine","admin");
+        if (!$_ENV["last_error"]) {
+            if ($details) {
+                $prop=array();
+                $prop["roleprop"]=wbItemToArray($conf["roleprop"]);
+                $prop["_roleprop__dict_"]=wbItemToArray($conf["_roleprop__dict_"]);
+            } else {
+                $prop=wbItemToArray($conf["roleprop"]);
+            }
+        } else {
+            if ($details) {
+                $prop=array();
+                $prop["roleprop"]=array();
+                $prop["_roleprop__dict_"]=array();
+            } else {
+                $prop=array();
+            }
         }
-        return $prop;
+    }
+    return $prop;
 }
 
 function wbGetUserUiConfig($prop=null) {
-        if ($prop==null) {
-                $prop=wbTreeRead("_config");
-                $prop=wbItemToArray($prop["tree"]);
-        }
-        if (is_array($prop)) {
-                foreach($prop as $key => $item) {
-                        $item=wbItemToArray($item);
-                        if (is_array($item)) {
-                                $item=wbGetUserUiConfig($item);
-                                if (!isset($item["data"])) {$item["data"]=array();}
-                                $item["data"]["visible"]="on";
-                                $prop[$key]=$item;
-                        }
-                };
-        }
-        return $prop;
+    if ($prop==null) {
+        $prop=wbTreeRead("_config");
+        $prop=wbItemToArray($prop["tree"]);
+    }
+    if (is_array($prop)) {
+        foreach($prop as $key => $item) {
+            $item=wbItemToArray($item);
+            if (is_array($item)) {
+                $item=wbGetUserUiConfig($item);
+                if (!isset($item["data"])) {
+                    $item["data"]=array();
+                }
+                $item["data"]["visible"]="on";
+                $prop[$key]=$item;
+            }
+        };
+    }
+    return $prop;
 }
 
 
 function wbItemToArray($Item = array())
 {
     if (is_array($Item)) {
-	$tmpItem=array();
+        $tmpItem=array();
         foreach ($Item as $i => $item) {
             if (is_string($item) AND ( substr($item,0,1)=="{" OR substr($item,0,1)=="[") )  {
-                        $tmp = json_decode($item, true);
-                        if (is_array($tmp)) {
-                                $item = wbItemToArray($tmp);
-                                unset($tmp);
-                        }
+                $tmp = json_decode($item, true);
+                if (is_array($tmp)) {
+                    $item = wbItemToArray($tmp);
+                    unset($tmp);
+                }
             }
             $item = wbItemToArray($item);
-                 if (is_array($item) AND isset($item['id'])) {
-                        $tmpItem[$item['id']] = $item;
-                } else {
-                        $tmpItem[$i] = $item;
-                }
+            if (is_array($item) AND isset($item['id'])) {
+                $tmpItem[$item['id']] = $item;
+            } else {
+                $tmpItem[$i] = $item;
+            }
         }
-        $Item=$tmpItem; unset($tmpItem);
+        $Item=$tmpItem;
+        unset($tmpItem);
     } else if (is_string($item) AND substr($Item,0,1)=="{" OR substr($Item,0,1)=="[") {
         $tmp = json_decode($Item, true);
         if (is_array($tmp)) {
-                $Item = wbItemToArray($tmp);
-                unset($tmp);
+            $Item = wbItemToArray($tmp);
+            unset($tmp);
         }
 
     }
@@ -359,13 +385,18 @@ function wbItemToArray($Item = array())
 
 function wbGetDataWbFrom($Item, $str)
 {
-	$str = trim($str);
-	$str_1=wbSetValuesStr("{{".$str."}}",$Item);
-	if (substr($str,0,1)=="_" AND $str !== $str_1) {
-		// если в атрибуте data-wb-from указанна общая переменная (типа _ENV, _SESS)
-		$tmp=json_encode($str_1,true);
-		if (is_array($tmp)) {return $tmp;} else {return $str_1;}
-	}
+    $str = trim($str);
+    $str_1=wbSetValuesStr("{{".$str."}}",$Item);
+    if (substr($str,0,1)=="_" AND $str !== $str_1) {
+        // если в атрибуте data-wb-from указанна общая переменная (типа _ENV, _SESS)
+        $tmp=json_encode($str_1,true);
+        if (is_array($tmp)) {
+            return $tmp;
+        }
+        else {
+            return $str_1;
+        }
+    }
     $str = wbSetValuesStr($str, $Item);
 
     //$Item = wbItemToArray($Item);
@@ -378,9 +409,9 @@ function wbGetDataWbFrom($Item, $str)
         $fld = str_replace(']', '"]', $fld);
         $fld = str_replace('""', '"', $fld);
         if (eval('return isset($Item'.$fld.');')) {
-                eval('$res=$Item'.$fld.';');
+            eval('$res=$Item'.$fld.';');
         } else {
-                $res="";
+            $res="";
         }
 
         return $res;
@@ -388,7 +419,7 @@ function wbGetDataWbFrom($Item, $str)
     if (isset($Item[$str])) {
         return $Item[$str];
     } else {
-	    return null;
+        return null;
     }
 }
 
@@ -403,27 +434,27 @@ function wbMerchantList($type = 'both')
     }
     $dir = $_ENV["path_{$type}"].'/modules';
     if (is_dir($dir)) {
-            exec("ls {$dir} -R --ignore'=*_*.php' -D -1 ", $list);
-            foreach ($list as $val) {
-                if (':' == substr($val, -1)) {
-                    $dir = substr($val, 0, -1);
-                }
-                $file = "{$dir}/{$val}";
-                if (is_file($file)) {
-                    $php = strtolower(trim(file_get_contents($file)));
-                    $form = explode('.php', $val);
-                    $form = $form[0];
-                    if ((strpos($php, "function {$form}_checkout") and strpos($php, "function {$form}_success"))
-                    or (strpos($php, "function {$form}__checkout") and strpos($php, "function {$form}__success"))) {
-                        $arr = array();
-                        $arr['id'] = $form;
-                        $arr['name'] = $form;
-                        $arr['dir'] = $dir;
-                        $arr['type'] = $type;
-                        $res[] = $arr;
-                    }
+        exec("ls {$dir} -R --ignore'=*_*.php' -D -1 ", $list);
+        foreach ($list as $val) {
+            if (':' == substr($val, -1)) {
+                $dir = substr($val, 0, -1);
+            }
+            $file = "{$dir}/{$val}";
+            if (is_file($file)) {
+                $php = strtolower(trim(file_get_contents($file)));
+                $form = explode('.php', $val);
+                $form = $form[0];
+                if ((strpos($php, "function {$form}_checkout") and strpos($php, "function {$form}_success"))
+                        or (strpos($php, "function {$form}__checkout") and strpos($php, "function {$form}__success"))) {
+                    $arr = array();
+                    $arr['id'] = $form;
+                    $arr['name'] = $form;
+                    $arr['dir'] = $dir;
+                    $arr['type'] = $type;
+                    $res[] = $arr;
                 }
             }
+        }
     }
     unset($dir,$list,$val,$form,$php,$file,$arr);
 
@@ -435,11 +466,11 @@ function wbFieldBuild($param, $data = array(),$locale=array())
 
     $set = wbGetForm('common', 'tree_fldset');
     $tpl = wbGetForm('snippets', $param['type']);
-	if (is_array($param["prop"])) {
-		$opt=$param["prop"];
-	} else {
-		$opt = json_decode($param["prop"], true);
-	}
+    if (is_array($param["prop"])) {
+        $opt=$param["prop"];
+    } else {
+        $opt = json_decode($param["prop"], true);
+    }
     $options = '';
     if (isset($opt['required']) and true == $opt['required']) {
         $options .= ' required ';
@@ -453,112 +484,113 @@ function wbFieldBuild($param, $data = array(),$locale=array())
     $param['options'] = trim($options);
 
     switch ($param['type']) {
-        case 'number':
-            if (isset($opt['min'])) {
-                $tpl->find('input')->attr('min', $opt['min']);
-            }
-            if (isset($opt['max'])) {
-                $tpl->find('input')->attr('max', $opt['max']);
-            }
-            if (isset($opt['step'])) {
-                $tpl->find('input')->attr('step', $opt['step']);
-            }
-            if (isset($opt['datalist'])) {
-                $param['listid'] = wbNewId();
-                $tpl->find('input')->attr('list', $param['listid']);
-                $tpl->find('datalist')->attr('data-wb-from', wbJsonEncode($opt['datalist']));
-                $tpl->find('datalist')->attr('data-wb-role', 'foreach');
-            } else {
-                $tpl->find('datalist')->remove();
-            }
-            break;
-        case 'enum':
-            if ('[{' == substr($param['prop'], 0, 2)) {
-                $arr = json_encode($param['prop'], true);
-            } elseif ($param['value'] > '') {
-                $param['enum'] = array();
-                $arr = explode(';', $param['value']);
-            }
-            foreach ($arr as $i => $line) {
-                $param['enum'][$line] = array('id' => $line, 'name' => $line);
-            }
-            $tpl->wbSetData($param);
-            break;
-        case 'image':
-            if (isset($_POST['data-id']) AND $_POST['_form']=="tree") {
-                $data["path"]="/uploads/{$_POST['_form']}/{$_POST['_item']}/{$_POST['data-id']}/";
-            } else {
-                $data["path"]="/uploads/{$data['_form']}/{$data['_item']}/";
-            }
-            $tpl->find('[data-wb-role=uploader]')->attr('data-wb-path',$data["path"]);
-            $tpl->wbSetValues($param);
-            $tpl->wbSetData($data);
-            break;
-        case 'gallery':
-            if (isset($_POST['data-id']) AND $_POST['_form']=="tree") {
-                $data["path"]="/uploads/{$_POST['_form']}/{$_POST['_item']}/{$_POST['data-id']}/";
-            } else {
-                $data["path"]="/uploads/{$data['_form']}/{$data['_item']}/";
-            }
-            $tpl->find('[data-wb-role=uploader]')->attr('data-wb-path',$data["path"]);
-            $tpl->wbSetValues($param);
-            $tpl->wbSetData($data);
-            break;
-        case 'forms':
-		$env=$_ENV;
-		$get=$_GET;
-		$par=$param;
-		$names=explode(";",$param["value"]);
-		$form=$names[0];
-		$mode=$names[1];
-		$item=$names[2];
-		$_ENV["route"]["form"]=$param["_form"]=$_GET["form"]=$form;
-		$_ENV["route"]["mode"]=$param["_mode"]=$_GET["mode"]=$mode;
-		$_ENV["route"]["item"]=$param["_item"]=$_GET["item"]=$item;
-		$tpl=wbGetForm($form,$mode);
-		$tpl->wbSetValues($param);
-		$tpl->wbSetData($data);
-		$tpl->find(".nav-tabs .nav-item:first-child")->addClass("active");
-		$_ENV=$env;
-		$_GET=$get;
-		$param=$par;
-		unset($env,$get,$par);
-		break;
-        case 'module':
-		if (!is_array($opt)) break;
-		foreach($opt as $key => $val) {
-			$tpl->find("[data-wb-role]:first")->attr($key,$val);
-		}
-		    $tpl->wbSetValues($param);
-		    $tpl->wbSetData($data);
-		break;
-        case 'multiinput':
-            $flds = wbFromString('');
+    case 'number':
+        if (isset($opt['min'])) {
+            $tpl->find('input')->attr('min', $opt['min']);
+        }
+        if (isset($opt['max'])) {
+            $tpl->find('input')->attr('max', $opt['max']);
+        }
+        if (isset($opt['step'])) {
+            $tpl->find('input')->attr('step', $opt['step']);
+        }
+        if (isset($opt['datalist'])) {
+            $param['listid'] = wbNewId();
+            $tpl->find('input')->attr('list', $param['listid']);
+            $tpl->find('datalist')->attr('data-wb-from', wbJsonEncode($opt['datalist']));
+            $tpl->find('datalist')->attr('data-wb-role', 'foreach');
+        } else {
+            $tpl->find('datalist')->remove();
+        }
+        break;
+    case 'enum':
+        if ('[{' == substr($param['prop'], 0, 2)) {
+            $arr = json_encode($param['prop'], true);
+        }
+        elseif ($param['value'] > '') {
+            $param['enum'] = array();
+            $arr = explode(';', $param['value']);
+        }
+        foreach ($arr as $i => $line) {
+            $param['enum'][$line] = array('id' => $line, 'name' => $line);
+        }
+        $tpl->wbSetData($param);
+        break;
+    case 'image':
+        if (isset($_POST['data-id']) AND $_POST['_form']=="tree") {
+            $data["path"]="/uploads/{$_POST['_form']}/{$_POST['_item']}/{$_POST['data-id']}/";
+        } else {
+            $data["path"]="/uploads/{$data['_form']}/{$data['_item']}/";
+        }
+        $tpl->find('[data-wb-role=uploader]')->attr('data-wb-path',$data["path"]);
+        $tpl->wbSetValues($param);
+        $tpl->wbSetData($data);
+        break;
+    case 'gallery':
+        if (isset($_POST['data-id']) AND $_POST['_form']=="tree") {
+            $data["path"]="/uploads/{$_POST['_form']}/{$_POST['_item']}/{$_POST['data-id']}/";
+        } else {
+            $data["path"]="/uploads/{$data['_form']}/{$data['_item']}/";
+        }
+        $tpl->find('[data-wb-role=uploader]')->attr('data-wb-path',$data["path"]);
+        $tpl->wbSetValues($param);
+        $tpl->wbSetData($data);
+        break;
+    case 'forms':
+        $env=$_ENV;
+        $get=$_GET;
+        $par=$param;
+        $names=explode(";",$param["value"]);
+        $form=$names[0];
+        $mode=$names[1];
+        $item=$names[2];
+        $_ENV["route"]["form"]=$param["_form"]=$_GET["form"]=$form;
+        $_ENV["route"]["mode"]=$param["_mode"]=$_GET["mode"]=$mode;
+        $_ENV["route"]["item"]=$param["_item"]=$_GET["item"]=$item;
+        $tpl=wbGetForm($form,$mode);
+        $tpl->wbSetValues($param);
+        $tpl->wbSetData($data);
+        $tpl->find(".nav-tabs .nav-item:first-child")->addClass("active");
+        $_ENV=$env;
+        $_GET=$get;
+        $param=$par;
+        unset($env,$get,$par);
+        break;
+    case 'module':
+        if (!is_array($opt)) break;
+        foreach($opt as $key => $val) {
+            $tpl->find("[data-wb-role]:first")->attr($key,$val);
+        }
+        $tpl->wbSetValues($param);
+        $tpl->wbSetData($data);
+        break;
+    case 'multiinput':
+        $flds = wbFromString('');
 
-            if ('[{' == substr($param['value'], 0, 2)) {
-                $arr = json_encode($param['value'], true);
-            } else {
-                $arr = explode(';', $param['value']);
+        if ('[{' == substr($param['value'], 0, 2)) {
+            $arr = json_encode($param['value'], true);
+        } else {
+            $arr = explode(';', $param['value']);
+        }
+        foreach ($arr as $i => $name) {
+            if ('' == $name) {
+                $name = 'data';
             }
-                foreach ($arr as $i => $name) {
-                    if ('' == $name) {
-                        $name = 'data';
-                    }
-                    $line = wbFromString($tpl->find('[data-wb-role=multiinput]')->html());
-                    $line->find('input')->attr('name', $name);
-                    $flds->append($line);
-                }
-                $tpl->wbSetValues($param);
-                $tpl->find('[data-wb-role=multiinput]')->html($flds);
-                $tpl->wbSetData($data);
+            $line = wbFromString($tpl->find('[data-wb-role=multiinput]')->html());
+            $line->find('input')->attr('name', $name);
+            $flds->append($line);
+        }
+        $tpl->wbSetValues($param);
+        $tpl->find('[data-wb-role=multiinput]')->html($flds);
+        $tpl->wbSetData($data);
 
-                unset($flds);
+        unset($flds);
 
-            break;
+        break;
     }
     if (isset($param["style"]) AND $param["style"]>"") {
-            $style=$tpl->attr("style");
-            $tpl->find(":first")->attr("style",$style.$param["style"]);
+        $style=$tpl->attr("style");
+        $tpl->find(":first")->attr("style",$style.$param["style"]);
     }
 
     $set->find('.form-group > label')->html($param['label']);
@@ -602,14 +634,16 @@ function wbFlushDatabase()
 function wbTable($table = 'data', $engine = false)
 {
     wbTrigger('func', __FUNCTION__, 'before');
-        if (strpos($table,":")) {
-                $table=explode(":",$table);
-                if ($table[1]=="engine" OR $table[1]=="e") {$engine=true;}
-                $table=$table[0];
+    if (strpos($table,":")) {
+        $table=explode(":",$table);
+        if ($table[1]=="engine" OR $table[1]=="e") {
+            $engine=true;
         }
+        $table=$table[0];
+    }
 
     if (substr($table,0,strlen($_ENV['dbe'])) == $_ENV['dbe']) {
-            $engine = true;
+        $engine = true;
     }
     if (false == $engine) {
         $db = $_ENV['dba'];
@@ -639,10 +673,10 @@ function wbTableName($table)
     $table = explode('/', $table);
     $table = array_pop($table);
     $table = str_replace('.json', '', $table);
-        if (strpos($table,":")) {
-                $table=explode(":",$table);
-                $table=$table[0];
-        }
+    if (strpos($table,":")) {
+        $table=explode(":",$table);
+        $table=$table[0];
+    }
     return $table;
 }
 
@@ -755,8 +789,8 @@ function wbListItems($table = 'pages', $where = '', $sort = null)
 }
 function wbItemList($table = 'pages', $where = '', $sort = null)
 {
-	ini_set('max_execution_time', 900);
-	ini_set('memory_limit', '1024M');
+    ini_set('max_execution_time', 900);
+    ini_set('memory_limit', '1024M');
     $list = array();
     $table = wbTable($table);
     $tname = wbTableName($table);
@@ -770,8 +804,11 @@ function wbItemList($table = 'pages', $where = '', $sort = null)
         $list = $_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])];
     } else {
         $list = wb_file_get_contents($table);
-        if (substr($list,0,1)=="{") {$list = json_decode($list,true);} else {
-                $list=unserialize($list);
+        if (substr($list,0,1)=="{") {
+            $list = json_decode($list,true);
+        }
+        else {
+            $list=unserialize($list);
         }
 
         if (is_array($list)) {
@@ -779,14 +816,15 @@ function wbItemList($table = 'pages', $where = '', $sort = null)
                 $item['_table'] = $tname;
                 $item = wbTrigger('form', __FUNCTION__, 'AfterItemRead', func_get_args(), $item);
                 if (
-                            ('_' == substr($item['id'], 0, 1) and 'admin' !== $_SESSION['user_role'])
-                        or
-                            (null == $item)
+                    ('_' == substr($item['id'], 0, 1) and 'admin' !== $_SESSION['user_role'])
+                    or
+                    (null == $item)
 
-                        or (isset($item['_removed']) and true == $item['_removed'])
-                        ) {
+                    or (isset($item['_removed']) and true == $item['_removed'])
+                ) {
                     unset($list[$key]);
-                } elseif ($where > '' and !wbWhereItem($item, $where)) {
+                }
+                elseif ($where > '' and !wbWhereItem($item, $where)) {
                     unset($list[$key]);
                 } else {
                     $list[$key] = $item;
@@ -830,38 +868,44 @@ function wbTreeRead($name)
 }
 
 function wbTreeToArray($tree) {
-        $assoc=array();
-        foreach($tree as $i => $item) {
-                if (isset($item["children"])  AND is_array($item["children"]) AND count($item["children"]) ) {$item["children"]=wbTreeToArray($item["children"]);}
-                if (isset($item["id"])) {
-                        $key=$item["id"];
-                } else {
-                        $key=$i;
-                }
-                if (!is_array($item["children"]) OR !count($item["children"])) {$item["children"]="";}
-                if (!is_array($item["data"]) OR !count($item["data"])) {$item["data"]="";}
-                $assoc[$key]=$item;
-
+    $assoc=array();
+    foreach($tree as $i => $item) {
+        if (isset($item["children"])  AND is_array($item["children"]) AND count($item["children"]) ) {
+            $item["children"]=wbTreeToArray($item["children"]);
         }
-        return $assoc;
+        if (isset($item["id"])) {
+            $key=$item["id"];
+        } else {
+            $key=$i;
+        }
+        if (!is_array($item["children"]) OR !count($item["children"])) {
+            $item["children"]="";
+        }
+        if (!is_array($item["data"]) OR !count($item["data"])) {
+            $item["data"]="";
+        }
+        $assoc[$key]=$item;
+
+    }
+    return $assoc;
 }
 
 function wbTreeFindBranchById($Item, $id)
 {
-        $Item=wbItemToArray($Item);
+    $Item=wbItemToArray($Item);
     $res = false;
     if (is_array($Item)) {
-            foreach ($Item as $item) {
-                if ($item['id'] == $id) {
-                    return $item;
-                }
-                if (is_array($item['children'])) {
-                    $res = wbTreeFindBranchById($item['children'], $id);
-                    if ($res) {
-                        return $res;
-                    }
+        foreach ($Item as $item) {
+            if ($item['id'] == $id) {
+                return $item;
+            }
+            if (is_array($item['children'])) {
+                $res = wbTreeFindBranchById($item['children'], $id);
+                if ($res) {
+                    return $res;
                 }
             }
+        }
     }
 
     return $res;
@@ -1005,45 +1049,45 @@ function wbItemRead($table = null, $id = null)
         }
         $item = wbTrigger('form', __FUNCTION__, 'AfterItemRead', func_get_args(), $item);
     } else {
-	$item = wbTrigger('form', __FUNCTION__, 'EmptyItemRead', func_get_args(), $item);
+        $item = wbTrigger('form', __FUNCTION__, 'EmptyItemRead', func_get_args(), $item);
     }
 
     return $item;
 }
 
 function wbCacheCheck() {
-        $cache = array("check"=>false,"id"=>false,"path"=>false,"data"=>false);
-        if (isset($_ENV["settings"]["cache"]) AND is_array($_ENV["settings"]["cache"])) {
-                foreach($_ENV["settings"]["cache"] as $line) {
-                        $c=wbAttrToArray($line["controller"]);
-                        $f=wbAttrToArray($line["form"]);
-                        $m=wbAttrToArray($line["mode"]);
-                        if (
-                                (in_array($_ENV["route"]["controller"],$c) OR $c==array("*") )
-                        AND     (in_array($_ENV["route"]["form"],$f) OR $f==array("*") OR ($f==array() AND !in_array("form",$c)))
-                        AND     (in_array($_ENV["route"]["mode"],$m) OR $m==array("*") OR ($m==array() AND !in_array("form",$c)))
-                        AND     $line["active"] == "on"
-                        )
-                        {
-                                $cacheId = md5(json_encode($_ENV["route"]).$_ENV["lang"].$_SESSION["lang"]);
-                                $cacheFile = $_ENV["dbac"]."/".$cacheId.".htm";
-                                if (!is_file($cacheFile)) {
-                                        $cache = array("check"=>null,"id"=>$cacheId,"path"=>$cacheFile,"data"=>false);
-                                } else {
-                                        $lastmod = filemtime($cacheFile);
-                                        $expired = $lastmod + $line["lifetime"]*1;
-                                        if (time() > $expired) {
-                                                $cache = array("check"=>null,"id"=>$cacheId,"path"=>$cacheFile,"data"=>false);
-                                        } else {
-                                                $data = file_get_contents($cacheFile);
-                                                $cache = array("check"=>true,"id"=>$cacheId,"path"=>$cacheFile,"data"=>$data);
-                                        }
+    $cache = array("check"=>false,"id"=>false,"path"=>false,"data"=>false);
+    if (isset($_ENV["settings"]["cache"]) AND is_array($_ENV["settings"]["cache"])) {
+        foreach($_ENV["settings"]["cache"] as $line) {
+            $c=wbAttrToArray($line["controller"]);
+            $f=wbAttrToArray($line["form"]);
+            $m=wbAttrToArray($line["mode"]);
+            if (
+                (in_array($_ENV["route"]["controller"],$c) OR $c==array("*") )
+                AND     (in_array($_ENV["route"]["form"],$f) OR $f==array("*") OR ($f==array() AND !in_array("form",$c)))
+                AND     (in_array($_ENV["route"]["mode"],$m) OR $m==array("*") OR ($m==array() AND !in_array("form",$c)))
+                AND     $line["active"] == "on"
+            )
+            {
+                $cacheId = md5(json_encode($_ENV["route"]).$_ENV["lang"].$_SESSION["lang"]);
+                $cacheFile = $_ENV["dbac"]."/".$cacheId.".htm";
+                if (!is_file($cacheFile)) {
+                    $cache = array("check"=>null,"id"=>$cacheId,"path"=>$cacheFile,"data"=>false);
+                } else {
+                    $lastmod = filemtime($cacheFile);
+                    $expired = $lastmod + $line["lifetime"]*1;
+                    if (time() > $expired) {
+                        $cache = array("check"=>null,"id"=>$cacheId,"path"=>$cacheFile,"data"=>false);
+                    } else {
+                        $data = file_get_contents($cacheFile);
+                        $cache = array("check"=>true,"id"=>$cacheId,"path"=>$cacheFile,"data"=>$data);
+                    }
 
-                                }
-                        }
                 }
+            }
         }
-        return $cache;
+    }
+    return $cache;
 }
 
 
@@ -1086,28 +1130,32 @@ function wbItemRemove($table = null, $id = null, $flush = true)
     }
     if (is_array($id)) {
         foreach($id as $iid) {
-                wbItemRemove($table, $iid, false);
+            wbItemRemove($table, $iid, false);
         }
-        if ($flush==true) {wbTableFlush($table);}
+        if ($flush==true) {
+            wbTableFlush($table);
+        }
     } else if (is_string($id)) {
-            if (strpos($id," ") OR strpos($id,'"') OR strpos($id,'=') OR strpos($id,'>') OR strpos($id,'<')) {
-                $list=wbItemList($table,$id);
-                $list=array_keys($list);
-                foreach($list as $iid) {
-                        wbItemRemove($table, $iid, false);
-                }
-                if ($flush==true) {wbTableFlush($table);}
-            } else {
-                $item = wbItemRead($table, $id);
-                if ($item == null)  return;
-                wbTrigger('form', __FUNCTION__, 'BeforeItemRemove', func_get_args(), $item);
-                if (is_array($item)) {
-                    $item['_removed'] = true;
-                    $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$id] = $item;
-                }
-                $res = wbItemSave($table, $item, $flush);
+        if (strpos($id," ") OR strpos($id,'"') OR strpos($id,'=') OR strpos($id,'>') OR strpos($id,'<')) {
+            $list=wbItemList($table,$id);
+            $list=array_keys($list);
+            foreach($list as $iid) {
+                wbItemRemove($table, $iid, false);
             }
-   }
+            if ($flush==true) {
+                wbTableFlush($table);
+            }
+        } else {
+            $item = wbItemRead($table, $id);
+            if ($item == null)  return;
+            wbTrigger('form', __FUNCTION__, 'BeforeItemRemove', func_get_args(), $item);
+            if (is_array($item)) {
+                $item['_removed'] = true;
+                $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$id] = $item;
+            }
+            $res = wbItemSave($table, $item, $flush);
+        }
+    }
 
     //if (!$res) {wbError('func', __FUNCTION__, 1007, func_get_args());}
     wbTrigger('form', __FUNCTION__, 'AfterItemRemove', func_get_args(), $item);
@@ -1168,9 +1216,9 @@ function wbTableFlush($table)
         flock($fp, LOCK_SH);
         $data = file_get_contents($table);
         if (substr($data,0,1)=="{") {
-                $data = json_decode($data,true);
+            $data = json_decode($data,true);
         } else {
-                $data=unserialize($data);
+            $data=unserialize($data);
         }
         $flag = false;
         foreach ($cache as $key => $item) {
@@ -1189,9 +1237,9 @@ function wbTableFlush($table)
             }
         }
         if (isset($_ENV["settings"]["format"]) AND $_ENV["settings"]["format"]=="serialize") {
-                $data = serialize($data);
+            $data = serialize($data);
         } else {
-                $data = wbJsonEncode($data);
+            $data = wbJsonEncode($data);
         }
 
         flock($fp, LOCK_UN);
@@ -1240,44 +1288,45 @@ function wbTrigger($type, $name, $trigger, $args = null, $data = null)
         $_ENV['error'][$type] = array();
     }
     switch ($type) {
-        case 'form':
-            if (is_string($args[0])) {
-                $call = wbTableName($args[0]).$trigger;
-                if (is_callable($call)) {
-                    $data = $call($data);
-                } else {
-                    $call = '_'.$call;
-                    if (is_callable($call)) {
-                        $data = $call($data);
-                    }
-                }
-            }
-            if (isset($_SESSION['trigger'][$trigger])) {
-                foreach ($_SESSION['trigger'][$trigger] as $module => $param) {
-                    $ecall = $module.'__'.$trigger;
-                    $acall = $module.'_'.$trigger;
-                    if (is_callable($acall)) {
-                        $data['_furl'] = $acall($args, $data);
-                    } elseif (is_callable($ecall)) {
-                        $data['_furl'] = $ecall($args, $data);
-                    }
-                }
-            }
-
-            return $data;
-            break;
-        case 'func':
-            $call = $name.'_'.$trigger;
+    case 'form':
+        if (is_string($args[0])) {
+            $call = wbTableName($args[0]).$trigger;
             if (is_callable($call)) {
                 $data = $call($data);
             } else {
-                wbError($type, $name, null);
+                $call = '_'.$call;
+                if (is_callable($call)) {
+                    $data = $call($data);
+                }
             }
+        }
+        if (isset($_SESSION['trigger'][$trigger])) {
+            foreach ($_SESSION['trigger'][$trigger] as $module => $param) {
+                $ecall = $module.'__'.$trigger;
+                $acall = $module.'_'.$trigger;
+                if (is_callable($acall)) {
+                    $data['_furl'] = $acall($args, $data);
+                }
+                elseif (is_callable($ecall)) {
+                    $data['_furl'] = $ecall($args, $data);
+                }
+            }
+        }
 
-            return $data;
-            break;
-        default:
-            break;
+        return $data;
+        break;
+    case 'func':
+        $call = $name.'_'.$trigger;
+        if (is_callable($call)) {
+            $data = $call($data);
+        } else {
+            wbError($type, $name, null);
+        }
+
+        return $data;
+        break;
+    default:
+        break;
     }
 
     return $data;
@@ -1297,21 +1346,22 @@ function wbFurlPut($item, $string, $flag = 'update')
         $item = array('id' => $table, 'furl' => array());
     }
     switch ($flag) {
-        case 'update':
-            foreach ($item['furl'] as $f => $fid) {
-                if ($id == $fid) {
-                    unset($item['furl'][$f]);
-                }
+    case 'update':
+        foreach ($item['furl'] as $f => $fid) {
+            if ($id == $fid) {
+                unset($item['furl'][$f]);
             }
-            $item['furl'][$furl] = $id; $res = $furl;
-            break;
-        case 'remove':
-            foreach ($item['furl'] as $f => $fid) {
-                if ($id == $fid) {
-                    unset($item['furl'][$f]);
-                }
+        }
+        $item['furl'][$furl] = $id;
+        $res = $furl;
+        break;
+    case 'remove':
+        foreach ($item['furl'] as $f => $fid) {
+            if ($id == $fid) {
+                unset($item['furl'][$f]);
             }
-            break;
+        }
+        break;
     }
     $res = wbItemSave('furl_index', $item);
     if ($res) {
@@ -1355,23 +1405,23 @@ function wbError($type, $name, $error = '__return__error__', $args = null)
         $_ENV["last_error"]=null;
     } else {
 
-	if (is_array($args) AND isset( $_ENV['errors'][$error])) {
-		foreach ($args as $key => $arg) {
-		    if (is_array($arg)) {
-			$arg = implode(',', $arg);
-		    }
-		    $_ENV['errors'][$error] = str_replace('{{'.$key.'}}', $arg, $_ENV['errors'][$error]);
-		}
-	}
+        if (is_array($args) AND isset( $_ENV['errors'][$error])) {
+            foreach ($args as $key => $arg) {
+                if (is_array($arg)) {
+                    $arg = implode(',', $arg);
+                }
+                $_ENV['errors'][$error] = str_replace('{{'.$key.'}}', $arg, $_ENV['errors'][$error]);
+            }
+        }
 
         if ('__return__error__' == $error) {
             $error = $_ENV['error'][$type][$name];
         } else {
-		if (isset($_ENV['errors'])) {
-			$_ENV['error'][$type][$name] = array('errno' => $error, 'error' => $_ENV['errors'][$error]);
-		} else {
-			$_ENV['error'][$type][$name] = array('errno' => $error, 'error' => 'unknown error');
-		}
+            if (isset($_ENV['errors'])) {
+                $_ENV['error'][$type][$name] = array('errno' => $error, 'error' => $_ENV['errors'][$error]);
+            } else {
+                $_ENV['error'][$type][$name] = array('errno' => $error, 'error' => 'unknown error');
+            }
         }
         $_ENV["last_error"]=$error;
     }
@@ -1380,7 +1430,12 @@ function wbError($type, $name, $error = '__return__error__', $args = null)
 
 function wbErrorOut($error,$ret = false)
 {
-	if ($ret == false ) {echo $_ENV['errors'][$error];} else {return $_ENV['errors'][$error];}
+    if ($ret == false ) {
+        echo $_ENV['errors'][$error];
+    }
+    else {
+        return $_ENV['errors'][$error];
+    }
 }
 
 function wbGetTpl($tpl = null, $path = false)
@@ -1388,41 +1443,45 @@ function wbGetTpl($tpl = null, $path = false)
     $out = null;
     $cur = null;
     $locale = null;
-        if (true == $path) {
-                if (!$cur and is_file($_ENV['path_app']."/{$tpl}")) {
-                    $cur = wbNormalizePath($_ENV['path_app']."/{$tpl}");
-                }
+    if (true == $path) {
+        if (!$cur and is_file($_ENV['path_app']."/{$tpl}")) {
+            $cur = wbNormalizePath($_ENV['path_app']."/{$tpl}");
+        }
+    } else {
+        if (!$cur and is_file($_ENV['path_tpl']."/{$tpl}")) {
+            $cur = wbNormalizePath($_ENV['path_tpl']."/{$tpl}");
+        }
+        if (!$cur and is_file($_ENV['path_engine']."/tpl/{$tpl}")) {
+            $cur = wbNormalizePath($_ENV['path_engine']."/tpl/{$tpl}");
+        }
+    }
+    if ($cur !== null ) {
+        $out = wbFromFile($cur);
+    }
+    if (!$out) {
+        if ($path !== false) {
+            $cur = wbNormalizePath($path."/{$tpl}");
         } else {
-                if (!$cur and is_file($_ENV['path_tpl']."/{$tpl}")) {
-                    $cur = wbNormalizePath($_ENV['path_tpl']."/{$tpl}");
-                }
-                if (!$cur and is_file($_ENV['path_engine']."/tpl/{$tpl}")) {
-                    $cur = wbNormalizePath($_ENV['path_engine']."/tpl/{$tpl}");
-                }
+            $cur = wbNormalizePath($_ENV['path_tpl']."/{$tpl}");
         }
-        if ($cur !== null ) {$out = wbFromFile($cur);}
-        if (!$out) {
-		if ($path !== false) {
-			$cur = wbNormalizePath($path."/{$tpl}");
-		} else {
-			$cur = wbNormalizePath($_ENV['path_tpl']."/{$tpl}");
-		}
-		$cur=str_replace($_ENV["path_app"],"",$cur);
-                wbErrorOut(wbError('func', __FUNCTION__, 1011, array($cur)));
-        }
+        $cur=str_replace($_ENV["path_app"],"",$cur);
+        wbErrorOut(wbError('func', __FUNCTION__, 1011, array($cur)));
+    }
 
-        $ini = substr($cur,0,-4).".ini";
-        if (is_object($out) AND !is_file($ini) AND $out->find("[type='text/locale'][src]")->length) {
-                $ini=$out->find("[type='text/locale'][src]")->attr("src");
-                if (is_file($_ENV['path_app']."/{$ini}")) {
-                        $ini=$_ENV['path_app']."/{$ini}";
-                } else {
-                        $path=implode("/",array_slice(explode("/",$cur),0,-1));
-                        $ini=$path."/".$out->find("[type='text/locale'][src]")->attr("src");
-                }
+    $ini = substr($cur,0,-4).".ini";
+    if (is_object($out) AND !is_file($ini) AND $out->find("[type='text/locale'][src]")->length) {
+        $ini=$out->find("[type='text/locale'][src]")->attr("src");
+        if (is_file($_ENV['path_app']."/{$ini}")) {
+            $ini=$_ENV['path_app']."/{$ini}";
+        } else {
+            $path=implode("/",array_slice(explode("/",$cur),0,-1));
+            $ini=$path."/".$out->find("[type='text/locale'][src]")->attr("src");
         }
-	if (is_object($out) AND is_file($ini)) {$locale=$out->wbSetFormLocale($ini);}
-	if ($locale!==null) wbEnvData("tpl->{$tpl}->locale",$locale);
+    }
+    if (is_object($out) AND is_file($ini)) {
+        $locale=$out->wbSetFormLocale($ini);
+    }
+    if ($locale!==null) wbEnvData("tpl->{$tpl}->locale",$locale);
     return $out;
 }
 
@@ -1435,10 +1494,15 @@ function wbLoopProtect($func,$args=array())
 }
 
 function wbLoopCheck($func,$args) {
-        if (!isset($_ENV['wbGetFormStack'])) {
-                $_ENV['wbGetFormStack'] = array();
-        }
-        if (in_array($func."_".md5(json_encode($args).$_ENV["lang"].$_SESSION["lang"]),$_ENV['wbGetFormStack'])) {return true;} else {return false;}
+    if (!isset($_ENV['wbGetFormStack'])) {
+        $_ENV['wbGetFormStack'] = array();
+    }
+    if (in_array($func."_".md5(json_encode($args).$_ENV["lang"].$_SESSION["lang"]),$_ENV['wbGetFormStack'])) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 function wbOconv($value, $oconv)
@@ -1465,13 +1529,18 @@ function wbGetForm($form = null, $mode = null, $engine = null)
 
     $loop=false;
     foreach(debug_backtrace() as $func) {
-        if ($aCall==$func["function"]) {$loop=true;}
-        if ($eCall==$func["function"]) {$loop=true;}
+        if ($aCall==$func["function"]) {
+            $loop=true;
+        }
+        if ($eCall==$func["function"]) {
+            $loop=true;
+        }
     }
 
     if (is_callable($aCall) and $loop == false) {
         $out = $aCall();
-    } elseif (is_callable($eCall) and false !== $engine and $loop == false) {
+    }
+    elseif (is_callable($eCall) and false !== $engine and $loop == false) {
         $out = $eCall();
     }
 
@@ -1499,7 +1568,7 @@ function wbGetForm($form = null, $mode = null, $engine = null)
                 $out = wbFromFile($current);
                 $ini = substr($current,0,-4).".ini";
             } else {
-		$cur = wbNormalizePath("/forms/{$_ENV["route"]["form"]}_{$_ENV["route"]["mode"]}.php");
+                $cur = wbNormalizePath("/forms/{$_ENV["route"]["form"]}_{$_ENV["route"]["mode"]}.php");
                 $out = wbErrorOut(wbError('func', __FUNCTION__, 1012, array($cur)), true);
                 $_ENV['error'][__FUNCTION__] = 'noform';
             }
@@ -1509,73 +1578,87 @@ function wbGetForm($form = null, $mode = null, $engine = null)
             $ini = substr($current,0,-4).".ini";
         }
     }
-        if (is_string($out)) {
-                $out = wbFromString($out);
+    if (is_string($out)) {
+        $out = wbFromString($out);
+    }
+    if ($ini!==null AND !is_file($ini) AND $out->find("[type='text/locale'][src]")->length) {
+        $src=$out->find("[type='text/locale'][src]")->attr("src");
+        if (is_file($src)) {
+            $ini=$src;
         }
-        if ($ini!==null AND !is_file($ini) AND $out->find("[type='text/locale'][src]")->length) {
-                $src=$out->find("[type='text/locale'][src]")->attr("src");
-                if (is_file($src)) {$ini=$src;} else {
-                        $ini=explode("/",$ini);
-                        $ini[count($ini)-1]=$src;
-                        if (is_file(implode("/",$ini))) {$ini=implode("/",$ini);} else {
-                                $ini[count($ini)-1]=$src.".ini";
-                                if (is_file(implode("/",$ini))) {$ini=implode("/",$ini);} else {
-                                        $ini=null;
-                                }
-                        }
+        else {
+            $ini=explode("/",$ini);
+            $ini[count($ini)-1]=$src;
+            if (is_file(implode("/",$ini))) {
+                $ini=implode("/",$ini);
+            }
+            else {
+                $ini[count($ini)-1]=$src.".ini";
+                if (is_file(implode("/",$ini))) {
+                    $ini=implode("/",$ini);
                 }
+                else {
+                    $ini=null;
+                }
+            }
         }
-        $locale=$out->wbSetFormLocale($ini);
-        if ($locale!==null) wbEnvData("form->{$aCall}->locale",$locale);
+    }
+    $locale=$out->wbSetFormLocale($ini);
+    if ($locale!==null) wbEnvData("form->{$aCall}->locale",$locale);
     return $out;
 }
 
 function wbEnvData($index,$value="__wb__null__data__") {
-        $loop=explode("->",$index);
-        $index='$_ENV["data"]';
-        $count=count($loop);
-        $i=0;
-        $res = false;
-        foreach($loop as $key) {
-                $i++;
-                if ($key=="") {$key="undefined";} else {$key=preg_replace('/[^ a-zа-яё\d]/ui', '_',$key );}
-                $index.="->".$key;
-                if (!eval('return isset( '.$index.' );')) {
-                        eval($index.' = new stdClass();');
-                }
-                if ($i==$count) {
-                        if ($value=="__wb__null__data__") {
-                                $res = eval('return '.$index.';');
-                        } else {
-
-                                $res = eval('return '.$index.' = $value;');
-                        }
-                }
+    $loop=explode("->",$index);
+    $index='$_ENV["data"]';
+    $count=count($loop);
+    $i=0;
+    $res = false;
+    foreach($loop as $key) {
+        $i++;
+        if ($key=="") {
+            $key="undefined";
         }
-        return $res;
+        else {
+            $key=preg_replace('/[^ a-zа-яё\d]/ui', '_',$key );
+        }
+        $index.="->".$key;
+        if (!eval('return isset( '.$index.' );')) {
+            eval($index.' = new stdClass();');
+        }
+        if ($i==$count) {
+            if ($value=="__wb__null__data__") {
+                $res = eval('return '.$index.';');
+            } else {
+
+                $res = eval('return '.$index.' = $value;');
+            }
+        }
+    }
+    return $res;
 }
 
 
 function wbErrorList()
 {
     $_ENV['errors'] = array(
-        100 => 'Login succeessful {{l}}',
-        101 => 'Login incorrect {{l}}',
-        404 => 'Page not found',
-        1001 => 'Table {{0}} not exists',
-        1002 => 'Table {{0}} already exixts',
-        1003 => 'Do not remove {{0}}',
-        1004 => 'Failed to remove file {{0}}',
-        1005 => 'Failed to remove table {{0}}',
-        1006 => 'Item {{1}} in table {{0}} not exists',
-        1007 => 'Failed to save record to table {{0}}',
-        1008 => 'Delete item {{1}} in table {{0}}',
-        1009 => 'Flush data from cache table {{0}}',
-        1010 => 'Failed to create table {{0}}',
-        1010 => 'Create a table {{0}}',
-        1011 => 'Template not found {{0}}',
-        1012 => 'Form not found {{0}}'
-    );
+                          100 => 'Login succeessful {{l}}',
+                          101 => 'Login incorrect {{l}}',
+                          404 => 'Page not found',
+                          1001 => 'Table {{0}} not exists',
+                          1002 => 'Table {{0}} already exixts',
+                          1003 => 'Do not remove {{0}}',
+                          1004 => 'Failed to remove file {{0}}',
+                          1005 => 'Failed to remove table {{0}}',
+                          1006 => 'Item {{1}} in table {{0}} not exists',
+                          1007 => 'Failed to save record to table {{0}}',
+                          1008 => 'Delete item {{1}} in table {{0}}',
+                          1009 => 'Flush data from cache table {{0}}',
+                          1010 => 'Failed to create table {{0}}',
+                          1010 => 'Create a table {{0}}',
+                          1011 => 'Template not found {{0}}',
+                          1012 => 'Form not found {{0}}'
+                      );
 }
 
 function wbLog($type, $name, $error, $args)
@@ -1593,9 +1676,9 @@ function wbLog($type, $name, $error, $args)
             $error['error'] = str_replace('{{'.$key.'}}', $arg, $error['error']);
         }
     }
-        if (isset($_ENV["settings"]["log"]) AND $_ENV["settings"]["log"]=="on")  {
-                error_log("{$type} {$name} [{$error['errno']}]: {$error['error']} [{$_SERVER['REQUEST_URI']}]");
-        }
+    if (isset($_ENV["settings"]["log"]) AND $_ENV["settings"]["log"]=="on")  {
+        error_log("{$type} {$name} [{$error['errno']}]: {$error['error']} [{$_SERVER['REQUEST_URI']}]");
+    }
 }
 
 function wbNewId($separator = '', $prefix = '')
@@ -1661,45 +1744,48 @@ function wbImagesToText($Item, $fld = 'text', $imgs = 'images')
         $image = wbGetItemImg($Item,0,0,$imgs);
         $image = substr($image, strlen($_ENV['path_app']));
         $Item['_image'] = $image;
-        if (!isset($Item[$fld])) {$Item[$fld]="";}
-                if (isset($Item['intext_position']) and $Item['intext_position']['pos'] > '') {
-                    if ('' == $Item['intext_position']['width']) {
-                        $width = $_ENV['intext_width'];
-                    } else {
-                        $width = $Item['intext_position']['width'];
-                    }
-                    if ('' == $Item['intext_position']['height']) {
-                        $height = $_ENV['intext_height'];
-                    } else {
-                        $height = $Item['intext_position']['height'];
-                    }
-                    $img = "
-                        <a href='{$image}' data-fancybox='gallery' class='wb-intext'>
-                        <img data-wb-role='thumbnail' data-wb-size='{$width};{$height};src' src='{$image}' style='float:{$Item['intext_position']['pos']};' data-wb-hide='wb'>
-                        </a>
-                        ";
-                        $Item[$fld] = $img.$Item[$fld];
-                }
-            if (isset($Item['images_position']) and isset($Item['images_position']['pos']) and $Item['images_position']['pos'] > '') {
-                $gal = wbGetForm('common', 'gallery');
-                $gal->wbSetData($Item);
-                if ($image > '' and $Item['intext_position']['pos'] > '') {
-                    if ($gal->find("a[href='{$image}'][idx]")->length) {
-                        $gal->find("a[href='{$image}']")->remove();
-                    } else {
-                        $gal->find("a[href='{$image}']")->parents('[idx]')->remove();
-                    }
-                }
-                if (!$gal->find('a')->length) {
-                    $gal->find('.wb-gallery')->remove();
-                }
-                if ('top' == $Item['images_position']['pos']) {
-                    $Item[$fld] = $gal->outerHtml().$Item[$fld];
-                } elseif ('bottom' == $Item['images_position']['pos']) {
-                    $Item[$fld] = $Item[$fld].$gal->outerHtml();
-                }
-                unset($gal);
+        if (!isset($Item[$fld])) {
+            $Item[$fld]="";
+        }
+        if (isset($Item['intext_position']) and $Item['intext_position']['pos'] > '') {
+            if ('' == $Item['intext_position']['width']) {
+                $width = $_ENV['intext_width'];
+            } else {
+                $width = $Item['intext_position']['width'];
             }
+            if ('' == $Item['intext_position']['height']) {
+                $height = $_ENV['intext_height'];
+            } else {
+                $height = $Item['intext_position']['height'];
+            }
+            $img = "
+                   <a href='{$image}' data-fancybox='gallery' class='wb-intext'>
+                                                        <img data-wb-role='thumbnail' data-wb-size='{$width};{$height};src' src='{$image}' style='float:{$Item['intext_position']['pos']};' data-wb-hide='wb'>
+                                                                </a>
+                                                                ";
+                                                                $Item[$fld] = $img.$Item[$fld];
+        }
+        if (isset($Item['images_position']) and isset($Item['images_position']['pos']) and $Item['images_position']['pos'] > '') {
+            $gal = wbGetForm('common', 'gallery');
+            $gal->wbSetData($Item);
+            if ($image > '' and $Item['intext_position']['pos'] > '') {
+                if ($gal->find("a[href='{$image}'][idx]")->length) {
+                    $gal->find("a[href='{$image}']")->remove();
+                } else {
+                    $gal->find("a[href='{$image}']")->parents('[idx]')->remove();
+                }
+            }
+            if (!$gal->find('a')->length) {
+                $gal->find('.wb-gallery')->remove();
+            }
+            if ('top' == $Item['images_position']['pos']) {
+                $Item[$fld] = $gal->outerHtml().$Item[$fld];
+            }
+            elseif ('bottom' == $Item['images_position']['pos']) {
+                $Item[$fld] = $Item[$fld].$gal->outerHtml();
+            }
+            unset($gal);
+        }
 
     }
 
@@ -1708,45 +1794,45 @@ function wbImagesToText($Item, $fld = 'text', $imgs = 'images')
 
 
 
-	function wbPagination($c, $m)
-	{
-	    $current = $c;
-	    $last = $m;
-	    $delta = 4;
-	    $left = $current - $delta;
-	    $right = $current + $delta + 1;
-	    $range = array();
-	    $rangeWithDots = array();
-	    $l = -1;
+function wbPagination($c, $m)
+{
+    $current = $c;
+    $last = $m;
+    $delta = 4;
+    $left = $current - $delta;
+    $right = $current + $delta + 1;
+    $range = array();
+    $rangeWithDots = array();
+    $l = -1;
 
-	    for ($i = 1; $i <= $last; $i++)
-	    {
-		if ($i == 1 || $i == $last || $i >= $left && $i < $right)
-		{
-		    array_push($range, $i);
-		}
-	    }
+    for ($i = 1; $i <= $last; $i++)
+    {
+        if ($i == 1 || $i == $last || $i >= $left && $i < $right)
+        {
+            array_push($range, $i);
+        }
+    }
 
-	    for($i = 0; $i<count($range); $i++)
-	    {
-		if ($l != -1)
-		{
-		    if ($range[$i] - $l === 2)
-		    {
-			array_push($rangeWithDots, $l + 1);
-		    }
-		    else if ($range[$i] - $l !== 1)
-		    {
-			array_push($rangeWithDots, '...');
-		    }
-		}
+    for($i = 0; $i<count($range); $i++)
+    {
+        if ($l != -1)
+        {
+            if ($range[$i] - $l === 2)
+            {
+                array_push($rangeWithDots, $l + 1);
+            }
+            else if ($range[$i] - $l !== 1)
+            {
+                array_push($rangeWithDots, '...');
+            }
+        }
 
-		array_push($rangeWithDots, $range[$i]);
-		$l = $range[$i];
-	    }
+        array_push($rangeWithDots, $range[$i]);
+        $l = $range[$i];
+    }
 
-	    return $rangeWithDots;
-	}
+    return $rangeWithDots;
+}
 
 function wbListFiles($dir)
 {
@@ -1903,8 +1989,8 @@ function wbWhereItem($item, $where = null)
             $phpif = wbWherePhp($where, $item);
         }
         if ($phpif > '') {
-                //echo $where."<br>";
-                //echo $phpif."<br>";
+            //echo $where."<br>";
+            //echo $phpif."<br>";
             @eval('if ( '.$phpif.' ) { $res=1; } else { $res=0; } ;');
         }
     }
@@ -1918,19 +2004,19 @@ function wbWherePhp($str = '', $item = array())
     $str = wbSetValuesStr($str, $item);
     $str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);
     $str = ' '.trim(strtr($str, array(
-                    '(' => '(',
-                    ')' => ')',
-                    '=' => ' == ',
-                    '>' => '>',
-                    '<' => ' < ',
-                    '>=' => ' >= ',
-                    '<=' => ' <= ',
-                    '<>' => ' !== ',
-                    '!=' => ' !== ',
-                    '!==' => ' !== ',
-                    '#' => ' !== ',
-                    '==' => ' == ',
-    ))).' ';
+                              '(' => '(',
+                              ')' => ')',
+                              '=' => ' == ',
+                              '>' => '>',
+                              '<' => ' < ',
+                              '>=' => ' >= ',
+                              '<=' => ' <= ',
+                              '<>' => ' !== ',
+                              '!=' => ' !== ',
+                              '!==' => ' !== ',
+                              '#' => ' !== ',
+                              '==' => ' == ',
+                          ))).' ';
     $exclude = array('AND', 'OR', 'LIKE', 'NOT_LIKE', 'IN_ARRAY');
 
     $context = '';
@@ -1941,11 +2027,16 @@ function wbWherePhp($str = '', $item = array())
             if (isset($item[$fld]) and true == $flag) {
                 //if ($flag==true) {
                 if (is_array($item[$fld])) {
-                        $res=wbJsonEncode($Item[$fld]);
-                        if ($res=="null") {$res='"[]"';} else {$res=htmlentities($res);}
-                        $str = str_replace(" {$fld} ", $res , $str);
+                    $res=wbJsonEncode($Item[$fld]);
+                    if ($res=="null") {
+                        $res='"[]"';
+                    }
+                    else {
+                        $res=htmlentities($res);
+                    }
+                    $str = str_replace(" {$fld} ", $res, $str);
                 } else {
-                        $str = str_replace(" {$fld} ", ' $item["'.$fld.'"] ', $str);
+                    $str = str_replace(" {$fld} ", ' $item["'.$fld.'"] ', $str);
                 }
                 $flag = false;
             }
@@ -1978,76 +2069,93 @@ function wbWherePhp($str = '', $item = array())
             }
         }
     }
-	$str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);
+    $str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);
     return $str;
 }
 
 function wbWherePhp_NEW($str = '', $item = array()) {
-        $str = wbSetValuesStr($str, $item);
-        $where=""; $func=""; $last=""; $fld="";
-        $cond=array( "=>","<=",">","<","=","<>","==","!==" );
-        $logic=array( 'AND', 'OR', 'LIKE', 'NOT_LIKE', '&&', '||', 'IN_ARRAY', '(', ')' ,",", '"');
+    $str = wbSetValuesStr($str, $item);
+    $where="";
+    $func="";
+    $last="";
+    $fld="";
+    $cond=array( "=>","<=",">","<","=","<>","==","!==" );
+    $logic=array( 'AND', 'OR', 'LIKE', 'NOT_LIKE', '&&', '||', 'IN_ARRAY', '(', ')',",", '"');
 
-        preg_match_all('/\"([^\"]+)\"|\"\"|\w+(?!\")|\d|(AND|OR|NOT|LIKE|NOT_LIKE|&&|\|\|)|,|(\(|\)|\(|\)|!==|==|=>|<=|<>|<|=)|(\|@)|\D|\W|\b/iu', $str, $arr); // возникают ошибки если в тексте пробел
-        $flag_l=$flag_f=false;
-        foreach($arr[0] as $a => $el) {
-                if ($last!=="" AND $flag_f==false) {$where .= $last; $last="";}
-                if ($last!=="" AND $flag_f==true AND $fld!=="") {$func.= $last; $last="";}
-                if ($last!=="" AND $flag_f==true AND $fld=="") {$fld = $last; $last="";}
-                if ($last=="" AND $fld=="" AND !in_array($el,$cond) AND !in_array($el,$logic) AND substr(trim($el),0,1)!=='"') {
-                        $fld = '$item["' . $el . '"]';
-                        $flag_l = true;
-                }
-
-                if ($fld=="") {$fld=$last;}
-                if (in_array($el,$cond) ) {
-                    $el = strtr($el, array(
-                    '=' => ' == ',
-                    '>' => ' > ',
-                    '<' => ' < ',
-                    '>=' => ' >= ',
-                    '<=' => ' <= ',
-                    '<>' => ' !== ',
-                    '!=' => ' !== ',
-                    '!==' => ' !== ',
-                    '#' => ' !== ',
-                    '==' => ' == ',
-                    ));
-                    $fld = "";
-                }
-                if (in_array($el,$logic) ) {
-                        $el = strtr($el, array(
-                                '&&' => 'AND',
-                                '||' => 'OR'
-                        ));
-                }
-
-                if ($flag_f == false) {
-                        if ($el == "|@" ) {
-                                $flag_f = true;
-                        } else {
-                                if ($flag_l!==true) $last = $el;
-                        }
-                } else if ($flag_f == true) {
-                        if (trim($el) == ")") {
-                                $flag_f=false;
-                                $last=$func.$el;
-                                $last=str_replace('$this',$fld,$last);
-                                $func="";
-                                $fld="";
-                        } else if (trim($el) == "(")  {
-                                $last=$el."";
-                        } else {
-                                $last=$el;
-                                $flag_l=false;
-                        }
-                }
-
+    preg_match_all('/\"([^\"]+)\"|\"\"|\w+(?!\")|\d|(AND|OR|NOT|LIKE|NOT_LIKE|&&|\|\|)|,|(\(|\)|\(|\)|!==|==|=>|<=|<>|<|=)|(\|@)|\D|\W|\b/iu', $str, $arr); // возникают ошибки если в тексте пробел
+    $flag_l=$flag_f=false;
+    foreach($arr[0] as $a => $el) {
+        if ($last!=="" AND $flag_f==false) {
+            $where .= $last;
+            $last="";
         }
-        if ($last!=="" AND $flag_f==false) {$where .= $last; $last="";}
+        if ($last!=="" AND $flag_f==true AND $fld!=="") {
+            $func.= $last;
+            $last="";
+        }
+        if ($last!=="" AND $flag_f==true AND $fld=="") {
+            $fld = $last;
+            $last="";
+        }
+        if ($last=="" AND $fld=="" AND !in_array($el,$cond) AND !in_array($el,$logic) AND substr(trim($el),0,1)!=='"') {
+            $fld = '$item["' . $el . '"]';
+            $flag_l = true;
+        }
 
-	$where=preg_replace("~\{\{([^(}})]*)\}\}~","",$where); // чистим "хвосты" если переменные не определены {{some}} заменяем на пусто
-        return $where;
+        if ($fld=="") {
+            $fld=$last;
+        }
+        if (in_array($el,$cond) ) {
+            $el = strtr($el, array(
+                            '=' => ' == ',
+                            '>' => ' > ',
+                            '<' => ' < ',
+                            '>=' => ' >= ',
+                            '<=' => ' <= ',
+                            '<>' => ' !== ',
+                            '!=' => ' !== ',
+                            '!==' => ' !== ',
+                            '#' => ' !== ',
+                            '==' => ' == ',
+                        ));
+            $fld = "";
+        }
+        if (in_array($el,$logic) ) {
+            $el = strtr($el, array(
+                            '&&' => 'AND',
+                            '||' => 'OR'
+                        ));
+        }
+
+        if ($flag_f == false) {
+            if ($el == "|@" ) {
+                $flag_f = true;
+            } else {
+                if ($flag_l!==true) $last = $el;
+            }
+        } else if ($flag_f == true) {
+            if (trim($el) == ")") {
+                $flag_f=false;
+                $last=$func.$el;
+                $last=str_replace('$this',$fld,$last);
+                $func="";
+                $fld="";
+            } else if (trim($el) == "(")  {
+                $last=$el."";
+            } else {
+                $last=$el;
+                $flag_l=false;
+            }
+        }
+
+    }
+    if ($last!=="" AND $flag_f==false) {
+        $where .= $last;
+        $last="";
+    }
+
+    $where=preg_replace("~\{\{([^(}})]*)\}\}~","",$where); // чистим "хвосты" если переменные не определены {{some}} заменяем на пусто
+    return $where;
 }
 
 
@@ -2083,71 +2191,71 @@ function wbt_route($sid, $e, $r = 'TABLE')
         $t = &$_ENV['sql'][$sid]['EXPR'];
     }
     switch ($e['expr_type']) {
-        case 'table':
-            if (is_array($e['alias'])) {
-                $key = $e['alias']['no_quotes'];
-            } else {
-                $key = $e['no_quotes'];
+    case 'table':
+        if (is_array($e['alias'])) {
+            $key = $e['alias']['no_quotes'];
+        } else {
+            $key = $e['no_quotes'];
+        }
+        $t[$key]['name'] = $e['no_quotes'];
+        if (isset($e['join_type']) and isset($e['ref_clause']) and is_array($e['ref_clause']) and 'JOIN' == $e['join_type']) {
+            $_ENV['sql'][$sid]['JOIN'] = $key;
+            foreach ($e['ref_clause'] as $s) {
+                wbt_route($sid, $s, 'WHERE');
             }
-            $t[$key]['name'] = $e['no_quotes'];
-            if (isset($e['join_type']) and isset($e['ref_clause']) and is_array($e['ref_clause']) and 'JOIN' == $e['join_type']) {
-                $_ENV['sql'][$sid]['JOIN'] = $key;
-                foreach ($e['ref_clause'] as $s) {
-                    wbt_route($sid, $s, 'WHERE');
-                }
-                unset($_ENV['sql'][$sid]['JOIN']);
+            unset($_ENV['sql'][$sid]['JOIN']);
+        }
+        break;
+    case 'expression':
+        $_ENV['sql'][$sid]['EXPR'] = array();
+        if (isset($e['sub_tree'])) {
+            foreach ($e['sub_tree'] as $s) {
+                wbt_route($sid, $s, 'WHERE');
             }
-            break;
-        case 'expression':
-            $_ENV['sql'][$sid]['EXPR'] = array();
+        }
+        if (isset($e['alias']) and $e['alias']['no_quotes'] > '') {
+            $t[$e['alias']['no_quotes']] = implode(' ', $_ENV['sql'][$sid]['EXPR']);
+        } else {
+            $t[] = implode(' ', $_ENV['sql'][$sid]['EXPR']);
+        }
+        unset($_ENV['sql'][$sid]['EXPR']);
+        break;
+    case 'colref':
+        if (in_array($r, array('WHERE', 'TABLE', 'SELECT'), true)) {
+            $t[] = '$'.$e['no_quotes'];
+        }
+        if (is_array($e['sub_tree'])) {
+            foreach ($e['sub_tree'] as $s) {
+                wbt_route($sid, $s, $r);
+            }
+        }
+        break;
+    case 'operator':
+        $op = strtr(mb_strtoupper($e['base_expr']), array(
+                        '<=' => '<=',
+                        '>=' => '>=',
+                        '=' => '==',
+                        '<>' => '!==',
+                        'NOT' => '!==',
+                    ));
+        $t[] = $op;
+        break;
+    case 'const':
+        if (in_array($r, array('WHERE', 'TABLE', 'SELECT'), true)) {
+            $t[] = $e['base_expr'];
+        }
+        break;
+    case 'bracket_expression':
+        if (in_array($r, array('WHERE', 'TABLE', 'SELECT'), true)) {
+            $t[] = '(';
             if (isset($e['sub_tree'])) {
-                foreach ($e['sub_tree'] as $s) {
-                    wbt_route($sid, $s, 'WHERE');
-                }
-            }
-            if (isset($e['alias']) and $e['alias']['no_quotes'] > '') {
-                $t[$e['alias']['no_quotes']] = implode(' ', $_ENV['sql'][$sid]['EXPR']);
-            } else {
-                $t[] = implode(' ', $_ENV['sql'][$sid]['EXPR']);
-            }
-            unset($_ENV['sql'][$sid]['EXPR']);
-            break;
-        case 'colref':
-            if (in_array($r, array('WHERE', 'TABLE', 'SELECT'), true)) {
-                $t[] = '$'.$e['no_quotes'];
-            }
-            if (is_array($e['sub_tree'])) {
                 foreach ($e['sub_tree'] as $s) {
                     wbt_route($sid, $s, $r);
                 }
             }
-            break;
-        case 'operator':
-            $op = strtr(mb_strtoupper($e['base_expr']), array(
-                    '<=' => '<=',
-                    '>=' => '>=',
-                    '=' => '==',
-                    '<>' => '!==',
-                    'NOT' => '!==',
-            ));
-            $t[] = $op;
-            break;
-        case 'const':
-            if (in_array($r, array('WHERE', 'TABLE', 'SELECT'), true)) {
-                $t[] = $e['base_expr'];
-            }
-            break;
-        case 'bracket_expression':
-            if (in_array($r, array('WHERE', 'TABLE', 'SELECT'), true)) {
-                $t[] = '(';
-                if (isset($e['sub_tree'])) {
-                    foreach ($e['sub_tree'] as $s) {
-                        wbt_route($sid, $s, $r);
-                    }
-                }
-                $t[] = ')';
-            }
-            break;
+            $t[] = ')';
+        }
+        break;
     }
 }
 
@@ -2166,11 +2274,11 @@ class wbt_filter extends FilterIterator
         //$tname, $filter, $join=null
         $this->type = $type;
         switch ($type) {
-            case 'where':
-                $this->userFilter = $data['where'];
-                $this->table = $data['table'];
-                $this->join = $data['join'];
-                break;
+        case 'where':
+            $this->userFilter = $data['where'];
+            $this->table = $data['table'];
+            $this->join = $data['join'];
+            break;
         }
     }
 
@@ -2178,9 +2286,9 @@ class wbt_filter extends FilterIterator
     {
         $item = $this->getInnerIterator()->current();
         switch ($this->type) {
-            case 'where':
-                eval('$'.$this->table.' = $item;');
-                break;
+        case 'where':
+            eval('$'.$this->table.' = $item;');
+            break;
         }
         eval('if ( '.$this->userFilter.' ) { $res=1; } else { $res=0; } ;');
         if (0 == $res) {
@@ -2224,38 +2332,38 @@ function wbRouterRead($file = null)
 }
 
 
-function wbAuthGetContents($url,$username,$password){
-	$cred = sprintf('Authorization: Basic %s', base64_encode("$username:$password") );
-	$opts = array(
-	    'http'=>array(
-		    'method'=>'GET',
-		    'header'=>$cred
-		)
-	);
-	$context = stream_context_create($opts);
-	$handle = @fopen($url, 'r', false, $context);
+function wbAuthGetContents($url,$username,$password) {
+    $cred = sprintf('Authorization: Basic %s', base64_encode("$username:$password") );
+    $opts = array(
+                'http'=>array(
+                    'method'=>'GET',
+                    'header'=>$cred
+                )
+            );
+    $context = stream_context_create($opts);
+    $handle = @fopen($url, 'r', false, $context);
 
-	if (!$handle) {
-		echo ($http_response_header[0]);
-		return false;
-	}
+    if (!$handle) {
+        echo ($http_response_header[0]);
+        return false;
+    }
 
-	return stream_get_contents($handle);
+    return stream_get_contents($handle);
 }
 
-function wbAuthPostContents($url, $post, $username,$password){
-	$cred = sprintf('Authorization: Basic %s', base64_encode("$username:$password") );
-	$post=http_build_query($post);
-	$opts = array(
-	    'http'=>array(
-		    'method'=>'POST',
-		    'header'=>$cred,
-		    'content'=>$post
-		)
-	);
-	$context = stream_context_create($opts);
-	$result = file_get_contents($_ENV["ajax_update"], false, $context);
-	return $result;
+function wbAuthPostContents($url, $post, $username,$password) {
+    $cred = sprintf('Authorization: Basic %s', base64_encode("$username:$password") );
+    $post=http_build_query($post);
+    $opts = array(
+                'http'=>array(
+                    'method'=>'POST',
+                    'header'=>$cred,
+                    'content'=>$post
+                )
+            );
+    $context = stream_context_create($opts);
+    $result = file_get_contents($_ENV["ajax_update"], false, $context);
+    return $result;
 }
 
 
@@ -2372,8 +2480,8 @@ function _wbSetValuesStr($tag = '', $Item = array(), $limit = 2, $vars = null)
         $tag = str_replace(array('%7B%7B', '%7D%7D'), array('{{', '}}'), $tag);
         if (false !== strpos($tag, '}}')) {
             // функция подставляющая значения
-        $tag = wbChangeQuot($tag);			// заменяем &quot на "
-        $spec = array('_form', '_mode', '_item', '_id');
+            $tag = wbChangeQuot($tag);			// заменяем &quot на "
+            $spec = array('_form', '_mode', '_item', '_id');
             $exit = false;
             $err = false;
             $nIter = 0;
@@ -2392,13 +2500,13 @@ function _wbSetValuesStr($tag = '', $Item = array(), $limit = 2, $vars = null)
                     } else {
                         $text = '';
                         $startIn = 0;		// начальная позиция текста за предыдущей заменой
-                    for ($i = 0; $i < $nSub; ++$i) {		// замена в исходном тексте найденных подстановок
-                        $In = $res[2][$i][0];						// текст вставки без скобок {{ и }}
-                        $beforSize = $res[2][$i][1] - 2 - $startIn;
-                        $text .= substr($tag, $startIn, $beforSize);		// исходный текст между предыдущей и текущей вставками
-                        $default = false;
-                        $special = 0;
-                        switch (strtoupper($res[4][$i][0])) {					// префикс вставки
+                        for ($i = 0; $i < $nSub; ++$i) {		// замена в исходном тексте найденных подстановок
+                            $In = $res[2][$i][0];						// текст вставки без скобок {{ и }}
+                            $beforSize = $res[2][$i][1] - 2 - $startIn;
+                            $text .= substr($tag, $startIn, $beforSize);		// исходный текст между предыдущей и текущей вставками
+                            $default = false;
+                            $special = 0;
+                            switch (strtoupper($res[4][$i][0])) {					// префикс вставки
                             case '_SETT':
                                 $sub = '$_ENV["settings"]';
                                 break;
@@ -2407,15 +2515,17 @@ function _wbSetValuesStr($tag = '', $Item = array(), $limit = 2, $vars = null)
                                 break;
                             case '_LANG':
                                 if (isset($_SESSION["lang"])) {
-                                        $lang=$_SESSION["lang"];
+                                    $lang=$_SESSION["lang"];
                                 } else if (isset($_ENV["lang"])) {
-                                        $lang=$_ENV["lang"];
+                                    $lang=$_ENV["lang"];
                                 }
-                                if (!isset($lang)) {$lang="eng";}
+                                if (!isset($lang)) {
+                                    $lang="eng";
+                                }
                                 if ($vars!==null AND is_array($Item) AND isset($Item["_global"]) AND $Item["_global"]==false ) {
-                                        $sub = '$Item[$lang]';
+                                    $sub = '$Item[$lang]';
                                 } else {
-                                        $sub = '$_ENV["locale"][$lang]';
+                                    $sub = '$_ENV["locale"][$lang]';
                                 }
                                 break;
                             case '_VAR':
@@ -2471,44 +2581,45 @@ function _wbSetValuesStr($tag = '', $Item = array(), $limit = 2, $vars = null)
                                 $n = strlen($res[4][$i][0]);
                                 $In = '['.substr($In, 0, $n).']'.substr($In, $n, strlen($In) - $n);
                                 break;
-                        }
-                        if ($default) {
-                            $pos = 0;
-                        } else {
-                            $pos = strlen($res[4][$i][0]);
-                        }
-                        $sub .= wbSetQuotes(substr($In, $pos, strlen($In) - $pos));		// индексная часть текущей вставки с добавленными кавычками у текстовых индексов
-                        if (eval('return isset('.$sub.');') AND !eval('return is_array('.$sub.');')) {
-                                $Item=wbsvRestoreValue($Item,$sub);
-                        }
-                        if (eval('return isset('.$sub.');')) {
-                            if (eval('return is_array('.$sub.');')) {
-                                $text .= eval('return json_encode('.$sub.');');
-                            } else {
-                                $temp = '';
-                                eval('$temp .= '.$sub.';');
-                                $temp = strtr($temp, array('{{' => '#~#~', '}}' => '~#~#'));
-                                $text .= $temp;
                             }
-                        } else {
+                            if ($default) {
+                                $pos = 0;
+                            } else {
+                                $pos = strlen($res[4][$i][0]);
+                            }
+                            $sub .= wbSetQuotes(substr($In, $pos, strlen($In) - $pos));		// индексная часть текущей вставки с добавленными кавычками у текстовых индексов
+                            if (eval('return isset('.$sub.');') AND !eval('return is_array('.$sub.');')) {
+                                $Item=wbsvRestoreValue($Item,$sub);
+                            }
+                            if (eval('return isset('.$sub.');')) {
+                                if (eval('return is_array('.$sub.');')) {
+                                    $text .= eval('return json_encode('.$sub.');');
+                                } else {
+                                    $temp = '';
+                                    eval('$temp .= '.$sub.';');
+                                    $temp = strtr($temp, array('{{' => '#~#~', '}}' => '~#~#'));
+                                    $text .= $temp;
+                                }
+                            } else {
                                 $Item = wbsvRestoreValue($Item,$sub);
-                                        $tmp=explode("[",$res[2][$i][0]); $tmp=$tmp[0];
+                                $tmp=explode("[",$res[2][$i][0]);
+                                $tmp=$tmp[0];
 
-                                        $skip=array("_GET","_POST","_COOK","_COOKIE","_SESS","_SESSION","_SETT","_SETTINGS","_LANG");
-                                        if (in_array($tmp,$skip)) {
-                                                $text.="";
-                                        } else {
-                                                if ($vars !== null) $text .= '{{' . $res[2][$i][0] . '}}';
-                                        }
+                                $skip=array("_GET","_POST","_COOK","_COOKIE","_SESS","_SESSION","_SETT","_SETTINGS","_LANG");
+                                if (in_array($tmp,$skip)) {
+                                    $text.="";
+                                } else {
+                                    if ($vars !== null) $text .= '{{' . $res[2][$i][0] . '}}';
+                                }
 
 
                                 ++$nUndef;
+                            }
+                            $startIn += $beforSize + strlen($res[2][$i][0]) + 4;
+                            if ($i + 1 == $nSub) {		// это была последняя вставка
+                                $text .= substr($tag, $startIn, strlen($tag) - $startIn);
+                            }
                         }
-                        $startIn += $beforSize + strlen($res[2][$i][0]) + 4;
-                        if ($i + 1 == $nSub) {		// это была последняя вставка
-                            $text .= substr($tag, $startIn, strlen($tag) - $startIn);
-                        }
-                    }
                         $tag = $text;
                     }
                 }
@@ -2536,101 +2647,101 @@ function _wbSetValuesStr($tag = '', $Item = array(), $limit = 2, $vars = null)
 }
 
 function wbsvSetValue($Item,$sub) {
-        $text="";
-            if (eval('return is_array('.$sub.');')) {
-                $text .= eval('return json_encode('.$sub.');');
-            } else {
-                $temp = '';
-                eval('$temp .= '.$sub.';');
-                $temp = strtr($temp, array('{{' => '#~#~', '}}' => '~#~#'));
-                $text .= $temp;
-            }
-        return $text;
+    $text="";
+    if (eval('return is_array('.$sub.');')) {
+        $text .= eval('return json_encode('.$sub.');');
+    } else {
+        $temp = '';
+        eval('$temp .= '.$sub.';');
+        $temp = strtr($temp, array('{{' => '#~#~', '}}' => '~#~#'));
+        $text .= $temp;
+    }
+    return $text;
 }
 
 
 function wbsvRestoreValue($Item,$sub) {
-        $arr=explode("~#~#|~#~#",str_replace("][","]~#~#|~#~#[",$sub));
-        $index="";
-        $result=true;
-        foreach($arr as $a) {
-                $index.=$a;
-                if ($result==true AND eval('return isset('.$index.');')) {
-                        if (eval('return is_array('.$index.');')) {
+    $arr=explode("~#~#|~#~#",str_replace("][","]~#~#|~#~#[",$sub));
+    $index="";
+    $result=true;
+    foreach($arr as $a) {
+        $index.=$a;
+        if ($result==true AND eval('return isset('.$index.');')) {
+            if (eval('return is_array('.$index.');')) {
 
-                        } else {
+            } else {
 
-                                $value=eval('return wbItemToArray('.$index.');');
-                                eval($index.' = $value ;');
-                        }
-                }
+                $value=eval('return wbItemToArray('.$index.');');
+                eval($index.' = $value ;');
+            }
         }
-        return $Item;
+    }
+    return $Item;
 }
 
 
 // добавление кавычек к нечисловым индексам
 function wbSetQuotes($In)
 {
-	$err = false;
-	$mask = '`\[(%*[\w\d]+)\]`u';
-	$nBrackets = preg_match_all($mask, $In, $res, PREG_OFFSET_CAPTURE);				// найти индексы без кавычек
-	if ($nBrackets === false)
-	{
-		echo 'Ошибка в шаблоне индексов. Обратитесь к разработчику.' . '<br>';
-		$err = true;
-	} else
-	{
-		if ($nBrackets == 0)
-		{
-			if (substr($In, 0, 2) != '["')
-			{
-				if (!is_numeric($In)) $In = '"' . $In . '"';
-				$In = '[' . $In . ']';
-			}
-		} else
-		{
-			for ($i = 0; $i < $nBrackets; $i++)
-			{
-				if (!is_numeric($res[1][$i][0])) $In = str_replace('['.$res[1][$i][0].']', '["'.$res[1][$i][0].'"]', $In);
-			}
-		}
-	}
-	return $In;
+    $err = false;
+    $mask = '`\[(%*[\w\d]+)\]`u';
+    $nBrackets = preg_match_all($mask, $In, $res, PREG_OFFSET_CAPTURE);				// найти индексы без кавычек
+    if ($nBrackets === false)
+    {
+        echo 'Ошибка в шаблоне индексов. Обратитесь к разработчику.' . '<br>';
+        $err = true;
+    } else
+    {
+        if ($nBrackets == 0)
+        {
+            if (substr($In, 0, 2) != '["')
+            {
+                if (!is_numeric($In)) $In = '"' . $In . '"';
+                $In = '[' . $In . ']';
+            }
+        } else
+        {
+            for ($i = 0; $i < $nBrackets; $i++)
+            {
+                if (!is_numeric($res[1][$i][0])) $In = str_replace('['.$res[1][$i][0].']', '["'.$res[1][$i][0].'"]', $In);
+            }
+        }
+    }
+    return $In;
 }
 
 // заменяем &quot на "
 function wbChangeQuot($Tag)
 {
-	$mask = '`&quot[^;]`u';
-	$nQuot = preg_match_all($mask, $Tag, $res, PREG_OFFSET_CAPTURE);				// найти &quot без последеующего ;
-	if ($nQuot === false)
-	{
-		echo 'Ошибка в шаблоне &quot. Обратитесь к разработчику.' . '<br>';
-		$err = true;
-		$In = $tag;
-	} else
-	{
-		if ($nQuot == 0)
-		{
-			$In = $Tag;
-		} else
-		{
-			$In = '';
-			$startIn = 0;		// начальная позиция текста за предыдущей заменой
-			for ($i = 0; $i < $nQuot; $i++)
-			{
-				$beforSize = $res[0][$i][1] - $startIn;
-				$In .= substr($Tag, $startIn, $beforSize) . '"';		// исходный текст между предыдущей и текущей &quot
-				$startIn += $beforSize + 5;
-				if ($i+1 == $nQuot)		// это была последняя &quot
-				{
-					$In .= substr($Tag,  $startIn, strlen($Tag) - $startIn);
-				}
-			}
-		}
-	}
-	return $In;
+    $mask = '`&quot[^;]`u';
+    $nQuot = preg_match_all($mask, $Tag, $res, PREG_OFFSET_CAPTURE);				// найти &quot без последеующего ;
+    if ($nQuot === false)
+    {
+        echo 'Ошибка в шаблоне &quot. Обратитесь к разработчику.' . '<br>';
+        $err = true;
+        $In = $tag;
+    } else
+    {
+        if ($nQuot == 0)
+        {
+            $In = $Tag;
+        } else
+        {
+            $In = '';
+            $startIn = 0;		// начальная позиция текста за предыдущей заменой
+            for ($i = 0; $i < $nQuot; $i++)
+            {
+                $beforSize = $res[0][$i][1] - $startIn;
+                $In .= substr($Tag, $startIn, $beforSize) . '"';		// исходный текст между предыдущей и текущей &quot
+                $startIn += $beforSize + 5;
+                if ($i+1 == $nQuot)		// это была последняя &quot
+                {
+                    $In .= substr($Tag,  $startIn, strlen($Tag) - $startIn);
+                }
+            }
+        }
+    }
+    return $In;
 }
 
 function wbRole($role, $userId = null)
@@ -2649,32 +2760,33 @@ function wbRole($role, $userId = null)
     return $res;
 }
 
-    function wbControls($set = '')
-    {
-        $res = '*';
-        $controls = '[data-wb-role]';
-        $allow = '[data-wb-allow], [data-wb-disallow], [data-wb-disabled], [data-wb-enabled], [data-wb-readonly], [data-wb-writable]';
-        $target = '[data-wb-prepend], [data-wb-append], [data-wb-remove], [data-wb-before], [data-wb-after], [data-wb-html], [data-wb-replace], [data-wb-selector], [data-wb-addclass], [data-wb-removeclass], [data-wb-removeattr], [data-wb-attr], [data-wb-src]';
-        $tags = array('dict', 'tree', 'gallery', 'imageloader', 'thumbnail', 'uploader','multiinput', 'where');
-        foreach(array_keys($_ENV["tags"]) as $tag) {
-		if (!in_array($tag,$tags)) $tags[]=$tag;
-	}
-
-        if ('' !== $set) {
-            $res = $$set;
-        } else {
-            $res = "{$controls},{$allow},{$target}";
-        }
-        unset($controls,$allow,$target);
-
-        return $res;
+function wbControls($set = '')
+{
+    $res = '*';
+    $controls = '[data-wb-role]';
+    $allow = '[data-wb-allow], [data-wb-disallow], [data-wb-disabled], [data-wb-enabled], [data-wb-readonly], [data-wb-writable]';
+    $target = '[data-wb-prepend], [data-wb-append], [data-wb-remove], [data-wb-before], [data-wb-after], [data-wb-html], [data-wb-replace], [data-wb-selector], [data-wb-addclass], [data-wb-removeclass], [data-wb-removeattr], [data-wb-attr], [data-wb-src]';
+    $tags = array('dict', 'tree', 'gallery', 'imageloader', 'thumbnail', 'uploader','multiinput', 'where');
+    foreach(array_keys($_ENV["tags"]) as $tag) {
+        if (!in_array($tag,$tags)) $tags[]=$tag;
     }
+
+    if ('' !== $set) {
+        $res = $$set;
+    } else {
+        $res = "{$controls},{$allow},{$target}";
+    }
+    unset($controls,$allow,$target);
+
+    return $res;
+}
 
 function wbListForms($exclude = true)
 {
     if (true == $exclude) {
         $exclude = array('forms/common', 'forms/admin', 'forms/source', 'forms/snippets');
-    } elseif (!is_array($exclude)) {
+    }
+    elseif (!is_array($exclude)) {
         $exclude = array('forms/snippets');
     }
     $list = array();
@@ -2777,14 +2889,18 @@ function wbListTags()
 }
 
 function wbListLocales() {
-        $out=wbGetForm("admin","edit");
-        $locales=wbEnvData("form->admin_edit->locale");
-        foreach($locales as $key => $loc) {
-                if (!isset($loc["_locale"])) {$loc["_locale"]=$key;}
-                if (!isset($loc["_flag"])) {$loc["_flag"]="";}
-                $locales[$key]=array("id"=>$key,"_locale"=>$loc["_locale"],"_flag"=>$loc["_flag"]);
+    $out=wbGetForm("admin","edit");
+    $locales=wbEnvData("form->admin_edit->locale");
+    foreach($locales as $key => $loc) {
+        if (!isset($loc["_locale"])) {
+            $loc["_locale"]=$key;
         }
-        return $locales;
+        if (!isset($loc["_flag"])) {
+            $loc["_flag"]="";
+        }
+        $locales[$key]=array("id"=>$key,"_locale"=>$loc["_locale"],"_flag"=>$loc["_flag"]);
+    }
+    return $locales;
 }
 
 function wbListFormsFull()
@@ -2806,16 +2922,16 @@ function wbListFormsFull()
             //$uri_path=str_replace($_SESSION["root_path"],"",$_ENV["path_".$type]);
             $uri_path = '';
             $data = array(
-                'type' => $type,
-                'path' => $_ENV['path_'.$type]."/forms/{$form}/".$name.".{$ext}",
-                'dir' => "/forms/{$form}",
-                'uri' => $uri_path."/forms/{$form}/".$fname,
-                'form' => $form,
-                'file' => $fname,
-                'ext' => $ext,
-                'name' => $name,
-                'mode' => $mode,
-            );
+                        'type' => $type,
+                        'path' => $_ENV['path_'.$type]."/forms/{$form}/".$name.".{$ext}",
+                        'dir' => "/forms/{$form}",
+                        'uri' => $uri_path."/forms/{$form}/".$fname,
+                        'form' => $form,
+                        'file' => $fname,
+                        'ext' => $ext,
+                        'name' => $name,
+                        'mode' => $mode,
+                    );
             $list[$type][] = $data;
         }
     }
@@ -2849,8 +2965,8 @@ function wbArraySort($array = array(), $args = array('votes' => 'd'))
         $a = (object) $a;
         $b = (object) $b;
         foreach ($args as $k => $v) {
-		if (isset($a->$k)) $a->$k=mb_strtolower($a->$k);
-		if (isset($b->$k)) $b->$k=mb_strtolower($b->$k);
+            if (isset($a->$k)) $a->$k=mb_strtolower($a->$k);
+            if (isset($b->$k)) $b->$k=mb_strtolower($b->$k);
             if (isset($a->$k) && isset($b->$k)) {
                 if ($a->$k == $b->$k) {
                     continue;
@@ -2915,7 +3031,12 @@ function wbListTpl()
 function wbListFilesRecursive($dir, $path = false)
 {
     $list = array();
-    if (is_dir($dir)) {$stack[] = $dir;} else {$stack=array();}
+    if (is_dir($dir)) {
+        $stack[] = $dir;
+    }
+    else {
+        $stack=array();
+    }
     while ($stack) {
         $thisdir = array_pop($stack);
         if (is_dir($thisdir) and $dircont = scandir($thisdir)) {
@@ -2927,14 +3048,15 @@ function wbListFilesRecursive($dir, $path = false)
                     if (is_file($current_file)) {
                         if (true == $path) {
                             $list[] = array(
-                                'file' => "{$dircont[$i]}",
-                                'path' => "{$thisdir}",
-                            );
+                                          'file' => "{$dircont[$i]}",
+                                          'path' => "{$thisdir}",
+                                      );
                         } else {
                             $list[] = "{$dircont[$i]}";
                         }
                         ++$idx;
-                    } elseif (is_dir($current_file)) {
+                    }
+                    elseif (is_dir($current_file)) {
                         $stack[] = $current_file;
                     }
                 }
@@ -2948,14 +3070,14 @@ function wbListFilesRecursive($dir, $path = false)
 
 function wbArrayWhere($arr, $where)
 {
-	$res  = array();
-	$iter = new ArrayObject($arr);
-	foreach ($iter as $key => $val) {
-		if (wbWhereItem($val, $where)) {
-			$res[]=$arr[$key];
-			unset($arr[$key]);
-		}
-	}
+    $res  = array();
+    $iter = new ArrayObject($arr);
+    foreach ($iter as $key => $val) {
+        if (wbWhereItem($val, $where)) {
+            $res[]=$arr[$key];
+            unset($arr[$key]);
+        }
+    }
 
     return $res;
 }
@@ -3002,14 +3124,15 @@ function wbCallFormFunc($name, $Item, $form = null, $mode = null)
 function wbTranslit($textcyr = null, $textlat = null)
 {
     $cyr = array(
-    'ё', 'ж',  'ч',  'щ',   'ш',  'ю',  'а', 'б', 'в', 'г', 'д', 'е', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ъ', 'ы', 'ь', 'э', 'я',
-    'Ё', 'Ж',  'Ч',  'Щ',   'Ш',  'Ю',  'А', 'Б', 'В', 'Г', 'Д', 'Е', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ъ', 'Ы', 'Ь', 'Э', 'Я', );
+               'ё', 'ж',  'ч',  'щ',   'ш',  'ю',  'а', 'б', 'в', 'г', 'д', 'е', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ъ', 'ы', 'ь', 'э', 'я',
+               'Ё', 'Ж',  'Ч',  'Щ',   'Ш',  'Ю',  'А', 'Б', 'В', 'Г', 'Д', 'Е', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ъ', 'Ы', 'Ь', 'Э', 'Я', );
     $lat = array(
-    'e', 'j', 'ch', 'sch', 'sh', 'u', 'a', 'b', 'v', 'g', 'd', 'e', 'z', 'i', 'i', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'f', 'h', 'c', '`', 'y', '', 'e', 'ya',
-    'E', 'j', 'Ch', 'Sch', 'Sh', 'U', 'A', 'B', 'V', 'G', 'D', 'E', 'Z', 'I', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'F', 'H', 'c', '`', 'Y', '', 'E', 'ya', );
+               'e', 'j', 'ch', 'sch', 'sh', 'u', 'a', 'b', 'v', 'g', 'd', 'e', 'z', 'i', 'i', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'f', 'h', 'c', '`', 'y', '', 'e', 'ya',
+               'E', 'j', 'Ch', 'Sch', 'Sh', 'U', 'A', 'B', 'V', 'G', 'D', 'E', 'Z', 'I', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'F', 'H', 'c', '`', 'Y', '', 'E', 'ya', );
     if ($textcyr) {
         return str_replace($cyr, $lat, $textcyr);
-    } elseif ($textlat) {
+    }
+    elseif ($textlat) {
         return str_replace($lat, $cyr, $textlat);
     } else {
         return null;
