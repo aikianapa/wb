@@ -1,5 +1,6 @@
 <?php
 function sitemap__init() {
+	ini_set('max_execution_time', 9999);
     if (isset($_ENV["route"]["params"][0])) {
         $mode=$_ENV["route"]["params"][0];
         $call="sitemap__{$mode}";
@@ -26,18 +27,18 @@ function sitemap__ajax() {
 	} else {
 		echo sitemap__generate();
 	}
-	
+
 }
 
 function sitemap__check_show($form) {
 	$formfile="{$_ENV["path_app"]}{$form["dir"]}/{$form["name"]}.php";
-	
+
 	if (is_file($formfile)) {$formfile=file_get_contents($formfile);}
 	if (strpos($formfile,"{$form["form"]}_show") OR strpos($formfile,"{$form["form"]}__show")) {$func=true;} else {$func=false;}
 
 		if (($form["mode"]=="show" OR $func==true) && !in_array($form["form"],$forms)) {
 			return true;
-		}	
+		}
 		return false;
 }
 
@@ -62,8 +63,8 @@ function sitemap__generate($href=null) {
                     if ($out->find("head meta[name=changefreq]:last")->length) {$freq=$out->find("head meta[name=changefreq]:last",0)->attr("content");} else {$freq="weekly";}
                     $lastmod=date('c',strtotime($lastmod));
                     $_SESSION["moduleSitemap"]["data"][$href]=array("freq"=>$freq,"lastmod"=>$lastmod,"priority"=>$priority);
-				    sitemap__node($href);                    
-					$oLinks=$out->find("a[href]");                    
+				    sitemap__node($href);
+					$oLinks=$out->find("a[href]");
 					foreach($oLinks as $oLink) {
 						$link=$oLink->attr("href");
                         if (!strpos("://",$link)) {$link=$_SESSION["moduleSitemap"]["host"].$link;}
@@ -71,8 +72,8 @@ function sitemap__generate($href=null) {
 						$l=parse_url($link);
 						if (
                             !in_array($link,$_SESSION["moduleSitemap"]["list"])
-                            AND !in_array($link,$list) 
-                            AND ($l["host"]==$_ENV["route"]["domain"] OR $l["host"]==$sub.$_ENV["route"]["host"]) 
+                            AND !in_array($link,$list)
+                            AND ($l["host"]==$_ENV["route"]["domain"] OR $l["host"]==$sub.$_ENV["route"]["host"])
                             AND $l["path"]!=="void(0)"
                             AND !strpos($link,"}}")
                         ) {
@@ -86,7 +87,7 @@ function sitemap__generate($href=null) {
 	//echo $out->outerHtml();
 	if (count($list)==0) {
 		return json_encode(false);
-		
+
 	} else {
 		return json_encode($list);
 	}
@@ -116,8 +117,8 @@ if (isset($_SESSION["moduleSitemap"]["data"][$link]) AND is_array($_SESSION["mod
         $$key=$val;
     }
 }
-    
-$date=date('c',time()); 
+
+$date=date('c',time());
 $node='<url>
 	<loc>'.$link.'</loc>
 	<lastmod>'.$lastmod.'</lastmod>

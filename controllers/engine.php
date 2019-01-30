@@ -128,7 +128,8 @@ function engine__controller_signup()
                 ,"active"           => ""
                 ,"first_name"       => $_POST["first_name"]
                 ,"last_name"        => $_POST["last_name"]
-                ,"name"             => $nick
+                ,"nickname"	    => $nick
+                ,"name"		    => $nick
                 ,"password"         => md5($_POST["password"])
                 ,"email"            => $_POST["email"]
             );
@@ -140,15 +141,22 @@ function engine__controller_signup()
 		}
             }
             if (!isset($user["role"])) $user["role"]="user";
-            wbItemSave("users",$user);
-
+            $out->wbSetData($user);
             $msg=$out->find(".signbox.mail",0);
-            $msg->wbSetData($user);
             $subj=$msg->find(".subject",0);
-            wbMail(array($_ENV["settings"]["email"],$_ENV["settings"]["header"]),array($_POST["email"],$nick),$subj->html(),$msg->html());
+            $message=$msg->find(".message")->outerHtml();
+            $result=wbMail(array($_ENV["settings"]["email"],$_ENV["settings"]["header"]),array($_POST["email"],$nick),$subj->text(),$message);
             unset($msg,$subj);
-            $out->find(".signpanel-wrapper")->html($out->find(".signbox.check"));
-            $out->find(".signbox.check")->removeClass("d-none");
+            if ($result) {
+		    $out->find(".signpanel-wrapper")->html($out->find(".signbox.check"));
+		    $out->find(".signbox.check")->removeClass("d-none");
+		    wbItemSave("users",$user);
+	    } else {
+		    $out->find(".signpanel-wrapper")->html($out->find(".signbox.error"));
+		    $out->find(".signbox.error")->removeClass("d-none");
+		    $out->find(".signbox.error p.errmsg")->html($_ENV["error"]["wbMail"]);
+	    }
+
         } else {
             $out->find("[name=password]",0)->prev("label",0)->addClass("text-danger");
             $out->find("[name=password_check]",0)->prev("label",0)->addClass("text-danger");

@@ -83,10 +83,9 @@
     </form><!-- signpanel-wrapper -->
     <div class="signbox mail d-none">
         <h3 class="subject">{{_LANG[subject]}}: {{_SETT[header]}}</h3>
-        <p class="message">{{name}}, {{_LANG[message1]}} {{_SETT[header]}} (<a href="{{_ENV[route][hostp]}}">{{_ENV[route][hostp]}}</a>)
-            {{_LANG[message2]}}: <a href="{{_ENV[route][hostp]}}/signup/{{id}}">{{_ENV[route][hostp]}}/signup/{{id}}</a>
+        <p class="message">{{name}}, {{_LANG[message1]}} <a href="{{_ENV.route.hostp}}">{{_SETT[header]}}</a>,<br>
+            {{_LANG[message2]}}: <a href="{{_ENV.route.hostp}}/signup/{{id}}">{{_ENV.route.hostp}}/signup/{{id}}</a>
             <br><br>
-            {{_LANG[message2]}}:<br>
             {{_LANG[login]}}: <b>{{_POST[email]}}</b><br>
             {{_LANG[password]}}: <b>{{_POST[password]}}</b><br>
         </p>
@@ -101,6 +100,19 @@
             <a  class="btn btn-dark btn-block" href="/login">{{_LANG[signup_login]}} <i class="fa fa-sign-in"></i></a>
         </div>
     </div>
+
+    <div class="signbox error d-none">
+        <div class="signbox-header">
+          <i class="pb-3 fa fa-user-circle-o fa-4x text-white"></i>
+          <h4>{{_LANG[signup_error]}}</h4>
+        </div>
+        <div class="signbox-body">
+            <p class="text-danger">{{_LANG[signup_error]}} {{_LANG[account]}} <b>{{_POST[email]}}</b> {{_LANG[signup_noreg]}}</p>
+            <p class="errmsg text-danger"></p>
+            <a  class="btn btn-dark btn-block" href="/signup/">{{_LANG[signup_header]}} <i class="fa fa-sign-in"></i></a>
+        </div>
+    </div>
+
 
     <div class="signbox exist d-none">
         <div class="signbox-header">
@@ -144,6 +156,8 @@
                 signup_already          = "Already registred?"
                 signup_login            = "Sign in"
                 signup_header           = "Sign up"
+                signup_error            = "Error"
+                signup_noreg            = "not registred"
                 login                   = "Login"
                 password                = "Password"
                 subject                 = "Account registration"
@@ -168,6 +182,8 @@
                 signup_already          = "Уже зарегистрированы?"
                 signup_login            = "Вход"
                 signup_header           = "Регистрация"
+                signup_error            = "Ошибка"
+                signup_noreg            = "не зарегистрирован"
                 login                   = "Логин"
                 password                = "Пароль"
                 subject                 = "Регистрация учётной записи"

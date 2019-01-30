@@ -150,66 +150,99 @@ function wbMailer(
 function wbMail(
     $from = null, $sent = null, $subject = null, $message = null, $attach = null
 ) {
-    require $_ENV["path_engine"].'/lib/phpmailer/PHPMailerAutoload.php';
-    $mail = new PHPMailer(); // for mail
-    // $mail = new PHPMailer(true); // for sendmail
 
-    /*
-        $mail->SMTPDebug = 2;                                 // Enable verbose debug output
-        $mail->isSMTP();                                      // Set mailer to use SMTP
-        $mail->Host = 'smtp1.example.com;smtp2.example.com';  // Specify main and backup SMTP servers
-        $mail->SMTPAuth = true;                               // Enable SMTP authentication
-        $mail->Username = 'user@example.com';                 // SMTP username
-        $mail->Password = 'secret';                           // SMTP password
-        $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
-        $mail->Port = 587;                                    // TCP port to connect to
-    */
+    if ($from == null) {
+        $from=$_ENV["settings"]["email"].";".$_ENV["settings"]["header"];
+    } else if (!is_array($from)) {
+        if (strpos($from,";")) {
+            $from=explode(";",$from);
+        }
+        else {
+            $from=array($from,strip_tags($_ENV['settings']['header']));
+        }
+    }
 
-    if (strpos($from,";")) {
-        $from=explode(";",$from);
-    }
-    else {
-        $from=array($from,strip_tags($_ENV['settings']['header']));
-    }
     if (!is_array($sent) AND is_string($sent) AND strpos($sent,";")) {
         $sent=array(explode(";",$sent));
     }
-    else {
+    else if (!is_array($sent)) {
         $sent=array(array($sent,$sent));
+    } else if (is_array($sent) AND !is_array($sent[0]) AND strpos($s,";")) {
+        foreach($sent as $k => $s) {
+            if (!is_array($s)) {
+                $sent[$k]=array(explode(";",$s));
+            }
+        }
+    } else if (is_array($sent) AND !is_array($sent[0]) AND !strpos($s,";")) {
+        $sent=array($sent);
     }
 
-    $mail->setFrom($from[0], $from[1]);
-    $mail->addReplyTo($from[0], $from[1]);
+    if ($_ENV["settings"]["phpmailer"]!=="on") {
+        require __DIR__.'/lib/phpmailer/PHPMailerAutoload.php';
+        $mail = new PHPMailer(); // for mail
+        // $mail = new PHPMailer(true); // for sendmail
 
-    foreach($sent as $s) {
-        $mail->addAddress($s[0], $s[1]);
-    }
+        /*
+            $mail->SMTPDebug = 2;                                 // Enable verbose debug output
+            $mail->isSMTP();                                      // Set mailer to use SMTP
+            $mail->Host = 'smtp1.example.com;smtp2.example.com';  // Specify main and backup SMTP servers
+            $mail->SMTPAuth = true;                               // Enable SMTP authentication
+            $mail->Username = 'user@example.com';                 // SMTP username
+            $mail->Password = 'secret';                           // SMTP password
+            $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
+            $mail->Port = 587;                                    // TCP port to connect to
+        */
 
-    $mail->Subject = $subject;
-    //Read an HTML message body from an external file, convert referenced images to embedded,
-    //convert HTML into a basic plain-text alternative body
-    $mail->msgHTML($message, dirname(__FILE__));
-    $mail->CharSet = 'utf-8';
-    //Replace the plain text body with one created manually
-    $mail->AltBody = strip_tags($message);
-    //Attach an image file
+        $mail->setFrom($from[0], $from[1]);
+        $mail->addReplyTo($from[0], $from[1]);
 
-    if (!is_array($attach) AND is_string($attach)) {
-        $attach=array($attach);
+        foreach($sent as $s) {
+            $mail->addAddress($s[0], $s[1]);
+        }
+        $mail->isHTML();
+        $mail->Subject = $subject;
+        //Read an HTML message body from an external file, convert referenced images to embedded,
+        //convert HTML into a basic plain-text alternative body
+        $mail->msgHTML($message, dirname(__FILE__));
+        $mail->CharSet = 'utf-8';
+        //Replace the plain text body with one created manually
+        $mail->AltBody = strip_tags($message);
+        //Attach an image file
+
+        if (!is_array($attach) AND is_string($attach)) {
+            $attach=array($attach);
+        }
+        if (is_array($attach)) {
+            foreach($attach as $a) {
+                $mail->addAttachment($attach);
+            }
+        }
+        //send the message, check for errors
+        $mail->send();
+        $error=$_ENV["error"][__FUNCTION__]=$mail->ErrorInfo;
+    } else {
+
+// Set content-type header for sending HTML email
+        $headers = "MIME-Version: 1.0" . "\r\n";
+        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+
+// Additional headers
+        $headers .= "From: {$from[0]}\r\n"."X-Mailer: php";
+        foreach($sent as $s) {
+            $error=mail($s[0],$subject,$message,$headers);
+            if ($error==true) {$error=false;} else {$error=true;}
+            $_ENV["error"][__FUNCTION__]=$error;
+
+        }
     }
-    foreach($attach as $a) {
-        $mail->addAttachment($attach);
-    }
-    //send the message, check for errors
-    $mail->send();
-    $_ENV["error"]=$mail->ErrorInfo;
-    if ($error>"") {
-        return false;
-    }
-    else {
-        return true;
-    }
+        if ($error>"") {
+            return false;
+        }
+        else {
+            return true;
+        }
 }
+
 
 function wbCheckWorkspace()
 {
@@ -1138,9 +1171,8 @@ function wbItemRemove($table = null, $id = null, $flush = true)
     } else if (is_string($id)) {
         if (strpos($id," ") OR strpos($id,'"') OR strpos($id,'=') OR strpos($id,'>') OR strpos($id,'<')) {
             $list=wbItemList($table,$id);
-            $list=array_keys($list);
-            foreach($list as $iid) {
-                wbItemRemove($table, $iid, false);
+            foreach($list as $item) {
+                wbItemRemove($table, $item["id"], false);
             }
             if ($flush==true) {
                 wbTableFlush($table);
@@ -1284,6 +1316,7 @@ function wb_file_get_contents($file)
 
 function wbTrigger($type, $name, $trigger, $args = null, $data = null)
 {
+	if (!isset($_ENV['error']) OR !is_array($_ENV['error'])) {$_ENV['error']=array();}
     if (!isset($_ENV['error'][$type])) {
         $_ENV['error'][$type] = array();
     }

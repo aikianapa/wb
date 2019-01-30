@@ -86,6 +86,16 @@
 
                 <div class="col-sm-12">
                         <div class="row form-group">
+                                <label class="col-sm-3 col-6">PHPmailer</label>
+                                <label class="switch switch-sm switch-success">
+				<input type="checkbox" name="phpmailer" value="">
+				<span></span>
+			</label>
+                        </div>
+                </div>
+
+                <div class="col-sm-12">
+                        <div class="row form-group">
                                 <label class="col-sm-3 col-6">{{_LANG[error_log]}}</label>
                                 <label class="switch switch-sm switch-success">
 				<input type="checkbox" name="log" value="">
