@@ -1,8 +1,7 @@
 <div class="modal fade" id="{{_form}}_{{_mode}}" data-keyboard="false" data-backdrop="static" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-xxl" role="document">
         <div class="modal-content">
-          <div class="modal-header pb-0 pt-1" data-wb-role="include" src="/engine/forms/common/common_tree_edit_nav.php">
-    		  </div>
+		<div class="modal-header pb-0 pt-1" data-wb-role="include" src="/engine/forms/common/common_tree_edit_nav.php">	</div>
 
             <!--div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -46,6 +45,21 @@
             </div>
         </div>
     </div>
+</div>
+
+
+<div class="modal tree-edit-fld" id="{{_form}}EditDictFld" data-keyboard="true" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header pb-0 pt-1">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">×</span> </button>
+				<h5 class="modal-title"></h5>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" role="form"></form>
+			</div>
+		</div>
+	</div>
 </div>
 
 <script type="text/locale" data-wb-role="include" src="tree_common"></script>

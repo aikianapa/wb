@@ -1,13 +1,13 @@
-	<div class="col-sm-12" data-wb-role="multiinput" name="fields">
-
-			<div class="col-sm-3 col-xs-12">
-				<input class="form-control" placeholder="{{_LANG[name]}}" type="text" name="name">
+	<div class="col-12" data-wb-role="multiinput" name="fields">
+			<div class="col-6">
+				<div class="form-group mb-0">
+					<div class="input-group">
+						<span class="input-group-addon wb-tree-dict-prop-btn"><i class="fa fa-gear"></i></span>
+						<input class="form-control" placeholder="{{_LANG[name]}}" type="text" name="name">
+					</div>
+				</div>
 			</div>
-
-			<div class="col-sm-4 col-xs-12">
-				<input class="form-control" placeholder="{{_LANG[label]}}" type="text" name="label">
-			</div>
-			<div class="col-sm-3 col-xs-12">
+			<div class="col-6">
 					<select class="form-control" name="type" placeholder="{{_LANG[type]}}">
 					<option value="string">string</option>
 					<option value="text">text</option>
@@ -40,17 +40,44 @@
 					<option value="color">color</option>
 					</select>
 			</div>
-			<div class="col-sm-2 col-xs-12">
-				<input class="form-control" placeholder="{{_LANG[default]}}" type="text" name="value">
+
+		<div class="hidden wb-prop-fields">
+			<div class="form-group row" data-type-allow="">
+				<label class="col-sm-3 form-control-label">{{_LANG[label]}}</label>
+				<div class="col-sm-9"><input class="form-control" placeholder="{{_LANG[label]}}" type="text" name="label"></div>
 			</div>
-			<div class="col-sm-3 hidden-xs">&nbsp;</div>
-			<div class="col-sm-4 col-xs-12">
-				<input class="form-control" placeholder="{{_LANG[json]}}" type="text" name="prop">
+			<div class="form-group row">
+				<label class="col-sm-3 form-control-label">{{_LANG[default]}}</label>
+				<div class="col-sm-9"><input class="form-control" placeholder="{{_LANG[default]}}" type="text" name="value"></div>
 			</div>
-			<div class="col-sm-5 col-xs-12">
-				<input class="form-control" placeholder="{{_LANG[css]}}" type="text" name="style">
+			<div class="form-group row">
+				<label class="col-sm-3 form-control-label">{{_LANG[form]}}</label>
+				<div class="col-sm-9">
+					<select class="form-control" data-wb-field="form" placeholder="{{_LANG[form]}}" data-wb-role="foreach" data-wb-from="_ENV[forms]" data-wb-tpl="false" data-wb-hide="wb">
+						<option>{{0}}</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group row">
+				<label class="col-sm-3 form-control-label">{{_LANG[mode]}}</label>
+				<div class="col-sm-9">
+					<input class="form-control" placeholder="{{_LANG[mode]}}" type="text" name="mode">
+				</div>
+			</div>
+			<div class="form-group row">
+				<label class="col-sm-3 form-control-label">{{_LANG[json]}}</label>
+				<div class="col-sm-9"><input class="form-control" placeholder="{{_LANG[json]}}" type="text" name="prop"></div>
+			</div>
+			<div class="form-group row">
+				<label class="col-sm-3 form-control-label">{{_LANG[class]}}</label>
+				<div class="col-sm-9"><input class="form-control" placeholder="{{_LANG[class]}}" type="text" name="class"></div>
+			</div>
+			<div class="form-group row">
+				<label class="col-sm-3 form-control-label">{{_LANG[css]}}</label>
+				<div class="col-sm-9"><input class="form-control" placeholder="{{_LANG[css]}}" type="text" name="style"></div>
 			</div>
 
+		</div>
 	</div>
 
 <script type="text/locale">
@@ -60,9 +87,12 @@
         type	= "Field type"
         default = "Default value"
         json    = "JSON data"
-        css	= "CSS style"
+        css	= "Style CSS"
         other	= "Other"
         plugins = "Plugins"
+        form 	= "Form"
+        mode	= "Mode"
+        class 	= "Style class"
 [rus]
         label	= "Метка"
         name    = "Имя поля"
@@ -72,4 +102,7 @@
         css	= "Стиль CSS"
         other	= "Другие"
         plugins = "Плагины"
+        form 	= "Форма"
+        mode	= "Режим"
+        class 	= "Класс стиля"
 </script>

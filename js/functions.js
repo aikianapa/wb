@@ -1,4 +1,5 @@
 "use strict"
+"use strict"
 var wbapp = new Object();
 $(function(){
         var loading = setInterval(function(){
@@ -450,7 +451,7 @@ function wb_tree() {
       if (!$(tree).find(".wb-tree-item").length) {
         $(tree).children(".dd-list").append(row);
       }
-      $(this).parents(".wb-tree-menu").remove();
+      $(document).find(".wb-tree-menu.show").remove();
       $(tree).treeStore();
     });
 
@@ -521,26 +522,9 @@ function wb_tree() {
       $("#tree_edit .modal-header").html($(tpl).find(".modal-header").html());
     } else {
       $("body").append(tpl);
-      var zi = 1050;
-      if ($(".modal:visible").length) {
-        $(".modal:visible").each(function() {
-          if (zi < $(this).css("z-index")) {
-            zi = $(this).css("z-index");
-          }
-        });
-        zi += 2;
-      }
-      $(edid).css("z-index", zi);
       $(edid).modal();
       $(document).click(function(e) {
-        if (!$(e.target).parents(".tree-edit").length &&
-          !$(e.target).parents(".wb-tree").length &&
-          !$(e.target).parents(".dropdown-item").length &&
-          !$(e.target).is(".dropdown-item") &&
-          !$(e.target).parents(".cke_reset_all").length &&
-          !$(e.target).parents(".cke_screen_reader_only").length &&
-          !$(e.target).is(".cke_dialog_background_cover")
-        ) {
+        if ($(e.target).parents(".dd-btn").length ) {
           $(tree).treeBranchChange(edid);
           $(edid).modal("hide");
         }
@@ -571,7 +555,6 @@ function wb_tree() {
     $(edid).find('.modal-footer button').on("click", function(e) {
       $(tree).treeStore();
       $(edid).modal("hide");
-      $(edid).next(".modal-backdrop").remove();
       setTimeout(function() {
         $(edid).remove();
       }, 500)
@@ -586,16 +569,37 @@ function wb_tree() {
       }
     });
 
+    $(edid).undelegate(".wb-tree-dict-prop-btn", "click");
+    $(edid).delegate(".wb-tree-dict-prop-btn", "click", function(e) {
+		var $prop = $(this).parents(".wb-multiinput").find(".wb-prop-fields");
+		$("#treeEditDictFld").find(".modal-title").html($(this).parents(".wb-multiinput").find("input[data-wb-field=name]").val()+"&nbsp;");
+		$("#treeEditDictFld").find(".modal-body form").html($prop.html());
+		$prop.find('[data-wb-field]').each(function(){
+			$("#treeEditDictFld [data-wb-field="+$(this).attr('data-wb-field')+"]").val($(this).val());
+		});
+
+		$("#treeEditDictFld").data("prop",$prop);
+		$("#treeEditDictFld").modal('show');
+    });
+
+	$("#treeEditDictFld").undelegate(":input","change");
+	$("#treeEditDictFld").delegate(":input","change",function(){
+		var $prop=$("#treeEditDictFld").data("prop");
+		$prop.find('[data-wb-field='+$(this).attr('data-wb-field')+']').attr("value",$(this).val());
+		$(edid).treeDictChange();
+	});
+
     $(edid).undelegate(".treeDict *", "change");
     $(edid).delegate(".treeDict *", "change", function(e) {
       if ($(e.currentTarget).is("input,select,textarea")) {
-        $(edid).treeDictChange();
+        $(edid).treeDictChange($(this));
       }
     });
 
   }
 
-  $.fn.treeDictChange = function() {
+  $.fn.treeDictChange = function(event) {
+	console.log("treeDictChange");
     var dict = [];
     var tree = $(this).data("tree");
 
@@ -604,14 +608,12 @@ function wb_tree() {
 
     $(this).find(".treeDict .wb-multiinput").each(function(i) {
       var fld = {};
-      $(this).find("input,select,textarea").each(function() {
+      $(this).find(":input").each(function() {
         if ($(this).is("input")) {
           fld[$(this).attr("data-wb-field")] = $(this).val();
-        }
-        if ($(this).is("textarea")) {
+        } else if ($(this).is("textarea")) {
           fld[$(this).attr("data-wb-field")] = $(this).html();
-        }
-        if ($(this).is("select")) {
+        } else if ($(this).is("select")) {
           fld[$(this).attr("data-wb-field")] = $(this).find("option:selected").attr("value");
         }
       });
@@ -625,11 +627,19 @@ function wb_tree() {
     $(this).data("data")["_form"] = form;
     $(this).data("data")["_item"] = formitem;
     var tpl = $(tree).treeEditModal($(this).data("data"));
+    if (event !== undefined ) $(event).treeDictUpdateProp(tpl);
     $(tpl).find("#treeDict_tree_tree").remove();
     $(this).find(".treeData").children("form").html($(tpl).find(".treeData form").html());
     $(this).treeContentEditEvents();
     wb_plugins();
     wb_multiinput();
+  }
+
+  $.fn.treeDictUpdateProp = function(tpl) {
+	if (!$(this).is("select[data-wb-field=type]")) return;
+	var field=$(this).parents(".wb-multiinput").find("[data-wb-field=name]").val();
+	var prop = $(tpl).find("[data-wb-field=name][value="+field+"]").parents(".wb-multiinput").find(".wb-prop-fields").html();
+	$(this).parents(".wb-multiinput").find(".wb-prop-fields").html(prop);
   }
 
   function wb_tree_json_prep(data, dict) {
@@ -1102,6 +1112,31 @@ function wb_plugins() {
     }
     if (is_callable("wb_plugin_editor")) wb_plugin_editor();
     if (is_callable("wbCommonUploader")) wbCommonUploader();
+
+	$(document).undelegate('.modal','hidden.bs.modal');
+	$(document).delegate('.modal','hidden.bs.modal', function (e) {
+		var zi=1000;
+		$(".modal:visible").each(function(){
+			zi += 10;
+		});
+		$(".modal-backdrop").css("z-index",zi-10);
+
+	});
+
+	$(document).undelegate('.modal','shown.bs.modal');
+	$(document).delegate('.modal','shown.bs.modal', function (e) {
+		var zi=1000;
+		$(".modal:visible").each(function(){
+			zi += 10;
+		});
+		$(this).css("z-index",zi+10);
+		$(".modal-backdrop").css("z-index",zi);
+		if ($(this).is("[data-backdrop=false]")) {
+			$(".modal-backdrop").css("z-index",zi-10);
+		}
+
+	});
+
   });
 }
 
