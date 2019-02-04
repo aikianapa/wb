@@ -430,7 +430,7 @@ function wbGetDataWbFrom($Item, $str)
             return $str_1;
         }
     }
-    $str = wbSetValuesStr($str, $Item);
+    if (strpos($str,"}}")) $str = wbSetValuesStr($str, $Item);
 
     //$Item = wbItemToArray($Item);
     $pos = strpos($str, '[');
@@ -574,13 +574,13 @@ function wbFieldBuild($param, $data = array(),$locale=array())
         $get=$_GET;
         $par=$param;
         $names=explode(";",$param["value"]);
-        $form=$names[0];
-        $mode=$names[1];
-        $item=$names[2];
+        $form=$param["form"];
+        $mode=$param["mode"];
         $_ENV["route"]["form"]=$param["_form"]=$_GET["form"]=$form;
         $_ENV["route"]["mode"]=$param["_mode"]=$_GET["mode"]=$mode;
-        $_ENV["route"]["item"]=$param["_item"]=$_GET["item"]=$item;
         $tpl=wbGetForm($form,$mode);
+        if ($param["selector"]>"") {$tpl=$tpl->find($param["selector"],0);}
+        $tpl->find(":first")->addClass($param["class"]);
         $tpl->wbSetValues($param);
         $tpl->wbSetData($data);
         $tpl->find(".nav-tabs .nav-item:first-child")->addClass("active");
@@ -2013,7 +2013,7 @@ function wbWhereItem($item, $where = null)
 {
     $where = htmlspecialchars_decode($where);
     $res = true;
-    $where = wbSetValuesStr($where, $item);
+    if (strpos($where,"}}")) $where = wbSetValuesStr($where, $item);
 
     if (!null == $where) {
         if ('%' == substr($where, 0, 1)) {
@@ -2031,10 +2031,10 @@ function wbWhereItem($item, $where = null)
     return $res;
 }
 
-
 function wbWherePhp($str = '', $item = array())
 {
-    $str = wbSetValuesStr($str, $item);
+	$str = htmlspecialchars_decode($str);
+	if (strpos($str,"}}")) $str = wbSetValuesStr($str, $item);
     $str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);
     $str = ' '.trim(strtr($str, array(
                               '(' => '(',
@@ -2105,92 +2105,6 @@ function wbWherePhp($str = '', $item = array())
     $str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);
     return $str;
 }
-
-function wbWherePhp_NEW($str = '', $item = array()) {
-    $str = wbSetValuesStr($str, $item);
-    $where="";
-    $func="";
-    $last="";
-    $fld="";
-    $cond=array( "=>","<=",">","<","=","<>","==","!==" );
-    $logic=array( 'AND', 'OR', 'LIKE', 'NOT_LIKE', '&&', '||', 'IN_ARRAY', '(', ')',",", '"');
-
-    preg_match_all('/\"([^\"]+)\"|\"\"|\w+(?!\")|\d|(AND|OR|NOT|LIKE|NOT_LIKE|&&|\|\|)|,|(\(|\)|\(|\)|!==|==|=>|<=|<>|<|=)|(\|@)|\D|\W|\b/iu', $str, $arr); // возникают ошибки если в тексте пробел
-    $flag_l=$flag_f=false;
-    foreach($arr[0] as $a => $el) {
-        if ($last!=="" AND $flag_f==false) {
-            $where .= $last;
-            $last="";
-        }
-        if ($last!=="" AND $flag_f==true AND $fld!=="") {
-            $func.= $last;
-            $last="";
-        }
-        if ($last!=="" AND $flag_f==true AND $fld=="") {
-            $fld = $last;
-            $last="";
-        }
-        if ($last=="" AND $fld=="" AND !in_array($el,$cond) AND !in_array($el,$logic) AND substr(trim($el),0,1)!=='"') {
-            $fld = '$item["' . $el . '"]';
-            $flag_l = true;
-        }
-
-        if ($fld=="") {
-            $fld=$last;
-        }
-        if (in_array($el,$cond) ) {
-            $el = strtr($el, array(
-                            '=' => ' == ',
-                            '>' => ' > ',
-                            '<' => ' < ',
-                            '>=' => ' >= ',
-                            '<=' => ' <= ',
-                            '<>' => ' !== ',
-                            '!=' => ' !== ',
-                            '!==' => ' !== ',
-                            '#' => ' !== ',
-                            '==' => ' == ',
-                        ));
-            $fld = "";
-        }
-        if (in_array($el,$logic) ) {
-            $el = strtr($el, array(
-                            '&&' => 'AND',
-                            '||' => 'OR'
-                        ));
-        }
-
-        if ($flag_f == false) {
-            if ($el == "|@" ) {
-                $flag_f = true;
-            } else {
-                if ($flag_l!==true) $last = $el;
-            }
-        } else if ($flag_f == true) {
-            if (trim($el) == ")") {
-                $flag_f=false;
-                $last=$func.$el;
-                $last=str_replace('$this',$fld,$last);
-                $func="";
-                $fld="";
-            } else if (trim($el) == "(")  {
-                $last=$el."";
-            } else {
-                $last=$el;
-                $flag_l=false;
-            }
-        }
-
-    }
-    if ($last!=="" AND $flag_f==false) {
-        $where .= $last;
-        $last="";
-    }
-
-    $where=preg_replace("~\{\{([^(}})]*)\}\}~","",$where); // чистим "хвосты" если переменные не определены {{some}} заменяем на пусто
-    return $where;
-}
-
 
 function wbt_where($table, $where)
 {
@@ -3020,6 +2934,7 @@ function wbArraySort($array = array(), $args = array('votes' => 'd'))
 
 function wbArrayAttr($attr)
 {
+    $attr = trim($attr);
     $attr = str_replace(',', ' ', $attr);
     $attr = str_replace(';', ' ', $attr);
 
@@ -3104,14 +3019,13 @@ function wbListFilesRecursive($dir, $path = false)
 function wbArrayWhere($arr, $where)
 {
     $res  = array();
-    $iter = new ArrayObject($arr);
-    foreach ($iter as $key => $val) {
+    foreach ($arr as $key => $val) {
         if (wbWhereItem($val, $where)) {
             $res[]=$arr[$key];
-            unset($arr[$key]);
         }
+        unset($arr[$key]);
     }
-
+    unset($arr);
     return $res;
 }
 

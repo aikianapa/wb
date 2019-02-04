@@ -1340,7 +1340,7 @@ abstract class kiNode
                     if (!$tag == FALSE) {
                         $inc->wbSetAttributes($Item);
                         if ($inc->has("[data-wb-json]")) {
-                            $inc->attr("data-wb-json",wbSetValuesStr($inc->attr("data-wb-json"),$Item));
+                            if (strpos($inc->attr("data-wb-json"),"}}")) $inc->attr("data-wb-json",wbSetValuesStr($inc->attr("data-wb-json"),$Item));
                         }
                         if ($inc->is("[data-wb-tpl=true]")) {
                             $inc->addTemplate();
@@ -1799,7 +1799,7 @@ abstract class kiNode
         }
         unset($list);
         $this->wbExcludeTags($Item);
-        $this->wbSetValuesStr($Item);
+        if (strpos($this->outerHtml(),"}}")) $this->wbSetValuesStr($Item);
         $this->wbIncludeTags($Item);
         if ($obj==FALSE) {
             return $this->outerHtml();
@@ -2101,10 +2101,6 @@ abstract class kiNode
     }
 
     public function tagMultiInput($Item) {
-        $len=count($this->find("input,select,textarea"));
-        if ($len==0) {
-            $len=1;
-        }
         include("wbattributes.php");
         if ($this->attr("name") AND !isset($name)) {
             $name=$this->attr("name");
@@ -2137,7 +2133,7 @@ abstract class kiNode
         foreach($Data as $i => $item) {
             $line=wbFromString($tpl);
             $line->wbSetData($item);
-            $inp=$line->find("input,select,textarea");
+            $inp=$line->find("[data-wb-role=multiinput],input,select,textarea");
             foreach($inp as $tag) {
                 $tname=$tag->attr("name");
                 $tplid=$tag->attr("data-wb-tpl");
@@ -2151,10 +2147,15 @@ abstract class kiNode
                     }
                     $tag->attr("data-wb-tpl",$newid);
                 }
-                if ($tag->attr("name")>"") {
-                    $tag->attr("name",$name."[{$i}][".$tname."]");
+                if ($tname>"") {
+			if ($tag->parents("[data-wb-role=multiinput][data-wb-field]")->length) {
+				$pos=strpos($tname,"[");
+				$tag->attr("name",$name."[{$i}][".substr($tname,0,$pos)."]".substr($tname,$pos));
+			} else {
+				$tag->attr("name",$name."[{$i}][".$tname."]");
+				$tag->attr("data-wb-field",$tname);
+			}
                 }
-                $tag->attr("data-wb-field",$tname);
             }
             $row=wbGetForm("common","multiinput_row")->outerHtml();
             $this->append(str_replace("{{template}}",$line->outerHtml(),$row));

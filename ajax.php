@@ -323,6 +323,17 @@ function ajax__treeedit() {
                     $res=wbFieldBuild($dict,$_POST["data"]);
                     $out->find(".treeData form")->append($res);
                     $arr[]=$dict["name"];
+                    $prop=$out->find(".treeDict [data-wb-field=name][value={$dict["name"]}]")->parents(".wb-multiinput")->find(".wb-prop-fields");
+			foreach($prop->find("[data-type-allow],[data-type-disallow]") as $element) {
+				if ($element->is("[data-type-allow]")) {
+					$attr=wbArrayAttr($element->attr("data-type-allow"));
+					if (!in_array($dict["type"],$attr)) {$element->remove();}
+				}
+				if ($element->is("[data-type-disallow]")) {
+					$attr=wbArrayAttr($element->attr("data-type-disallow"));
+					if (in_array($dict["type"],$attr)) {$element->remove();}
+				}
+			}
                 }
             }
     }

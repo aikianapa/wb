@@ -8,11 +8,13 @@ function wbSetValuesStr($tag = "",$Item = array(), $limit = 0, $vars = null)
     if (!is_array($Item)) {
         $Item = array($Item);
     }
+    html_entity_decode($tag);
+    $tag = wbChangeQuot($tag);            // заменяем & quot на "
+    if (!strpos($tag,"}}")) return $tag;
+
    // Обработка для доступа к полям с JSON имеющим id в содержании, в частности к tree
-    $arr = new ArrayIterator($Item);
-    $Item= array();
     $flag = false;
-    foreach ($arr as $key => $item) {
+    foreach ($Item as $key => $item) {
         if (!is_array($item) and ('[' == substr(trim($item), 0, 1) or '{' == substr(trim($item), 0, 1))) {
             $item = json_decode($item, true);
             if (is_array($item)) {
@@ -29,7 +31,6 @@ function wbSetValuesStr($tag = "",$Item = array(), $limit = 0, $vars = null)
     }
 
     // функция подставляющая значения
-    $tag = wbChangeQuot($tag);            // заменяем & quot на "
     $spec= array('_form','_mode','_item','_id');
     $exit = false;
     $err = false;

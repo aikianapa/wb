@@ -42,29 +42,49 @@
 			</div>
 
 		<div class="hidden wb-prop-fields">
-			<div class="form-group row" data-type-allow="">
+			<div class="form-group row">
 				<label class="col-sm-3 form-control-label">{{_LANG[label]}}</label>
 				<div class="col-sm-9"><input class="form-control" placeholder="{{_LANG[label]}}" type="text" name="label"></div>
 			</div>
+
+			<!--div class="form-group row">
+				<label class="col-sm-3 form-control-label">{{_LANG[label]}} ({{_LANG[locales]}})</label>
+				<div class="col-sm-9" data-wb-role="multiinput" name="locales">
+					<div class="col-4">
+						<input class="form-control" placeholder="{{_LANG[label]}} ({{_LANG[locales]}})" type="text" name="lang">
+					</div>
+					<div class="col-4">
+						<input class="form-control" placeholder="{{_LANG[label]}} ({{_LANG[locales]}})" type="text" name="label">
+					</div>
+				</div>
+			</div-->
+
+
 			<div class="form-group row">
 				<label class="col-sm-3 form-control-label">{{_LANG[default]}}</label>
 				<div class="col-sm-9"><input class="form-control" placeholder="{{_LANG[default]}}" type="text" name="value"></div>
 			</div>
-			<div class="form-group row">
+			<div class="form-group row" data-type-allow="forms">
 				<label class="col-sm-3 form-control-label">{{_LANG[form]}}</label>
 				<div class="col-sm-9">
-					<select class="form-control" data-wb-field="form" placeholder="{{_LANG[form]}}" data-wb-role="foreach" data-wb-from="_ENV[forms]" data-wb-tpl="false" data-wb-hide="wb">
-						<option>{{0}}</option>
+					<select class="form-control" name="form" placeholder="{{_LANG[form]}}" data-wb-role="foreach" data-wb-from="_ENV[forms]" data-wb-tpl="false">
+						<option value="{{0}}">{{0}}</option>
 					</select>
 				</div>
 			</div>
-			<div class="form-group row">
+			<div class="form-group row" data-type-allow="forms">
 				<label class="col-sm-3 form-control-label">{{_LANG[mode]}}</label>
 				<div class="col-sm-9">
 					<input class="form-control" placeholder="{{_LANG[mode]}}" type="text" name="mode">
 				</div>
 			</div>
-			<div class="form-group row">
+			<div class="form-group row" data-type-allow="forms">
+				<label class="col-sm-3 form-control-label">{{_LANG[selector]}}</label>
+				<div class="col-sm-9">
+					<input class="form-control" placeholder="{{_LANG[selector]}}" type="text" name="selector">
+				</div>
+			</div>
+			<div class="form-group row" data-type-disallow="forms">
 				<label class="col-sm-3 form-control-label">{{_LANG[json]}}</label>
 				<div class="col-sm-9"><input class="form-control" placeholder="{{_LANG[json]}}" type="text" name="prop"></div>
 			</div>
@@ -93,6 +113,8 @@
         form 	= "Form"
         mode	= "Mode"
         class 	= "Style class"
+        selector= "Selector"
+        locales = "Locales"
 [rus]
         label	= "Метка"
         name    = "Имя поля"
@@ -105,4 +127,6 @@
         form 	= "Форма"
         mode	= "Режим"
         class 	= "Класс стиля"
+        selector= "Селектор"
+        locales = "Локализации"
 </script>
