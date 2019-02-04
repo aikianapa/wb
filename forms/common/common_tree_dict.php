@@ -1,5 +1,5 @@
 	<div class="col-12" data-wb-role="multiinput" name="fields">
-			<div class="col-6">
+			<div class="col-4">
 				<div class="form-group mb-0">
 					<div class="input-group">
 						<span class="input-group-addon wb-tree-dict-prop-btn"><i class="fa fa-gear"></i></span>
@@ -7,7 +7,15 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-6">
+			<div class="col-4">
+				<div class="form-group mb-0">
+					<div class="input-group">
+						<span class="input-group-addon wb-tree-dict-lang-btn"><i class="fa fa-language"></i></span>
+						<input class="form-control" placeholder="{{_LANG[label]}}" type="text" name="label">
+					</div>
+				</div>
+			</div>
+			<div class="col-4">
 					<select class="form-control" name="type" placeholder="{{_LANG[type]}}">
 					<option value="string">string</option>
 					<option value="text">text</option>
@@ -42,10 +50,6 @@
 			</div>
 
 		<div class="hidden wb-prop-fields">
-			<div class="form-group row">
-				<label class="col-sm-3 form-control-label">{{_LANG[label]}}</label>
-				<div class="col-sm-9"><input class="form-control" placeholder="{{_LANG[label]}}" type="text" name="label"></div>
-			</div>
 
 			<!--div class="form-group row">
 				<label class="col-sm-3 form-control-label">{{_LANG[label]}} ({{_LANG[locales]}})</label>

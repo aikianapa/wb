@@ -150,7 +150,6 @@ function wbMailer(
 function wbMail(
     $from = null, $sent = null, $subject = null, $message = null, $attach = null
 ) {
-
     if ($from == null) {
         $from=$_ENV["settings"]["email"].";".$_ENV["settings"]["header"];
     } else if (!is_array($from)) {
@@ -161,23 +160,20 @@ function wbMail(
             $from=array($from,strip_tags($_ENV['settings']['header']));
         }
     }
-
     if (!is_array($sent) AND is_string($sent) AND strpos($sent,";")) {
         $sent=array(explode(";",$sent));
     }
     else if (!is_array($sent)) {
         $sent=array(array($sent,$sent));
-    } else if (is_array($sent) AND !is_array($sent[0]) AND strpos($s,";")) {
+    } else if (is_array($sent) AND !is_array($sent[0]) AND strpos($sent[0],";")) {
         foreach($sent as $k => $s) {
-            if (!is_array($s)) {
-                $sent[$k]=array(explode(";",$s));
-            }
+            if (!is_array($s)) {$sent[$k]=explode(";",$s);}
         }
-    } else if (is_array($sent) AND !is_array($sent[0]) AND !strpos($s,";")) {
+    } else if (is_array($sent) AND !is_array($sent[0]) AND !strpos($sent[0],";")) {
         $sent=array($sent);
     }
 
-    if ($_ENV["settings"]["phpmailer"]!=="on") {
+    if ($_ENV["settings"]["phpmailer"]=="on") {
         require __DIR__.'/lib/phpmailer/PHPMailerAutoload.php';
         $mail = new PHPMailer(); // for mail
         // $mail = new PHPMailer(true); // for sendmail

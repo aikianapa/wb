@@ -16,8 +16,10 @@ function _usersAfterItemRead($Item) {
 	if (wbLoopCheck(__FUNCTION__,func_get_args())) {return $Item;} else {wbLoopProtect(__FUNCTION__,func_get_args());}
 	if ($_ENV["route"]["mode"]=="edit") {
 	    if (!isset($Item["roleprop"]) OR $Item["roleprop"]=="" OR $Item["roleprop"]=="[]") {
-		if ($Item["id"]=="admin") {
+		if ($Item["super"]=="on") {
 			$Item=array_merge($Item,wbGetUserUi(true));
+			$Item["isgroup"]="on";
+			$Item["role"]="admin";
 		} else {
 			// read admin menu/dashboard config as default
 			$prop=wbItemRead("users",$_SESSION["user_role"]);

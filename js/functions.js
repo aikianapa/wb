@@ -1602,7 +1602,7 @@ allow_dismiss: true,
 }
 
 function wb_check_email(email) {
-    if (email.match(/^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z] {2,6}$/i)) {
+    if (email.match(/^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/i)) {
         return true;
     } else {
         return false;
