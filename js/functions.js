@@ -79,6 +79,9 @@ success: function(data) {
             s.onload = resolve;
             s.onerror = reject;
             document.head.appendChild(s);
+		if (func !== undefined) {
+		    func(data);
+		}
         });
     }
 
@@ -112,7 +115,6 @@ function wb_delegates() {
     wb_formsave();
     wb_base_fix();
     wb_plugins();
-    wb_multiinput();
     wb_tree();
     $(document).trigger("wb-delegates");
 }
@@ -388,6 +390,13 @@ open:
 
     $.fn.treeEvents = function() {
         var tree = this;
+        var row = $(document).data("wb-tree-row");
+        var form = $(this).parents("[data-wb-form]").attr("data-wb-form");
+	row = wb_setdata(row, {
+	"name": "",
+	"form": form,
+	"id": wb_newid()
+	}, true);
         // collapse
         $(this).undelegate(".wb-tree-item button[data-action]", "click");
         $(this).delegate(".wb-tree-item button[data-action]", "click", function() {
@@ -417,13 +426,6 @@ open:
 
         $(this).undelegate(".wb-tree-add", "click");
         $(this).delegate(".wb-tree-add", "click", function(e) {
-            var row = $(document).data("wb-tree-row");
-            var form = $(this).parents("[data-wb-form]").attr("data-wb-form");
-            row = wb_setdata(row, {
-"name": "",
-"form": form,
-"id": wb_newid()
-            }, true);
             $(this).parent(".wb-tree-item").after(row);
             $(tree).treeStore();
         });
@@ -431,6 +433,9 @@ open:
         $(this).undelegate(".wb-tree-del", "click");
         $(this).delegate(".wb-tree-del", "click", function(e) {
             $(this).parent(".wb-tree-item").remove();
+            if (!$(tree).find(".wb-tree-item").length) {
+                $(tree).children(".dd-list").append(row);
+            }
             $(tree).treeStore();
         });
 
@@ -438,14 +443,6 @@ open:
         $(this).undelegate(".wb-tree-menu .dropdown-item", "click");
         $(this).delegate(".wb-tree-menu .dropdown-item", "click", function(e) {
             var name = $(tree).attr("name");
-            var tpl = $($(tree).attr("data-tpl")).html();
-            var row = $(document).data("wb-tree-row");
-            var form = $(this).parents("[data-wb-form]").attr("data-wb-form");
-            row = wb_setdata(row, {
-"name": "",
-"form": form,
-"id": wb_newid()
-            }, true);
             if ($(this).attr("href") == "#edit") {
                 $(this).parents(".wb-tree-menu").parent(".wb-tree-item").children(".dd3-btn").trigger("click");
             }
@@ -757,7 +754,7 @@ function wb_newid(separator, prefix) {
 
 }
 
-function wb_multiinput() {
+function _____wb_multiinput() {
     if ($("[data-wb-role=multiinput]").length && $(document).data("wb-multiinput-menu") == undefined) {
         wbapp.getWait("/ajax/getform/common/multiinput_menu/", {}, function(data) {
             $(document).data("wb-multiinput-menu", data);
@@ -769,7 +766,15 @@ function wb_multiinput() {
     }
 
     $.fn.wbMultiInpitEvents = function() {
-        var $multi = this;
+	var row = $(document).data("wb-multiinput-row");
+        var $multi = $(this);
+	var name = $multi.attr("name");
+	var tpl = $($multi.attr("data-wb-tpl")).html();
+	row = str_replace("{{template}}", tpl, row);
+	row = wb_setdata(row, {
+	"form": "procucts",
+	"id": "_new"
+	}, true);
         $(document).undelegate(".wb-multiinput", "mouseenter");
         $(document).delegate(".wb-multiinput", "mouseenter", function() {
             $(document).data("wb-multiinput", this);
@@ -804,14 +809,6 @@ function wb_multiinput() {
         $(document).delegate(".wb-multiinput .wb-multiinput-add", "click", function(e) {
             var line = $(document).data("wb-multiinput");
             var multi = $(line).parents("[data-wb-role=multiinput]");
-            var tpl = $($(multi).attr("data-wb-tpl")).html();
-            var row = $(document).data("wb-multiinput-row");
-            var name = $(multi).attr("name");
-            row = str_replace("{{template}}", tpl, row);
-            row = wb_setdata(row, {
-                //"form": "procucts",
-"id": "_new"
-            }, true);
             $(line).after(row);
             $(multi).wbMultiInpitSort();
             wb_plugins();
@@ -823,13 +820,6 @@ function wb_multiinput() {
             var line = $(document).data("wb-multiinput");
             var multi = $(line).parents("[data-wb-role=multiinput]");
             var tpl = $($(multi).attr("data-wb-tpl")).html();
-            var row = $(document).data("wb-multiinput-row");
-            var name = $(multi).attr("name");
-            row = str_replace("{{template}}", tpl, row);
-            row = wb_setdata(row, {
-"form": "procucts",
-"id": "_new"
-            }, true);
             if ($(this).attr("href") == "#after") {
                 $(line).after(row);
             }
@@ -879,7 +869,7 @@ update: function(e) {
                 $(e.target).wbMultiInpitSort();
             }
         });
-        $("[data-wb-role=multiinput]").wbMultiInpitEvents();
+        $("[data-wb-role=multiinput]").each(function(){$(this).wbMultiInpitEvents();});
     }
 }
 

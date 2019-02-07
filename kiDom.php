@@ -2100,69 +2100,6 @@ abstract class kiNode
         $this->replaceWith($out);
     }
 
-    public function tagMultiInput($Item) {
-        include("wbattributes.php");
-        if ($this->attr("name") AND !isset($name)) {
-            $name=$this->attr("name");
-        }
-        else {
-            $this->attr("name");
-        }
-        $tpl=wbFromString($this->html());
-        $template=$this->innerHtml();
-        $tplId=wbNewId();
-        $this->after("<script type='text/template' id='{$tplId}'>".$template."</script>");
-        $this->attr("data-wb-tpl","#".$tplId);
-        if (isset($Item[$name]) AND is_array($Item[$name])) {
-            $this->tagMultiInputSetData($Item[$name]);
-        }
-        elseif (isset($Item["%".$name]) AND is_array($Item["%".$name])) {
-            // dirty fix where multiinput in loop
-            $this->tagMultiInputSetData($Item["%".$name]);
-        } else {
-            $this->tagMultiInputSetData();
-        }
-
-    }
-
-    function tagMultiInputSetData($Data=array(0=>array())) {
-        $tpl=$this->html();
-        $mtplid=$this->attr("data-wb-tpl");
-        $this->html("");
-        $name=$this->attr("name");
-        foreach($Data as $i => $item) {
-            $line=wbFromString($tpl);
-            $line->wbSetData($item);
-            $inp=$line->find("[data-wb-role=multiinput],input,select,textarea");
-            foreach($inp as $tag) {
-                $tname=$tag->attr("name");
-                $tplid=$tag->attr("data-wb-tpl");
-                $newid=str_replace("#","",$mtplid."_".$tname);
-                if ($tplid>"" AND $mtplid>"") {
-                    if (!$this->find("script[id={$newid}]")->length) {
-                        $line->find("script[id={$tplid}]")->attr("id",$newid);
-                        $this->append($line->find("script[id={$newid}]"));
-                    } else {
-                        $line->find("script[id={$tplid}]")->remove();
-                    }
-                    $tag->attr("data-wb-tpl",$newid);
-                }
-                if ($tname>"") {
-			if ($tag->parents("[data-wb-role=multiinput][data-wb-field]")->length) {
-				$pos=strpos($tname,"[");
-				$tag->attr("name",$name."[{$i}][".substr($tname,0,$pos)."]".substr($tname,$pos));
-			} else {
-				$tag->attr("name",$name."[{$i}][".$tname."]");
-				$tag->attr("data-wb-field",$tname);
-			}
-                }
-            }
-            $row=wbGetForm("common","multiinput_row")->outerHtml();
-            $this->append(str_replace("{{template}}",$line->outerHtml(),$row));
-            unset($line);
-        }
-    }
-
 
     public function getAttrVars() {
         return $tag->attr("vars");
@@ -2730,7 +2667,9 @@ abstract class kiNode
         if (in_array($tag,array_keys($_ENV['tags']))) {
             $node = new $class($this);
             return $node->$name($arguments[0]);
-        }
+        } else {
+		echo $tag;
+	}
 
 
         throw new BadMethodCallException('Method "'.get_class($this).'.'.$name.'" is not defined.');
