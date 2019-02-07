@@ -9,23 +9,24 @@ function form__controller() {
 	if (is_callable($call)) {
 		$_ENV["DOM"]=$call();
 	} else {
-        $aCall=$_ENV["route"]["form"]."_".$_ENV["route"]["mode"];
-        $eCall=$_ENV["route"]["form"]."__".$_ENV["route"]["mode"];
-        if (is_callable($aCall)) {
-            $out=$aCall();
-        } elseif (is_callable($eCall)) {
-            $out=$eCall();
-        } elseif (form__controller__common__controller()==true) {
-            $out=$_ENV["DOM"];
-        } else {
-              echo __FUNCTION__ .": {$_ENV['sysmsg']['err_func_lost']} ".$call."()";
-              die;
-        }
-        if (!is_object($out)) {$_ENV["DOM"]=wbFromString($out);} else {$_ENV["DOM"]=$out;}
+		$aCall=$_ENV["route"]["form"]."_".$_ENV["route"]["mode"];
+		$eCall=$_ENV["route"]["form"]."__".$_ENV["route"]["mode"];
+		if (is_callable($aCall)) {
+		    $out=$aCall();
+		} elseif (is_callable($eCall)) {
+		    $out=$eCall();
+		} elseif (form__controller__common__controller()==true) {
+		    $out=$_ENV["DOM"];
+		} else {
+		      echo __FUNCTION__ .": {$_ENV['sysmsg']['err_func_lost']} ".$call."()";
+		      die;
+		}
+		if (!is_object($out)) {$_ENV["DOM"]=wbFromString($out);}
+		$_ENV["DOM"]=$out;
 	}
 	unset($out);
 	wbTrigger("func",__FUNCTION__,"after");
-return $_ENV["DOM"];
+	return $_ENV["DOM"];
 }
 
 function form__controller__common__controller() {
@@ -86,28 +87,6 @@ function form__controller__show() {
         }
 		$_ENV["DOM"]->wbSetData($Item);
 	}
-    if ($_ENV["DOM"]->find("head")->length) {
-        // Вставки в тэг HEAD
-        if (isset($Item["head_add"]) AND isset($Item["head_add_active"]) AND $Item["head_add_active"]=="on")  {$_ENV["DOM"]->find("head")->append($Item["head_add"]);}
-        if (!isset($Item["head_noadd_glob"]) OR $Item["head_noadd_glob"]!=="on") {
-            if (isset($_ENV["settings"]["head_add"]) AND isset($_ENV["settings"]["head_add_active"]) AND $_ENV["settings"]["head_add_active"]=="on")  {$_ENV["DOM"]->find("head")->append($_ENV["settings"]["head_add"]);}
-        }
-        if (isset($Item["meta_description"]) AND $Item["meta_description"]>"") {
-            $_ENV["DOM"]->find("head meta[name=description]")->remove();
-            $_ENV["DOM"]->find("head")->prepend("<meta name='description' content='{$Item["meta_description"]}'>");
-        }
-        if (isset($Item["meta_keywords"]) AND $Item["meta_keywords"]>"") {
-            $_ENV["DOM"]->find("head meta[name=keywords]")->remove();
-            $_ENV["DOM"]->find("head")->prepend("<meta name='keywords' content='{$Item["meta_keywords"]}'>");
-        }
-    }
-    if ($_ENV["DOM"]->find("body")->length) {
-        // Вставки в тэг BODY
-        if (isset($Item["body_add"]) AND isset($Item["body_add_active"]) AND $Item["body_add_active"]=="on")  {$_ENV["DOM"]->append($Item["body_add"]);}
-        if (!isset($Item["body_noadd_glob"]) OR $Item["body_noadd_glob"]!=="on") {
-            if (isset($_ENV["settings"]["body_add"]) AND isset($_ENV["settings"]["body_add_active"]) AND $_ENV["settings"]["body_add_active"]=="on") {$_ENV["DOM"]->append($_ENV["settings"]["body_add"]);}
-        }
-    }
 	return $_ENV["DOM"];
 }
 

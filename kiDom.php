@@ -1371,7 +1371,7 @@ abstract class kiNode
             $this->wbTargeter($Item);
             $this->tagHideAttrs();
             $this->find(".wb-value")->removeClass("wb-value");
-
+	    $this->wbAppends($Item);
             $check=$this->find("[data-wb-role]:not(.wb-done),[role]:not(.wb-done)");
             if ($check->length) {
                 $exit=true;
@@ -1388,47 +1388,6 @@ abstract class kiNode
         }
         gc_collect_cycles();
         return $this;
-    }
-
-
-    public function wbSetData1($Item=array()) {
-        $this->wbSetFormLocale();
-        $this->wbExcludeTags($Item);
-        $this->wbSetAttributes($Item);
-        $this->wbUserAllow();
-        $nodes=new IteratorIterator($this->find("*"));
-        foreach($nodes as $inc) {
-            if (!$inc->parents("[type=text/template]")->length) {
-                $inc->wbUserAllow();
-                $inc->wbWhere($Item);
-                $tag=$inc->wbCheckTag();
-                if (!$tag==FALSE && !$inc->is(".wb-done") AND !in_array($tag,array_keys($_ENV['tags']))) {
-                    if ($inc->has("[data-wb-json]")) {
-                        $inc->attr("data-wb-json",wbSetValuesStr($inc->attr("data-wb-json"),$Item));
-                    }
-                    if ($inc->is("[data-wb-tpl=true]")) {
-                        $inc->addTemplate();
-                    }
-                    $inc->wbProcess($Item,$tag);
-                    $inc->tagHideAttrs();
-                } else if (!$tag==FALSE && !$inc->is(".wb-done") AND in_array($tag,array_keys($_ENV['tags']))) {
-                    $inc->wbProcess($Item,$tag);
-                    $inc->tagHideAttrs();
-                }
-            }
-        };
-        unset($inc);
-        $this->tagInclude_inc($Item);
-        $this->wbSetValues($Item);
-        $this->contentLoop($Item);
-        $this->wbPlugins($Item);
-        if ($this->find("data-wb-role:not(.wb-done)")->length) {
-            $this->wbSetData($Item);
-        }
-        $this->wbIncludeTags($Item);
-        $this->wbTargeter($Item);
-        $this->find(".wb-value")->removeClass("wb-value");
-        gc_collect_cycles();
     }
 
     public function wbWhere($Item) {
@@ -1864,7 +1823,30 @@ abstract class kiNode
         }
     }
 
-
+	public function wbAppends($Item=array()) {
+	    if ($this->find("head")->length) {
+		// Вставки в тэг HEAD
+		if (isset($Item["head_add"]) AND isset($Item["head_add_active"]) AND $Item["head_add_active"]=="on")  {$this->find("head")->append($Item["head_add"]);}
+		if (!isset($Item["head_noadd_glob"]) OR $Item["head_noadd_glob"]!=="on") {
+		    if (isset($_ENV["settings"]["head_add"]) AND isset($_ENV["settings"]["head_add_active"]) AND $_ENV["settings"]["head_add_active"]=="on")  {$this->find("head")->append($_ENV["settings"]["head_add"]);}
+		}
+		if (isset($Item["meta_description"]) AND $Item["meta_description"]>"") {
+		    $this->find("head meta[name=description]")->remove();
+		    $this->find("head")->prepend("<meta name='description' content='{$Item["meta_description"]}'>");
+		}
+		if (isset($Item["meta_keywords"]) AND $Item["meta_keywords"]>"") {
+		    $this->find("head meta[name=keywords]")->remove();
+		    $this->find("head")->prepend("<meta name='keywords' content='{$Item["meta_keywords"]}'>");
+		}
+	    }
+	    if ($this->find("body")->length) {
+		// Вставки в тэг BODY
+		if (isset($Item["body_add"]) AND isset($Item["body_add_active"]) AND $Item["body_add_active"]=="on")  {$this->append($Item["body_add"]);}
+		if (!isset($Item["body_noadd_glob"]) OR $Item["body_noadd_glob"]!=="on") {
+		    if (isset($_ENV["settings"]["body_add"]) AND isset($_ENV["settings"]["body_add_active"]) AND $_ENV["settings"]["body_add_active"]=="on") {$this->append($_ENV["settings"]["body_add"]);}
+		}
+	    }
+	}
 
     public function wbTableProcessor() {
         $data=array();
@@ -5541,74 +5523,4 @@ class kiNodesList extends kiList
         PHP_SAPI === 'cli' && ob_get_level() > 0 && @ob_flush();
     }
 }
-
-
-// Класс для работы $_SESSION через memcache
-/*class MemcachedSessionHandler implements \SessionHandlerInterface
-{
-
-    private $memcached;
-    private $ttl;
-    private $prefix;
-
-    public function __construct(
-        \Memcached $memcached,
-        $expiretime = 86400,
-        $prefix = 'sess_')
-    {
-        $this->memcached = $memcached;
-        $this->ttl = $expiretime;
-        $this->prefix = $prefix;
-        $this->useMe();
-    }
-
-    public function open($savePath, $sessionName)
-    {
-        return true;
-    }
-
-    public function close()
-    {
-        return true;
-    }
-
-    public function read($sessionId)
-    {
-        return $this->memcached->get($this->prefix . $sessionId) ? : '';
-    }
-
-    public function write($sessionId, $data)
-    {
-        return $this->memcached->set(
-          $this->prefix . $sessionId,
-          $data,
-          time() + $this->ttl);
-    }
-
-    public function destroy($sessionId)
-    {
-        return $this->memcached->delete($this->prefix . $sessionId);
-    }
-
-    public function gc($lifetime)
-    {
-        return true;
-    }
-
-    private function useMe()
-    {
-        session_set_save_handler(
-            array($this, 'open'),
-            array($this, 'close'),
-            array($this, 'read'),
-            array($this, 'write'),
-            array($this, 'destroy'),
-            array($this, 'gc')
-        );
-
-        register_shutdown_function('session_write_close');
-    }
-}
-
-*/
 ?>
