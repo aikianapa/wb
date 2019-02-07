@@ -1394,7 +1394,7 @@ abstract class kiNode
         $where=$this->attr("data-wb-where");
         if ($where=="") $where=$this->attr("where");
         if ($this->is("meta")) {
-            $this->attr("data-wb-done","true");
+            $this->addClass("wb-done");
         }
         if ($where>"" AND $this->hasRole("foreach")) {
             return;
@@ -2123,27 +2123,30 @@ abstract class kiNode
     }
 
     public function tagHideAttrs() {
-        if (($this->is("[data-wb-role]") AND !$this->hasClass("wb-done") AND !$this->is("[data-wb-done]")) OR $this->attr("data-wb-hide")=="") return;
+        if (($this->is("[data-wb-role]") AND !$this->hasClass("wb-done") AND !$this->is("[data-wb-done]")) ) return;
         $list=wbAttrToArray($this->attr("data-wb-hide"));
-        $hide="";
         if (in_array("wb",$list)) {
             $attrs=$this->attributes();
             foreach($attrs as $attr) {
                 if (substr($attr->name,0,8)=="data-wb-") {
-                    $hide.=" ".$attr->name;
+			if (!in_array($attr->name,$list)) {
+				$list[]=$attr->name;
+			}
                 }
             }
-            $hide.=" data-wb-hide data-wb-done";
-        }
-        if (in_array("*",$list)) {
+        } else if (in_array("*",$list)) {
             $this->after($this->innerHtml());
             $this->remove();
             return;
         }
-        $list=explode(" ",trim($hide));
         foreach($list as $attr) {
-            $this->removeAttr($attr);
+		if ($this->hasAttr($attr)) {
+			$this->removeAttr($attr);
+		} else if ($this->hasAttr("data-wb-".$attr)) {
+			$this->removeAttr("data-wb-".$attr);
+		}
         }
+	$this->removeAttr("data-wb-hide");
         if (!$this->is("[data-wb-role]") AND !$this->is("[role]") AND $this->is("[data-wb-done=true]")) {
             $this->removeAttr("data-wb-done");
         }
@@ -2559,16 +2562,6 @@ abstract class kiNode
         }
     }
 
-
-    public function hasAttr($attr) {
-        if ($this->attr($attr)==NULL) {
-            return FALSE;
-        }
-        else {
-            return TRUE;
-        }
-    }
-
     public function hasClass($class) {
         $res=false;
         $list=explode(" ",trim($this->class));
@@ -2931,6 +2924,11 @@ abstract class kiNode
     public function hasAttribute($name)	{
         return $this->attributes && $this->attributes->has($name);
     }
+
+    public function hasAttr($name) {
+	return $this->hasAttribute($name);
+    }
+
 
     protected function insertAt(&$nodes, $targetCnid = 0, $targetChid = -1, $replace = false) {
         // Work only with tags and docs
@@ -4982,6 +4980,10 @@ class kiNodesList extends kiList
         return isset($this->list[0])
                && $this->list[0]->attributes
                && $this->list[0]->attributes->has($name);
+    }
+
+    public function hasAttr($name) {
+	return $this->hasAttribute($name);
     }
 
     protected function prepareContent($content)	{

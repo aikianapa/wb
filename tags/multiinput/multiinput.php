@@ -31,7 +31,7 @@ class tagMultiInput extends kiNode  {
         } else {
             $this->tagMultiInputSetData();
         }
-	$this->DOM->append('<script data-wb-append="body">$(document).on("wbapp",function(){wb_include("/engine/tags/multiinput/multiinput.js")});</script>');
+	$this->DOM->append('<script data-wb-append="body">wb_include("/engine/tags/multiinput/multiinput.js");</script>');
     }
 
     public function tagMultiInputSetData($Data=array(0=>array())) {

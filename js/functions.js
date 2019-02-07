@@ -551,8 +551,7 @@ open:
         $(edid).data("dict", dict);
         $(edid).data("data", data);
         $(edid).treeContentEditEvents();
-
-        wb_multiinput();
+	if (is_callable("wb_multiinput")) {wb_multiinput();}
         wb_plugins();
     };
 
