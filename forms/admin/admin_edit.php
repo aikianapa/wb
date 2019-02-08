@@ -59,6 +59,26 @@
                 </div>
 
                 <div class="col-sm-12">
+                    <div class="row form-group">
+                        <label class="col-sm-3 col-12">PHPmailer</label>
+                        <div class="col-sm-3 col-6 form-group">
+                                <label class="switch switch-sm switch-success">
+				<input type="checkbox" name="phpmailer" value="">
+				<span></span>
+			</label>
+                        </div>
+
+                        <div class="col-sm-3 col-6">
+                                <a href="" tabindex data-wb-ajax="/module/phpmailer/settings" data-wb-html="#adminMain .phpmailer-settings" class="btn btn-secondary form-control">
+                                    <i class="fa fa-gear"></i> {{_LANG[settings]}}
+                                </a>
+                            <div class="phpmailer-settings"></div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-sm-12">
                     <div class="form-group row">
                         <label class="col-sm-3">{{_LANG[path_tpl]}}</label>
                         <input class="col-sm-9 form-control" placeholder="{{_LANG[dirTpl]}}" type="text" name="path_tpl" required> </div>
@@ -82,16 +102,6 @@
                             <div class="ulogin-settings"></div>
                         </div-->
                     </div>
-                </div>
-
-                <div class="col-sm-12">
-                        <div class="row form-group">
-                                <label class="col-sm-3 col-6">PHPmailer</label>
-                                <label class="switch switch-sm switch-success">
-				<input type="checkbox" name="phpmailer" value="">
-				<span></span>
-			</label>
-                        </div>
                 </div>
 
                 <div class="col-sm-12">

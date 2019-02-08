@@ -1624,7 +1624,7 @@ function wb_check_required(form) {
         }
         if ($(this).is("[type=password]")) {
             var pcheck = $(this).attr("name") + "_check";
-            if ($("input[type=password][name=" + pcheck + "]").length) {
+            if ($("input[type=password][name='" + pcheck + "']").length) {
                 if ($(this).val() !== $("input[type=password][name=" + pcheck + "]").val()) {
                     res = false;
                     $(this).data("error", wbapp.sysmsg.pass_match);

@@ -9,7 +9,7 @@ function wb_multiinput() {
         });
     }
 
-    $.fn.wbMultiInpitEvents = function() {
+    $.fn.wbMultiInputEvents = function() {
         var $multi = $(this);
 	var name = $multi.attr("name");
 	if ($multi.data("wb-multiinput-row") == undefined)  {
@@ -61,7 +61,7 @@ function wb_multiinput() {
             if (!$multi.find(".wb-multiinput").length) {
                 $multi.append(row);
             }
-            $multi.wbMultiInpitSort();
+            $multi.wbMultiInputSort();
             return false;
         });
 
@@ -69,7 +69,7 @@ function wb_multiinput() {
         $multi.delegate(".wb-multiinput .wb-multiinput-add", "click", function(e) {
             var line = $(document).data("wb-multiinput");
             $(line).after(row);
-            $multi.wbMultiInpitSort();
+            $multi.wbMultiInputSort();
             wb_plugins();
             return false;
         });
@@ -93,14 +93,14 @@ function wb_multiinput() {
             if (!$multi.find(".wb-multiinput").length) {
                 $multi.append(row);
             }
-            $multi.wbMultiInpitSort();
+            $multi.wbMultiInputSort();
             $multi.trigger("multiinput", $multi, this);
             wb_plugins();
             e.preventDefault();
         });
     }
 
-    $.fn.wbMultiInpitSort = function() {
+    $.fn.wbMultiInputSort = function() {
         var name = $(this).attr("name");
         var last = null;
         $(this).find(".wb-multiinput").each(function(i) {
@@ -126,10 +126,10 @@ function wb_multiinput() {
         $("[data-wb-role=multiinput][data-wb-tpl]").each(function(){
 		$(this).sortable({
 			update: function(e) {
-				$(e.target).wbMultiInpitSort();
+				$(e.target).wbMultiInputSort();
 			}
 		});
-		$(this).wbMultiInpitEvents();
+		$(this).wbMultiInputEvents();
 	});
 }
 

@@ -2,7 +2,7 @@
 </div>
 
 <span data-wb-html="#{{_ENV[route][name]}}Settings .modal-title">Настройки ROBOKASSA</span>
-<button class="btn btn-secondary" data-dismiss="modal" data-wb-html="#{{_ENV[route][name]}}Settings .modal-footer">Готово</button>
+<button class="btn btn-secondary" data-dismiss="modal" data-wb-formsave="#admin_settings" data-wb-html="#{{_ENV[route][name]}}Settings .modal-footer">Готово</button>
 <div data-wb-html="#{{_ENV[route][name]}}Settings .modal-body">
     <div class="row form-group">
         <label class="col-sm-4 control-label">Мерчант ID</label>

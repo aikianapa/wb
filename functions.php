@@ -174,10 +174,9 @@ function wbMail(
     }
 
     if ($_ENV["settings"]["phpmailer"]=="on") {
-        require __DIR__.'/lib/phpmailer/PHPMailerAutoload.php';
-        $mail = new PHPMailer(); // for mail
-        // $mail = new PHPMailer(true); // for sendmail
-
+        require __DIR__.'/modules/phpmailer/phpmailer/PHPMailerAutoload.php';
+        $sett=$_ENV["settings"]["phmail"];
+        $mail = ($sett["func"]=="sendmail") ? new PHPMailer(true) : new PHPMailer();
         /*
             $mail->SMTPDebug = 2;                                 // Enable verbose debug output
             $mail->isSMTP();                                      // Set mailer to use SMTP
@@ -188,6 +187,16 @@ function wbMail(
             $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
             $mail->Port = 587;                                    // TCP port to connect to
         */
+        if ($sett["smtp"]=="on") {
+		$mail->isSMTP();
+		$mail->Host = $sett["host"];
+		$sett["smtp"]=="on" ? $mail->SMTPAuth = true : $mail->SMTPAuth = false;
+		$mail->Username = $sett["username"];
+		$mail->Password = $sett["password"];
+		$mail->SMTPSecure = $sett["secure"];
+		intval($sett["port"]) > 0 ? $mail->Port = intval($sett["port"]) : $mail->Port = 587;
+	}
+
 
         $mail->setFrom($from[0], $from[1]);
         $mail->addReplyTo($from[0], $from[1]);
