@@ -1,10 +1,14 @@
 <?php
+require_once __DIR__.'/lib/vendor/autoload.php';
 require_once __DIR__.'/kiDom.php';
 require_once __DIR__.'/wbapp.php';
 
+use Nahid\JsonQ\Jsonq;
+use soundintheory\PHPSQL;
+
+
 function wbInit()
 {
-
     error_reporting(error_reporting() & ~E_NOTICE);
     wbErrorList();
     wbTrigger('func', __FUNCTION__, 'before');
@@ -829,6 +833,7 @@ function wbItemList($table = 'pages', $where = '', $sort = null)
 {
     ini_set('max_execution_time', 900);
     ini_set('memory_limit', '1024M');
+    $where=wbSetValuesStr($where);
     $list = array();
     $table = wbTable($table);
     $tname = wbTableName($table);
@@ -2022,14 +2027,15 @@ function wbWhereItem($item, $where = null)
 
     if (!null == $where) {
         if ('%' == substr($where, 0, 1)) {
-            $phpif = substr($where, 1);
+		$phpif = substr($where, 1);
         } else {
-            $phpif = wbWherePhp($where, $item);
+		$phpif = wbWherePhp($where, $item);
+
         }
         if ($phpif > '') {
             //echo $where."<br>";
             //echo $phpif."<br>";
-            @eval('if ( '.$phpif.' ) { $res=1; } else { $res=0; } ;');
+            eval('return $res = ( '.$phpif.' );');
         }
     }
 
@@ -2038,7 +2044,6 @@ function wbWhereItem($item, $where = null)
 
 function wbWherePhp($str = '', $item = array())
 {
-	$str = htmlspecialchars_decode($str);
 	if (strpos($str,"}}")) $str = wbSetValuesStr($str, $item);
     $str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);
     $str = ' '.trim(strtr($str, array(
@@ -2060,22 +2065,24 @@ function wbWherePhp($str = '', $item = array())
     $context = '';
     preg_match_all('/\w+(?!\")\b/iu', $str, $arr); // возникают ошибки если в тексте пробел
     $flag = true;
+    $ready=array();
     foreach ($arr[0] as $a => $fld) {
         if (!in_array(strtoupper($fld), $exclude, true)) {
-            if (isset($item[$fld]) and true == $flag) {
+            if (isset($item[$fld]) and true == $flag and !in_array($fld,$ready)) {
                 //if ($flag==true) {
                 if (is_array($item[$fld])) {
                     $res=wbJsonEncode($Item[$fld]);
                     if ($res=="null") {
-                        $res='"[]"';
+                        $res=' "[]" ';
                     }
                     else {
                         $res=htmlentities($res);
                     }
-                    $str = str_replace(" {$fld} ", $res, $str);
+                    $str = str_replace("{$fld}", $res, $str);
                 } else {
-                    $str = str_replace(" {$fld} ", ' $item["'.$fld.'"] ', $str);
+                    $str = str_replace("{$fld}", ' $item["'.$fld.'"] ', $str);
                 }
+                $ready[]=$fld;
                 $flag = false;
             }
         } else {
@@ -2129,6 +2136,7 @@ function wbt_where($table, $where)
 
     return $res;
 }
+
 
 function wbt_route($sid, $e, $r = 'TABLE')
 {
@@ -2250,6 +2258,8 @@ class wbt_filter extends FilterIterator
         return true;
     }
 }
+
+
 
 function wbRouterAdd($route = null, $destination = null)
 {
@@ -2948,10 +2958,13 @@ function wbArrayAttr($attr)
 
 function wbNormalizePath($path)
 {
+/*
     $patterns = array('~/{2,}~', '~/(\./)+~', '~([^/\.]+/(?R)*\.{2,}/)~', '~\.\./~');
     $replacements = array('/', '/', '', '');
 
     return preg_replace($patterns, $replacements, $path);
+*/
+	return realpath($path);
 }
 
 function wbClearValues($out)
@@ -3024,6 +3037,7 @@ function wbListFilesRecursive($dir, $path = false)
 function wbArrayWhere($arr, $where)
 {
     $res  = array();
+    $where=wbSetValuesStr($where);
     foreach ($arr as $key => $val) {
         if (wbWhereItem($val, $where)) {
             $res[]=$arr[$key];
@@ -3096,4 +3110,5 @@ function wbBr2nl($str)
     $str = preg_replace('/(rn|n|r)/', '', $str);
     return preg_replace('=<br */?>=i', 'n', $str);
 }
+
 ?>

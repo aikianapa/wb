@@ -1,4 +1,5 @@
 <?php
+use Nahid\JsonQ\Jsonq;
 class wbApp {
     public $settings;
     public $route;
@@ -8,6 +9,7 @@ class wbApp {
 
     public function __construct() {
         include_once (__DIR__."/functions.php");
+        wbInit();
     }
 
     function __call($func, $params){
@@ -25,6 +27,13 @@ class wbApp {
             return call_user_func_array($func,$params);
         }
     }
+
+	public function json($data) {
+		$json = new Jsonq();
+		if (is_string($data)) {$data=wbItemList($data);}
+		if (!is_array($data)) {$data=array($data);}
+		return $json->collect($data);
+	}
 
         public function settings() {
         $this->settings=$_ENV["settings"];

@@ -1,0 +1,6 @@
+{
+    "require": {
+        "nahid/jsonq": "^5.2",
+        "soundintheory/php-sql-parser": "^1.0"
+    }
+}

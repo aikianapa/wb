@@ -4673,7 +4673,6 @@ abstract class kiList implements Iterator, ArrayAccess, Countable {
     }
 }
 
-
 class kiAttributesList extends kiList {
     public $node;
     public function __clone()
