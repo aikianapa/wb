@@ -647,16 +647,16 @@ function wbInitDatabase()
 {
     wbTrigger('func', __FUNCTION__, 'before');
     if (!is_dir($_ENV['dbe'])) {
-        mkdir($_ENV['dbe'], 0766);
+        @mkdir($_ENV['dbe'], 0766);
     }
     if (!is_dir($_ENV['dba'])) {
-        mkdir($_ENV['dba'], 0766);
+        @mkdir($_ENV['dba'], 0766);
     }
     if (!is_dir($_ENV['dbec'])) {
-        mkdir($_ENV['dbec'], 0766);
+        @mkdir($_ENV['dbec'], 0766);
     }
     if (!is_dir($_ENV['dbac'])) {
-        mkdir($_ENV['dbac'], 0766);
+        @mkdir($_ENV['dbac'], 0766);
     }
 }
 
@@ -1552,10 +1552,11 @@ function wbOconv($value, $oconv)
 {
     $oconv = htmlspecialchars_decode($oconv, ENT_QUOTES);
     $value = htmlspecialchars_decode($value, ENT_QUOTES);
-    $oconv = '$result = '.$oconv.'("'.$value.'");';
-    eval($oconv);
-
-    return $result;
+    if (is_callable($oconv)) {
+	$oconv = '$result = '.$oconv.'("'.$value.'");';
+	eval($oconv);
+	return $result;
+    }
 }
 
 function wbGetForm($form = null, $mode = null, $engine = null)
@@ -2033,8 +2034,8 @@ function wbWhereItem($item, $where = null)
 
         }
         if ($phpif > '') {
-            //echo $where."<br>";
-            //echo $phpif."<br>";
+		//echo $where."<br>";
+		//echo $phpif."<br>";
             eval('return $res = ( '.$phpif.' );');
         }
     }
@@ -2043,6 +2044,96 @@ function wbWhereItem($item, $where = null)
 }
 
 function wbWherePhp($str = '', $item = array())
+{
+	if (strpos($str,"}}")) {
+		$str = wbSetValuesStr($str, $item);
+		$str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);
+	}
+	$cache=md5($str);
+	if (!isset($_ENV["cache"][__FUNCTION__])) $_ENV["cache"][__FUNCTION__]=array();
+	if (isset($_ENV["cache"][__FUNCTION__][$cache])) {
+		return $_ENV["cache"][__FUNCTION__][$cache];
+	}
+	$exclude = array(
+		'AND'	=> 0,
+		'OR'	=> 0,
+		'ARRAY'	=> 0,
+		'LIKE'		=>array("func2"=>"wbWhereLike"),
+		'IN_ARRAY'	=>array("func1"=>"in_array"),
+		'IN'		=>array("func1"=>"in_array"),
+		'NOT_LIKE'	=>array("func2"=>"!wbWhereNotLike"),
+		'NOT_IN_ARRAY'	=>array("func1"=>"!in_array"),
+		'NOT_IN'	=>array("func1"=>"!in_array"),
+	);
+	$cond=array('<','>','=','==','>=','<=','!=','!==','#',"(",")","<>",",");
+	$re = '/"(?:[^"\\\\]|\\\\.)*"|\'(?:[^"\\\\]|\\\\.)*\'|\{\{([^(}})]*)\}\}|\w+(?!\")\b|[=!#<>\,]+|[\(\)]/ium';
+	preg_match_all($re, $str, $arr, PREG_SET_ORDER);
+	$str=""; $len=0; $flag=0;
+	foreach($arr as $index => $fld) {
+		$fld=$fld[0];
+		$sup=strtoupper($fld);
+		$exc=isset($exclude[$sup]);
+		$con=in_array($fld,$cond);
+		if ($flag==1) $flag=2;
+		if ((substr($fld,0,1)!=='"' OR substr($fld,0,1)!=="'") AND !$exc AND !$con) {
+		    if (isset($item[$fld])) {
+			if (is_array($item[$fld])) {
+			    $fld="'".wbJsonEncode($item[$fld])."'";
+			    //$fld='wbJsonEncode($item["'.$fld.'"])';
+			    if ($fld=="null") {
+				$fld=' "[]" ';
+			    } else {
+				$fld=htmlentities($fld);
+			    }
+			} else {
+			    $fld = str_replace("{$fld}", ' $item["'.$fld.'"] ', $fld);
+			}
+		    } else if ((substr($fld,0,1)=='"' OR substr($fld,0,1)=="'") OR $fld=="''" OR $fld=='""') {
+			// строки в кавычках
+		    } else if ($fld > "" AND $fld!=="''" AND $fld!=='""'){
+                        if (!is_numeric($fld) AND is_string($fld)) {
+				$fld = str_replace("{$fld}", ' $item["'.$fld.'"] ', $fld);
+			}
+		    }
+		} else if ($exc AND $flag==0) {
+			$prev=substr($str,-$len);
+			if (isset($exclude[$sup]) AND isset($exclude[$sup]["func2"])) {
+				$str=substr($str,0,-$len);
+				$str.=$exclude[$sup]["func2"]."(".$prev;
+				$flag = 1;
+				$fld="";
+			} else if (isset($exclude[$sup]) AND isset($exclude[$sup]["func1"])) {
+				$fld=$exclude[$sup]["func1"];
+			}
+		} else if ($con) {
+			$fld = strtr($fld, array(
+				'>' => '>',
+				'<' => ' < ',
+				'>=' => ' >= ',
+				'<=' => ' <= ',
+				'<>' => ' !== ',
+				'!=' => ' !== ',
+				'!==' => ' !== ',
+				'#' => ' !== ',
+				'==' => ' == ',
+				'=' => ' == ',
+			));
+		}
+		if ($flag==2) {
+			$str.=", ".$fld." ) ";
+			$flag=0;
+		} else {
+			$len=strlen($fld);
+			$str.=" ".$fld;
+		}
+	}
+
+    //$str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);
+    $_ENV["cache"][__FUNCTION__][$cache]=$str;
+    return $str;
+}
+
+function wbWherePhpOld($str = '', $item = array())
 {
 	if (strpos($str,"}}")) $str = wbSetValuesStr($str, $item);
     $str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);

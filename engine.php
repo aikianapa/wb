@@ -32,7 +32,7 @@ if ($cache["check"] === false OR $cache["check"] === null) {
 		$html = $_ENV["DOM"]->outerHtml();
 	}
 }
-if ($_ENV["route"]["mode"]=="show") $html=wbClearValues($html);
+
 if ($cache["check"]===null) {
 	file_put_contents($cache["path"],$html);
 } else if ($cache["check"]===true) {

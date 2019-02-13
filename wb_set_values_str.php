@@ -1,5 +1,5 @@
 <?php
-function wbSetValuesStr($tag = "",$Item = array(), $limit = 0, $vars = null)
+function wbSetValuesStr($tag = "",$Item = array(), $limit = 2, $vars = null)
 {
 	// $vars - не используется
     if (is_object($tag)) {
