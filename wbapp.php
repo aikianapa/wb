@@ -67,13 +67,22 @@ class wbApp {
                 return $this->dom;
         }
 
+        public function fromString($string) {
+                $this->template=wbFromString($string);
+                $this->dom=$this->template->clone();
+                return $this->dom;
+        }
+
         public function form($form="pages",$mode="show",$engine=false) {
                 $this->template=wbGetForm($form,$mode,$engine);
                 $this->dom=$this->template->clone();
                 return $this->dom;
         }
 
-        public function dom() {
+        public function dom($data="__wbVarNotAssigned__") {
+		if ($data!=="__wbVarNotAssigned__") {
+			$this->data($data);
+		}
                 $this->dom->wbSetData($this->data);
                 return $this->dom;
         }

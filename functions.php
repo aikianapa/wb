@@ -3141,18 +3141,10 @@ function wbArrayWhere($arr, $where)
 
 function wbCallFormFunc($name, $Item, $form = null, $mode = null)
 {
-    if (!isset($_GET['mode'])) {
-        $_GET['mode'] = '';
-    }
-    if (!isset($_GET['form'])) {
-        $_GET['form'] = '';
-    }
-    if (null == $mode) {
-        $mode = $_GET['mode'];
-    }
-    if ('' == $mode) {
-        $mode = 'list';
-    }
+    if (!isset($_GET['mode'])) $_GET['mode'] = '';
+    if (!isset($_GET['form'])) $_GET['form'] = '';
+    if (null == $mode) $mode = $_GET['mode'];
+    if ('' == $mode) $mode = 'list';
     if (null == $form) {
         if (isset($Item['form']) && $Item['form'] > '') {
             $form = $Item['form'];
@@ -3165,7 +3157,7 @@ function wbCallFormFunc($name, $Item, $form = null, $mode = null)
     //	formCurrentInclude($form);
     $func = $form.$name;
     $_func = '_'.$func;
-    $Item=wbItemToArray($Item);
+    //$Item=wbItemToArray($Item);
     if (is_callable($func)) {
         $Item = $func($Item, $mode);
     } else {
