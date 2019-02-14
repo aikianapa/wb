@@ -2161,8 +2161,8 @@ abstract class kiNode
             $srcVal["%{$k}"]=$v;
         };
         unset($v);
-        include("wbattributes.php");
         $this->wbSetAttributes($Item);
+        include("wbattributes.php");
         $name=$this->attr("name");
         if (isset($from)) {
             $name=$from;

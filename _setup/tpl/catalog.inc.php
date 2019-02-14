@@ -3,7 +3,7 @@
 		<div data-wb-hide="*" data-wb-role="foreach" data-wb-from="data[lang]" data-wb-where='lang="{{_SESS[lang]}}"' data-wb-tpl="false">
 		<a href="/products/vitrina/{{%id}}">{{value}}</a>
 		<div class="megamenudown-sub" style="background-image:url(/uploads/tree/products_category/{{%id}}/{{%data[megaimg][0][img]}});">
-			<div class="mega-item-menu" data-wb-role="where" data='children = "" ' data-hide="data-wb-role,data">
+			<div class="mega-item-menu" data-wb-where='children = "[]" ' data-hide="wb">
 				<a class="mini" href="/products/vitrina/{{%id}}"><span>{{value}}</span></a>
 			</div>
 			<div class="mega-item-menu" >
