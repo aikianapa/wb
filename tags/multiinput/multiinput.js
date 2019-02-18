@@ -103,7 +103,7 @@ function wb_multiinput() {
     $.fn.wbMultiInputSort = function() {
         var name = $(this).attr("name");
         var last = null;
-        $(this).find(".wb-multiinput").each(function(i) {
+        $(this).children(".wb-multiinput").each(function(i) {
             $(this).find("input,select,textarea").each(function() {
                 if ($(this).attr("data-wb-field") > "") {
                     var field = $(this).attr("data-wb-field");
@@ -122,14 +122,16 @@ function wb_multiinput() {
         }
     }
 
-
         $("[data-wb-role=multiinput][data-wb-tpl]").each(function(){
-		$(this).sortable({
-			update: function(e) {
-				$(e.target).wbMultiInputSort();
-			}
-		});
-		$(this).wbMultiInputEvents();
+		if ($(this).data("wb-multiinput-row") == undefined) {
+			$(this).sortable({
+				update: function(e) {
+					$(e.target).wbMultiInputSort();
+				}
+			});
+			$(this).wbMultiInputEvents();
+		}
+
 	});
 }
 

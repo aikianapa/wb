@@ -2507,7 +2507,9 @@ abstract class kiNode
         if ($vars>"") {
             $Item=wbAttrAddData($vars,$Item);
         }
-        $inner=wbFromFile($_SESSION['engine_path']."/tpl/gallery.php");
+        //$inner=wbFromFile($_SESSION['engine_path']."/tpl/gallery.php");
+        $inner=wbGetTpl("gallery.php");
+        if (!$inner) $inner=wbGetForm("common","common_gallery");
         if ($src=="") {
             if (trim($this->html())>"<p>&nbsp;</p>") {
                 $inner->find(".comGallery")->html($this->html());

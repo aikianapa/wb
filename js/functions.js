@@ -1,5 +1,4 @@
 "use strict"
-"use strict"
 var wbapp = new Object();
 $(function() {
     var loading = setInterval(function() {
@@ -7,7 +6,7 @@ $(function() {
             wb_init();
             clearInterval(loading);
         }
-    },50);
+    },10);
 });
 
 function wb_init() {
@@ -103,6 +102,11 @@ success: function(data) {
     wbapp.newId = function(separator, prefix) {
         return wb_newid(separator, prefix);
     }
+    wbapp.modal = function(id,selector) {
+	return wb_modal(id,selector);
+    }
+
+
     wb_alive();
     wb_delegates();
     $("body").removeClass("cursor-wait");
@@ -274,6 +278,21 @@ function wb_json_encode(obj) {
 
 function wb_json_decode(str) {
     return JSON.safeParse(str);
+}
+
+function wb_modal(id,selector) {
+	if (id == undefined) {var id = "commonModal";}
+	if (selector == undefined) {var selector = "body";}
+	if (substr(id,0,1)=="#") {id=substr(id,1);}
+	if ($(document).data("modal")==undefined) {
+		wbapp.getWait("/ajax/getform/common/modal/", {}, function(data) {
+			$(document).data("modal", data);
+		});
+	}
+	if ($(selector).find("#"+id).length) return $("#"+id);
+	$(selector).append($(document).data("modal"));
+	$(selector).find(".modal:last").attr("id",id);
+	return $("#"+id);
 }
 
 
@@ -585,32 +604,57 @@ open:
 
         $(edid).undelegate(".wb-tree-dict-prop-btn", "click");
         $(edid).delegate(".wb-tree-dict-prop-btn", "click", function(e) {
-            var $prop = $(this).parents(".wb-multiinput").find(".wb-prop-fields");
-            $("#treeEditDictFld").find(".modal-title").html($(this).parents(".wb-multiinput").find("input[data-wb-field=name]").val()+"&nbsp;");
-            $("#treeEditDictFld").find(".modal-body form").html($prop.html());
-            $prop.find('[data-wb-field]').each(function() {
-                $("#treeEditDictFld [data-wb-field="+$(this).attr('data-wb-field')+"]").val($(this).val());
-            });
-
-            $("#treeEditDictFld").data("prop",$prop);
-            $("#treeEditDictFld").modal('show');
+		var modal = wbapp.modal("#treeEditDictProp");
+		var type = $(this).parents(".wb-multiinput").find("[data-wb-field=type]").val();
+		var name = $(this).parents(".wb-multiinput").find("input[data-wb-field=name]").val();
+		var field = $(this).parents(".wb-multiinput").find("input[data-wb-field=prop]");
+		$("#treeEditDictProp .modal-body").html($(edid).find("script.wb-prop-fields").html());
+		$("#treeEditDictProp").find("[data-type-allow],[data-type-disallow]").each(function(){
+		if ( $(this).attr("data-type-allow") !== undefined ) {
+			var allow = explode(" ",trim(str_replace(";"," ",str_replace(","," ",$(this).attr("data-type-allow")))));
+			if (!in_array(type,allow)) {$(this).remove();}
+		} else if ( $(this).attr("data-type-disallow") !== undefined ) {
+			var disallow = explode(" ",trim(str_replace(";"," ",str_replace(","," ",$(this).attr("data-type-disallow")))));
+			if (in_array(type,disallow)) {$(this).remove();}
+		}
+		});
+		var data = {};
+		if ($(field).attr("value")>"") {data=$.parseJSON($(field).attr("value"));}
+		wb_setdata($("#treeEditDictProp form"), data );
+		wb_delegates();
+		$("#treeEditDictProp").find(".modal-title").html(name+"&nbsp;");
+		$("#treeEditDictProp").data("field",field);
+		$("#treeEditDictProp").modal('show');
         });
 
-        $("#treeEditDictFld").undelegate(":input","change");
-        $("#treeEditDictFld").delegate(":input","change",function() {
-            var $prop=$("#treeEditDictFld").data("prop");
-                if ($(this).is("input")) {
-			$prop.find('[data-wb-field='+$(this).attr('data-wb-field')+']').attr("value",$(this).val());
-                } else if ($(this).is("textarea")) {
-			$prop.find('[data-wb-field='+$(this).attr('data-wb-field')+']').html("value",$(this).html());
-                } else if ($(this).is("select")) {
-			$prop.find('[data-wb-field='+$(this).attr('data-wb-field')+']')
-			.find("option[value='"+$(this).find("option:selected").attr("value")+"']").prop("selected",true);
-                }
+        $(document).undelegate("#treeEditDictProp",'hide.bs.modal');
+        $(document).delegate("#treeEditDictProp",'hide.bs.modal', function (e) {
+		var field = $("#treeEditDictProp").data("field");
+		var form = $("#treeEditDictProp").find("form").serializeJSON();
+		$(field).attr("value",json_encode(form));
+		$(edid).treeDictChange(e);
+	});
+
+        $(edid).undelegate(".wb-tree-dict-lang-btn", "click");
+        $(edid).delegate(".wb-tree-dict-lang-btn", "click", function(e) {
+		var modal = wbapp.modal("#treeEditDictProp");
+		var name = $(this).parents(".wb-multiinput").find("input[data-wb-field=name]").val();
+		var field = $(this).parents(".wb-multiinput").find("input[data-wb-field=lang]");
+		$("#treeEditDictProp .modal-body").html($(edid).find("script.wb-prop-lang").html());
+		var data = {};
+		if ($(field).attr("value")>"") {data=$.parseJSON($(field).attr("value"));}
+		wb_setdata($("#treeEditDictProp form"), data );
+		wb_delegates();
+		$("#treeEditDictProp").find(".modal-title").html(name+"&nbsp;");
+		$("#treeEditDictProp").data("field",field);
+		$("#treeEditDictProp").modal('show');
         });
 
-        $(document).undelegate("#treeEditDictFld",'hide.bs.modal');
-        $(document).delegate("#treeEditDictFld",'hide.bs.modal', function (e) {
+        $(document).undelegate("#treeEditDictProp",'hide.bs.modal');
+        $(document).delegate("#treeEditDictProp",'hide.bs.modal', function (e) {
+		var field = $("#treeEditDictProp").data("field");
+		var form = $("#treeEditDictProp").find("form").serializeJSON();
+		$(field).attr("value",json_encode(form));
 		$(edid).treeDictChange(e);
 	});
 
@@ -664,7 +708,7 @@ open:
     $.fn.treeDictUpdateProp = function(tpl) {
         if (!$(this).is("select[data-wb-field=type]")) return;
         var field=$(this).parents(".wb-multiinput").find("[data-wb-field=name]").val();
-        var prop = $(tpl).find("[data-wb-field=name][value="+field+"]").parents(".wb-multiinput").find(".wb-prop-fields").html();
+        var prop = $(tpl).find("[data-wb-field=name][value='"+field+"']").parents(".wb-multiinput").find(".wb-prop-fields").html();
         $(this).parents(".wb-multiinput").find(".wb-prop-fields").html(prop);
     }
 
@@ -1931,16 +1975,12 @@ function wb_setdata(selector, data, ret) {
         item = data._item;
     }
 
+    if (is_object(html)) {var tpl=$(html).outerHTML();} else {var tpl=html;}
 
     var url = "/ajax/setdata/" + form + "/" + item;
     var res = null;
-    var param = {
-tpl:
-        html,
-data:
-        data
-    };
-    param = base64_encode(json_encode(param));
+    var param = {tpl: tpl, data: data };
+    param = base64_encode(JSON.stringify(param));
     wbapp.postWait(url, {
 data: param
     }, function(data) {

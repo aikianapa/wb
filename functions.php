@@ -98,7 +98,7 @@ function wbInitEnviroment()
             }
         }
     }
-
+    $_ENV["locales"]=wbListLocales();
     $_ENV["settings"]["js_locale"]=substr($_SESSION["lang"],0,2);
 
 
@@ -127,7 +127,6 @@ function wbInitEnviroment()
     foreach(array_keys($_ENV['tags']) as $name) {
         require_once $_ENV['tags'][$name];
     }
-
 }
 
 function wbGetSysMsg() {
@@ -505,14 +504,11 @@ function wbMerchantList($type = 'both')
 
 function wbFieldBuild($param, $data = array(),$locale=array())
 {
-
+	$param=wbItemToArray($param);
     $set = wbGetForm('common', 'tree_fldset');
     $tpl = wbGetForm('snippets', $param['type']);
-    if (is_array($param["prop"])) {
-        $opt=$param["prop"];
-    } else {
-        $opt = json_decode($param["prop"], true);
-    }
+    $opt=$param["prop"];
+    $lang=$param["lang"];
     $options = '';
     if (isset($opt['required']) and true == $opt['required']) {
         $options .= ' required ';
@@ -524,6 +520,9 @@ function wbFieldBuild($param, $data = array(),$locale=array())
         $options .= ' disabled ';
     }
     $param['options'] = trim($options);
+    $label=$param['label'];
+    if (isset($lang["labels"]) AND isset($lang["labels"][$_SESSION["lang"]]) AND $lang["labels"][$_SESSION["lang"]]["name"]>"") $label=$param['label']=$lang["labels"][$_SESSION["lang"]]["name"];
+
 
     switch ($param['type']) {
     case 'number':
@@ -546,15 +545,16 @@ function wbFieldBuild($param, $data = array(),$locale=array())
         }
         break;
     case 'enum':
-        if ('[{' == substr($param['prop'], 0, 2)) {
-            $arr = json_encode($param['prop'], true);
-        }
-        elseif ($param['value'] > '') {
+	$arr=array();
+	if ($param['value'] > '' AND strpos(";",$param['value'])) {
             $param['enum'] = array();
             $arr = explode(';', $param['value']);
         }
+	$param=wbItemToArray($param);
+	if (isset($param["prop"]["enum"])) $arr=explode(",",$param["prop"]["enum"]);
         foreach ($arr as $i => $line) {
-            $param['enum'][$line] = array('id' => $line, 'name' => $line);
+		$line=ltrim(rtrim($line));
+		$param['enum'][$line] = array('id' => $line, 'name' => $line);
         }
         $tpl->wbSetData($param);
         break;
@@ -581,15 +581,14 @@ function wbFieldBuild($param, $data = array(),$locale=array())
     case 'forms':
         $env=$_ENV;
         $get=$_GET;
-        $par=$param;
-        $names=explode(";",$param["value"]);
-        $form=$param["form"];
-        $mode=$param["mode"];
+	$par=$param;
+        $param=wbItemToArray($param);
+        $form=$param["prop"]["form"];
+        $mode=$param["prop"]["mode"];
         $_ENV["route"]["form"]=$param["_form"]=$_GET["form"]=$form;
         $_ENV["route"]["mode"]=$param["_mode"]=$_GET["mode"]=$mode;
         $tpl=wbGetForm($form,$mode);
-        if ($param["selector"]>"") {$tpl=$tpl->find($param["selector"],0);}
-        $tpl->find(":first")->addClass($param["class"]);
+        if ($param["prop"]["selector"]>"") {$tpl=$tpl->find($param["prop"]["selector"],0)->clone();}
         $tpl->wbSetValues($param);
         $tpl->wbSetData($data);
         $tpl->find(".nav-tabs .nav-item:first-child")->addClass("active");
@@ -607,35 +606,44 @@ function wbFieldBuild($param, $data = array(),$locale=array())
         $tpl->wbSetData($data);
         break;
     case 'multiinput':
-        $flds = wbFromString('');
-
-        if ('[{' == substr($param['value'], 0, 2)) {
-            $arr = json_encode($param['value'], true);
-        } else {
-            $arr = explode(';', $param['value']);
-        }
-        foreach ($arr as $i => $name) {
-            if ('' == $name) {
-                $name = 'data';
-            }
-            $line = wbFromString($tpl->find('[data-wb-role=multiinput]')->html());
-            $line->find('input')->attr('name', $name);
-            $flds->append($line);
-        }
         $tpl->wbSetValues($param);
+	$wrp=wbGetForm('common','multiinput_wrapper');
+        $param=wbItemToArray($param);
+        $field=$param["name"];
+        $flds = wbFromString('');
+	$arr=$param["prop"]["multiflds"];
+        foreach ($arr as $i => $multi) {
+		if (!isset($multi["style"])) $multi["style"]="";
+		if (!isset($multi["class"])) $multi["class"]="";
+		$name = 'data'.$i;
+		if ($multi["name"] > "") $name=$multi["name"];
+		$line = $wrp->clone();
+		$snip = wbGetForm('snippets', $multi['type']);
+		$line->find(":first")->attr("class",$multi["class"]);
+		$line->find(":first")->attr("style",$multi["style"]);
+		$line->find(":first")->append($snip);
+		$line->find('[name]')->attr('name', $name);
+		$line->wbSetValues($multi);
+		$line->find(".wb-value")->removeAttr("value");
+		$line->find(".wb-value")->removeClass("wb-value");
+		$line->find(".wb-attrs")->removeClass("wb-attrs");
+		$flds->append($line);
+        }
         $tpl->find('[data-wb-role=multiinput]')->html($flds);
-        $tpl->wbSetData($data);
-
+	$tpl->wbSetData($data);
         unset($flds);
-
         break;
     }
     if (isset($param["style"]) AND $param["style"]>"") {
+	    // old
         $style=$tpl->attr("style");
         $tpl->find(":first")->attr("style",$style.$param["style"]);
     }
 
-    $set->find('.form-group > label')->html($param['label']);
+	if (isset($param["prop"]["class"])) $tpl->find(":first")->addClass($param["prop"]["class"]);
+	if (isset($param["prop"]["style"])) $tpl->find(":first")->attr("style",$param["prop"]["style"]);
+
+    $set->find('.form-group > label')->html($label);
     $set->find('.form-group > div')->html($tpl->outerHtml());
     $set->wbSetData($param);
     $set->wbSetValues($data);
@@ -2066,7 +2074,7 @@ function wbWherePhp($str = '', $item = array())
 		'NOT_IN'	=>array("func1"=>"!in_array"),
 	);
 	$cond=array('<','>','=','==','>=','<=','!=','!==','#',"(",")","<>",",");
-	$re = '/"(?:[^"\\\\]|\\\\.)*"|\'(?:[^"\\\\]|\\\\.)*\'|\{\{([^(}})]*)\}\}|\w+(?!\")\b|[=!#<>\,]+|[\(\)]/ium';
+	$re = '/"(?:[^"\\\\]|\\\\.)*"|\'(?:[^"\\\\]|\\\\.)*\'|\{\{([^(}})]*)\}\}|\w+(?!\")\b|\[(.*?)\]|[=!#<>\,]+|[\(\)]/ium';
 	preg_match_all($re, $str, $arr, PREG_SET_ORDER);
 	$str=""; $len=0; $flag=0;
 	foreach($arr as $index => $fld) {
@@ -2075,6 +2083,18 @@ function wbWherePhp($str = '', $item = array())
 		$exc=isset($exclude[$sup]);
 		$con=in_array($fld,$cond);
 		if ($flag==1) $flag=2;
+		if (is_array($item[$fld]) OR isset($tmpfld)) {
+			if (isset($arr[$index+1]) AND substr($arr[$index+1][0],0,1) == "[") {
+				if (!isset($tmpfld)) {
+					$tmpfld = str_replace("{$fld}", ' $item["'.$fld.'"]', $fld);
+					$flag=3;
+				} else {
+					$tmpfld.= $fld;
+				}
+			}
+		}
+
+		if ($flag!==3) {
 		if ((substr($fld,0,1)!=='"' OR substr($fld,0,1)!=="'") AND !$exc AND !$con) {
 		    if (isset($item[$fld])) {
 			if (is_array($item[$fld])) {
@@ -2119,10 +2139,17 @@ function wbWherePhp($str = '', $item = array())
 				'=' => ' == ',
 			));
 		}
-		if ($flag==2) {
+		}
+		if ($flag==3 AND (!isset($arr[$index+1]) OR substr($arr[$index+1][0],0,1) !== "[")) {
+			$fld=wbSetQuotes($tmpfld.$fld);
+			eval('$arr=is_array('.$fld.');');
+			if ($arr) eval('$fld=wbJsonEncode('.$fld.');');
+			$str.=" ".$fld;
+			$flag=0;
+		} else if ($flag==2) {
 			$str.=", ".$fld." ) ";
 			$flag=0;
-		} else {
+		} else if ($flag!==2 AND $flag!==3)  {
 			$len=strlen($fld);
 			$str.=" ".$fld;
 		}
@@ -2937,7 +2964,6 @@ function wbListTags()
         }
     }
     unset($arr);
-
     return $list;
 }
 

@@ -211,35 +211,20 @@ function ajax__getlocale($type="tpl",$name="default.php") {
 function ajax__setdata() {
     $form=$_ENV["route"]["form"];
     $item=$_ENV["route"]["item"];
-    $table=wbTable($form);
+    $Item=array();
     $_REQUEST=json_decode(base64_decode($_REQUEST["data"]),true);
-    if (isset($_REQUEST["_base"])) {
-        $_ENV['path_tpl'] = $_ENV['path_app'].$_REQUEST["_base"];
-    }
-    if (!isset($_REQUEST["data-wb-mode"])) {
-        $_REQUEST["mode"]="list";
-    }
-    else {
-        $_REQUEST["mode"]=$_REQUEST["data-wb-mode"];
-    }
-    $Item=wbItemRead($table,$item);
-    if (!is_array($Item)) {
-        $Item=array($Item);
-    }
-    if (!is_array($_REQUEST["data"])) {
-        $_REQUEST["data"]=array($_REQUEST["data"]);
-    }
+    if (isset($_REQUEST["_base"])) $_ENV['path_tpl'] = $_ENV['path_app'].$_REQUEST["_base"];
+    if (isset($_REQUEST["data-wb-mode"])) $_REQUEST["mode"]=$_REQUEST["data-wb-mode"];
+    if (!isset($_REQUEST["data-wb-mode"])) $_REQUEST["mode"]="list";
+    if ($form!=="undefined" && $item!=="undefined") $Item=wbItemRead($form,$item);
+    if (!is_array($_REQUEST["data"])) $_REQUEST["data"]=array($_REQUEST["data"]);
     $Item=array_merge(wbItemToArray($Item),$_REQUEST["data"]);
     if (isset($Item["_form"])) {
         $_ENV["route"]["form"]=$_GET["form"]=$Item["_form"];
         $_ENV["route"]["controller"]="form";
     }
-    if (isset($Item["_item"])) {
-        $_ENV["route"]["item"]=$_GET["item"]=$Item["_item"];
-    }
-    if (isset($Item["_mode"])) {
-        $_ENV["route"]["mode"]=$_GET["mode"]=$Item["_mode"];
-    }
+    if (isset($Item["_item"])) $_ENV["route"]["item"]=$_GET["item"]=$Item["_item"];
+    if (isset($Item["_mode"])) $_ENV["route"]["mode"]=$_GET["mode"]=$Item["_mode"];
     $Item=wbCallFormFunc("BeforeShowItem",$Item,$form,$_REQUEST["mode"]);
     $Item=wbCallFormFunc("BeforeItemShow",$Item,$form,$_REQUEST["mode"]);
     $tpl=wbFromString($_REQUEST["tpl"]);
