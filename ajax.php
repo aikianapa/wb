@@ -218,7 +218,9 @@ function ajax__setdata() {
     if (!isset($_REQUEST["data-wb-mode"])) $_REQUEST["mode"]="list";
     if ($form!=="undefined" && $item!=="undefined") $Item=wbItemRead($form,$item);
     if (!is_array($_REQUEST["data"])) $_REQUEST["data"]=array($_REQUEST["data"]);
-    $Item=array_merge(wbItemToArray($Item),$_REQUEST["data"]);
+    $Item=wbItemToArray($Item);
+    if (!is_array($Item)) $Item=array();
+    $Item=array_merge($Item,$_REQUEST["data"]);
     if (isset($Item["_form"])) {
         $_ENV["route"]["form"]=$_GET["form"]=$Item["_form"];
         $_ENV["route"]["controller"]="form";

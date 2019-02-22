@@ -1166,10 +1166,10 @@ empty: 'fa fa-star-o'
         }
         if (wb_plugins_loaded()) {
             if ($("input[type=phone]").length) {
-                $("input[type=phone]").mask("+7 (999) 999-99-99");
+                $("input[type=phone]").mask("+9 (999) 999-99-99");
             }
             if ($("input[type=tel]").length) {
-                $("input[type=tel]").mask("+7 (999) 999-99-99");
+                $("input[type=tel]").mask("+9 (999) 999-99-99");
             }
             if ($("input[data-wb-mask]").length) {
                 $("input[data-wb-mask]").each(function() {

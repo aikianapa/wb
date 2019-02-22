@@ -11,10 +11,12 @@ function wb_include(url,defer,async) {
     var loaded=$(document).data("wb_include");
     var res=false;
     $(loaded).each(function(i){
-        if (loaded[i]==url) {res=true;}
+        if (loaded[i]==url) {
+		res=true;
+	}
     });
     if (res==false) {
-                if (url.substr(-3) == ".js" ) {
+                if (url.substr(-3) == ".js" || url.indexOf("js?")>0) {
                         new Promise(function (resolve, reject) {
                                 var s;
                                 s = document.createElement('script');
@@ -24,7 +26,7 @@ function wb_include(url,defer,async) {
                                 document.head.appendChild(s);
                         });
                 } else {
-                        if (url.substr(-4) == ".css" ) {
+                        if (url.substr(-4) == ".css" || url.indexOf(".css?")>0) {
                                     var inc = document.createElement('link');
                                     inc.type = "text/css";
                                     inc.rel = "stylesheet"
@@ -35,9 +37,13 @@ function wb_include(url,defer,async) {
                                     inc.rel = "less"
                                     inc.href = url;
                                 }
-                                    document.getElementsByTagName('body')[0].appendChild(inc);
+                                document.getElementsByTagName('body')[0].appendChild(inc);
                         }
             loaded.push(url);
+            setTimeout(function(){
+		$(document).trigger("wb_include",{url:url});
+	    },500);
+
     }
     return;
 }

@@ -684,11 +684,14 @@ function wbFlushDatabase()
 function wbTable($table = 'data', $engine = false)
 {
     wbTrigger('func', __FUNCTION__, 'before');
+    $create = false;
     if (strpos($table,":")) {
         $table=explode(":",$table);
         if ($table[1]=="engine" OR $table[1]=="e") {
             $engine=true;
-        }
+        } else if ($table[1]=="create" OR $table[1]=="c") {
+		$create = true;
+	}
         $table=$table[0];
     }
 
@@ -703,7 +706,7 @@ function wbTable($table = 'data', $engine = false)
     $tname = wbTableName($table);
     $table = wbTablePath($tname, $engine);
     if (!is_file($table)) {
-        if ($tname > '' and in_array($tname, $_ENV['forms'], true)) {
+        if ( $tname > '' and ( in_array($tname, $_ENV['forms'], true) or $create == true )) {
             wbTableCreate($tname);
         }
     }
@@ -2845,7 +2848,7 @@ function wbControls($set = '')
     $res = '*';
     $controls = '[data-wb-role]';
     $allow = '[data-wb-allow], [data-wb-disallow], [data-wb-disabled], [data-wb-enabled], [data-wb-readonly], [data-wb-writable]';
-    $target = '[data-wb-prepend], [data-wb-append], [data-wb-remove], [data-wb-before], [data-wb-after], [data-wb-html], [data-wb-replace], [data-wb-selector], [data-wb-addclass], [data-wb-removeclass], [data-wb-removeattr], [data-wb-attr], [data-wb-src]';
+    $target = '[data-wb-prepend], [data-wb-append], [data-wb-remove], [data-wb-before], [data-wb-after], [data-wb-html], [data-wb-replace], [data-wb-selector], [data-wb-addclass], [data-wb-removeclass], [data-wb-removeattr], [data-wb-attr], [data-wb-src], [data-wb-clear]';
     $tags = array('dict', 'tree', 'gallery', 'imageloader', 'thumbnail', 'uploader','multiinput', 'where');
     foreach(array_keys($_ENV["tags"]) as $tag) {
         if (!in_array($tag,$tags)) $tags[]=$tag;

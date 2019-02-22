@@ -172,7 +172,7 @@ function wbSetValuesStr($tag = "",$Item = array(), $limit = 2, $vars = null)
                                             $newParm[] = (trim($parm) == '@') ? $sub : trim($parm);
                                         }
                                     }
-                                    if (count($newParms)) {
+                                    if (is_array($newParms) AND count($newParms)) {
                                         $ParmsNew = implode(',', $newParm);
                                         $func     = str_replace($res[14][$i][0], $ParmsNew, $func);
                                     } else {

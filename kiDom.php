@@ -1651,6 +1651,8 @@ abstract class kiNode
         };
         unset($inc,$attribute,$$attribute,$selector);
         $this->find("[data-wb-remove]")->remove();
+        $this->find("[data-wb-clear]")->html("");
+        $this->find("[data-wb-clear]")->removeAttr("data-wb-clear");
     }
 
 
@@ -5224,6 +5226,13 @@ class kiNodesList extends kiList
         $this->state = null;
         return $this;
     }
+
+	public function clear()	{
+		foreach ($this->list as $node) {
+		    $node->clearChildren();
+		};
+		return $this;
+	}
 
     protected function saveState()	{
         $list = $this->list;

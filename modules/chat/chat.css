@@ -1,0 +1,8 @@
+.chat-box {text-align:right;}
+.chat-box .modal-content {height:100vh;}
+.chat-box .modal-dialog {margin:0; width:320px;}
+.chat-box .modal-body {height:80vh; overflow-y: auto; overflow-x: hidden;}
+.chat-box .chat-wrap {display:block;height:200px;}
+.chat-box #chat-area span	{ color: white; background: #3b6998; padding: 4px 8px; border-radius:3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; margin: 0 10px 0 0; }
+.chat-box #chat-area p	{ padding: 8px 0; border-bottom: 1px solid #ccc;     line-height: 1.6rem;}
+.chat-box #sendie {width:100%; resize:none;outline: unset;border: 1px #ccc solid;}

@@ -55,13 +55,13 @@
                 <div class="form-group row">
                   <label class="col-sm-3 form-control-label">{{_LANG[firstname]}}:</label>
                   <div class="col-sm-8 col-xl-6 mg-t-10 mg-sm-t-0">
-                    <input class="form-control" placeholder="{{_LANG[firstname]}}" type="text" name="firstname">
+                    <input class="form-control" placeholder="{{_LANG[firstname]}}" type="text" name="first_name">
                   </div>
                 </div>
                 <div class="form-group row">
                   <label class="col-sm-3 form-control-label">{{_LANG[lastname]}}:</label>
                   <div class="col-sm-8 col-xl-6 mg-t-10 mg-sm-t-0">
-                    <input class="form-control" placeholder="{{_LANG[lastname]}}" type="text" name="lastname">
+                    <input class="form-control" placeholder="{{_LANG[lastname]}}" type="text" name="last_name">
                   </div>
                 </div>
                 <div class="form-group row">
@@ -79,7 +79,7 @@
                 <div class="form-group row">
                   <label class="col-sm-3 form-control-label">{{_LANG[phone]}}:</label>
                   <div class="col-sm-8 col-xl-6 mg-t-10 mg-sm-t-0">
-                    <input class="form-control" placeholder="{{_LANG[phone]}}" type="text" name="phone">
+                    <input class="form-control" placeholder="{{_LANG[phone]}}" type="mask" data-wb-mask="+9 (999) 999-99-99" name="phone">
                   </div>
                 </div>
 

@@ -146,6 +146,10 @@ label.switch-primary input:checked+span {
     padding: 2px 60px 2px 30px;
 }
 
+.wb-multiinput * {
+	z-index:100;
+}
+
 .wb-multiinput [class^='col-'], .wb-multiinput .col {
     padding: 0 5px;
 }
@@ -164,11 +168,20 @@ font-family: FontAwesome;
 }
 
 .wb-multiinput-del, .wb-multiinput-add {
-    position:absolute;
-    line-height: 40px!important;
-    font-size: 16px!important;
-    color: #3b6998;
-    cursor: pointer;
+	position:absolute;
+	cursor: pointer;
+	background: #3b6998;
+	width: 23px;
+	height: 23px;
+	border-radius: 50%;
+	line-height: 25px!important;
+	text-align: center;
+	vertical-align: middle;
+	margin-top: 8px;
+	margin-right: -5px;
+	color: white;
+	text-shadow: none;
+	font-size: 14px!important;
 }
 
 .wb-multiinput-del {
@@ -556,6 +569,7 @@ th.wb-asc[data-wb-sort]:before {
     padding: 0;
 }
 
+.nowrap {white-space:nowrap;}
 
 @media screen {
   .wb-print-box {
