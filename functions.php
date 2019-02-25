@@ -5,7 +5,7 @@ require_once __DIR__.'/wbapp.php';
 
 use Nahid\JsonQ\Jsonq;
 use soundintheory\PHPSQL;
-
+use Rct567\DomQuery\DomQuery;
 
 function wbInit()
 {

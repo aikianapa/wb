@@ -6,5 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Rct567\\' => array($vendorDir . '/rct567/dom-query/src/Rct567'),
     'Nahid\\JsonQ\\' => array($vendorDir . '/nahid/jsonq/src'),
 );

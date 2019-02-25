@@ -49,6 +49,53 @@
         ]
     },
     {
+        "name": "rct567/dom-query",
+        "version": "v0.6.2",
+        "version_normalized": "0.6.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Rct567/DomQuery.git",
+            "reference": "9b5a8effef904b55cc2a7ebb598b9c1f37a5d628"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Rct567/DomQuery/zipball/9b5a8effef904b55cc2a7ebb598b9c1f37a5d628",
+            "reference": "9b5a8effef904b55cc2a7ebb598b9c1f37a5d628",
+            "shasum": ""
+        },
+        "require": {
+            "ext-xml": "*",
+            "php": "^7.0.0"
+        },
+        "time": "2018-03-14T16:10:40+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Rct567\\": "src/Rct567"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Rct567",
+                "email": "rct999@gmail.com"
+            }
+        ],
+        "description": "DomQuery is a PHP library that allows easy 'jQuery like' DOM traversing and manipulation",
+        "keywords": [
+            "css",
+            "dom",
+            "html",
+            "jquery",
+            "selector",
+            "xml"
+        ]
+    },
+    {
         "name": "soundintheory/php-sql-parser",
         "version": "1.0",
         "version_normalized": "1.0.0.0",

@@ -7,6 +7,10 @@ namespace Composer\Autoload;
 class ComposerStaticInit10d8e36cc1cac79ce2653b63f64aad0d
 {
     public static $prefixLengthsPsr4 = array (
+        'R' => 
+        array (
+            'Rct567\\' => 7,
+        ),
         'N' => 
         array (
             'Nahid\\JsonQ\\' => 12,
@@ -14,6 +18,10 @@ class ComposerStaticInit10d8e36cc1cac79ce2653b63f64aad0d
     );
 
     public static $prefixDirsPsr4 = array (
+        'Rct567\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/rct567/dom-query/src/Rct567',
+        ),
         'Nahid\\JsonQ\\' => 
         array (
             0 => __DIR__ . '/..' . '/nahid/jsonq/src',

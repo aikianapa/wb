@@ -248,9 +248,9 @@ function wbSetValuesStr($tag = "",$Item = array(), $limit = 2, $vars = null)
                                 $text .= $func;
                             }
                         } else {
-                            if (eval('return isset($Item["'.$res[4][$i][0].'"]);')) {
+                            //if (eval('return isset($Item["'.$res[4][$i][0].'"]);')) {
+                            if (eval('return isset('.$sub.');')) {
                                 $temp = '';
-                                eval('$temp .= '.$sub.';');
                                 $temp = strtr($temp, array('{{'=> '#~#~','}}'=> '~#~#'));
                                 $text .= $temp;
                             } else {

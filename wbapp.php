@@ -1,5 +1,6 @@
 <?php
 use Nahid\JsonQ\Jsonq;
+use Rct567\DomQuery\DomQuery;
 class wbApp {
     public $settings;
     public $route;
@@ -63,19 +64,26 @@ class wbApp {
 
         public function template($name="default.php") {
                 $this->template=wbGetTpl($name);
-                $this->dom=$this->template->clone();
+                $this->dom = clone $this->template;
                 return $this->dom;
         }
 
-        public function fromString($string) {
-                $this->template=wbFromString($string);
-                $this->dom=$this->template->clone();
+        public function fromString($string="") {
+		if (substr($string,0,1)!=="<") {$string="<span>{$string}</span>";}
+                $this->template=new DomQuery($string);
+                $this->dom = clone $this->template;
+                return $this->dom;
+        }
+
+        public function fromFile($file="") {
+                $this->template=new DomQuery(file_get_contents($file));
+                $this->dom = clone $this->template;
                 return $this->dom;
         }
 
         public function form($form="pages",$mode="show",$engine=false) {
                 $this->template=wbGetForm($form,$mode,$engine);
-                $this->dom=$this->template->clone();
+                $this->dom= clone $this->template;
                 return $this->dom;
         }
 

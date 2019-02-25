@@ -1136,7 +1136,7 @@ data: data
                 if ($(this).attr("placeholder") !== undefined) {
                     var ph = $(this).attr("placeholder");
                 } else {
-                    var ph = 'новый';
+                    var ph = 'new';
                 }
                 if ($(this).attr("height") !== undefined) {
                     var h = $(this).attr("height");
@@ -1783,18 +1783,20 @@ _message:
                             $("#" + $(this).attr("id")).modal();
                         }
                     });
-                    if (done !== undefined) {
-                        (eval(done))(link, src, data);
-                    }
-                    var navlink = $(link).attr("data-wb-ajax");
-                    $("[data-wb-ajax='" + navlink + "']").addClass("active");
+                    if (done !== undefined) (eval(done))(link, src, data);
+
+                    var navlink = $(document).data("data-wb-ajax");
+			setTimeout(function(){
+				$(navlink).each(function(i,link){
+					$("[data-wb-ajax='"+link+"']").addClass("active");
+				});
+			},5);
                     console.log("trigger: wb_ajax_done");
                     $(document).trigger("wb_ajax_done", [link, src, data]);
                     wb_plugins();
                     wb_delegates();
                     wb_ajax_loader_done();
                     $(that).removeAttr("disabled");
-                    $("[data-tmp-active]").addClass("active").removeAttr("data-tmp-active");
                 });
             }
         } else {
@@ -1807,10 +1809,20 @@ _message:
 
     $(document).undelegate("[data-wb-ajax]", "click");
     $(document).delegate("[data-wb-ajax]", "click", function(e) {
+	    $(this).parents("ul").find(".active[data-wb-ajax]").removeClass("active");
+	    $(this).addClass("active");
+	    var act=[];
+	    $(".nav").find(".active[data-wb-ajax]").each(function(){
+		act.push($(this).attr("data-wb-ajax"));
+	    });
+	    $(document).data("data-wb-ajax",act);
+	    //$(this).parents(".nav").find("a.active").removeClass("active");
+
+	    /*
         var that = e.target;
         $(".active").each(function() {
             if ($(that).parents(".nav-sub").length) {
-                $(this).parents(".nav-sub").find(".nav-link.active").removeClass("active");
+               // $(this).parents(".nav-sub").find(".nav-link.active").removeClass("active");
             }
             if ( 	( $(this).parents(".nav").attr("id")+$(this).parents(".nav").attr("class") )
                     !==
@@ -1819,7 +1831,7 @@ _message:
                 $(".active").attr("data-tmp-active",true);
             }
         });
-
+	*/
         if ($(this).is(":not(:input)") || $(this).is("button")) {
             wb_ajax_process(this);
         }

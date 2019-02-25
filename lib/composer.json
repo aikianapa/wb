@@ -1,6 +1,7 @@
 {
     "require": {
         "nahid/jsonq": "^5.2",
-        "soundintheory/php-sql-parser": "^1.0"
+        "soundintheory/php-sql-parser": "^1.0",
+        "rct567/dom-query": "^0.6.2"
     }
 }
