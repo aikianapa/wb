@@ -1068,7 +1068,55 @@ function wbWhereNotLike($ref, $val)
 
 function wbJsonEncode($Item = array())
 {
-    return json_encode($Item, JSON_UNESCAPED_UNICODE | JSON_HEX_AMP | JSON_HEX_TAG | JSON_HEX_APOS | JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_HEX_QUOT);
+	if (version_compare(phpversion(),"5.6")<0) {
+		return stripcslashes(wbJsonEncodeAlt($Item));
+	} else {
+		return json_encode($Item, JSON_UNESCAPED_UNICODE | JSON_HEX_AMP | JSON_HEX_TAG | JSON_HEX_APOS | JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_HEX_QUOT);
+	}
+}
+
+function wbJsonEncodeAlt($a=false)
+{
+  if (is_null($a)) return 'null';
+  if ($a === false) return 'false';
+  if ($a === true) return 'true';
+  if (is_scalar($a))
+  {
+    if (is_float($a))
+    {
+      // Always use "." for floats.
+      $a = str_replace(",", ".", strval($a));
+    }
+
+    // All scalars are converted to strings to avoid indeterminism.
+    // PHP's "1" and 1 are equal for all PHP operators, but
+    // JS's "1" and 1 are not. So if we pass "1" or 1 from the PHP backend,
+    // we should get the same result in the JS frontend (string).
+    // Character replacements for JSON.
+    static $jsonReplaces = array(array("\\", "/", "\n", "\t", "\r", "\b", "\f", '"'),
+    array('\\\\', '\\/', '\\n', '\\t', '\\r', '\\b', '\\f', '\"'));
+    return '"' . str_replace($jsonReplaces[0], $jsonReplaces[1], $a) . '"';
+  }
+  $isList = true;
+  for ($i = 0, reset($a); $i < count($a); $i++, next($a))
+  {
+    if (key($a) !== $i)
+    {
+      $isList = false;
+      break;
+    }
+  }
+  $result = array();
+  if ($isList)
+  {
+    foreach ($a as $v) $result[] = wbJsonEncodeAlt($v);
+    return '[ ' . join(', ', $result) . ' ]';
+  }
+  else
+  {
+    foreach ($a as $k => $v) $result[] = wbJsonEncodeAlt($k).': '.wbJsonEncodeAlt($v);
+    return '{ ' . join(', ', $result) . ' }';
+  }
 }
 
 function wbItemRead($table = null, $id = null)
@@ -2848,7 +2896,7 @@ function wbControls($set = '')
     $res = '*';
     $controls = '[data-wb-role]';
     $allow = '[data-wb-allow], [data-wb-disallow], [data-wb-disabled], [data-wb-enabled], [data-wb-readonly], [data-wb-writable]';
-    $target = '[data-wb-prepend], [data-wb-append], [data-wb-remove], [data-wb-before], [data-wb-after], [data-wb-html], [data-wb-replace], [data-wb-selector], [data-wb-addclass], [data-wb-removeclass], [data-wb-removeattr], [data-wb-attr], [data-wb-src], [data-wb-clear]';
+    $target = '[data-wb-prepend], [data-wb-append], [data-wb-remove], [data-wb-before], [data-wb-after], [data-wb-html], [data-wb-replace], [data-wb-selector], [data-wb-addclass], [data-wb-removeclass], [data-wb-prependto], [data-wb-appendto], [data-wb-removeattr], [data-wb-attr], [data-wb-src], [data-wb-clear]';
     $tags = array('dict', 'tree', 'gallery', 'imageloader', 'thumbnail', 'uploader','multiinput', 'where');
     foreach(array_keys($_ENV["tags"]) as $tag) {
         if (!in_array($tag,$tags)) $tags[]=$tag;

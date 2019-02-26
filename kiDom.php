@@ -1632,18 +1632,25 @@ abstract class kiNode
                         $com=str_replace("data-wb-","",$attribute);
                         if ($com=="replace") $com="replaceWith";
                         if ($$attribute>""  AND $com>"" AND $com!=="selector") {
-                            $res=$this->find($selector);
-                            if ($res->length) {
-                                foreach($res as $s) {
-                                    if ($com == "attr") {
-                                        $s->$com($$attribute,$inc->attr("value"));
-                                    } else {
-                                        $s->$com($$attribute);
-                                    }
+				if ($com=="prependto" OR $com=="appendto") {
+					if ($this->find($$attribute)->length AND $this->find($selector)->length ) {
+						$this->find($selector)->$com($$attribute);
+						$inc->remove();
+					}
+				} else {
+				    $res=$this->find($selector);
+				    if ($res->length) {
+					foreach($res as $s) {
+					    if ($com == "attr") {
+						$s->$com($$attribute,$inc->attr("value"));
+					    } else {
+						$s->$com($$attribute);
+					    }
 
-                                }
-                                $inc->remove();
-                            }
+					}
+					$inc->remove();
+				    }
+				}
                         }
                     }
                 }
@@ -2217,6 +2224,7 @@ abstract class kiNode
         if (!is_array($data)) {
             $data=wbItemToArray($data);
         }
+        if (!is_array($data)) return;
         foreach($data as $item) {
             $tpl=$rowtpl->clone();
             $tpl->wbSetAttributes($item);

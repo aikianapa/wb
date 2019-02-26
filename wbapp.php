@@ -10,6 +10,7 @@ class wbApp {
 
     public function __construct() {
         include_once (__DIR__."/functions.php");
+        //include_once (__DIR__."/wbfunctions.php");
         wbInit();
     }
 
@@ -76,10 +77,43 @@ class wbApp {
         }
 
         public function fromFile($file="") {
-                $this->template=new DomQuery(file_get_contents($file));
-                $this->dom = clone $this->template;
-                return $this->dom;
+        $res = "";
+        if ($file=="") {
+            return $this->fromString("");
+        } else {
+            if (!session_id()) {
+                session_start();
+            }
+            $context = stream_context_create(array(
+                                                 'http'=>array(
+                                                         'method'=>"POST",
+                                                         'header'=>	'Accept-language:' . " en\r\n" .
+                                                         'Content-Type:' . " application/x-www-form-urlencoded\r\n" .
+                                                         'Cookie: ' . session_name()."=".session_id()."\r\n" .
+                                                         'Connection: ' . " Close\r\n\r\n",
+                                                         'content' => http_build_query($_POST)
+                                                 )
+                                             ));
+            session_write_close();
+            $url=parse_url($file);
+            if (is_file($file)) {
+                $fp = fopen ($file,"r");
+                flock ($fp, LOCK_SH);
+            }
+            if (isset($url["scheme"])) {
+                $res=@file_get_contents($file,false,$context);
+            } else if (is_file($file)) {
+                $res=file_get_contents($file);
+            }
+            if (is_file($file)) {
+                $res=file_get_contents($file,false,$context);
+                flock ($fp, LOCK_UN);
+                fclose ($fp);
+            }
+            session_start(); // reopen session after session_write_close()
+            return $this->fromString($res);
         }
+	}
 
         public function form($form="pages",$mode="show",$engine=false) {
                 $this->template=wbGetForm($form,$mode,$engine);

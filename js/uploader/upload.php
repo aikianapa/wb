@@ -65,6 +65,8 @@ if (isset($_REQUEST["name"])) {
 } else {
 	$fileName = uniqid("file_");
 }
+$ext = substr(strrchr($_REQUEST["name"],'.'),1);
+$fileName=wbNewId().".".$ext;
 
 $fileName=str_replace(array(" ",":",";","#","&"),array("_","_","_","_","_"),mb_strtolower(wbTranslit(trim($fileName))));
 

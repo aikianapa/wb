@@ -339,6 +339,7 @@ function wb_tree() {
         var name = $(this).attr("name");
         var store = $(this).find("input[name='" + name + "']");
         $(store).val(wb_json_encode($(this).treeBranchStore()));
+        $(".modal:visible").wbFixModal();
     };
 
     $.fn.treeBranchStore = function() {
@@ -1205,8 +1206,35 @@ empty: 'fa fa-star-o'
 		$("tester").remove();
         });
 
+	// modal fixer
+	$('.modal').on('shown.bs.modal', function () {
+		$(this).wbFixModal();
+	})
+	$(".content-box, .modal-body").perfectScrollbar();
+	$("#treeEditForm").find(".tree-view,.tree-edit > div").perfectScrollbar();
+	$(window).on('resize',function(){
+		$(".modal:visible").wbFixModal();
+	});
     });
 }
+
+$.fn.wbFixModal = function () {
+    	$(this).find(".modal-dialog").css( 'height' ,'').css("margin","");
+	$(this).find(".modal-content").css( 'height' ,'');
+	$(this).find(".modal-body").css( 'height' ,'');
+
+    var mh = $(this).height();
+    var wh = $(window).height();
+    var mhd = $(this).find(".modal-header").height();
+    var mft = $(this).find(".modal-footer").height();
+    var mbd = $(this).find(".modal-body").height();
+    if ( (mhd + mft + mbd) > wh ) {
+	$(this).find(".modal-dialog").height(wh).css({"overflow":"hidden","margin":"0"});
+	$(this).find(".modal-content").height(wh).css("overflow","hidden");;
+	$(this).find(".modal-body").height( wh - (mhd + mft) ).css("overflow","auto");
+	//$(this).height(wh).css("overflow","hidden");
+    }
+};
 
 function wb_plugins_loaded() {
     return $("script[src='/engine/js/plugins/plugins.js']").length;
