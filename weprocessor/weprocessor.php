@@ -89,6 +89,9 @@ class WEProcessor {
 				case '_GET': 		$res = $_GET; break;
 				case '_POST':		$res = $_POST; break;
 				case '_CURRENT':	$res = $this->context; break;
+				case '_MODE': 		$res = $_ENV["route"]["mode"]; break;
+				case '_FORM': 		$res = $_ENV["route"]["form"]; break;
+				case '_ITEM': 		$res = $_ENV["route"]["item"]; break;
 				default: {
 					if ($this->debug) print(" UNKNOWN VARIABLE: '".json_encode($v)."'");
 					$this->evalFail();
