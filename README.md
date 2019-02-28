@@ -19,6 +19,6 @@
 * Download and extract [ZIP file](https://github.com/aikianapa/wb/archive/master.zip) WebBasic to your web directory or get the latest development version with:
 
 `git clone https://github.com/aikianapa/wb.git`
-* Rename directory from 'wb' to 'engine'
+* Rename directory from 'wb-master' to 'engine'
 * Open link in browser: http://yourdomain/engine
-* Folow to instalation master
+* Folow to installation master

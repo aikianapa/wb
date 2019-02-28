@@ -1210,8 +1210,10 @@ empty: 'fa fa-star-o'
 	$('.modal').on('shown.bs.modal', function () {
 		$(this).wbFixModal();
 	})
-	$(".content-box, .modal-body").perfectScrollbar();
-	$("#treeEditForm").find(".tree-view,.tree-edit > div").perfectScrollbar();
+	if (wb_plugins_loaded()) {
+		$(".content-box, .modal-body").perfectScrollbar();
+		$("#treeEditForm").find(".tree-view,.tree-edit > div").perfectScrollbar();
+	}
 	$(window).on('resize',function(){
 		$(".modal:visible").wbFixModal();
 	});
