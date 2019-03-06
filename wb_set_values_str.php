@@ -1,15 +1,5 @@
 <?php
-<<<<<<< HEAD
-
-include_once 'engine/weprocessor/weprocessor.php';
-
-function wbSetValuesStr($tag = "",$Item = array(), $limit = 2, $vars = null)
-{
-    $processor = new WEProcessor($Item);
-    return $processor->substitute($tag);
-=======
-include_once 'weprocessor/weprocessor.php';
-
+include_once __DIR__ .'/weprocessor.php';
 function wbSetValuesStr($tag = "",$Item = array(), $limit = 2, $vars = null)
 {
 //    print_r($Item);
@@ -335,7 +325,5 @@ function wbSetValuesStr($tag = "",$Item = array(), $limit = 2, $vars = null)
         $tag = strtr($tag, array('#~#~'=> '{{','~#~#'=> '}}'));
         return $tag;
     }
->>>>>>> origin/master
 }
-
 ?>
