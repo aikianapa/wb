@@ -1,0 +1,70 @@
+%class weparser
+%start webExpr
+
+#
+# все терминалы должны быть переданы из программы:
+# EXT_START EXT_END - это начало и конец выражения
+# EXT_LET - это операция ->
+# EXT_VAR, EXT_NUM, EXT_STR - это переменные, числа и строки
+#
+
+%left '+' '-'
+%left '*' '/'
+%left EXT_LET
+%left '.' '['
+
+webExpr = EXT_START expr/$ EXT_END
+.
+
+expr =
+  expr/e1 '+' expr/e2 { $$ = $this->d->add($e1, $e2); }
+| expr '-' expr { $$ = $1 - $3; }
+| expr '*' expr { $$ = $1 * $3; }
+| expr '/' expr { $$ = $1 / $3; }
+| '(' expr/$ ')'
+| callfn
+| access
+| '@' { $$ = $this->d->getLet(); }
+.
+
+callfn =
+  EXT_VAR/a '(' ')' { $$ = $this->d->call_fn($a, array()); }
+| EXT_VAR/a '(' call_args/p ')' { $$ = $this->d->call_fn($a, $p); }
+| let_set
+.
+
+call_args =
+  expr/e1 { $$ = array($e1); }
+| expr/e1 ',' call_args/e2 { $$ = array_merge(array($e1), $e2); }
+.
+
+access =
+  access_index
+| access_field
+| num
+| EXT_STR
+| EXT_VAR/n { $$ = $this->d->get_variable($n); }
+| webExpr
+.
+
+index =
+  num
+| EXT_STR
+| EXT_VAR/$
+| webExpr
+.
+
+access_index = access/e '[' index/i ']' { $$ = $this->d->call_index($e, $i); }
+.
+
+access_field = access/e '.' index/i { $$ = $this->d->call_field($e, $i); }
+.
+
+num = EXT_NUM/n { $$ = (double)$n; }
+.
+
+let_set = let_set_left EXT_LET expr/$
+.
+
+let_set_left = access/e { $$ = $this->d->setLet($e); }
+.

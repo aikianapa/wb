@@ -1,0 +1,1029 @@
+<?php
+
+class weparser extends lime_parser {
+private $d;
+public function __construct($d) {
+    $this->d = $d;
+}
+var $qi = 0;
+var $i = array (
+  0 => 
+  array (
+    'EXT_START' => 's 1',
+    'webExpr' => 's 45',
+    '\'start\'' => 'a \'start\'',
+  ),
+  1 => 
+  array (
+    'EXT_START' => 's 1',
+    'expr' => 's 2',
+    '\'(\'' => 's 12',
+    'callfn' => 's 15',
+    'access' => 's 16',
+    '\'@\'' => 's 27',
+    'EXT_VAR' => 's 28',
+    'let_set' => 's 32',
+    'access_index' => 's 34',
+    'access_field' => 's 35',
+    'num' => 's 36',
+    'EXT_STR' => 's 37',
+    'webExpr' => 's 38',
+    'EXT_NUM' => 's 24',
+    'let_set_left' => 's 39',
+  ),
+  2 => 
+  array (
+    'EXT_END' => 's 3',
+    '\'+\'' => 's 4',
+    '\'-\'' => 's 6',
+    '\'*\'' => 's 8',
+    '\'/\'' => 's 10',
+  ),
+  3 => 
+  array (
+    '#' => 'r 0',
+    '\'.\'' => 'r 0',
+    '\'[\'' => 'r 0',
+    'EXT_END' => 'r 0',
+    '\'/\'' => 'r 0',
+    '\'*\'' => 'r 0',
+    '\'-\'' => 'r 0',
+    '\'+\'' => 'r 0',
+    'EXT_LET' => 'r 0',
+    '\')\'' => 'r 0',
+    '\',\'' => 'r 0',
+    '\']\'' => 'r 0',
+  ),
+  4 => 
+  array (
+    'EXT_START' => 's 1',
+    'expr' => 's 5',
+    '\'(\'' => 's 12',
+    'callfn' => 's 15',
+    'access' => 's 16',
+    '\'@\'' => 's 27',
+    'EXT_VAR' => 's 28',
+    'let_set' => 's 32',
+    'access_index' => 's 34',
+    'access_field' => 's 35',
+    'num' => 's 36',
+    'EXT_STR' => 's 37',
+    'webExpr' => 's 38',
+    'EXT_NUM' => 's 24',
+    'let_set_left' => 's 39',
+  ),
+  5 => 
+  array (
+    '\'+\'' => 'r 1',
+    '\'-\'' => 'r 1',
+    '\'*\'' => 's 8',
+    '\'/\'' => 's 10',
+    'EXT_END' => 'r 1',
+    '\')\'' => 'r 1',
+    '\',\'' => 'r 1',
+  ),
+  6 => 
+  array (
+    'EXT_START' => 's 1',
+    'expr' => 's 7',
+    '\'(\'' => 's 12',
+    'callfn' => 's 15',
+    'access' => 's 16',
+    '\'@\'' => 's 27',
+    'EXT_VAR' => 's 28',
+    'let_set' => 's 32',
+    'access_index' => 's 34',
+    'access_field' => 's 35',
+    'num' => 's 36',
+    'EXT_STR' => 's 37',
+    'webExpr' => 's 38',
+    'EXT_NUM' => 's 24',
+    'let_set_left' => 's 39',
+  ),
+  7 => 
+  array (
+    '\'+\'' => 'r 2',
+    '\'-\'' => 'r 2',
+    '\'*\'' => 's 8',
+    '\'/\'' => 's 10',
+    'EXT_END' => 'r 2',
+    '\')\'' => 'r 2',
+    '\',\'' => 'r 2',
+  ),
+  8 => 
+  array (
+    'EXT_START' => 's 1',
+    'expr' => 's 9',
+    '\'(\'' => 's 12',
+    'callfn' => 's 15',
+    'access' => 's 16',
+    '\'@\'' => 's 27',
+    'EXT_VAR' => 's 28',
+    'let_set' => 's 32',
+    'access_index' => 's 34',
+    'access_field' => 's 35',
+    'num' => 's 36',
+    'EXT_STR' => 's 37',
+    'webExpr' => 's 38',
+    'EXT_NUM' => 's 24',
+    'let_set_left' => 's 39',
+  ),
+  9 => 
+  array (
+    '\'+\'' => 'r 3',
+    '\'-\'' => 'r 3',
+    '\'*\'' => 'r 3',
+    '\'/\'' => 'r 3',
+    'EXT_END' => 'r 3',
+    '\')\'' => 'r 3',
+    '\',\'' => 'r 3',
+  ),
+  10 => 
+  array (
+    'EXT_START' => 's 1',
+    'expr' => 's 11',
+    '\'(\'' => 's 12',
+    'callfn' => 's 15',
+    'access' => 's 16',
+    '\'@\'' => 's 27',
+    'EXT_VAR' => 's 28',
+    'let_set' => 's 32',
+    'access_index' => 's 34',
+    'access_field' => 's 35',
+    'num' => 's 36',
+    'EXT_STR' => 's 37',
+    'webExpr' => 's 38',
+    'EXT_NUM' => 's 24',
+    'let_set_left' => 's 39',
+  ),
+  11 => 
+  array (
+    '\'+\'' => 'r 4',
+    '\'-\'' => 'r 4',
+    '\'*\'' => 'r 4',
+    '\'/\'' => 'r 4',
+    'EXT_END' => 'r 4',
+    '\')\'' => 'r 4',
+    '\',\'' => 'r 4',
+  ),
+  12 => 
+  array (
+    'EXT_START' => 's 1',
+    'expr' => 's 13',
+    '\'(\'' => 's 12',
+    'callfn' => 's 15',
+    'access' => 's 16',
+    '\'@\'' => 's 27',
+    'EXT_VAR' => 's 28',
+    'let_set' => 's 32',
+    'access_index' => 's 34',
+    'access_field' => 's 35',
+    'num' => 's 36',
+    'EXT_STR' => 's 37',
+    'webExpr' => 's 38',
+    'EXT_NUM' => 's 24',
+    'let_set_left' => 's 39',
+  ),
+  13 => 
+  array (
+    '\'+\'' => 's 4',
+    '\'-\'' => 's 6',
+    '\'*\'' => 's 8',
+    '\'/\'' => 's 10',
+    '\')\'' => 's 14',
+  ),
+  14 => 
+  array (
+    'EXT_END' => 'r 5',
+    '\'/\'' => 'r 5',
+    '\'*\'' => 'r 5',
+    '\'-\'' => 'r 5',
+    '\'+\'' => 'r 5',
+    '\')\'' => 'r 5',
+    '\',\'' => 'r 5',
+  ),
+  15 => 
+  array (
+    'EXT_END' => 'r 6',
+    '\'/\'' => 'r 6',
+    '\'*\'' => 'r 6',
+    '\'-\'' => 'r 6',
+    '\'+\'' => 'r 6',
+    '\')\'' => 'r 6',
+    '\',\'' => 'r 6',
+  ),
+  16 => 
+  array (
+    '\'[\'' => 's 17',
+    '\'.\'' => 's 25',
+    'EXT_END' => 'r 7',
+    '\'/\'' => 'r 7',
+    '\'*\'' => 'r 7',
+    '\'-\'' => 'r 7',
+    '\'+\'' => 'r 7',
+    '\')\'' => 'r 7',
+    '\',\'' => 'r 7',
+    'EXT_LET' => 'r 28',
+  ),
+  17 => 
+  array (
+    'EXT_START' => 's 1',
+    'num' => 's 18',
+    'EXT_STR' => 's 19',
+    'EXT_VAR' => 's 20',
+    'webExpr' => 's 21',
+    'index' => 's 22',
+    'EXT_NUM' => 's 24',
+  ),
+  18 => 
+  array (
+    '\']\'' => 'r 20',
+    '\'.\'' => 'r 20',
+    '\'[\'' => 'r 20',
+    'EXT_END' => 'r 20',
+    '\'/\'' => 'r 20',
+    '\'*\'' => 'r 20',
+    '\'-\'' => 'r 20',
+    '\'+\'' => 'r 20',
+    '\')\'' => 'r 20',
+    '\',\'' => 'r 20',
+    'EXT_LET' => 'r 20',
+  ),
+  19 => 
+  array (
+    '\']\'' => 'r 21',
+    '\'.\'' => 'r 21',
+    '\'[\'' => 'r 21',
+    'EXT_END' => 'r 21',
+    '\'/\'' => 'r 21',
+    '\'*\'' => 'r 21',
+    '\'-\'' => 'r 21',
+    '\'+\'' => 'r 21',
+    '\')\'' => 'r 21',
+    '\',\'' => 'r 21',
+    'EXT_LET' => 'r 21',
+  ),
+  20 => 
+  array (
+    '\']\'' => 'r 22',
+    '\'.\'' => 'r 22',
+    '\'[\'' => 'r 22',
+    'EXT_END' => 'r 22',
+    '\'/\'' => 'r 22',
+    '\'*\'' => 'r 22',
+    '\'-\'' => 'r 22',
+    '\'+\'' => 'r 22',
+    '\')\'' => 'r 22',
+    '\',\'' => 'r 22',
+    'EXT_LET' => 'r 22',
+  ),
+  21 => 
+  array (
+    '\']\'' => 'r 23',
+    '\'.\'' => 'r 23',
+    '\'[\'' => 'r 23',
+    'EXT_END' => 'r 23',
+    '\'/\'' => 'r 23',
+    '\'*\'' => 'r 23',
+    '\'-\'' => 'r 23',
+    '\'+\'' => 'r 23',
+    '\')\'' => 'r 23',
+    '\',\'' => 'r 23',
+    'EXT_LET' => 'r 23',
+  ),
+  22 => 
+  array (
+    '\']\'' => 's 23',
+  ),
+  23 => 
+  array (
+    '\'.\'' => 'r 24',
+    '\'[\'' => 'r 24',
+    'EXT_END' => 'r 24',
+    '\'/\'' => 'r 24',
+    '\'*\'' => 'r 24',
+    '\'-\'' => 'r 24',
+    '\'+\'' => 'r 24',
+    '\')\'' => 'r 24',
+    '\',\'' => 'r 24',
+    'EXT_LET' => 'r 24',
+  ),
+  24 => 
+  array (
+    '\'.\'' => 'r 26',
+    '\'[\'' => 'r 26',
+    'EXT_END' => 'r 26',
+    '\'/\'' => 'r 26',
+    '\'*\'' => 'r 26',
+    '\'-\'' => 'r 26',
+    '\'+\'' => 'r 26',
+    '\')\'' => 'r 26',
+    '\']\'' => 'r 26',
+    '\',\'' => 'r 26',
+    'EXT_LET' => 'r 26',
+  ),
+  25 => 
+  array (
+    'EXT_START' => 's 1',
+    'num' => 's 18',
+    'EXT_STR' => 's 19',
+    'EXT_VAR' => 's 20',
+    'webExpr' => 's 21',
+    'index' => 's 26',
+    'EXT_NUM' => 's 24',
+  ),
+  26 => 
+  array (
+    '\'.\'' => 'r 25',
+    '\'[\'' => 'r 25',
+    'EXT_END' => 'r 25',
+    '\'/\'' => 'r 25',
+    '\'*\'' => 'r 25',
+    '\'-\'' => 'r 25',
+    '\'+\'' => 'r 25',
+    '\')\'' => 'r 25',
+    '\',\'' => 'r 25',
+    'EXT_LET' => 'r 25',
+  ),
+  27 => 
+  array (
+    'EXT_END' => 'r 8',
+    '\'/\'' => 'r 8',
+    '\'*\'' => 'r 8',
+    '\'-\'' => 'r 8',
+    '\'+\'' => 'r 8',
+    '\')\'' => 'r 8',
+    '\',\'' => 'r 8',
+  ),
+  28 => 
+  array (
+    '\'(\'' => 's 29',
+    '\'.\'' => 'r 18',
+    '\'[\'' => 'r 18',
+    'EXT_END' => 'r 18',
+    '\'/\'' => 'r 18',
+    '\'*\'' => 'r 18',
+    '\'-\'' => 'r 18',
+    '\'+\'' => 'r 18',
+    '\')\'' => 'r 18',
+    '\',\'' => 'r 18',
+    'EXT_LET' => 'r 18',
+  ),
+  29 => 
+  array (
+    'EXT_START' => 's 1',
+    'expr' => 's 30',
+    '\'(\'' => 's 12',
+    'callfn' => 's 15',
+    'access' => 's 16',
+    '\'@\'' => 's 27',
+    'EXT_VAR' => 's 28',
+    '\')\'' => 's 42',
+    'call_args' => 's 43',
+    'let_set' => 's 32',
+    'access_index' => 's 34',
+    'access_field' => 's 35',
+    'num' => 's 36',
+    'EXT_STR' => 's 37',
+    'webExpr' => 's 38',
+    'EXT_NUM' => 's 24',
+    'let_set_left' => 's 39',
+  ),
+  30 => 
+  array (
+    '\'+\'' => 's 4',
+    '\'-\'' => 's 6',
+    '\'*\'' => 's 8',
+    '\'/\'' => 's 10',
+    '\',\'' => 's 31',
+    '\')\'' => 'r 12',
+  ),
+  31 => 
+  array (
+    'EXT_START' => 's 1',
+    'expr' => 's 30',
+    '\'(\'' => 's 12',
+    'callfn' => 's 15',
+    'access' => 's 16',
+    '\'@\'' => 's 27',
+    'EXT_VAR' => 's 28',
+    'let_set' => 's 32',
+    'call_args' => 's 33',
+    'access_index' => 's 34',
+    'access_field' => 's 35',
+    'num' => 's 36',
+    'EXT_STR' => 's 37',
+    'webExpr' => 's 38',
+    'EXT_NUM' => 's 24',
+    'let_set_left' => 's 39',
+  ),
+  32 => 
+  array (
+    'EXT_END' => 'r 11',
+    '\'/\'' => 'r 11',
+    '\'*\'' => 'r 11',
+    '\'-\'' => 'r 11',
+    '\'+\'' => 'r 11',
+    '\')\'' => 'r 11',
+    '\',\'' => 'r 11',
+  ),
+  33 => 
+  array (
+    '\')\'' => 'r 13',
+  ),
+  34 => 
+  array (
+    '\'.\'' => 'r 14',
+    '\'[\'' => 'r 14',
+    'EXT_END' => 'r 14',
+    '\'/\'' => 'r 14',
+    '\'*\'' => 'r 14',
+    '\'-\'' => 'r 14',
+    '\'+\'' => 'r 14',
+    '\')\'' => 'r 14',
+    '\',\'' => 'r 14',
+    'EXT_LET' => 'r 14',
+  ),
+  35 => 
+  array (
+    '\'.\'' => 'r 15',
+    '\'[\'' => 'r 15',
+    'EXT_END' => 'r 15',
+    '\'/\'' => 'r 15',
+    '\'*\'' => 'r 15',
+    '\'-\'' => 'r 15',
+    '\'+\'' => 'r 15',
+    '\')\'' => 'r 15',
+    '\',\'' => 'r 15',
+    'EXT_LET' => 'r 15',
+  ),
+  36 => 
+  array (
+    '\'.\'' => 'r 16',
+    '\'[\'' => 'r 16',
+    'EXT_END' => 'r 16',
+    '\'/\'' => 'r 16',
+    '\'*\'' => 'r 16',
+    '\'-\'' => 'r 16',
+    '\'+\'' => 'r 16',
+    '\')\'' => 'r 16',
+    '\',\'' => 'r 16',
+    'EXT_LET' => 'r 16',
+  ),
+  37 => 
+  array (
+    '\'.\'' => 'r 17',
+    '\'[\'' => 'r 17',
+    'EXT_END' => 'r 17',
+    '\'/\'' => 'r 17',
+    '\'*\'' => 'r 17',
+    '\'-\'' => 'r 17',
+    '\'+\'' => 'r 17',
+    '\')\'' => 'r 17',
+    '\',\'' => 'r 17',
+    'EXT_LET' => 'r 17',
+  ),
+  38 => 
+  array (
+    '\'.\'' => 'r 19',
+    '\'[\'' => 'r 19',
+    'EXT_END' => 'r 19',
+    '\'/\'' => 'r 19',
+    '\'*\'' => 'r 19',
+    '\'-\'' => 'r 19',
+    '\'+\'' => 'r 19',
+    '\')\'' => 'r 19',
+    '\',\'' => 'r 19',
+    'EXT_LET' => 'r 19',
+  ),
+  39 => 
+  array (
+    'EXT_LET' => 's 40',
+  ),
+  40 => 
+  array (
+    'EXT_START' => 's 1',
+    'expr' => 's 41',
+    '\'(\'' => 's 12',
+    'callfn' => 's 15',
+    'access' => 's 16',
+    '\'@\'' => 's 27',
+    'EXT_VAR' => 's 28',
+    'let_set' => 's 32',
+    'access_index' => 's 34',
+    'access_field' => 's 35',
+    'num' => 's 36',
+    'EXT_STR' => 's 37',
+    'webExpr' => 's 38',
+    'EXT_NUM' => 's 24',
+    'let_set_left' => 's 39',
+  ),
+  41 => 
+  array (
+    '\'+\'' => 'r 27',
+    '\'-\'' => 'r 27',
+    '\'*\'' => 'r 27',
+    '\'/\'' => 'r 27',
+    'EXT_END' => 'r 27',
+    '\')\'' => 'r 27',
+    '\',\'' => 'r 27',
+  ),
+  42 => 
+  array (
+    'EXT_END' => 'r 9',
+    '\'/\'' => 'r 9',
+    '\'*\'' => 'r 9',
+    '\'-\'' => 'r 9',
+    '\'+\'' => 'r 9',
+    '\')\'' => 'r 9',
+    '\',\'' => 'r 9',
+  ),
+  43 => 
+  array (
+    '\')\'' => 's 44',
+  ),
+  44 => 
+  array (
+    'EXT_END' => 'r 10',
+    '\'/\'' => 'r 10',
+    '\'*\'' => 'r 10',
+    '\'-\'' => 'r 10',
+    '\'+\'' => 'r 10',
+    '\')\'' => 'r 10',
+    '\',\'' => 'r 10',
+  ),
+  45 => 
+  array (
+    '#' => 'r 29',
+  ),
+);
+function reduce_0_webExpr_1($tokens, &$result) {
+#
+# (0) webExpr :=  EXT_START  expr  EXT_END
+#
+$result = $tokens[1];
+
+}
+
+function reduce_1_expr_1($tokens, &$result) {
+#
+# (1) expr :=  expr  '+'  expr
+#
+$result = reset($tokens);
+$e1 =& $tokens[0];
+$e2 =& $tokens[2];
+ $result = $this->d->add($e1, $e2); 
+}
+
+function reduce_2_expr_2($tokens, &$result) {
+#
+# (2) expr :=  expr  '-'  expr
+#
+$result = reset($tokens);
+ $result = $tokens[0] - $tokens[2]; 
+}
+
+function reduce_3_expr_3($tokens, &$result) {
+#
+# (3) expr :=  expr  '*'  expr
+#
+$result = reset($tokens);
+ $result = $tokens[0] * $tokens[2]; 
+}
+
+function reduce_4_expr_4($tokens, &$result) {
+#
+# (4) expr :=  expr  '/'  expr
+#
+$result = reset($tokens);
+ $result = $tokens[0] / $tokens[2]; 
+}
+
+function reduce_5_expr_5($tokens, &$result) {
+#
+# (5) expr :=  '('  expr  ')'
+#
+$result = $tokens[1];
+
+}
+
+function reduce_6_expr_6($tokens, &$result) {
+#
+# (6) expr :=  callfn
+#
+$result = reset($tokens);
+
+}
+
+function reduce_7_expr_7($tokens, &$result) {
+#
+# (7) expr :=  access
+#
+$result = reset($tokens);
+
+}
+
+function reduce_8_expr_8($tokens, &$result) {
+#
+# (8) expr :=  '@'
+#
+$result = reset($tokens);
+ $result = $this->d->getLet(); 
+}
+
+function reduce_9_callfn_1($tokens, &$result) {
+#
+# (9) callfn :=  EXT_VAR  '('  ')'
+#
+$result = reset($tokens);
+$a =& $tokens[0];
+ $result = $this->d->call_fn($a, array()); 
+}
+
+function reduce_10_callfn_2($tokens, &$result) {
+#
+# (10) callfn :=  EXT_VAR  '('  call_args  ')'
+#
+$result = reset($tokens);
+$a =& $tokens[0];
+$p =& $tokens[2];
+ $result = $this->d->call_fn($a, $p); 
+}
+
+function reduce_11_callfn_3($tokens, &$result) {
+#
+# (11) callfn :=  let_set
+#
+$result = reset($tokens);
+
+}
+
+function reduce_12_call_args_1($tokens, &$result) {
+#
+# (12) call_args :=  expr
+#
+$result = reset($tokens);
+$e1 =& $tokens[0];
+ $result = array($e1); 
+}
+
+function reduce_13_call_args_2($tokens, &$result) {
+#
+# (13) call_args :=  expr  ','  call_args
+#
+$result = reset($tokens);
+$e1 =& $tokens[0];
+$e2 =& $tokens[2];
+ $result = array_merge(array($e1), $e2); 
+}
+
+function reduce_14_access_1($tokens, &$result) {
+#
+# (14) access :=  access_index
+#
+$result = reset($tokens);
+
+}
+
+function reduce_15_access_2($tokens, &$result) {
+#
+# (15) access :=  access_field
+#
+$result = reset($tokens);
+
+}
+
+function reduce_16_access_3($tokens, &$result) {
+#
+# (16) access :=  num
+#
+$result = reset($tokens);
+
+}
+
+function reduce_17_access_4($tokens, &$result) {
+#
+# (17) access :=  EXT_STR
+#
+$result = reset($tokens);
+
+}
+
+function reduce_18_access_5($tokens, &$result) {
+#
+# (18) access :=  EXT_VAR
+#
+$result = reset($tokens);
+$n =& $tokens[0];
+ $result = $this->d->get_variable($n); 
+}
+
+function reduce_19_access_6($tokens, &$result) {
+#
+# (19) access :=  webExpr
+#
+$result = reset($tokens);
+
+}
+
+function reduce_20_index_1($tokens, &$result) {
+#
+# (20) index :=  num
+#
+$result = reset($tokens);
+
+}
+
+function reduce_21_index_2($tokens, &$result) {
+#
+# (21) index :=  EXT_STR
+#
+$result = reset($tokens);
+
+}
+
+function reduce_22_index_3($tokens, &$result) {
+#
+# (22) index :=  EXT_VAR
+#
+$result = $tokens[0];
+
+}
+
+function reduce_23_index_4($tokens, &$result) {
+#
+# (23) index :=  webExpr
+#
+$result = reset($tokens);
+
+}
+
+function reduce_24_access_index_1($tokens, &$result) {
+#
+# (24) access_index :=  access  '['  index  ']'
+#
+$result = reset($tokens);
+$e =& $tokens[0];
+$i =& $tokens[2];
+ $result = $this->d->call_index($e, $i); 
+}
+
+function reduce_25_access_field_1($tokens, &$result) {
+#
+# (25) access_field :=  access  '.'  index
+#
+$result = reset($tokens);
+$e =& $tokens[0];
+$i =& $tokens[2];
+ $result = $this->d->call_field($e, $i); 
+}
+
+function reduce_26_num_1($tokens, &$result) {
+#
+# (26) num :=  EXT_NUM
+#
+$result = reset($tokens);
+$n =& $tokens[0];
+ $result = (double)$n; 
+}
+
+function reduce_27_let_set_1($tokens, &$result) {
+#
+# (27) let_set :=  let_set_left  EXT_LET  expr
+#
+$result = $tokens[2];
+
+}
+
+function reduce_28_let_set_left_1($tokens, &$result) {
+#
+# (28) let_set_left :=  access
+#
+$result = reset($tokens);
+$e =& $tokens[0];
+ $result = $this->d->setLet($e); 
+}
+
+function reduce_29_start_1($tokens, &$result) {
+#
+# (29) 'start' :=  webExpr
+#
+$result = reset($tokens);
+
+}
+
+var $method = array (
+  0 => 'reduce_0_webExpr_1',
+  1 => 'reduce_1_expr_1',
+  2 => 'reduce_2_expr_2',
+  3 => 'reduce_3_expr_3',
+  4 => 'reduce_4_expr_4',
+  5 => 'reduce_5_expr_5',
+  6 => 'reduce_6_expr_6',
+  7 => 'reduce_7_expr_7',
+  8 => 'reduce_8_expr_8',
+  9 => 'reduce_9_callfn_1',
+  10 => 'reduce_10_callfn_2',
+  11 => 'reduce_11_callfn_3',
+  12 => 'reduce_12_call_args_1',
+  13 => 'reduce_13_call_args_2',
+  14 => 'reduce_14_access_1',
+  15 => 'reduce_15_access_2',
+  16 => 'reduce_16_access_3',
+  17 => 'reduce_17_access_4',
+  18 => 'reduce_18_access_5',
+  19 => 'reduce_19_access_6',
+  20 => 'reduce_20_index_1',
+  21 => 'reduce_21_index_2',
+  22 => 'reduce_22_index_3',
+  23 => 'reduce_23_index_4',
+  24 => 'reduce_24_access_index_1',
+  25 => 'reduce_25_access_field_1',
+  26 => 'reduce_26_num_1',
+  27 => 'reduce_27_let_set_1',
+  28 => 'reduce_28_let_set_left_1',
+  29 => 'reduce_29_start_1',
+);
+var $a = array (
+  0 => 
+  array (
+    'symbol' => 'webExpr',
+    'len' => 3,
+    'replace' => true,
+  ),
+  1 => 
+  array (
+    'symbol' => 'expr',
+    'len' => 3,
+    'replace' => true,
+  ),
+  2 => 
+  array (
+    'symbol' => 'expr',
+    'len' => 3,
+    'replace' => true,
+  ),
+  3 => 
+  array (
+    'symbol' => 'expr',
+    'len' => 3,
+    'replace' => true,
+  ),
+  4 => 
+  array (
+    'symbol' => 'expr',
+    'len' => 3,
+    'replace' => true,
+  ),
+  5 => 
+  array (
+    'symbol' => 'expr',
+    'len' => 3,
+    'replace' => true,
+  ),
+  6 => 
+  array (
+    'symbol' => 'expr',
+    'len' => 1,
+    'replace' => true,
+  ),
+  7 => 
+  array (
+    'symbol' => 'expr',
+    'len' => 1,
+    'replace' => true,
+  ),
+  8 => 
+  array (
+    'symbol' => 'expr',
+    'len' => 1,
+    'replace' => true,
+  ),
+  9 => 
+  array (
+    'symbol' => 'callfn',
+    'len' => 3,
+    'replace' => true,
+  ),
+  10 => 
+  array (
+    'symbol' => 'callfn',
+    'len' => 4,
+    'replace' => true,
+  ),
+  11 => 
+  array (
+    'symbol' => 'callfn',
+    'len' => 1,
+    'replace' => true,
+  ),
+  12 => 
+  array (
+    'symbol' => 'call_args',
+    'len' => 1,
+    'replace' => true,
+  ),
+  13 => 
+  array (
+    'symbol' => 'call_args',
+    'len' => 3,
+    'replace' => true,
+  ),
+  14 => 
+  array (
+    'symbol' => 'access',
+    'len' => 1,
+    'replace' => true,
+  ),
+  15 => 
+  array (
+    'symbol' => 'access',
+    'len' => 1,
+    'replace' => true,
+  ),
+  16 => 
+  array (
+    'symbol' => 'access',
+    'len' => 1,
+    'replace' => true,
+  ),
+  17 => 
+  array (
+    'symbol' => 'access',
+    'len' => 1,
+    'replace' => true,
+  ),
+  18 => 
+  array (
+    'symbol' => 'access',
+    'len' => 1,
+    'replace' => true,
+  ),
+  19 => 
+  array (
+    'symbol' => 'access',
+    'len' => 1,
+    'replace' => true,
+  ),
+  20 => 
+  array (
+    'symbol' => 'index',
+    'len' => 1,
+    'replace' => true,
+  ),
+  21 => 
+  array (
+    'symbol' => 'index',
+    'len' => 1,
+    'replace' => true,
+  ),
+  22 => 
+  array (
+    'symbol' => 'index',
+    'len' => 1,
+    'replace' => true,
+  ),
+  23 => 
+  array (
+    'symbol' => 'index',
+    'len' => 1,
+    'replace' => true,
+  ),
+  24 => 
+  array (
+    'symbol' => 'access_index',
+    'len' => 4,
+    'replace' => true,
+  ),
+  25 => 
+  array (
+    'symbol' => 'access_field',
+    'len' => 3,
+    'replace' => true,
+  ),
+  26 => 
+  array (
+    'symbol' => 'num',
+    'len' => 1,
+    'replace' => true,
+  ),
+  27 => 
+  array (
+    'symbol' => 'let_set',
+    'len' => 3,
+    'replace' => true,
+  ),
+  28 => 
+  array (
+    'symbol' => 'let_set_left',
+    'len' => 1,
+    'replace' => true,
+  ),
+  29 => 
+  array (
+    'symbol' => '\'start\'',
+    'len' => 1,
+    'replace' => true,
+  ),
+);
+}
