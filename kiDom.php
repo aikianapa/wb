@@ -80,6 +80,7 @@ final class wbRouter {
             self::$names[] = "";
             return self::returnRoute();
         }
+        if (is_array(self::$routes)) {
         foreach (self::$routes as $route => $uri) {
             // Заменяем wildcards на рег. выражения
             $name=null;
@@ -104,6 +105,7 @@ final class wbRouter {
                 break; // URL обработан!
             }
         }
+	}
         return self::returnRoute();
     }
 
