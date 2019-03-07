@@ -35,3 +35,5 @@
         </div>
     </div>
 </div>
+
+<script type="text/locale" data-wb-role="inlclude" src="news_list"></script>
