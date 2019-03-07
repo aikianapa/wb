@@ -23,9 +23,10 @@ class tagVariable extends kiNode  {
     public function tagVariable_set($Item) {
 	include($_ENV["path_engine"]."/wbattributes.php");
         if ($var>"") {
-			if (isset($value)) {$value=wbSetValuesStr($value,$Item);}
-			if (isset($else)) {$else=wbSetValuesStr($else,$Item);}
-			if (isset($if)) {$if=wbSetValuesStr($if,$Item);}
+			if (isset($value)) {$value=preg_replace("~\{\{([^(}})]*)\}\}~","",wbSetValuesStr($value,$Item));}
+			if (isset($else)) {$else=preg_replace("~\{\{([^(}})]*)\}\}~","",wbSetValuesStr($else,$Item));}
+			if (isset($if)) {$if=preg_replace("~\{\{([^(}})]*)\}\}~","",wbSetValuesStr($if,$Item));}
+
 
 		if (isset($_ENV["variables"][$var])) {unset($_ENV["variables"][$var]);}
 		if (!isset($where) OR (isset($where) AND wbWhereItem($Item,$where)) OR isset($if)) {
