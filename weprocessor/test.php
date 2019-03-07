@@ -1,6 +1,8 @@
 <?php
 
-include_once 'weprocessor.php';
+include_once(__DIR__."/weprocessor.php");
+
+// xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
 
 // Переменная $_SESSION //
 $_SESSION["user"]=array("tester");										// добавил array
@@ -181,4 +183,12 @@ print("FAILED: $failed\n");
 print("TOTAL:  $total\n");
 print("\n");
 
+// $xhprof_data = xhprof_disable();
+
+// include_once(__DIR__."/../../xhprof/xhprof_lib/utils/xhprof_lib.php");
+// include_once(__DIR__."/../../xhprof/xhprof_lib/utils/xhprof_runs.php");
+// $xhprof_runs = new XHProfRuns_Default("/tmp");
+// $run_id = $xhprof_runs->save_run($xhprof_data, "weprocessor");
+// echo "Report: http://localhost:88/xhprof/xhprof_html/index.php?run=$run_id&source=weprocessor";
+// echo "\n";
 ?>
