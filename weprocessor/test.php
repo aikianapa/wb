@@ -74,14 +74,15 @@ $_ENV["variables"]["prop"] = "prop";
 $exprs = array(
 	'{{var42}}' => '42',
 	'{{ 42 + 2 * 3 - 6}}' => '42',
-	'{{ today()}}' => '[CANT CHECK]',
+	'{{ today() }}' => '[CANT CHECK]',
+	'{{ date("Y-m-d") }}' => '[CANT CHECK]',
+	'{{ date("d.m.Y",strtotime("now +1 month")) }}' => '[CANT CHECK]',
 	'{{ array[1] }}' => '2',
 	'{{ array[2][1] }}' => '4',
 	'{{ array.1 }}' => '2',
 	'{{ array[2][3][1] }}' => '7',
 	'{{ array.2.3.1 }}' => '7',
 	'{{ array.2.3.1 }}' => '7',
-	'{{ date("Y-m-d")}}' => '[CANT CHECK]',
 	'{{ obj.f1 }}' => 'f1val',
 	'{{ obj.o1.f2 }}' => 'f2val',
 	'{{ myfunc("1", "2", "3", "4", "5") }}' => 'myfunc(1, 2, 3, 4, 5)',
@@ -90,14 +91,13 @@ $exprs = array(
 		 => 'text|{{var42 + {{var2}}}}|text|42|text{not_expr}',
 	'text|{{var42 + {{var42}}}}|text|{{var42}}|text{not_expr}'
 		 => 'text|84|text|42|text{not_expr}',
-	'Сегодня: {{date("d.m.Y",strtotime("now +1 month"))}}' => '[CANT CHECK]',
 	'{{array.42}}' => '{"value":"text"}',
 	'{{array.42[value]}}' => 'text',
 	'{{array.42}}' => '{"value":"text","1":{"2":{"3":{"4":{"5":{"6":"text"}}}}}}',
 	'{{array.42.value}}' => 'text',
 	'{{array.42[value]}}' => 'text',
 	'{{array.value.1.2.3.4.5.6}}' => 'text',
-	 '{{array.42.value->strlen(@)}}' => '4',
+	'{{array.42.value->strlen(@)}}' => '4',
 	'{{array.42[value]->strlen(@)}}' => '4',
 	'3. записано как {{field3[sub]}} либо {{field3.sub}} и должно отобразить значение test'
 		 => '3. записано как test либо test и должно отобразить значение test',
@@ -163,9 +163,20 @@ foreach($exprs as $expr=>$expected) {
 		}
 	};
 
-	if ($substituted == $expected) $printResult("OK", "'$expr''\n");
-	elseif ($expected != '[CANT CHECK]') $printResult("FAILED", "\n     EXPR:     '$expr'\n     EXPECTED: '$expected'\n     GOT       '$substituted'\n");
-	else $printResult("???", "'$expr' -> '$substituted'\n");
+	$processOK = function ($expr) {
+		global $printResult;
+		$printResult("OK", "'$expr''\n");
+	};
+
+	$processFailed = function ($expr, $expected, $substituted) {
+		global $printResult;
+		$printResult("FAILED", "\n     EXPR:     '$expr'\n     EXPECTED: '$expected'\n     GOT       '$substituted'\n");
+	};
+
+	if ($substituted == $expected) $processOK($expr);
+	elseif ($expected != '[CANT CHECK]') $processFailed($expr, $expected, $substituted);
+	elseif ($expected == '[CANT CHECK]' && $expr != $substituted) $processOK($expr);
+	else $processFailed($expr, $expected, $substituted);
 
 	$total += 1;
 }
