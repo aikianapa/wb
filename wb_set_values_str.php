@@ -4,7 +4,7 @@ include_once(__DIR__."/weprocessor/weprocessor.php");
 
 function wbSetValuesStr($tag = "",$Item = array(), $limit = 2, $vars = null)
 {
-    if (!true) {
+    if (true) {
         $processor = new WEProcessor($Item);
         return $processor->substitute($tag);
     } else {

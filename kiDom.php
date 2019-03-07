@@ -1839,7 +1839,10 @@ abstract class kiNode
 		// Вставки в тэг HEAD
 		if (isset($Item["head_add"]) AND isset($Item["head_add_active"]) AND $Item["head_add_active"]=="on")  {$this->find("head")->append($Item["head_add"]);}
 		if (!isset($Item["head_noadd_glob"]) OR $Item["head_noadd_glob"]!=="on") {
-		    if (isset($_ENV["settings"]["head_add"]) AND isset($_ENV["settings"]["head_add_active"]) AND $_ENV["settings"]["head_add_active"]=="on")  {$this->find("head")->append($_ENV["settings"]["head_add"]);}
+		    if (isset($_ENV["settings"]["head_add"]) AND isset($_ENV["settings"]["head_add_active"]) AND $_ENV["settings"]["head_add_active"]=="on")  {
+			    $this->find("head")->append($_ENV["settings"]["head_add"]);
+			    unset($_ENV["settings"]["head_add"]);
+		    }
 		}
 		if (isset($Item["meta_description"]) AND $Item["meta_description"]>"") {
 		    $this->find("head meta[name=description]")->remove();
@@ -1854,7 +1857,10 @@ abstract class kiNode
 		// Вставки в тэг BODY
 		if (isset($Item["body_add"]) AND isset($Item["body_add_active"]) AND $Item["body_add_active"]=="on")  {$this->append($Item["body_add"]);}
 		if (!isset($Item["body_noadd_glob"]) OR $Item["body_noadd_glob"]!=="on") {
-		    if (isset($_ENV["settings"]["body_add"]) AND isset($_ENV["settings"]["body_add_active"]) AND $_ENV["settings"]["body_add_active"]=="on") {$this->append($_ENV["settings"]["body_add"]);}
+		    if (isset($_ENV["settings"]["body_add"]) AND isset($_ENV["settings"]["body_add_active"]) AND $_ENV["settings"]["body_add_active"]=="on") {
+			    $this->append($_ENV["settings"]["body_add"]);
+			    unset($_ENV["settings"]["body_add"]);
+		    }
 		}
 	    }
 	}
