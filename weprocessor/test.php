@@ -133,7 +133,7 @@ $exprs = array(
 	'{{var42->id(@)*2}}'=>'84',
 	'{{ {{_ENV->count()}} * 2 }}' => '4',
 	'{{_ENV->count() * 2 }}' => '4',
-	'{{data[lang][{{_SESS[lang]}}][name]}}'
+	'{{data[lang][{{_SESS[lang]}}][name]}}' => '{{data[lang][{{_SESS[lang]}}][name]}}',
 );
 
 $processor = new WEProcessor($context);
