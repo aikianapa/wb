@@ -74,6 +74,7 @@ $_ENV["variables"]["prop"] = "prop";
 $exprs = array(
 	'{{var42}}' => '42',
 	'{{ 42 + 2 * 3 - 6}}' => '42',
+	'{{ unknownFN() }}' => '{{ unknownFN() }}',
 	'{{ today() }}' => '[CANT CHECK]',
 	'{{ date("Y-m-d") }}' => '[CANT CHECK]',
 	'{{ date("d.m.Y",strtotime("now +1 month")) }}' => '[CANT CHECK]',
@@ -163,20 +164,13 @@ foreach($exprs as $expr=>$expected) {
 		}
 	};
 
-	$processOK = function ($expr) {
-		global $printResult;
+	if ($substituted == $expected || $expected == '[CANT CHECK]' && $expr != $substituted) {
 		$printResult("OK", "'$expr''\n");
-	};
-
-	$processFailed = function ($expr, $expected, $substituted) {
-		global $printResult;
+	} elseif ($expected != '[CANT CHECK]') {
 		$printResult("FAILED", "\n     EXPR:     '$expr'\n     EXPECTED: '$expected'\n     GOT       '$substituted'\n");
-	};
-
-	if ($substituted == $expected) $processOK($expr);
-	elseif ($expected != '[CANT CHECK]') $processFailed($expr, $expected, $substituted);
-	elseif ($expected == '[CANT CHECK]' && $expr != $substituted) $processOK($expr);
-	else $processFailed($expr, $expected, $substituted);
+	} else {
+		$printResult("FAILED", "\n     EXPR:     '$expr'\n     GOT       '$substituted'\n");
+	}
 
 	$total += 1;
 }

@@ -107,36 +107,40 @@ class WEProcessor {
 
 	public function call_fn($name, $args) {
 		if ($this->debug) print("##call_fn($name, '".json_encode($args)."') -> ");
+		$res = null;
 
 		switch ($name) {
 			// если нужно реализовать некую новую функцию то пишем соответствующую ветку в этом свитче
-			case "today":  $res = date("Y-m-d", time()); break;
-			case "myfunc": $res = "myfunc(" . join($args, ", ") . ")"; break;
-			case "id": {
-				$res = $args[0];
-				break;
-			}
+			case "today": 	$res = date("Y-m-d", time()); break;
+			case "myfunc":	$res = "myfunc(" . join($args, ", ") . ")"; break;
+			case "id": 		$res = $args[0];break;
 			// пытаемся вызвать существующую функцию напрямую, как есть.
 			// если не срабатывает - нужно определить ветку в этом свитче с необходимым преобразованием аргументов
 			default: {
-				if (is_array($args)) {
-					if (empty($args)) {
-						// есть специальный случай. если мы вызываем функцию, у которой
-						$requiredParams = count(array_filter((new ReflectionFunction($name))->getParameters(), function($p) { return !$p->isOptional(); }));
+				try {
+					if (is_array($args)) {
+						if (empty($args)) {
+							// есть специальный случай. если мы вызываем функцию, у которой
+							$requiredParams = count(array_filter((new ReflectionFunction($name))->getParameters(), function($p) { return !$p->isOptional(); }));
 
-						if ($requiredParams == 1 && isset($this->let)) {
-							$res = call_user_func($name, $this->let);
-						} elseif ($requiredParams == 0) {
-							$res = call_user_func($name);
+							if ($requiredParams == 1 && isset($this->let)) {
+								$res = call_user_func($name, $this->let);
+							} elseif ($requiredParams == 0) {
+								$res = call_user_func($name);
+							} else {
+								$this->evalFail();
+								$res = "[can't call '$name': requires '$requiredParams' arguments and @ is not set]";
+							}
 						} else {
-							$this->evalFail();
-							$res = "[can't call '$name': requires '$requiredParams' arguments and @ is not set]";
+							$res = call_user_func_array($name, array_values($args));
 						}
 					} else {
-						$res = call_user_func_array($name, array_values($args));
+						$res = call_user_func($name, $args);
 					}
-				} else {
-					$res = call_user_func($name, $args);
+				} catch (ReflectionException $e) {
+					if ($this->debug) print($e->getMessage());
+					$this->evalFail();
+					$res = null;
 				}
 				break;
 			}
