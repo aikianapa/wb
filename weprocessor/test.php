@@ -126,7 +126,10 @@ $exprs = array(
 	'{{lang["ru"]}}' => '{"data":{"text":"Some Russian conent"}}',
 	'{{lang[{{_SESS[lang]}}].data.text}}' => 'Some Russian conent',
 	'{{%_table}}'=>'table',
-	'{{NOT_EXISTENT_VAR}}'=>'{{NOT_EXISTENT_VAR}}'
+	'{{NOT_EXISTENT_VAR}}'=>'{{NOT_EXISTENT_VAR}}',
+	'{{var42->id(@)*2}}'=>'84',
+	'{{ {{_ENV->count()}} * 2 }}' => '4',
+	'{{_ENV->count() * 2 }}' => '4',
 );
 
 $processor = new WEProcessor($context);
