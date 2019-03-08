@@ -20,7 +20,7 @@
 		<p data-id="{{id}}" data-uid="{{uid}}"><span><i class="fa fa-user"></i> {{nick}}</span>
 		<small class="pull-right">
 			<i class="fa fa-clock-o"></i>
-			{{date('d.m.y H:i',strtotime("{{_created}}"))}}
+			{{date('d.m.y H:i',strtotime({{_created}}))}}
 		</small>
 		<br>{{msg}}</p>
 	</script>
