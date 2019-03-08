@@ -70,6 +70,10 @@ $context["%lang"]["ru"]["name"]='Russian';
 $context["lang"]["ru"]["data"]["text"]='Some Russian conent';
 $context["%_table"] = "table";
 
+$context["data"]["lang"]["ru"]["name"]="Russian";
+
+//{{data[lang1][{{_SESS[lang1]}}][name]}}
+
 $_ENV = array("1" => 111111);
 $_ENV["variables"]["prop"] = "prop";
 
@@ -133,7 +137,7 @@ $exprs = array(
 	'{{var42->id(@)*2}}'=>'84',
 	'{{ {{_ENV->count()}} * 2 }}' => '4',
 	'{{_ENV->count() * 2 }}' => '4',
-	'{{data[lang][{{_SESS[lang]}}][name]}}' => '{{data[lang][{{_SESS[lang]}}][name]}}',
+	'{{data[lang][{{_SESS[lang]}}][not_exists]}}' => '{{data[lang][{{_SESS[lang]}}][not_exists]}}',
 );
 
 $processor = new WEProcessor($context);

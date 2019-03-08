@@ -26,6 +26,8 @@ class WEProcessor {
 	}
 
 	public function add($a1, $a2) {
+		if ($this->failedEval) return null;
+
 		if ($this->debug) print("##add('". json_encode($a1) ."', '". json_encode($a2) ."') -> ");
 		if (is_string($a1)) $res = $a1 . $a2;
 		else $res =  $a1 + $a2;
@@ -35,11 +37,15 @@ class WEProcessor {
 	}
 
 	public function setLet($v) {
+		if ($this->failedEval) return null;
+
 		if ($this->debug) print("##setLet('" . json_encode($v) . "')\n");
 		$this->let = $v;
 	}
 
 	public function getLet() {
+		if ($this->failedEval) return null;
+
 		if ($this->debug) print("##getLet()='" . json_encode($this->let) . "'\n");
 		if (isset($this->let)) {
 			$let = $this->let;
@@ -51,11 +57,15 @@ class WEProcessor {
 	}
 
 	public function set_variable($v, $e) {
+		if ($this->failedEval) return null;
+
 		if ($this->debug) print("##set_variable($v, $e)\n");
 		$this->context[$v] = $e;
 	}
 
 	public function get_variable($v) {
+		if ($this->failedEval) return null;
+
 		if ($this->debug) print("##get_variable(\n  '".json_encode($v)."'\n) ->\n  ");
 		if (is_array($v)) {
 			$res = $v;
@@ -93,8 +103,7 @@ class WEProcessor {
 				case '_FORM': 		$res = $_ENV["route"]["form"]; break;
 				case '_ITEM': 		$res = $_ENV["route"]["item"]; break;
 				default: {
-					if ($this->debug) print(" UNKNOWN VARIABLE: '".json_encode($v)."'");
-					$this->evalFail();
+					$this->evalFail("UNKNOWN VARIABLE: '".json_encode($v)."'");
 					$res = null;
 					break;
 				}
@@ -106,6 +115,8 @@ class WEProcessor {
 	}
 
 	public function call_fn($name, $args) {
+		if ($this->failedEval) return null;
+
 		if ($this->debug) print("##call_fn($name, '".json_encode($args)."') -> ");
 		$res = null;
 
@@ -128,8 +139,8 @@ class WEProcessor {
 							} elseif ($requiredParams == 0) {
 								$res = call_user_func($name);
 							} else {
-								$this->evalFail();
-								$res = "[can't call '$name': requires '$requiredParams' arguments and @ is not set]";
+								$this->evalFail("fn '$name': requires '$requiredParams' arguments and @ is not set");
+								$res = null;
 							}
 						} else {
 							$res = call_user_func_array($name, array_values($args));
@@ -138,8 +149,7 @@ class WEProcessor {
 						$res = call_user_func($name, $args);
 					}
 				} catch (ReflectionException $e) {
-					if ($this->debug) print($e->getMessage());
-					$this->evalFail();
+					$this->evalFail($e->getMessage());
 					$res = null;
 				}
 				break;
@@ -151,26 +161,31 @@ class WEProcessor {
 	}
 
 	public function call_index($name, $args) {
+		if ($this->failedEval) return null;
+
 		if ($this->debug) print("##call_index(\n  '".json_encode($name)."',\n  '".json_encode($args)."'\n) ->\n  ");
 		$var = $this->get_variable($name);
+		if ($this->failedEval) return null;
+
 		if (is_null($args) || is_null($var)) {
-			$this->evalFail();
+			$this->evalFail("args: '". json_encode($args) ."', var: '".json_encode($var)."'");
 			$var = null;
 		} else if (is_array($args)) {
 			foreach ($args as $idx) {
 				if (is_array($var) && isset($var[$idx])) {
 					$var = $var[$idx];
 				} else {
-					$this->evalFail();
+					$this->evalFail("var: '". json_encode($var) ."', idx: '".json_encode($idx)."'");
 					$var = null;
 					break;
 				}
 			}
 		} else {
-			if (is_array($var) && isset($var[$args])) {
-				$var = $var[$args];
+			$idx = $args;
+			if (is_array($var) && isset($var[$idx])) {
+				$var = $var[$idx];
 			} else {
-				$this->evalFail();
+				$this->evalFail("var: '". json_encode($var) ."', idx: '".json_encode($idx)."'");
 				$var = null;
 			}
 		}
@@ -179,6 +194,8 @@ class WEProcessor {
 	}
 
 	public function call_field($obj, $args) {
+		if ($this->failedEval) return null;
+
 		if ($this->debug) print("##call_field('".json_encode($obj)."', '".json_encode($args)."')\n");
 		if (is_object($obj)) {
 			if ($this->debug) print("OBJECT '". json_encode($obj) ."'\n");
@@ -208,8 +225,8 @@ class WEProcessor {
 			}
 			return $obj;
 		} else {
-			$this->evalFail();
-			return "call_field: Left must be Array or Object, got '". json_encode($obj) ."' with args='" . json_encode($args) . "'";
+			$this->evalFail("Left must be Array or Object, got '". json_encode($obj) ."' with args='" . json_encode($args) . "'");
+			return null;
 		}
 	}
 
@@ -287,9 +304,9 @@ class WEProcessor {
 		return $substituted;
 	}
 
-	private function evalFail() {
-		if ($this->debug) {
-			print "evalFail()\n";
+	private function evalFail($message = "") {
+		if ($this->debug && !$this->failedEval) {
+			print "\n###evalFail(\n  '$$message'\n)\n";
 			debug_print_backtrace();
 		}
 		$this->failedEval = true;
@@ -297,6 +314,7 @@ class WEProcessor {
 	private function evalReset() {
 		$this->failedEval = false;
 	}
+
 }
 
 ?>
