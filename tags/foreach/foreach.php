@@ -292,7 +292,8 @@ class tagForeach extends kiNode  {
             }
         }
         unset($val,$ndx,$t_step,$string,$text,$func,$inner,$tmptpl);
-        gc_collect_cycles();
+        // it reduce performance twice
+        // gc_collect_cycles();
     }
 }
 

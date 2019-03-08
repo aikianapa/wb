@@ -1388,7 +1388,8 @@ abstract class kiNode
                 $exit=true;
             }
         }
-        gc_collect_cycles();
+        // it reduce performance twice
+        // gc_collect_cycles();
         return $this;
     }
 
