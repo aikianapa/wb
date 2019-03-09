@@ -17,7 +17,7 @@ function engine__controller_login()
 {
     //$user=array("id"=>"admin","password"=>md5("admin"),"role"=>"admin","point"=>"/admin/","active"=>"on");
     //wbItemSave("users",$user);
-    if (is_callable(wbUserLogin)) {
+    if (is_callable("wbUserLogin")) {
 	return wbUserLogin();
     } else {
 	if (isset($_POST["l"]) AND $_POST["l"]>"") {

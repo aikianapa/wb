@@ -638,6 +638,7 @@ function wbFieldBuild($param, $data = array(),$locale=array())
         $param=wbItemToArray($param);
         $field=$param["name"];
         $flds = wbFromString('');
+        if (isset($param["prop"]["multiflds"])) {
 	$arr=$param["prop"]["multiflds"];
         foreach ($arr as $i => $multi) {
 		if (!isset($multi["style"])) $multi["style"]="";
@@ -656,6 +657,7 @@ function wbFieldBuild($param, $data = array(),$locale=array())
 		$line->find(".wb-attrs")->removeClass("wb-attrs");
 		$flds->append($line);
         }
+	}
         $tpl->find('[data-wb-role=multiinput]')->html($flds);
 	$tpl->wbSetData($data);
         unset($flds);
