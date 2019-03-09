@@ -2119,7 +2119,7 @@ abstract class kiNode
                         $fld=str_replace(array("{{","}}"),array("",""),$atval);
                         if (isset($Item[$fld]) AND $this->is(":input")) {
                             $atval=$Item[$fld];
-                            if (is_array($atval)) {
+                            if (array($atval) === $atval) {
                                 $atval=wbJsonEncode($atval);
                             }
                         } else {
@@ -2127,12 +2127,11 @@ abstract class kiNode
                         }
                         $this->attr($atname,$atval);
                     };
-                    if ($atval>"" && substr($atval,0,1)=="%") {
+                    if (!(array)$atval === $atval AND $atval>"" AND substr($atval,0,1)=="%") {
                         $ev=substr($atval,1);
                         eval('$tmp = '.$ev.';');
                         $this->attr($atname,$tmp);
                     }
-                    unset($atname,$atval,$at);
                 }
             };
             unset($attributes);

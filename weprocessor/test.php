@@ -18,7 +18,8 @@ $_SETT["template"]="template.php";
 $_SETT["variables"]["var1"]="Значение 1";
 $_SETT["variables"]["var2"]="Значение 2";
 $_SETT["variables"]["var3"][0]="Значение 3-0";
-$_SETT["variables"]["var3"][1]="Значение 3-1";
+
+
 $_SESSION["settings"]=$_SETT;
 
 // Переменная $_GET //
@@ -45,11 +46,14 @@ $_COOKIE["field"]["sub3"]="Кука33";
 $context = array(
 	"var42" => 42,
 	"text" => 'text1',
+	"_ndx" => 1,
 	"obj" => (object)array("f1" => "f1val", "o1" => (object)array("f2"=>"f2val")),
 	"array" =>	array(1,2,
 					array(3,4,5,
 						array(6,7,8)))
 );
+
+$context["%visits"][1] = "_NDX";
 
 $context["field"]["sub"][0]["sub1"]["sub2"]["value"]="test";
 $context["field3"]["sub"]="test";
@@ -91,6 +95,7 @@ $exprs = array(
 	'{{ array.2.3.1 }}' => '7',
 	'{{ array.2.3.1 }}' => '7',
 	'{{ obj.f1 }}' => 'f1val',
+	'{{%visits[{{_ndx}}]}}' => '_NDX',
 	'{{ obj.o1.f2 }}' => 'f2val',
 	'{{ myfunc("1", "2", "3", "4", "5") }}' => 'myfunc(1, 2, 3, 4, 5)',
 	'{{ myfunc(1+2) }}' => 'myfunc(3)',

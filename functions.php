@@ -390,20 +390,49 @@ function wbGetUserUiConfig($prop=null) {
     return $prop;
 }
 
+function wbProfData(&$xhprof_data) {
+	$tmp=$xhprof_data;
+	$last=array_pop($tmp);
+	$sec=$last["wt"];
+	foreach($xhprof_data as $key=> &$item) {
+		$item["func"]=explode("==>",$key);
+		$item["func"]=$item["func"][1];
+	}
+	$xhprof_data = wbArraySort($xhprof_data,"wt:d");
+	$tpl=wbFromString('
+	<script data-wb-src="jquery"></script>
+	<script data-wb-src="bootstrap3"></script>
+	<table class="table table-striped">
+	<thead><tr>
+	<th>Name</th><th>Calls</th><th>Time</th><th>MemUse</th><th>PeakMemUse</th><th>CPU</th>
+	</tr></thead>
+	<tbody data-wb-role="foreach" data-wb-from="data">
+	<tr>
+	<td class="text-right">{{func}}</td>
+	<td class="text-center">{{ct}}</td>
+	<td class="text-right">{{wt->round(@ / 1000000,4)}}</td>
+	<td class="text-right">{{mu->number_format()}}</td>
+	<td class="text-right">{{pmu->number_format()}}</td>
+	<td class="text-center">{{cpu}}</td>
+	</tr>
+	</tbody>
+	</table>');
+	$tpl->wbSetData(array("data"=>$xhprof_data));
+	return $tpl->outerHtml();
+}
 
-function wbItemToArray($Item = array())
+function wbItemToArray(&$Item = array())
 {
-    if (is_array($Item)) {
+    if ((array)$Item === $Item) {
         $tmpItem=array();
         foreach ($Item as $i => $item) {
-            if (is_string($item) AND ( substr($item,0,1)=="{" OR substr($item,0,1)=="[") )  {
-                $tmp = json_decode($item, true);
-                if (is_array($tmp)) {
-                    $item = wbItemToArray($tmp);
-                    unset($tmp);
+            if ((string)$item === $item) {
+                $fc = $item[0];
+                if ( $fc == "{" OR $fc == "[" ) {
+                    $tmp = json_decode($item, true);
+                    if ((array)$tmp === $tmp) $item = wbItemToArray($tmp);
                 }
             }
-            $item = wbItemToArray($item);
             if (is_array($item) AND isset($item['id'])) {
                 $tmpItem[$item['id']] = $item;
             } else {
@@ -412,13 +441,11 @@ function wbItemToArray($Item = array())
         }
         $Item=$tmpItem;
         unset($tmpItem);
-    } else if (is_string($item) AND substr($Item,0,1)=="{" OR substr($Item,0,1)=="[") {
+    } else if ($Item[0]=="{" OR $Item[0]=="[") {
         $tmp = json_decode($Item, true);
-        if (is_array($tmp)) {
+        if ((array)$tmp === $tmp) {
             $Item = wbItemToArray($tmp);
-            unset($tmp);
         }
-
     }
 
     return $Item;
@@ -924,6 +951,7 @@ function wbTreeRead($name)
 
 function wbTreeToArray($tree) {
     $assoc=array();
+    if (!is_array($tree)) return $assoc;
     foreach($tree as $i => $item) {
         if (isset($item["children"])  AND is_array($item["children"]) AND count($item["children"]) ) {
             $item["children"]=wbTreeToArray($item["children"]);
@@ -947,7 +975,7 @@ function wbTreeToArray($tree) {
 
 function wbTreeFindBranchById($Item, $id)
 {
-    $Item=wbItemToArray($Item);
+    //$Item=wbItemToArray($Item);
     $res = false;
     if (is_array($Item)) {
         foreach ($Item as $item) {
@@ -968,7 +996,7 @@ function wbTreeFindBranchById($Item, $id)
 
 function wbTreeFindBranch($tree, $branch = '', $parent = 'true', $childrens = 'true')
 {
-    $tree=wbItemToArray($tree);
+    //$tree=wbItemToArray($tree);
     if ($branch > '') {
         $branch = html_entity_decode($branch);
         $br = explode('->', $branch);
@@ -1385,14 +1413,15 @@ function wb_file_get_contents($file)
 
 function wbTrigger($type, $name, $trigger, $args = null, $data = null)
 {
-	if (!isset($_ENV['error']) OR !is_array($_ENV['error'])) {$_ENV['error']=array();}
-    if (!isset($_ENV['error'][$type])) {
-        $_ENV['error'][$type] = array();
-    }
+
+	$env_error = $_ENV['error'];
+	if (!isset($env_error) OR (array)$env_error !== $env_error) $_ENV['error'] = array();
+	if (!isset($env_error[$type])) $_ENV['error'][$type] = array();
     switch ($type) {
     case 'form':
-        if (is_string($args[0])) {
-            $call = wbTableName($args[0]).$trigger;
+	$arg0 = $args[0];
+        if ((string)$arg0 === $arg0) {
+            $call = wbTableName($arg0).$trigger;
             if (is_callable($call)) {
                 $data = $call($data);
             } else {
@@ -2086,7 +2115,7 @@ function wbWhereItem($item, $where = null)
     if (strpos($where,"}}")) $where = wbSetValuesStr($where, $item);
 
     if (!null == $where) {
-        if ('%' == substr($where, 0, 1)) {
+        if ('%' == $where[0]) {
 		$phpif = substr($where, 1);
         } else {
 		$phpif = wbWherePhp($where, $item);
@@ -2118,11 +2147,11 @@ function wbWherePhp($str = '', $item = array())
 		'OR'	=> 0,
 		'ARRAY'	=> 0,
 		'LIKE'		=>array("func2"=>"wbWhereLike"),
-		'IN_ARRAY'	=>array("func1"=>"in_array"),
-		'IN'		=>array("func1"=>"in_array"),
+		'IN_ARRAY'	=>array("arr"=>"in_array"),
+		'IN'		=>array("arr"=>"in_array"),
 		'NOT_LIKE'	=>array("func2"=>"!wbWhereNotLike"),
-		'NOT_IN_ARRAY'	=>array("func1"=>"!in_array"),
-		'NOT_IN'	=>array("func1"=>"!in_array"),
+		'NOT_IN_ARRAY'	=>array("arr"=>"!in_array"),
+		'NOT_IN'	=>array("arr"=>"!in_array"),
 	);
 	$cond=array('<','>','=','==','>=','<=','!=','!==','#',"(",")","<>",",");
 	$re = '/"(?:[^"\\\\]|\\\\.)*"|\'(?:[^"\\\\]|\\\\.)*\'|\{\{([^(}})]*)\}\}|\w+(?!\")\b|\[(.*?)\]|[=!#<>\,]+|[\(\)]/ium';
@@ -2134,7 +2163,7 @@ function wbWherePhp($str = '', $item = array())
 		$exc=isset($exclude[$sup]);
 		$con=in_array($fld,$cond);
 		if ($flag==1) $flag=2;
-		if (is_array($item[$fld]) OR isset($tmpfld)) {
+		if ((array)$item[$fld] === $item[$fld] OR isset($tmpfld)) {
 			if (isset($arr[$index+1]) AND substr($arr[$index+1][0],0,1) == "[") {
 				if (!isset($tmpfld)) {
 					$tmpfld = str_replace("{$fld}", ' $item["'.$fld.'"]', $fld);
@@ -2146,50 +2175,60 @@ function wbWherePhp($str = '', $item = array())
 		}
 
 		if ($flag!==3) {
-		if ((substr($fld,0,1)!=='"' OR substr($fld,0,1)!=="'") AND !$exc AND !$con) {
-		    if (isset($item[$fld])) {
-			if (is_array($item[$fld])) {
-			    $fld="'".wbJsonEncode($item[$fld])."'";
-			    //$fld='wbJsonEncode($item["'.$fld.'"])';
-			    if ($fld=="null") {
-				$fld=' "[]" ';
-			    } else {
-				$fld=htmlentities($fld);
+				if ((substr($fld,0,1)!=='"' OR substr($fld,0,1)!=="'") AND !$exc AND !$con) {
+			    if (isset($item[$fld])) {
+				if (is_array($item[$fld])) {
+				    $fld="'".wbJsonEncode($item[$fld])."'";
+				    //$fld='wbJsonEncode($item["'.$fld.'"])';
+				    if ($fld=="null") {
+					$fld=' "[]" ';
+				    } else {
+					$fld=htmlentities($fld);
+				    }
+				} else {
+				    $fld = str_replace("{$fld}", ' $item["'.$fld.'"] ', $fld);
+				}
+			    } else if ((substr($fld,0,1)=='"' OR substr($fld,0,1)=="'") OR $fld=="''" OR $fld=='""') {
+				// строки в кавычках
+			    } else if ($fld > "" AND $fld!=="''" AND $fld!=='""'){
+				if (!is_numeric($fld) AND is_string($fld)) {
+					$fld = str_replace("{$fld}", ' $item["'.$fld.'"] ', $fld);
+				}
 			    }
-			} else {
-			    $fld = str_replace("{$fld}", ' $item["'.$fld.'"] ', $fld);
+			} else if ($exc AND $flag==0) {
+				$prev=substr($str,-$len);
+				if (isset($exclude[$sup]) AND isset($exclude[$sup]["func2"])) {
+					$str=substr($str,0,-$len);
+					$str.=$exclude[$sup]["func2"]."(".$prev;
+					$flag = 1;
+					$fld="";
+				} else if (isset($exclude[$sup]) AND isset($exclude[$sup]["arr"])) {
+					$str=substr($str,0,-$len);
+					$str.=$exclude[$sup]["arr"]."(".$prev.", array";
+					$flag = 4;
+					$fld="";
+
+				} else if (isset($exclude[$sup]) AND isset($exclude[$sup]["func1"])) {
+					$fld=$exclude[$sup]["func1"];
+				}
+			} else if ($exc AND $flag==4) {
+				$str.=")";
+				$flag=0;
+			} else if ($con) {
+				$fld = strtr($fld, array(
+					'>' => '>',
+					'<' => ' < ',
+					'>=' => ' >= ',
+					'<=' => ' <= ',
+					'<>' => ' !== ',
+					'!=' => ' !== ',
+					'!==' => ' !== ',
+					'#' => ' !== ',
+					'==' => ' == ',
+					'=' => ' == ',
+				));
+				if ($str=="") $str='""';
 			}
-		    } else if ((substr($fld,0,1)=='"' OR substr($fld,0,1)=="'") OR $fld=="''" OR $fld=='""') {
-			// строки в кавычках
-		    } else if ($fld > "" AND $fld!=="''" AND $fld!=='""'){
-                        if (!is_numeric($fld) AND is_string($fld)) {
-				$fld = str_replace("{$fld}", ' $item["'.$fld.'"] ', $fld);
-			}
-		    }
-		} else if ($exc AND $flag==0) {
-			$prev=substr($str,-$len);
-			if (isset($exclude[$sup]) AND isset($exclude[$sup]["func2"])) {
-				$str=substr($str,0,-$len);
-				$str.=$exclude[$sup]["func2"]."(".$prev;
-				$flag = 1;
-				$fld="";
-			} else if (isset($exclude[$sup]) AND isset($exclude[$sup]["func1"])) {
-				$fld=$exclude[$sup]["func1"];
-			}
-		} else if ($con) {
-			$fld = strtr($fld, array(
-				'>' => '>',
-				'<' => ' < ',
-				'>=' => ' >= ',
-				'<=' => ' <= ',
-				'<>' => ' !== ',
-				'!=' => ' !== ',
-				'!==' => ' !== ',
-				'#' => ' !== ',
-				'==' => ' == ',
-				'=' => ' == ',
-			));
-		}
 		}
 		if ($flag==3 AND (!isset($arr[$index+1]) OR substr($arr[$index+1][0],0,1) !== "[")) {
 			$fld=wbSetQuotes($tmpfld.$fld);
@@ -2205,85 +2244,9 @@ function wbWherePhp($str = '', $item = array())
 			$str.=" ".$fld;
 		}
 	}
-
+	if ($flag==4) {$str.=")";}
     //$str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);
     $_ENV["cache"][__FUNCTION__][$cache]=$str;
-    return $str;
-}
-
-function wbWherePhpOld($str = '', $item = array())
-{
-	if (strpos($str,"}}")) $str = wbSetValuesStr($str, $item);
-    $str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);
-    $str = ' '.trim(strtr($str, array(
-                              '(' => '(',
-                              ')' => ')',
-                              '=' => ' == ',
-                              '>' => '>',
-                              '<' => ' < ',
-                              '>=' => ' >= ',
-                              '<=' => ' <= ',
-                              '<>' => ' !== ',
-                              '!=' => ' !== ',
-                              '!==' => ' !== ',
-                              '#' => ' !== ',
-                              '==' => ' == ',
-                          ))).' ';
-    $exclude = array('AND', 'OR', 'LIKE', 'NOT_LIKE', 'IN_ARRAY');
-
-    $context = '';
-    preg_match_all('/\w+(?!\")\b/iu', $str, $arr); // возникают ошибки если в тексте пробел
-    $flag = true;
-    $ready=array();
-    foreach ($arr[0] as $a => $fld) {
-        if (!in_array(strtoupper($fld), $exclude, true)) {
-            if (isset($item[$fld]) and true == $flag and !in_array($fld,$ready)) {
-                //if ($flag==true) {
-                if (is_array($item[$fld])) {
-                    $res=wbJsonEncode($Item[$fld]);
-                    if ($res=="null") {
-                        $res=' "[]" ';
-                    }
-                    else {
-                        $res=htmlentities($res);
-                    }
-                    $str = str_replace("{$fld}", $res, $str);
-                } else {
-                    $str = str_replace("{$fld}", ' $item["'.$fld.'"] ', $str);
-                }
-                $ready[]=$fld;
-                $flag = false;
-            }
-        } else {
-            $flag = true;
-        }
-    }
-
-    preg_match_all('/in_array\((.*),array\(/', $str, $arr);
-    foreach ($arr[1] as $a => $fld) {
-        $str = str_replace("in_array({$fld},array(", 'in_array ($item["'.$fld.'"],array(', $str);
-    }
-
-    if (strpos(strtolower($str), ' like ')) {
-        preg_match_all('/\S*\slike\s\S*/iu', $str, $arr);
-        foreach ($arr[0] as $a => $cls) {
-            $tmp = explode(' like ', $cls);
-            if (2 == count($tmp)) {
-                $str = str_replace($cls, 'wbWhereLike('.$tmp[0].','.$tmp[1].')', $str);
-            }
-        }
-    }
-
-    if (strpos(strtolower($str), ' not_like ')) {
-        preg_match_all('/\S*\snot_like\s\S*/iu', $str, $arr);
-        foreach ($arr[0] as $a => $cls) {
-            $tmp = explode(' not_like ', $cls);
-            if (2 == count($tmp)) {
-                $str = str_replace($cls, 'wbWhereNotLike('.$tmp[0].','.$tmp[1].')', $str);
-            }
-        }
-    }
-    $str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);
     return $str;
 }
 
@@ -2576,206 +2539,6 @@ function wbGetWords($str, $w = 100)
 }
 
 include("wb_set_values_str.php");
-
-function _wbSetValuesStr($tag = '', $Item = array(), $limit = 2, $vars = null)
-{
-    if (is_object($tag)) {
-        $tag = $tag->outerHtml();
-    }
-    if (!is_array($Item)) {
-        $Item = array($Item);
-    }
-    // Обработка для доступа к полям с JSON имеющим id в содержании, в частности к tree
-    $arr = new ArrayIterator($Item);
-    $Item = array();
-    $flag = false;
-    foreach ($arr as $key => $item) {
-        if (!is_array($item) and ('[' == substr(trim($item), 0, 1) or '{' == substr(trim($item), 0, 1))) {
-            $item = json_decode($item, true);
-            if (is_array($item)) {
-                foreach ($item as $k => $a) {
-                    if (isset($a['id']) and $a['id'] > '' and $key !== $a['id']) {
-                        $flag = true;
-                        $Item[$key][$a['id']] = $a;
-                    }
-                }
-            }
-        } else {
-            $Item[$key] = $item;
-        }
-    }
-
-    // =========== Конец обработки ===============
-    if (is_string($tag)) {
-        //$tag=strtr($tag,array("%7B%7B"=>"{{","%7D%7D"=>"}}"));
-        $tag = str_replace(array('%7B%7B', '%7D%7D'), array('{{', '}}'), $tag);
-        if (false !== strpos($tag, '}}')) {
-            // функция подставляющая значения
-            $tag = wbChangeQuot($tag);			// заменяем &quot на "
-            $spec = array('_form', '_mode', '_item', '_id');
-            $exit = false;
-            $err = false;
-            $nIter = 0;
-            $_FUNC = '';
-            if ($vars==null) {
-                $mask = '`(\{\{){1,1}(%*[\w\d]+|_form|_mode|_item|((_SETT|_SETTINGS|_SESS|_SESSION|_VAR|_SRV|_COOK|_COOKIE|_FUNC|_LANG|_ENV|_REQ|_GET|_POST|%*[\w\d]+)?([\[]{1,1}(%*[\w\d]+|"%*[\w\d]+")[\]]{1,1})*))(\}\}){1,1}`u';
-            } else {
-                $mask = '`(\{\{){1,1}(%*[\w\d]+|(('.$vars.'|%*[\w\d]+)?([\[]{1,1}(%*[\w\d]+|"%*[\w\d]+")[\]]{1,1})*))(\}\}){1,1}`u';
-            }
-            while (!$exit) {
-                $nUndef = 0;
-                $nSub = preg_match_all($mask, $tag, $res, PREG_OFFSET_CAPTURE);				// найти все вставки, не содержащие в себе других вставок
-                if (false !== $nSub) {
-                    if (0 == $nSub) {
-                        $exit = true;
-                    } else {
-                        $text = '';
-                        $startIn = 0;		// начальная позиция текста за предыдущей заменой
-                        for ($i = 0; $i < $nSub; ++$i) {		// замена в исходном тексте найденных подстановок
-                            $In = $res[2][$i][0];						// текст вставки без скобок {{ и }}
-                            $beforSize = $res[2][$i][1] - 2 - $startIn;
-                            $text .= substr($tag, $startIn, $beforSize);		// исходный текст между предыдущей и текущей вставками
-                            $default = false;
-                            $special = 0;
-                            switch (strtoupper($res[4][$i][0])) {					// префикс вставки
-                            case '_SETT':
-                                $sub = '$_ENV["settings"]';
-                                break;
-                            case '_SETTINGS':
-                                $sub = '$_ENV["settings"]';
-                                break;
-                            case '_LANG':
-                                if (isset($_SESSION["lang"])) {
-                                    $lang=$_SESSION["lang"];
-                                } else if (isset($_ENV["lang"])) {
-                                    $lang=$_ENV["lang"];
-                                }
-                                if (!isset($lang)) {
-                                    $lang="eng";
-                                }
-                                if ($vars!==null AND is_array($Item) AND isset($Item["_global"]) AND $Item["_global"]==false ) {
-                                    $sub = '$Item[$lang]';
-                                } else {
-                                    $sub = '$_ENV["locale"][$lang]';
-                                }
-                                break;
-                            case '_VAR':
-                                $sub = '$_ENV["variables"]';
-                                break;
-                            case '_SESS':
-                                $sub = '$_SESSION';
-                                break;
-                            case '_SESSION':
-                                $sub = '$_SESSION';
-                                break;
-                            case '_COOK':
-                                $sub = '$_COOKIE';
-                                break;
-                            case '_COOKIE':
-                                $sub = '$_COOKIE';
-                                break;
-                            case '_REQ':
-                                $sub = '$_REQUEST';
-                                break;
-                            case '_GET':
-                                $sub = '$_GET';
-                                break;
-                            case '_ENV':
-                                $sub = '$_ENV';
-                                break;
-                            case '_FUNC':
-                                // нужно придумать вызов функций
-                                break;
-                            case '_SRV':
-                                $sub = '$_SERVER';
-                                break;
-                            case '_POST':
-                                $sub = '$_POST';
-                                break;
-                            case '':
-                                if (in_array($In, $spec, true)) {
-                                    $sub = '$_GET';
-                                    $In = substr($In, 1, strlen($In) - 1);		// убираем символ _ в начале
-                                    if (!isset($_GET['item']) and ('item' == $In)) {
-                                        $In = 'id';
-                                    }
-                                    if (!isset($_GET['id']) and ('id' == $In)) {
-                                        $In = 'item';
-                                    }
-                                } else {
-                                    $sub = '$Item';
-                                }
-                                break;
-                            default:									// 1ый индекс без скобок [] - префикса нет
-                                $sub = '$Item';
-                                $default = true;
-                                $n = strlen($res[4][$i][0]);
-                                $In = '['.substr($In, 0, $n).']'.substr($In, $n, strlen($In) - $n);
-                                break;
-                            }
-                            if ($default) {
-                                $pos = 0;
-                            } else {
-                                $pos = strlen($res[4][$i][0]);
-                            }
-                            $sub .= wbSetQuotes(substr($In, $pos, strlen($In) - $pos));		// индексная часть текущей вставки с добавленными кавычками у текстовых индексов
-                            if (eval('return isset('.$sub.');') AND !eval('return is_array('.$sub.');')) {
-                                $Item=wbsvRestoreValue($Item,$sub);
-                            }
-                            if (eval('return isset('.$sub.');')) {
-                                if (eval('return is_array('.$sub.');')) {
-                                    $text .= eval('return json_encode('.$sub.');');
-                                } else {
-                                    $temp = '';
-                                    eval('$temp .= '.$sub.';');
-                                    $temp = strtr($temp, array('{{' => '#~#~', '}}' => '~#~#'));
-                                    $text .= $temp;
-                                }
-                            } else {
-                                $Item = wbsvRestoreValue($Item,$sub);
-                                $tmp=explode("[",$res[2][$i][0]);
-                                $tmp=$tmp[0];
-
-                                $skip=array("_GET","_POST","_COOK","_COOKIE","_SESS","_SESSION","_SETT","_SETTINGS","_LANG");
-                                if (in_array($tmp,$skip)) {
-                                    $text.="";
-                                } else {
-                                    if ($vars !== null) $text .= '{{' . $res[2][$i][0] . '}}';
-                                }
-
-
-                                ++$nUndef;
-                            }
-                            $startIn += $beforSize + strlen($res[2][$i][0]) + 4;
-                            if ($i + 1 == $nSub) {		// это была последняя вставка
-                                $text .= substr($tag, $startIn, strlen($tag) - $startIn);
-                            }
-                        }
-                        $tag = $text;
-                    }
-                }
-                ++$nIter;
-                if ($limit > 0 and $nIter == $limit) {
-                    $exit = true;
-                }
-                if ($nUndef == $nSub) {
-                    $exit = true;
-                }
-            }
-            if (isset($_GET['mode']) && 'edit' == $_GET['mode']) {
-                $tag = wbFromString($tag);
-                foreach ($tag->find('pre') as $pre) {
-                    $pre->html(htmlspecialchars($pre->html()));
-                }
-                unset($pre);
-                $tag = $tag->htmlOuter();
-            }
-        }
-        $tag = strtr($tag, array('#~#~' => '{{', '~#~#' => '}}'));
-
-        return $tag;
-    }
-}
 
 function wbsvSetValue($Item,$sub) {
     $text="";

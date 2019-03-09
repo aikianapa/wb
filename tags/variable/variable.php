@@ -38,15 +38,11 @@ class tagVariable extends kiNode  {
 
 			if (isset($_ENV["variables"][$var])) {
 				$tmp=substr($_ENV["variables"][$var],0,1);
-				if ($tmp=="{" OR $tmp=="]" AND is_array(json_decode($_ENV["variables"][$var],true))) {
-					$array=json_decode($_ENV["variables"][$var],true);
-					if (is_array($array)) {
-						$_ENV["variables"][$var]=$array;
-					}
+				$array=json_decode($_ENV["variables"][$var],true);
+				if ( ($tmp=="{" OR $tmp=="]") AND (array)$array === $array ) {
+					$_ENV["variables"][$var]=$array;
 				}
-				unset($array,$tmp);
 			}
-
 			if (isset($oconv) AND $oconv>"") {
 				$_ENV["variables"][$var]=wbOconv($_ENV["variables"][$var],$oconv);
 			}
