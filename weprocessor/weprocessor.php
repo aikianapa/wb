@@ -84,12 +84,12 @@ class WEProcessor {
 				case '_COOKIE':		$res = $_COOKIE; break;
 				case '_LANG': {
 					if (isset($_SESSION['lang'])) $res = $_SESSION["lang"];
-					elseif (isset($_ENVp['lang'])) $res = $_ENV["lang"];
+					elseif (isset($_ENV['lang'])) $res = $_ENV["lang"];
 					else $res = 'eng';
 					if (is_array($this->context) AND isset($this->context["_global"]) AND $this->context["_global"]==false ) {
-						$this->context = $this->context[$res];
+						$res = $this->context[$res];
 					} else {
-						$this->context = $_ENV["locale"];
+						$res = $_ENV["locale"][$res];
 					}
 					break;
 				}
