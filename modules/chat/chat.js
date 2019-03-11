@@ -7,17 +7,16 @@ Name: Chat Engine
 
 
 $(document).on("chat_start",function() {
+	var vTimer = 2000;
+	var hTimer = 10000;
 
 	var instanse = false;
 	var state = 0;
 	var state_rooms = [];
 	var mes;
-	var room = "common";
 	var name = $("#ChatBox").attr("data-nickname");
 	var uid = $("#ChatBox").attr("data-uid");
-	console.log(uid);
-	var msgt = base64_encode($("#ChatBox #ChatMsgTpl").html());
-
+	var notify ;
 
 	$("#ChatBox #ChatMsgTpl").remove();
 
@@ -27,28 +26,33 @@ $(document).on("chat_start",function() {
 
     // kick off chat
 	var chat =  new Chat();
-	//chat.getState();
-	chat.update();
-	var timer = chat.setTimer(1000);
+	chat.getState();
+	var timer = chat.setTimer(hTimer);
 
 	$('#ChatBox').on('show.bs.modal', function (e) {
 		timer = chat.setTimer(0);
 		var newroom=$(e.relatedTarget).attr("data-room");
 		if (newroom==undefined || newroom=="") newroom="common";
-		if (newroom!==room) {
-			room=newroom;
-			state = 0;
+		if (newroom!==chat.room) {
+			chat.room=newroom;
+			$('#ChatBox').attr("data-room",chat.room);
 			$("#ChatBox #chat-area").html("");
-			chat.update();
-			//chat.getState();
+			chat.showText(chat.texts[chat.room]);
 		}
-		$("[data-toggle=modal][data-target='#ChatBox'][data-room='"+room+"'] .notify").addClass("hidden");
-		timer = chat.setTimer(1000);
+		$("[data-target='#ChatBox'][data-room='"+chat.room+"'] .notify").addClass("hidden");
+		timer = chat.setTimer(vTimer);
+		chat.notifies[chat.room] = "no";
+		chat.toBottom();
 	});
 
 	$('#ChatBox').on('hidden.bs.modal', function (e) {
 		timer = chat.setTimer(0);
-		timer = chat.setTimer(30000);
+		timer = chat.setTimer(hTimer);
+		chat.room = null;
+	});
+
+	$(document).on("wb_ajax_done",function(){
+		chat.notify();
 	});
 
     // watch textarea for key presses
@@ -86,7 +90,6 @@ $(document).on("chat_start",function() {
 		}
             // send
             if (len <= maxLength + 1) {
-
                 chat.send(text, name);
                 $('#ChatBox #sendie').val("");
 
@@ -97,17 +100,59 @@ $(document).on("chat_start",function() {
 
 
 function Chat () {
-    this.update = updateChat;
-    this.send = sendChat;
-    this.getState = getStateOfChat;
-    this.setTimer = setTimer;
-    this.notify = chatNotify;
-    this.playSound = playSound;
-    this.stopSound = stopSound;
+	this.update = updateChat;
+	this.send = sendChat;
+	this.getState = getStateOfChat;
+	this.setTimer = setTimer;
+	this.notify = chatNotify;
+	this.playSound = playSound;
+	this.stopSound = stopSound;
+	this.addText = addText;
+	this.showText = showText;
+	this.toBottom = toBottom;
+	this.room = null; // current room
+	this.lasts = lasts; // функция получает/обновляет список последних id сообщений чатов
+	this.texts = {}; // все сообщения чатов
+	this.rooms = {}; // список последних id сообщений чатов
+	this.notifies = {};
 }
 
+function addText(text,chatRoom) {
+	var last = $("<div>"+text+"</div>").find("p[data-id]:last-child").attr("data-id");
+	if (chat.texts[chatRoom] == undefined) chat.texts[chatRoom] = "";
+	chat.rooms[chatRoom]=last;
+	chat.texts[chatRoom]+=text;
+	if (chat.room == chatRoom) {
+		chat.showText(text);
+		setcookie("#ChatBox_"+chatRoom,last);
+	}
+
+	if (getcookie("#ChatBox_"+chatRoom) !== last) {
+		if (chat.notifies[chatRoom] !== "wait") chat.notifies[chatRoom] = "yes";
+	} else {
+		if (chat.notifies[chatRoom] !== "wait") chat.notifies[chatRoom] = "no";
+	}
+	chat.notify();
+}
+
+function showText(text) {
+	$('#ChatBox #chat-area').append(text);
+	chat.toBottom();
+}
+
+function toBottom() {
+	setTimeout(function(){
+		$('#ChatBox .modal-body').scrollTop(0);
+	setTimeout(function(){
+		$('#ChatBox .modal-body').scrollTop($('#ChatBox #chat-area').height());
+	},100);
+	},100);
+
+}
+
+
 function setTimer(timeout) {
-	if (timeout==undefined) timeout=1000;
+	if (timeout==undefined) timeout=vTimer;
 	if (timeout==0) {
 		console.log("Stop chat timer");
 		clearInterval(timer);
@@ -123,72 +168,83 @@ function getStateOfChat() {
     if(!instanse) {
         instanse = true;
         $.ajax({
-type: "POST",
-url: "/ajax/chat/",
-data: {
-'function': 'getState',
-'room': room
-            },
-dataType: "json",
-
-success: function(data) {
-                state = data.state;
-                instanse = false;
-            },
+		type: "POST",
+		url: "/ajax/chat/",
+		data: {'function': 'getState'},
+		dataType: "json",
+		success: function(data) {
+				data = $.parseJSON(base64_decode(data));
+				state = data.state;
+				var last;
+				$.each(state,function(ro,item){
+					chat.addText(item,ro);
+				});
+			}
         });
     }
+}
+
+function lasts() {
+	var res = {};
+	$.each(chat.rooms,function(ro,item){
+		res[ro]=item;
+	});
+	return res;
 }
 
 //Updates the chat
 function updateChat() {
-    if(!instanse) {
-        instanse = true;
-        $.ajax({
-type: "POST",
-url: "/ajax/chat/",
-data: {
-'function': 'update',
-'state': state,
-'room': room,
-'tpl': msgt
-            },
-dataType: "json",
-success: function(data) {
-                if(data.text) {
-                    for (var i = 0; i < data.text.length; i++) {
-                        $('#ChatBox #chat-area').append($( data.text[i] ));
-                    }
-                    $('#ChatBox .modal-body').scrollTop( $("#ChatBox #chat-wrap").height() );
-                }
-                document.getElementById('chat-area').scrollTop = document.getElementById('chat-area').scrollHeight;
-                instanse = false;
-                state = data.state;
-                chat.notify(data);
-            },
-        });
-    }
-    else {
-        setTimeout(updateChat, 1500);
-    }
+	$.ajax({
+		type: "POST",
+		url: "/ajax/chat/",
+		data: {
+		'function': 'update',
+		'state': chat.lasts(),
+			    },
+		dataType: "json",
+		success: function(data) {
+				$.each(data.state,function(ro,item){
+					if (item.text !== null) {
+						chat.addText(item.text,ro);
+					}
+				});
+			    },
+	});
 }
 
-function chatNotify(data) {
+function chatNotify() {
 	var notify = false;
-	$.each(data.state_rooms,function(r,c){
-		if (state_rooms[r] == undefined) { state_rooms[r] = getcookie("#ChatBox_"+r);}
-		if (state_rooms[r] == undefined || state_rooms[r] == "") {state_rooms[r]=c; setcookie("#ChatBox_"+r,c);}
-		if (state_rooms[r] !== c) {
+	$.each(chat.notifies,function(ro,no){
+		if (no == "yes") {
 			notify = true;
-			state_rooms[r]=c;
-			if (!$("#ChatBox").is(":visible") || r !== room) {
-				$("[data-toggle=modal][data-target='#ChatBox'][data-room='"+r+"'] .notify").removeClass("hidden");
-				$("#ChatBox").trigger("chat-notify",r);
-			} else {
-				setcookie("#ChatBox_"+r,c);
+			$("#ChatBox").trigger("chat-notify",ro);
+			if (chat.room !== ro) {
+				chat.notifies[ro] = "wait";
+				if ($.bootstrapGrowl) {
+				var baloon = $("#ChatBox #ChatBaloon").html();
+				baloon=str_replace("{room}",ro,baloon);
+				$.bootstrapGrowl(baloon, {
+					ele: 'body',
+					type: "warning",
+					offset: {
+					from: 'bottom',
+					amount: 20
+				},
+				align: 'left',
+				width: "auto",
+				delay: 10000,
+				allow_dismiss: true,
+				stackup_spacing: 10
+				});
+				}
+
 			}
 		}
+		if (no !== "no" && chat.room !== ro) {
+			$("[data-target='#ChatBox'][data-room='"+ro+"'] .notify").removeClass("hidden");
+		}
 	});
-	if (notify == true && $("#ChatBox #chat-area p:last").attr("data-uid") !== uid) chat.playSound();
+	if (notify == true) chat.playSound();
 }
 
 function playSound(file) {
@@ -209,20 +265,21 @@ function stopSound() {
 function sendChat(message, nickname)
 {
 	if (message==undefined || message=="") return;
-    updateChat();
+	updateChat();
     $.ajax({
-type: "POST",
-url: "/ajax/chat/",
-data: {
-'function': 'send',
-'message': base64_encode(message),
-'nickname': base64_encode(nickname),
-'room': room
-        },
-dataType: "json",
-success: function(data) {
-            updateChat();
-        },
+	type: "POST",
+	url: "/ajax/chat/",
+	data: {
+	'function': 'send',
+	'message': base64_encode(message),
+	'nickname': base64_encode(nickname),
+	'room': chat.room
+		},
+	dataType: "json",
+	success: function(data) {
+			data = $.parseJSON(base64_decode(data));
+			chat.addText(data.text,chat.room);
+		},
     });
 }
 

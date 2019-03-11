@@ -29,51 +29,64 @@ function ajax__chat()
 {
 	$chat = new wbApp();
 	if (!isset($_SESSION["user_id"]) OR $_SESSION["user_id"]=="") return;
+	$user = $_SESSION["user_id"];
 	$chat->wbTable("chat:c");
 	$chat->wbTable("chatcache:c");
 	if (isset($_POST['function'])) {$function = $_POST['function'];} else {$function="getState";}
 	if (isset($_POST['room'])) {$room = $_POST['room'];} else {$room="common";}
 	$log = array();
 	$where = 'room = "'.$room.'"';
+	$from=date("Y-m-d H:i:s",strtotime("now - 1 month"));
+	$tpl = wbFromFile(__DIR__ . "/chat_ui.php");
+	$tpl = wbFromString($tpl->find("#ChatBox #ChatMsgTpl",0)->html());
     switch($function) {
     	case('getState'):
-		$rooms=$chat->json("chatcache")->groupBy("room")->get();
-		foreach($rooms as $key => $r) {$rooms[$key]=count($r);}
-		$messages=wbItemList("chatcache",$where);
-		$log['state'] = count($messages);
-		if ($log['state']==0) $messages=wbItemList("chat",$where);
-		$log['state'] = $rooms[$room];
-		$log['room'] = $room;
-		$log['state_rooms'] = $rooms;
+		$lasts = 15;
+		$rooms1=$chat->json("chatcache")->get();
+		$rooms2=$chat->json("chat")->get();
+		$messages=array_merge($rooms1,$rooms2);
+		$rooms=$chat->json($messages)
+			->where("_created",">",$from)
+			->groupBy("room")
+			->get();
+		foreach($rooms as $key => $r) {
+			$data=wbArraySort(array_slice($r,-$lasts),"_created:a");
+			$rooms[$key]="";
+			foreach($data as $item) {
+				$t = $tpl->clone();
+				$t->wbSetData($item);
+				$rooms[$key].=$t->outerHtml();
+			}
+		}
+		$log['state'] = $rooms;
+		$log=base64_encode(json_encode($log));
         	break;
     	case('update'):
-		$rooms=$chat->json("chatcache")->groupBy("room")->get();
-		$lines=$rooms[$room];
-		foreach($rooms as $key => $r) {
-			$rooms[$key]=array_pop($r);
-			$rooms[$key]=$rooms[$key]["id"];
-		}
-		$tpl = wbFromString(base64_decode($_POST["tpl"]));
-        	$state = $_POST['state'];
-        	$count = count($lines);
-		$log['state_rooms'] = $rooms;
-        	if($state == $count){
-        		 $log['state'] = $state;
-        		 $log['text'] = false;
-		} else {
-        		$text= array();
-        		$log['state'] = $state + count($lines) - $state;
-        		$line_num=0;
-			foreach ($lines as $key => $line) {
-				if($line_num >= $state){
+		$state = $_POST['state'];
+		$rooms=array_keys($state);
+		$messages=$chat->json("chatcache")->where("room","in",$rooms)->groupBy("room")->get();
+		$log = array("state"=>array());
+		foreach($messages as $room => $msgs) {
+			$last=$chat->json($msgs)->where("id","=",$state[$room])->get();
+			$last=array_pop($last);
+			$news=$chat->json($msgs)
+			->where("_created",'>=',$last["_created"])
+			->where("id",'!==',$last["id"])
+			->get();
+			$last=$news;
+			$last=array_pop($last);
+			$text= "";
+			if (count($news)) {
+				foreach ($news as $key => $line) {
 					$t = $tpl->clone();
 					$t->wbSetData($line);
-					$t = $t->outerHtml();
-					$text[] =  $t;
+					$text .= $t->outerHtml();
 				}
-				$line_num++;
-                        }
-        		$log['text'] = $text;
+				$log["state"][$room]["text"]=$text;
+				$log["state"][$room]["last_id"]=$last["id"];
+			} else {
+				unset($log["state"][$room]);
+			}
 		}
 		break;
 
@@ -87,20 +100,27 @@ function ajax__chat()
 					$message = preg_replace($reg_exUrl, '<a href="'.$url[0].'" target="_blank">'.$url[0].'</a>', $message);
 				}
 			}
-			wbItemSave("chatcache",array(
+			$id = wbItemSave("chatcache",array(
 				"room"		=> $room,
 				"uid"		=> $_SESSION["user_id"],
 				"role"		=> $_SESSION["user_role"],
 				"nick"		=> $nickname,
 				"msg"		=> $message
 			));
+			$line=wbItemRead("chatcache",$id);
+			$t = $tpl->clone();
+			$t->wbSetData($line);
+			$log["text"]=$t->outerHtml();
+			$log=base64_encode(json_encode($log));
 		 }
         	 break;
 
     }
 
     echo json_encode($log);
+}
 
+function chat__arj() {
 
 }
 

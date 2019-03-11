@@ -2,9 +2,12 @@
 	<div class="modal-dialog" role="document">
 	<div class="modal-content">
 		<div class="modal-header">
-			<h6 class="modal-title"><i class="fa fa-user"></i> <span id="nickname"></span></h6>
+			<h6 class="modal-title w-100">
+				<i class="fa fa-user"></i> <span id="nickname"></span>
+				<!--a class="pull-right mr-1"><i class="fa fa-gear"></i></a-->
+			</h6>
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-			<span aria-hidden="true">&times;</span>
+				<span aria-hidden="true">&times;</span>
 			</button>
 		</div>
 		<div class="modal-body">
@@ -24,6 +27,11 @@
 		</small>
 		<br>{{msg}}</p>
 	</script>
+	<div id="ChatBaloon" class="hidden">
+		<a href class="nav-link pd-x-7 pos-relative" data-toggle="modal" data-target="#ChatBox" data-room="{room}">
+		<nobr>{{_LANG[baloon]}}</nobr>
+		</a>
+	</div>
 </div>
 <div data-wb-prepend=".kt-headpanel-right" data-wb-hide="*">
 	<a class="nav-link pd-x-7 pos-relative" data-toggle="modal" data-target="#ChatBox" data-room="common">
@@ -53,9 +61,11 @@ exit            = "Exit"
 chat	        = "Chat"
 send		= "Send"
 type		= "Type your message"
+baloon		= "New message"
 [rus]
 exit            = "Выйти"
 chat 	        = "Чат"
 send		= "Отправить"
 type		= "Напишите ваше сообщение"
+baloon		= "Новое сообщение"
 </script>
