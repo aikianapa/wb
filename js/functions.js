@@ -1615,6 +1615,7 @@ _id:
                     console.log("call: " + name + "_after_formsave");
                     $(document).trigger("wb_after_formsave", [name, item, form, true]);
                     console.log("call: wb_after_formsave");
+                    $(formObj).trigger("wb_form_saved");
                     return data;
                 },
 error: function(data) {
@@ -1661,6 +1662,8 @@ allow_dismiss: true,
                 stackup_spacing: 10
             });
         }
+	$(document).trigger("wb_form_invalid",formObj);
+	return false;
     }
 }
 

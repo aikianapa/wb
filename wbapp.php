@@ -32,8 +32,11 @@ class wbApp {
 
 	public function json($data) {
 		$json = new Jsonq();
-		if (is_string($data)) {$data=wbItemList($data);}
-		if (!is_array($data)) {$data=array($data);}
+		if (is_string($data)) {
+			$data=wbItemList($data);
+		} else if (!is_array($data)) {
+			$data=(array)$data;
+		}
 		return $json->collect($data);
 	}
 

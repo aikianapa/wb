@@ -1327,12 +1327,10 @@ function wbItemSave($table, $item = null, $flush = true)
     $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$item['id']] = $item;
     wbTrigger('form', __FUNCTION__, 'AfterItemSave', func_get_args(), $item);
     $res = true;
-
     if ($flush == true) {
         $res = wbTableFlush($table);
     }
-
-    return $res;
+    return $item["id"];
 }
 
 function wbTableFlush($table)
