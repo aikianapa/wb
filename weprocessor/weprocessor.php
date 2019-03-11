@@ -67,7 +67,7 @@ class WEProcessor {
 		if ($this->failedEval) return null;
 
 		if ($this->debug) print("##get_variable(\n  '".json_encode($v)."'\n) ->\n  ");
-		if (is_array($v)) {
+		if ((array)$v === $v) {
 			$res = $v;
 		} elseif (@isset($this->context[$v])) {
 			$res = $this->context[$v];
@@ -86,8 +86,9 @@ class WEProcessor {
 					if (isset($_SESSION['lang'])) $res = $_SESSION["lang"];
 					elseif (isset($_ENV['lang'])) $res = $_ENV["lang"];
 					else $res = 'eng';
-					if (is_array($this->context) AND isset($this->context["_global"]) AND $this->context["_global"]==false ) {
-						$res = $this->context[$res];
+					$ctx = $this->context;
+					if ((array)$ctx === $ctx AND isset($ctx["_global"]) AND $ctx["_global"]==false ) {
+						$res = $ctx[$res];
 					} else {
 						$res = $_ENV["locale"][$res];
 					}
@@ -129,7 +130,7 @@ class WEProcessor {
 			// если не срабатывает - нужно определить ветку в этом свитче с необходимым преобразованием аргументов
 			default: {
 				try {
-					if (is_array($args)) {
+					if ((array)$args === $args) {
 						if (empty($args)) {
 							// есть специальный случай. если мы вызываем функцию, у которой
 							$requiredParams = count(array_filter((new ReflectionFunction($name))->getParameters(), function($p) { return !$p->isOptional(); }));
@@ -170,9 +171,9 @@ class WEProcessor {
 		if (is_null($args) || is_null($var)) {
 			$this->evalFail("args: '". json_encode($args) ."', var: '".json_encode($var)."'");
 			$var = null;
-		} else if (is_array($args)) {
+		} else if ((array)$args === $args) {
 			foreach ($args as $idx) {
-				if (is_array($var) && isset($var[$idx])) {
+				if ((array)$var === $var && isset($var[$idx])) {
 					$var = $var[$idx];
 				} else {
 					$this->evalFail("var: '". json_encode($var) ."', idx: '".json_encode($idx)."'");
@@ -182,7 +183,7 @@ class WEProcessor {
 			}
 		} else {
 			$idx = $args;
-			if (is_array($var) && isset($var[$idx])) {
+			if ((array)$var === $var && isset($var[$idx])) {
 				$var = $var[$idx];
 			} else {
 				$this->evalFail("var: '". json_encode($var) ."', idx: '".json_encode($idx)."'");
@@ -199,7 +200,7 @@ class WEProcessor {
 		if ($this->debug) print("##call_field('".json_encode($obj)."', '".json_encode($args)."')\n");
 		if (is_object($obj)) {
 			if ($this->debug) print("OBJECT '". json_encode($obj) ."'\n");
-			if (is_array($args)) {
+			if ((array)$args === $args) {
 				foreach ($args as $idx) {
 					if ($this->debug) print("idx: '" . json_encode($idx) . "'\n");
 					$obj = $obj->$idx;
@@ -209,9 +210,9 @@ class WEProcessor {
 				$obj = $obj->$args;
 			}
 			return $obj;
-		} elseif (is_array($obj)) {
+		} elseif ((array)$obj === $obj) {
 			if ($this->debug) print("ARRAY '". json_encode($obj) ."'\n");
-			if (is_array($args)) {
+			if ((array)$args === $args) {
 				foreach ($args as $idx) {
 					if ($this->debug) print("idx: '" . json_encode($idx) . "'\n");
 					$obj = $obj[$idx];
@@ -270,7 +271,7 @@ class WEProcessor {
 			if ($this->failedEval || !isset($res)) {
 				return $expr;
 			} else {
-				if (is_array($res)) return json_encode($res);
+				if ((array)$res === $res) return json_encode($res);
 				else return $res;
 			}
 		} catch (parse_error $e) {
