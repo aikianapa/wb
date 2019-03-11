@@ -1,22 +1,18 @@
-/*
-Created by: Kenrick Beckett
-Modified by: Oleg Frolov
-Name: Chat Engine
-*/
-
-
-
 $(document).on("chat_start",function() {
-	var vTimer = 2000;
-	var hTimer = 10000;
-
-	var instanse = false;
+	var vTimer = 2000; 	if (wbapp.settings.chatmod.timerv !== undefined ) vTimer=wbapp.settings.chatmod.timerv*1000;
+	var hTimer = 10000;	if (wbapp.settings.chatmod.timerh !== undefined ) hTimer=wbapp.settings.chatmod.timerh*1000;
+	var dRoom = "common";	if (wbapp.settings.chatmod.chatname !== undefined ) dRoom=wbapp.settings.chatmod.chatname;
+	var baloons = true;	if (wbapp.settings.chatmod.notify !== undefined && wbapp.settings.chatmod.notify == "") baloons=false;
+	var bColor = "warning"; if (wbapp.settings.chatmod.color !== undefined) bColor=wbapp.settings.chatmod.color;
+	var bDelay = 10000; 	if (wbapp.settings.chatmod.delay !== undefined) bDelay=wbapp.settings.chatmod.delay*1000;
+	var show = false; 	if (wbapp.settings.chatmod.startview !== undefined && wbapp.settings.chatmod.startview == "on") show=true;
 	var state = 0;
 	var state_rooms = [];
 	var mes;
 	var name = $("#ChatBox").attr("data-nickname");
 	var uid = $("#ChatBox").attr("data-uid");
 	var notify ;
+
 
 	$("#ChatBox #ChatMsgTpl").remove();
 
@@ -32,7 +28,7 @@ $(document).on("chat_start",function() {
 	$('#ChatBox').on('show.bs.modal', function (e) {
 		timer = chat.setTimer(0);
 		var newroom=$(e.relatedTarget).attr("data-room");
-		if (newroom==undefined || newroom=="") newroom="common";
+		if (newroom==undefined || newroom=="") newroom=dRoom;
 		if (newroom!==chat.room) {
 			chat.room=newroom;
 			$('#ChatBox').attr("data-room",chat.room);
@@ -152,7 +148,7 @@ function toBottom() {
 
 
 function setTimer(timeout) {
-	if (timeout==undefined) timeout=vTimer;
+	if (timeout==undefined) var timeout=vTimer;
 	if (timeout==0) {
 		console.log("Stop chat timer");
 		clearInterval(timer);
@@ -165,8 +161,6 @@ function setTimer(timeout) {
 
 //gets the state of the chat
 function getStateOfChat() {
-    if(!instanse) {
-        instanse = true;
         $.ajax({
 		type: "POST",
 		url: "/ajax/chat/",
@@ -179,9 +173,9 @@ function getStateOfChat() {
 				$.each(state,function(ro,item){
 					chat.addText(item,ro);
 				});
+				if (show == true) {$('#ChatBox').modal("show");} else {$('#ChatBox').modal("hide");}
 			}
         });
-    }
 }
 
 function lasts() {
@@ -214,6 +208,7 @@ function updateChat() {
 
 function chatNotify() {
 	var notify = false;
+	var i = 0;
 	$.each(chat.notifies,function(ro,no){
 		if (no == "yes") {
 			notify = true;
@@ -221,21 +216,22 @@ function chatNotify() {
 			if (chat.room !== ro) {
 				chat.notifies[ro] = "wait";
 				if ($.bootstrapGrowl) {
-				var baloon = $("#ChatBox #ChatBaloon").html();
-				baloon=str_replace("{room}",ro,baloon);
-				$.bootstrapGrowl(baloon, {
-					ele: 'body',
-					type: "warning",
-					offset: {
-					from: 'bottom',
-					amount: 20
-				},
-				align: 'left',
-				width: "auto",
-				delay: 10000,
-				allow_dismiss: true,
-				stackup_spacing: 10
-				});
+					var baloon = $("#ChatBox #ChatBaloon").html();
+					baloon=str_replace("{room}",ro,baloon);
+					$.bootstrapGrowl(baloon, {
+						ele: 'body',
+						type: bColor,
+						offset: {
+						from: 'bottom',
+						amount: 20
+					},
+					align: 'left',
+					width: "auto",
+					delay: bDelay + i*200,
+					allow_dismiss: true,
+					stackup_spacing: 10
+					});
+					i++;
 				}
 
 			}

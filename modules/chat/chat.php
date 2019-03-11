@@ -21,7 +21,8 @@ function chat__ui() {
 	$js=$out->find('script[src*="chat.js"]');
 	if (is_object($js)) {$js->attr("src",$dir."/chat.js");}
         $Item=array("chats"=>array());
-	$out->wbSetData(array("nickname"=> $_SESSION["user"]["nickname"],"room"=>"common"));
+        $dRoom="common"; if (isset($_ENV["settings"]["chatmod"]["chatname"])) {$lasts=$_ENV["settings"]["chatmod"]["chatname"];}
+	$out->wbSetData(array("nickname"=> $_SESSION["user"]["nickname"],"room"=>$dRoom));
 	return $out;
 }
 
@@ -33,7 +34,8 @@ function ajax__chat()
 	$chat->wbTable("chat:c");
 	$chat->wbTable("chatcache:c");
 	if (isset($_POST['function'])) {$function = $_POST['function'];} else {$function="getState";}
-	if (isset($_POST['room'])) {$room = $_POST['room'];} else {$room="common";}
+	$dRoom="common"; if (isset($_ENV["settings"]["chatmod"]["chatname"])) {$lasts=$_ENV["settings"]["chatmod"]["chatname"];}
+	if (isset($_POST['room'])) {$room = $_POST['room'];} else {$room=$dRoom;}
 	$log = array();
 	$where = 'room = "'.$room.'"';
 	$from=date("Y-m-d H:i:s",strtotime("now - 1 month"));
@@ -41,7 +43,7 @@ function ajax__chat()
 	$tpl = wbFromString($tpl->find("#ChatBox #ChatMsgTpl",0)->html());
     switch($function) {
     	case('getState'):
-		$lasts = 15;
+		$lasts = 15; if (isset($_ENV["settings"]["chatmod"]["last"])) {$lasts=$_ENV["settings"]["chatmod"]["last"];}
 		$rooms1=$chat->json("chatcache")->get();
 		$rooms2=$chat->json("chat")->get();
 		$messages=array_merge($rooms1,$rooms2);
@@ -118,6 +120,14 @@ function ajax__chat()
     }
 
     echo json_encode($log);
+}
+
+function chat__settings() {
+    if (wbRole("admin")) {
+        $form=wbFromFile(__DIR__."/chat_settings.php");
+        $form->wbSetData($_ENV["settings"]);  // проставляем значения
+        return $form->outerHtml();
+    }
 }
 
 function chat__arj() {

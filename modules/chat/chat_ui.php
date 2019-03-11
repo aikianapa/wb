@@ -4,7 +4,9 @@
 		<div class="modal-header">
 			<h6 class="modal-title w-100">
 				<i class="fa fa-user"></i> <span id="nickname"></span>
-				<!--a class="pull-right mr-1"><i class="fa fa-gear"></i></a-->
+				<a data-wb-allow="admin" data-wb-ajax="/module/chat/settings" data-wb-append="body" class="pull-right mr-1" data-wb-href="" aria-expanded="false">
+                                <i class="fa fa-gear"></i>
+                                </a>
 			</h6>
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 				<span aria-hidden="true">&times;</span>
