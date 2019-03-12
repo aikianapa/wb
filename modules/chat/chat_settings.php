@@ -2,7 +2,7 @@
 <span data-wb-html="#{{_ENV[route][name]}}Settings .modal-title">Chat {{_LANG.settings}}</span>
 <button class="btn btn-primary" data-wb-formsave="#ChatBox_settings" data-wb-html="#{{_ENV[route][name]}}Settings .modal-footer">{{_LANG.ready}}</button>
 <div data-wb-html="#{{_ENV[route][name]}}Settings .modal-body">
-	<form method="post" id="ChatBox_settings" data-wb-form="admin" data-wb-item="settings" data-wb-allow="admin">
+	<form method="post" id="ChatBox_settings" data-wb-form="admin" data-wb-item="settings" data-wb-add="false" data-wb-allow="admin">
     <div class="row form-group">
         <label class="col-sm-5 control-label" title="{{_LANG[startview]}}">{{_LANG[startview]}}</label>
         <div class="col-sm-7">
@@ -50,9 +50,10 @@
         <div class="col-sm-7">
 		<select class="form-control" name="chatmod[color]" value="{{chatmod[color]}}" required>
 			<option value="primary">Primary</option>
-			<option value="default">Default</option>
 			<option value="warning">Warning</option>
 			<option value="danger">Danger</option>
+			<option value="info">Info</option>
+			<option value="default">Default</option>
 		</select>
 	</div>
     </div>

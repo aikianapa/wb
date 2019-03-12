@@ -1823,7 +1823,7 @@ function wbNewId($separator = '', $prefix = '')
     } else {
         $id = $id.$separator.$md;
     }
-    $_SESSION['newIdLast'] = $id;
+    $_ENV['newIdLast']=$_SESSION['newIdLast'] = $id;
 
     return $id;
 }

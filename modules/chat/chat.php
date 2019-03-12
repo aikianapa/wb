@@ -102,7 +102,10 @@ function ajax__chat()
 					$message = preg_replace($reg_exUrl, '<a href="'.$url[0].'" target="_blank">'.$url[0].'</a>', $message);
 				}
 			}
+			$id = explode(" ",microtime());
+			$id = dechex($id[1].substr($id[0],2));
 			$id = wbItemSave("chatcache",array(
+				"id"		=> $id,
 				"room"		=> $room,
 				"uid"		=> $_SESSION["user_id"],
 				"role"		=> $_SESSION["user_role"],

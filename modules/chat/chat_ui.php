@@ -30,9 +30,9 @@
 		<br>{{msg}}</p>
 	</script>
 	<div id="ChatBaloon" class="hidden">
-		<a href class="nav-link pd-x-7 pos-relative" data-toggle="modal" data-target="#ChatBox" data-room="{room}">
+		<span data-wb-href class="pd-x-7 pos-relative" data-toggle="modal" data-target="#ChatBox" data-room="{room}">
 		<nobr>{{_LANG[baloon]}}</nobr>
-		</a>
+		</span>
 	</div>
 </div>
 <div data-wb-prepend=".kt-headpanel-right" data-wb-hide="*">

@@ -11,7 +11,6 @@ $(document).on("chat_start",function() {
 	var mes;
 	var name = $("#ChatBox").attr("data-nickname");
 	var uid = $("#ChatBox").attr("data-uid");
-	var notify ;
 
 
 	$("#ChatBox #ChatMsgTpl").remove();
@@ -37,6 +36,8 @@ $(document).on("chat_start",function() {
 		}
 		$("[data-target='#ChatBox'][data-room='"+chat.room+"'] .notify").addClass("hidden");
 		timer = chat.setTimer(vTimer);
+		var last = $("#ChatBox #chat-area").find("p[data-id]:last-child").attr("data-id");
+		setcookie("#ChatBox_"+chat.room,last);
 		chat.notifies[chat.room] = "no";
 		chat.toBottom();
 	});
@@ -113,7 +114,8 @@ function Chat () {
 	this.notifies = {};
 }
 
-function addText(text,chatRoom) {
+function addText(text,chatRoom,flag) {
+	if (flag==undefined) flag=true;
 	var last = $("<div>"+text+"</div>").find("p[data-id]:last-child").attr("data-id");
 	if (chat.texts[chatRoom] == undefined) chat.texts[chatRoom] = "";
 	chat.rooms[chatRoom]=last;
@@ -123,12 +125,12 @@ function addText(text,chatRoom) {
 		setcookie("#ChatBox_"+chatRoom,last);
 	}
 
-	if (getcookie("#ChatBox_"+chatRoom) !== last) {
+	if (last > getcookie("#ChatBox_"+chatRoom)) {
 		if (chat.notifies[chatRoom] !== "wait") chat.notifies[chatRoom] = "yes";
 	} else {
 		if (chat.notifies[chatRoom] !== "wait") chat.notifies[chatRoom] = "no";
 	}
-	chat.notify();
+	if (flag!==false) chat.notify();
 }
 
 function showText(text) {
@@ -171,8 +173,9 @@ function getStateOfChat() {
 				state = data.state;
 				var last;
 				$.each(state,function(ro,item){
-					chat.addText(item,ro);
+					chat.addText(item,ro,false);
 				});
+				chat.update();
 				if (show == true) {$('#ChatBox').modal("show");} else {$('#ChatBox').modal("hide");}
 			}
         });
@@ -202,6 +205,7 @@ function updateChat() {
 						chat.addText(item.text,ro);
 					}
 				});
+				chat.notify();
 			    },
 	});
 }
@@ -275,6 +279,8 @@ function sendChat(message, nickname)
 	success: function(data) {
 			data = $.parseJSON(base64_decode(data));
 			chat.addText(data.text,chat.room);
+			var last = $("<div>"+data.text+"</div>").find("p[data-id]:last-child").attr("data-id");
+			setcookie("#ChatBox_"+chat.room,last);
 		},
     });
 }
