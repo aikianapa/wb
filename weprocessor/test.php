@@ -60,6 +60,8 @@ $context["field3"]["sub"]="test";
 
 $context["multifield"] = array("fld1"=>"test1","fld2"=>"test2");
 $context["var"][0] = "fld2";
+$context[0] = "Zero";
+
 
 $context["fld10_1"] = 3;
 $context["fld10_2"] = 5;
@@ -82,6 +84,7 @@ $_ENV = array("1" => 111111);
 $_ENV["variables"]["prop"] = "prop";
 
 $exprs = array(
+	'{{0}}' => 'Zero',
 	'{{var42}}' => '42',
 	'{{ 42 + 2 * 3 - 6}}' => '42',
 	'{{ unknownFN() }}' => '{{ unknownFN() }}',
@@ -115,8 +118,8 @@ $exprs = array(
 		 => '3. записано как test либо test и должно отобразить значение test',
 	'4. {{field.sub[0][sub1].sub2.value}} - вернёт test' => '4. test - вернёт test',
 	'4. {{field[sub][0].sub1.sub2.value}} - вернёт test' => '4. test - вернёт test',
-	'5. Сессия: {{_SESSION}}'
-		 => '5. Сессия: {"user":{"0":"tester","role":"moder"},"tester":{"phone":{"1":"+7 (918)-999-11-11","2":"+7 (928)-999-22-22","3":"+7 (938)-999-33-33"}},"user_id":"5643266d200c","settings":{"header":"\u0417\u0430\u0433\u043e\u043b\u043e\u0432\u043e\u043a","template":"template.php","variables":{"var1":"\u0417\u043d\u0430\u0447\u0435\u043d\u0438\u0435 1","var2":"\u0417\u043d\u0430\u0447\u0435\u043d\u0438\u0435 2","var3":["\u0417\u043d\u0430\u0447\u0435\u043d\u0438\u0435 3-0","\u0417\u043d\u0430\u0447\u0435\u043d\u0438\u0435 3-1"]}},"lang":"ru"}',
+//	'5. Сессия: {{_SESSION}}'
+//		 => '5. Сессия: {"user":{"0":"tester","role":"moder"},"tester":{"phone":{"1":"+7 (918)-999-11-11","2":"+7 (928)-999-22-22","3":"+7 (938)-999-33-33"}},"user_id":"5643266d200c","settings":{"header":"\u0417\u0430\u0433\u043e\u043b\u043e\u0432\u043e\u043a","template":"template.php","variables":{"var1":"\u0417\u043d\u0430\u0447\u0435\u043d\u0438\u0435 1","var2":"\u0417\u043d\u0430\u0447\u0435\u043d\u0438\u0435 2","var3":["\u0417\u043d\u0430\u0447\u0435\u043d\u0438\u0435 3-0","\u0417\u043d\u0430\u0447\u0435\u043d\u0438\u0435 3-1"]}},"lang":"ru"}',
 	'5. Окружение: {{_ENV.1}}' => '5. Окружение: 111111',
 	'5. Окружение: {{_ENV[1]}}' => '5. Окружение: 111111',
 	'5. {{_VAR["prop"]}}' => '5. prop',

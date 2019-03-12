@@ -51,7 +51,7 @@
 	  <label class="col-sm-2 form-control-label">{{_lang[template]}}</label>
 	   <div class="col-sm-10">
 		   <select class="form-control" name="template" placeholder="{{_lang[template]}}" data-wb-role="foreach" data-wb-from="tpllist">
-				<option value="{{0}}">{{0}}</option>
+				<option value="{{%tpllist[{{_idx}}]}}">{{%tpllist[{{_idx}}]}}</option>
 		   </select>
 		</div>
 	</div>

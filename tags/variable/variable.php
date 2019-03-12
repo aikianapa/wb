@@ -23,9 +23,9 @@ class tagVariable extends kiNode  {
     public function tagVariable_set($Item) {
 	include($_ENV["path_engine"]."/wbattributes.php");
         if ($var>"") {
-			if (isset($value)) {$value=preg_replace("~\{\{(.*)\}\}~","",wbSetValuesStr($value,$Item));}
-			if (isset($else)) {$else=preg_replace("~\{\{(.*)\}\}~","",wbSetValuesStr($else,$Item));}
-			if (isset($if)) {$if=preg_replace("~\{\{(.*)\}\}~","",wbSetValuesStr($if,$Item));}
+			//if (isset($value)) {$value=preg_replace("~\{\{(.*)\}\}~","",wbSetValuesStr($value,$Item));}
+			//if (isset($else)) {$else=preg_replace("~\{\{(.*)\}\}~","",wbSetValuesStr($else,$Item));}
+			//if (isset($if)) {$if=preg_replace("~\{\{(.*)\}\}~","",wbSetValuesStr($if,$Item));}
 
 
 		if (isset($_ENV["variables"][$var])) {unset($_ENV["variables"][$var]);}
@@ -38,11 +38,12 @@ class tagVariable extends kiNode  {
 
 			if (isset($_ENV["variables"][$var])) {
 				$tmp=substr($_ENV["variables"][$var],0,1);
-				$array=json_decode($_ENV["variables"][$var],true);
-				if ( ($tmp=="{" OR $tmp=="]") AND (array)$array === $array ) {
-					$_ENV["variables"][$var]=$array;
+				if ($tmp=="{" OR $tmp=="]" AND is_array(json_decode($_ENV["variables"][$var],true))) {
+					$array=json_decode($_ENV["variables"][$var],true);
+					if ((array)$array === $array) $_ENV["variables"][$var]=$array;
 				}
 			}
+
 			if (isset($oconv) AND $oconv>"") {
 				$_ENV["variables"][$var]=wbOconv($_ENV["variables"][$var],$oconv);
 			}

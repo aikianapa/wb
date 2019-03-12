@@ -1,0 +1,4 @@
+.chat-box {text-align:right;}
+.chat-box .modal-content {height:100vh;}
+.chat-box .modal-dialog {margin:0; width:320px;}
+.chat-box .chat-wrap {display:block;height:200px; overflow-y:auto;}

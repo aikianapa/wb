@@ -111,7 +111,7 @@ function ajax__gettree() {
     }
     $tree=wbTreeRead($tree);
     $tree=wbTreeFindBranch($tree["tree"],$branch,$parent,$childrens);
-    return base64_encode(json_encode($tree));
+     return base64_encode(json_encode(wbItemToArray($tree)));
 }
 
 function ajax__gettreedict() {
@@ -120,7 +120,7 @@ function ajax__gettreedict() {
     }
     $tree=wbTreeRead($tree);
     $tree=$tree["dict"];
-    return base64_encode(json_encode($tree));
+     return base64_encode(json_encode(wbItemToArray($tree)));
 }
 
 

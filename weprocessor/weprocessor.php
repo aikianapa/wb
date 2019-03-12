@@ -12,7 +12,7 @@ class WEProcessor {
 	protected $termsMap = array(
 		array('EXT_NUM', '/^[0-9]+(\.[0-9]+)?/'),
 		array('EXT_STR', '/^"[^"]*"/'),
-		array('EXT_VAR', '/^%*[A-Za-z_]\w*/'),
+		array('EXT_VAR', '/^%*[A-Za-z0-9_]\w*/'),
 		array('EXT_START', '/^\{\{/'),
 		array('EXT_END', '/^\}\}/'),
 		array('EXT_LET', '/^-\>/')

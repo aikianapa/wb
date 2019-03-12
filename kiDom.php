@@ -1733,7 +1733,6 @@ abstract class kiNode
                     } else {
                         $value=$def;
                     }
-
                     if ($value!=="") {
                         $inp->attr("value",$value);
                     }
@@ -1753,15 +1752,16 @@ abstract class kiNode
                     }
 
                     if ($inp->is("select") AND $inp->attr("value")>"") {
-                        $value=$inp->attr("value");
-                        if (is_array($value)) {
-                            foreach($value as $val) {
-                                $inp->find("option[value=".$val."]")->selected="selected";
-                            }
-                            $value=$value[0];
-                        } else {
-                            $inp->find("option[value=".$value."]")->selected="selected";
-                        }
+                        if ($inp->is("[multiple]")) {
+				$value=json_decode($Item[$name],true);
+				foreach($value as $val) {
+					if ($val>"") $inp->find("option[value=".$val."]")->selected="selected";
+				}
+				$value=$value[0];
+			} else {
+				$value=$inp->attr("value");
+				$inp->find("option[value=".$value."]")->selected="selected";
+			}
                     }
                 };
                 $inp->wbSetMultiValue($Item);
@@ -2119,7 +2119,7 @@ abstract class kiNode
                         $fld=str_replace(array("{{","}}"),array("",""),$atval);
                         if (isset($Item[$fld]) AND $this->is(":input")) {
                             $atval=$Item[$fld];
-                            if (array($atval) === $atval) {
+                            if (is_array($atval)) {
                                 $atval=wbJsonEncode($atval);
                             }
                         } else {
@@ -2127,7 +2127,7 @@ abstract class kiNode
                         }
                         $this->attr($atname,$atval);
                     };
-                    if (!(array)$atval === $atval AND $atval>"" AND substr($atval,0,1)=="%") {
+                    if ($atval>"" && substr($atval,0,1)=="%") {
                         $ev=substr($atval,1);
                         eval('$tmp = '.$ev.';');
                         $this->attr($atname,$tmp);

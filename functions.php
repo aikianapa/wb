@@ -426,14 +426,15 @@ function wbItemToArray(&$Item = array())
     if ((array)$Item === $Item) {
         $tmpItem=array();
         foreach ($Item as $i => $item) {
-            if ((string)$item === $item) {
-                $fc = $item[0];
-                if ( $fc == "{" OR $fc == "[" ) {
-                    $tmp = json_decode($item, true);
-                    if ((array)$tmp === $tmp) $item = wbItemToArray($tmp);
+            if (!(array)$item === $item AND ( $item[0]=="{" OR $item[0]=="[") )  {
+                $tmp = json_decode($item, true);
+                if ((array)$tmp === $tmp) {
+                    $item = wbItemToArray($tmp);
+                    unset($tmp);
                 }
             }
-            if (is_array($item) AND isset($item['id'])) {
+            $item = wbItemToArray($item);
+            if ((array)$item === $item AND isset($item['id'])) {
                 $tmpItem[$item['id']] = $item;
             } else {
                 $tmpItem[$i] = $item;
@@ -441,13 +442,14 @@ function wbItemToArray(&$Item = array())
         }
         $Item=$tmpItem;
         unset($tmpItem);
-    } else if ($Item[0]=="{" OR $Item[0]=="[") {
+    } else if (!(array)$item === $item  AND $Item[0]=="{" OR $Item[0]=="[") {
         $tmp = json_decode($Item, true);
         if ((array)$tmp === $tmp) {
             $Item = wbItemToArray($tmp);
+            unset($tmp);
         }
-    }
 
+    }
     return $Item;
 }
 
@@ -1012,7 +1014,6 @@ function wbTreeFindBranch($tree, $branch = '', $parent = 'true', $childrens = 't
             $tree = $tree[0]['children'];
         }
     }
-
     return $tree;
 }
 
@@ -2135,7 +2136,8 @@ function wbWherePhp($str = '', $item = array())
 {
 	if (strpos($str,"}}")) {
 		$str = wbSetValuesStr($str, $item);
-		$str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);
+		//$str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);
+		$str=preg_replace("~\{\{(.*)\}\}~","",$str);
 	}
 	$cache=md5($str);
 	if (!isset($_ENV["cache"][__FUNCTION__])) $_ENV["cache"][__FUNCTION__]=array();
@@ -2147,8 +2149,8 @@ function wbWherePhp($str = '', $item = array())
 		'OR'	=> 0,
 		'ARRAY'	=> 0,
 		'LIKE'		=>array("func2"=>"wbWhereLike"),
-		'IN_ARRAY'	=>array("arr"=>"in_array"),
-		'IN'		=>array("arr"=>"in_array"),
+		'IN_ARRAY'	=>array("func1"=>"in_array"),
+		'IN'		=>array("func"=>"in_array"),
 		'NOT_LIKE'	=>array("func2"=>"!wbWhereNotLike"),
 		'NOT_IN_ARRAY'	=>array("arr"=>"!in_array"),
 		'NOT_IN'	=>array("arr"=>"!in_array"),
@@ -2197,7 +2199,12 @@ function wbWherePhp($str = '', $item = array())
 			    }
 			} else if ($exc AND $flag==0) {
 				$prev=substr($str,-$len);
-				if (isset($exclude[$sup]) AND isset($exclude[$sup]["func2"])) {
+				if (isset($exclude[$sup]) AND isset($exclude[$sup]["func1"])) {
+					$str=substr($str,0,-$len);
+					if ($str>"") $str.="(";
+					$str.=$exclude[$sup]["func1"];
+					$fld="";
+				} else if (isset($exclude[$sup]) AND isset($exclude[$sup]["func2"])) {
 					$str=substr($str,0,-$len);
 					$str.=$exclude[$sup]["func2"]."(".$prev;
 					$flag = 1;

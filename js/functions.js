@@ -1,13 +1,21 @@
 "use strict"
 var wbapp = new Object();
 $(function() {
-    var loading = setInterval(function() {
-        if ($(document).data("wb_include").length >= 3) {
-            wb_init();
-            clearInterval(loading);
-        }
-    },10);
+	if ($(document).data("wb_include")==undefined) {
+		// загрузка напрямую
+		wb_init();
+	} else {
+		// загрузка из wbengine
+	    var loading = setInterval(function() {
+		if ($(document).data("wb_include").length >= 3) {
+		    wb_init();
+		    clearInterval(loading);
+		}
+	    },10);
+	}
 });
+
+
 
 function wb_init() {
     if ($("link[rel$=less],style[rel$=less]").length) wb_include("/engine/js/less.min.js");
@@ -84,7 +92,6 @@ success: function(data) {
         });
     }
 
-
     wbapp.settings = wb_settings();
     wbapp.sysmsg = wb_getsysmsg();
     wbapp.getlocale = function(type,form) {
@@ -99,13 +106,15 @@ success: function(data) {
     wbapp.merchantModal = function(mode) {
         return wb_merchant_modal(mode);
     }
+    wbapp.getSnippet = function(snippet) {
+        return wb_getsnippet(snippet);
+    }
     wbapp.newId = function(separator, prefix) {
         return wb_newid(separator, prefix);
     }
     wbapp.modal = function(id,selector) {
 	return wb_modal(id,selector);
     }
-
 
     wb_alive();
     wb_delegates();
@@ -196,6 +205,12 @@ function wb_ajaxWait(ajaxObjs, fn) {
 	// wait all done
     }
     fn();
+}
+
+function wb_getsnippet(snippet) {
+	var res;
+        wbapp.postWait("/ajax/getform/snippets/" + snippet,{}, function(data) {res=data;});
+        return res;
 }
 
 function wb_merchant_modal(mode) {
@@ -926,9 +941,10 @@ function wb_base_fix() {
             if (!$(this).is("[data-toggle]")) {
                 var hash = $(this).attr("href");
                 var role = $(this).attr("role");
-                if (hash !== undefined && role == undefined && substr(hash, 0, 1) == "#") {
+                if (hash !== undefined && role == undefined && hash.substr(0, 1) == "#") {
                     var loc = explode("#", window.location.href);
-                    var loc = str_replace(base, "", loc[0]);
+                    var loc = loc[0];
+                    loc.replace(base, "");
                     document.location = loc + hash;
                     e.preventDefault();
                 }
@@ -1684,19 +1700,23 @@ function wb_check_required(form) {
         if ($(this).is(":not([disabled],[type=checkbox]):visible")) {
             if ($(this).val() == "") {
                 res = false;
+                console.log("trigger: wb_required_false");
                 $(document).trigger("wb_required_false", [this]);
             } else {
                 if ($(this).attr("type") == "email" && !wb_check_email($(this).val())) {
                     res = false;
                     $(this).data("error", wbapp.sysmsg.email_correct);
+                    console.log("trigger: wb_required_false");
                     $(document).trigger("wb_required_false", [this]);
                 } else {
+		    console.log("trigger: wb_required_true");
                     $(document).trigger("wb_required_true", [this]);
                 }
             }
         }
         if ($(this).is("[type=checkbox]") && $(this).is(":not(:checked)")) {
             res = false;
+            console.log("trigger: wb_required_false");
             $(document).trigger("wb_required_false", [this]);
         }
         if ($(this).is("[type=password]")) {
@@ -1705,6 +1725,7 @@ function wb_check_required(form) {
                 if ($(this).val() !== $("input[type=password][name=" + pcheck + "]").val()) {
                     res = false;
                     $(this).data("error", wbapp.sysmsg.pass_match);
+                    console.log("trigger: wb_required_false");
                     $(document).trigger("wb_required_false", [this]);
                 }
             }
@@ -1715,14 +1736,17 @@ function wb_check_required(form) {
             if (lenstr < minlen) {
                 res = false;
                 $(this).data("error", wbapp.sysmsg.min_length+": " + minlen);
+                console.log("trigger: wb_required_false");
                 $(document).trigger("wb_required_false", [this]);
             }
         }
     });
     if (res == true) {
+	console.log("trigger: wb_required_success");
         $(document).trigger("wb_required_success", [form]);
     }
     if (res == false) {
+	console.log("trigger: wb_required_danger");
         $(document).trigger("wb_required_danger", [form]);
     }
     return res;
