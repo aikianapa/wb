@@ -1344,28 +1344,14 @@ abstract class kiNode
                         if ($inc->has("[data-wb-json]")) {
                             if (strpos($inc->attr("data-wb-json"),"}}")) $inc->attr("data-wb-json",wbSetValuesStr($inc->attr("data-wb-json"),$Item));
                         }
-                        if ($inc->is("[data-wb-tpl=true]")) {
-                            $inc->addTemplate();
-                        }
-
-                        $func="tag".$tag;
-                        //if ($inc->attr("src")>"" AND strpos($inc->attr("src"),"/")) {
-                        //    echo $inc->attr("src");
-                        //$inc->attr("src",wbNormalizePath($this->attr("src")));
-                        //}
-                        if ($tag>"") {
-                            $inc->$func($Item);
-                        }
-                        //$inc->tagHideAttrs();
-//				} else if (!$tag==FALSE && !$inc->is(".wb-done") AND in_array($tag,array_keys($_ENV['tags']))) {
-//					$inc->wbProcess($Item,$tag);
+                        if ($inc->is("[data-wb-tpl=true]")) $inc->addTemplate();
+                        if ($tag>"") {$func="tag".$tag; $inc->$func($Item);}
                         $inc->tagHideAttrs();
                         $inc->addClass("wb-done");
                     }
 
                 }
             };
-//in_array($tag,array_keys($_ENV['tags']))
             $this->tagInclude_inc($Item);
             $this->wbSetValues($Item);
             $this->wbPlugins($Item);
@@ -1388,8 +1374,6 @@ abstract class kiNode
                 $exit=true;
             }
         }
-        // it reduce performance twice
-        // gc_collect_cycles();
         return $this;
     }
 
@@ -2570,7 +2554,9 @@ abstract class kiNode
             }
             elseif 	($this->hasAttr("role")) 		{
                 $tl=wbAttrToArray($this->attr("role"));
-            }
+            } elseif ($this->hasAttr("data-wb-".$role)) {
+		return true;
+	    }
             if (in_array($role,$tl)) {
                 return true;
             }
