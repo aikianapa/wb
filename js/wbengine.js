@@ -5,18 +5,23 @@ $.fn.outerHTML = function (s) {
 };
 
 function wb_include(url,defer,async) {
-    if ($(document).data("wb_include")==undefined) {
-        $(document).data("wb_include",[]);
-    }
+    if ($(document).data("wb_include")==undefined) $(document).data("wb_include",[]);
+    if ($(document).data("wb_include_loading")==undefined) $(document).data("wb_include_loading",[]);
     var loaded=$(document).data("wb_include");
+    var loading=$(document).data("wb_include_loading");
     var res=false;
-    $(loaded).each(function(i){
-        if (loaded[i]==url) {
-		res=true;
-	}
-    });
+    if (loading.includes(url)) res=true;
     if (res==false) {
+		loading.push(url);
+		$(document).data("wb_include_loading",loading);
                 if (url.substr(-3) == ".js" || url.indexOf("js?")>0) {
+			$.getScript(url,function(data, textStatus, jqxhr){
+				loaded.push(url);
+				$(document).data("wb_include",loaded);
+				$(document).trigger("wb_include",{url:url});
+				console.log(url);
+			});
+/*
                         new Promise(function (resolve, reject) {
                                 var s;
                                 s = document.createElement('script');
@@ -25,6 +30,7 @@ function wb_include(url,defer,async) {
                                 s.onerror = reject;
                                 document.head.appendChild(s);
                         });
+                        */
                 } else {
                         if (url.substr(-4) == ".css" || url.indexOf(".css?")>0) {
                                     var inc = document.createElement('link');
@@ -38,12 +44,10 @@ function wb_include(url,defer,async) {
                                     inc.href = url;
                                 }
                                 document.getElementsByTagName('body')[0].appendChild(inc);
+                                loaded.push(url);
+                                $(document).data("wb_include",loaded);
+                                $(document).trigger("wb_include",{url:url});
                         }
-            loaded.push(url);
-            setTimeout(function(){
-		$(document).trigger("wb_include",{url:url});
-	    },500);
-
     }
     return;
 }
