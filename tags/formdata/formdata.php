@@ -37,7 +37,6 @@ class tagFormdata extends kiNode  {
         }
         if (isset($field) AND $field>"") {
             $Item=wbGetDataWbFrom($Item,$field);
-            $Item=wbItemToArray($Item);
         }
         if (isset($vars) AND $vars>"") {
             $Item=wbAttrAddData($vars,$Item);
@@ -45,11 +44,10 @@ class tagFormdata extends kiNode  {
         if (isset($call) AND is_callable($call)) {
             $Item=$call($Item);
         }
-        if (is_array($srcItem)) {
+        if ((array)$srcItem === $srcItem) {
             foreach($srcItem as $k => $v) {
                 $Item["%{$k}"]=$v;
             };
-            unset($v);
         }
         $Item=wbCallFormFunc("BeforeShowItem",$Item,$table,$mode);
         $Item=wbCallFormFunc("BeforeItemShow",$Item,$table,$mode);

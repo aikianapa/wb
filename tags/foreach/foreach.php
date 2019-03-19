@@ -23,8 +23,8 @@ class tagForeach extends kiNode  {
         $cacheId=0;
         $form="";
         $where="";
-
         include($_ENV["path_engine"]."/wbattributes.php");
+
         if ($form>"" AND $table=="") {
             $table=$form;
         }

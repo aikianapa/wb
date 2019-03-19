@@ -138,4 +138,4 @@ function wb_multiinput() {
 $(document).on("wb-delegates",function(){
 	wb_multiinput();
 });
-$(document).trigger("wb-delegates");
+$(document).on("wbapp",function(){$(document).trigger("wb-delegates");});

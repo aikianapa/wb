@@ -1331,7 +1331,7 @@ abstract class kiNode
         $this->wbUserAllow();
         $exit=false;
         while($exit !== true) {
-            $nodes=new IteratorIterator($this->find("*:not(.wb-done)"));
+            $nodes=$this->find("*:not(.wb-done)");
             $this->addClass("wb-done");
             foreach($nodes as $inc) {
                 if (!$inc->parents("[type=text/template]")->length AND !$inc->parents("script")->length) {
@@ -1339,7 +1339,7 @@ abstract class kiNode
                     $inc->wbUserAllow();
                     $inc->wbWhere($Item);
                     $tag=$inc->wbCheckTag();
-                    if (!$tag == FALSE) {
+                    if ($tag) {
                         $inc->wbSetAttributes($Item);
                         if ($inc->has("[data-wb-json]")) {
                             if (strpos($inc->attr("data-wb-json"),"}}")) $inc->attr("data-wb-json",wbSetValuesStr($inc->attr("data-wb-json"),$Item));
@@ -1722,8 +1722,9 @@ abstract class kiNode
                     }
                     else {
                         if (!$inp->hasAttr("value") AND isset($Item[$name])) {
-                            if (is_array($Item[$name])) {
-                                $Item[$name]=wbJsonEncode($Item[$name]);
+				$tmpname=$Item[$name];
+                            if ((array)$tmpname === $tmpname) {
+                                $Item[$name]=wbJsonEncode($tmpname);
                             }
                             $inp->attr("value",$Item[$name]);
                         }
@@ -2094,7 +2095,7 @@ abstract class kiNode
         if (is_object($attributes) AND !$this->hasClass("wb-attrs")) {
             foreach($attributes as $at) {
                 $atname=$at->name;
-                $atval=$this->attr($atname);
+                $atval=html_entity_decode($this->attr($atname));
                 if (strpos($atname,"}}") OR strpos($atname,"%")) {
                     $atname=wbSetValuesStr($atname,$Item);
                 }

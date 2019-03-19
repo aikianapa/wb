@@ -421,19 +421,20 @@ function wbProfData(&$xhprof_data) {
 	return $tpl->outerHtml();
 }
 
-function wbItemToArray(&$Item = array())
+function wbItemToArray(&$Item = array(),$convid = true)
 {
+	if ($Item["_table"]=="admin" && $Item["id"]=="settings") {$convid=false;}
     if ((array)$Item === $Item) {
         $tmpItem=array();
         foreach ($Item as $i => $item) {
             if (!((array)$item === $item) AND ( $item[0]=="{" OR $item[0]=="[") )  {
                 $tmp = json_decode($item, true);
                 if ((array)$tmp === $tmp) {
-                    $item = wbItemToArray($tmp);
+                    $item = wbItemToArray($tmp,$convid);
                 }
             }
-            $item = wbItemToArray($item);
-            if ((array)$item === $item AND isset($item['id'])) {
+            $item = wbItemToArray($item,$convid);
+            if ( $convid == true AND (array)$item === $item AND isset($item['id'])) {
                 $tmpItem[$item['id']] = $item;
             } else {
                 $tmpItem[$i] = $item;
@@ -443,10 +444,9 @@ function wbItemToArray(&$Item = array())
     } else if ( !(array($item) === $item) AND $Item[0]=="{" OR $Item[0]=="[") {
         $tmp = json_decode($Item, true);
         if ((array)$tmp === $tmp) {
-            $Item = wbItemToArray($tmp);
+            $Item = wbItemToArray($tmp,$convid);
             unset($tmp);
         }
-
     }
     return $Item;
 }
