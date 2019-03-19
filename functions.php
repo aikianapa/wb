@@ -426,11 +426,10 @@ function wbItemToArray(&$Item = array())
     if ((array)$Item === $Item) {
         $tmpItem=array();
         foreach ($Item as $i => $item) {
-            if (!(array)$item === $item AND ( $item[0]=="{" OR $item[0]=="[") )  {
+            if (!((array)$item === $item) AND ( $item[0]=="{" OR $item[0]=="[") )  {
                 $tmp = json_decode($item, true);
                 if ((array)$tmp === $tmp) {
                     $item = wbItemToArray($tmp);
-                    unset($tmp);
                 }
             }
             $item = wbItemToArray($item);
@@ -441,8 +440,7 @@ function wbItemToArray(&$Item = array())
             }
         }
         $Item=$tmpItem;
-        unset($tmpItem);
-    } else if (!(array)$item === $item  AND $Item[0]=="{" OR $Item[0]=="[") {
+    } else if ( !(array($item) === $item) AND $Item[0]=="{" OR $Item[0]=="[") {
         $tmp = json_decode($Item, true);
         if ((array)$tmp === $tmp) {
             $Item = wbItemToArray($tmp);
@@ -637,7 +635,6 @@ function wbFieldBuild($param, $data = array(),$locale=array())
     case 'multiinput':
         $tpl->wbSetValues($param);
 	$wrp=wbGetForm('common','multiinput_wrapper');
-        $param=wbItemToArray($param);
         $field=$param["name"];
         $flds = wbFromString('');
         if (isset($param["prop"]["multiflds"])) {
