@@ -1,11 +1,11 @@
 $(document).on("chat_start",function() {
-	var vTimer = 2000; 	if (wbapp.settings.chatmod.timerv !== undefined ) vTimer=wbapp.settings.chatmod.timerv*1000;
-	var hTimer = 10000;	if (wbapp.settings.chatmod.timerh !== undefined ) hTimer=wbapp.settings.chatmod.timerh*1000;
-	var dRoom = "common";	if (wbapp.settings.chatmod.chatname !== undefined ) dRoom=wbapp.settings.chatmod.chatname;
-	var baloons = true;	if (wbapp.settings.chatmod.notify !== undefined && wbapp.settings.chatmod.notify == "") baloons=false;
-	var bColor = "warning"; if (wbapp.settings.chatmod.color !== undefined) bColor=wbapp.settings.chatmod.color;
-	var bDelay = 10000; 	if (wbapp.settings.chatmod.delay !== undefined) bDelay=wbapp.settings.chatmod.delay*1000;
-	var show = false; 	if (wbapp.settings.chatmod.startview !== undefined && wbapp.settings.chatmod.startview == "on") show=true;
+	var vTimer = 2000; 	if (wbapp.settings.chatmod !== undefined && wbapp.settings.chatmod.timerv !== "" ) vTimer=wbapp.settings.chatmod.timerv*1000;
+	var hTimer = 10000;	if (wbapp.settings.chatmod !== undefined && wbapp.settings.chatmod.timerh !== "" ) hTimer=wbapp.settings.chatmod.timerh*1000;
+	var dRoom = "common";	if (wbapp.settings.chatmod !== undefined && wbapp.settings.chatmod.chatname !== "" ) dRoom=wbapp.settings.chatmod.chatname;
+	var baloons = true;	if (wbapp.settings.chatmod !== undefined && wbapp.settings.chatmod.notify == "") baloons=false;
+	var bColor = "warning"; if (wbapp.settings.chatmod !== undefined && wbapp.settings.chatmod.color !== "") bColor=wbapp.settings.chatmod.color;
+	var bDelay = 10000; 	if (wbapp.settings.chatmod !== undefined && wbapp.settings.chatmod.delay !== "") bDelay=wbapp.settings.chatmod.delay*1000;
+	var show = false; 	if (wbapp.settings.chatmod !== undefined && wbapp.settings.chatmod.startview == "on") show=true;
 	var state = 0;
 	var state_rooms = [];
 	var mes;

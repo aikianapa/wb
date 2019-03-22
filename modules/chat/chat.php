@@ -65,6 +65,7 @@ function ajax__chat()
         	break;
     	case('update'):
 		$state = $_POST['state'];
+		if ( (array)$state === $state ) {
 		$rooms=array_keys($state);
 		$messages=$chat->json("chatcache")->where("room","in",$rooms)->groupBy("room")->get();
 		$log = array("state"=>array());
@@ -91,8 +92,8 @@ function ajax__chat()
 			}
 		}
 		break;
-
-    	 case('send'):
+		}
+    	case('send'):
 		  $nickname = htmlentities(strip_tags(base64_decode($_POST['nickname'])));
 		  if ($nickname>"") {
 			$reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";

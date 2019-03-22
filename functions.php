@@ -423,7 +423,7 @@ function wbProfData(&$xhprof_data) {
 
 function wbItemToArray(&$Item = array(),$convid = true)
 {
-	if ($Item["_table"]=="admin" && $Item["id"]=="settings") {$convid=false;}
+	if (isset($Item["_table"]) && $Item["_table"]=="admin" && $Item["id"]=="settings") {$convid=false;}
     if ((array)$Item === $Item) {
         $tmpItem=array();
         foreach ($Item as $i => $item) {
