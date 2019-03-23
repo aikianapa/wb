@@ -4,7 +4,7 @@
         <div class="row" data-wb-role="formdata" data-wb-form="orders" data-wb-item="{{_SESS[order_id]}}">
 			<div class="col-12 col-xs-12 col-sm-6">
 				<input type="hidden" name="receiver" value="{{receiver}}">
-				<input type="hidden" name="short-dest" value="Оплата заказа {{_ENV[host]}} № {{id}}">
+				<input type="hidden" name="short-dest" value="Оплата заказа {{_ENV[route][host]}} № {{id}}">
 				<input type="hidden" name="label" value="{{id}}">
                                 <input type="hidden" name="language" value="{{_SESS[lang]}}">
 				<input type="hidden" name="quickpay-form" value="shop">
