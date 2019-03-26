@@ -1787,7 +1787,8 @@ function wbErrorList()
                           1010 => 'Failed to create table {{0}}',
                           1010 => 'Create a table {{0}}',
                           1011 => 'Template not found {{0}}',
-                          1012 => 'Form not found {{0}}'
+                          1012 => 'Form not found {{0}}',
+                          1013 => 'PHP code not valid'
                       );
 }
 
@@ -2893,12 +2894,6 @@ function wbArrayAttr($attr)
 
 function wbNormalizePath($path)
 {
-/*
-    $patterns = array('~/{2,}~', '~/(\./)+~', '~([^/\.]+/(?R)*\.{2,}/)~', '~\.\./~');
-    $replacements = array('/', '/', '', '');
-
-    return preg_replace($patterns, $replacements, $path);
-*/
 	return realpath($path);
 }
 
@@ -3036,6 +3031,19 @@ function wbBr2nl($str)
 {
     $str = preg_replace('/(rn|n|r)/', '', $str);
     return preg_replace('=<br */?>=i', 'n', $str);
+}
+
+function wbCheckPhpCode($code) {
+	$file=$_ENV["path_app"]."/uploads/".wbNewId().".php";
+	$umask=umask(0);
+	file_put_contents($file,$code);
+	umask($umask);
+	exec("php -l ".$file, $error, $code);
+	wbFileRemove($file);
+	// ошибок нет
+	if ($code == 0) return true;
+	// ошибки есть
+	return false;
 }
 
 ?>

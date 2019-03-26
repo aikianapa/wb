@@ -92,7 +92,46 @@ function filemanager__putfile()
 {
     $res=false;
     if (wbRole("admin") && isset($_POST["file"]) && isset($_POST["text"])) {
-        $res=file_put_contents($_ENV["path_app"].$_POST["file"], $_POST["text"]);
+
+	$file=$_ENV["path_app"].$_POST["file"];
+	$ext = pathinfo($file, PATHINFO_EXTENSION);
+	$code = $_POST["text"];
+	if ($ext == "php" && substr(trim(escapeshellarg($code)),1,2)=="<?") {
+		// если форма перезаписывается из engine в app приводим в порядок имена функций
+		if (substr($file,0,strlen($_ENV["path_engine"]."/forms/")) !== $_ENV["path_engine"]."/forms/") {
+			$mask='`(function\W?[\w\d\-\_]+__[\w\d\-\_]+)|(function\W?_[\w\d\-\_]+)`u';
+			preg_match_all($mask, $code, $res, PREG_OFFSET_CAPTURE);
+			if (isset($res[0])) {
+				foreach($res[0] as $i => $func) {
+					$func=$func[0];
+					$func=array_pop(explode(" ",trim($func)));
+					$newf=str_replace("__","_",$func);
+					if (substr($newf,0,1) == "_") {$newf=substr($newf,1);}
+					$code=str_replace($func,$newf,$code);
+				}
+			}
+		}
+		$res=wbCheckPhpCode($code);
+		if (!$res) {
+			$res=array("result"=>false,"error"=>"invalid");
+			echo json_encode($res);
+			die;
+		}
+	}
+	$path=explode("/",$file);
+	array_pop($path);
+	$path=implode("/",$path);
+	$umask=umask(0);
+	if (!is_dir($path)) {
+		mkdir($path,0777,true);
+	}
+        $res=file_put_contents($file, $code);
+	umask($umask);
+        if ($res) {
+		$res=array("result"=>true,"error"=>"success");
+	} else {
+		$res=array("result"=>false,"error"=>"unknown");
+	}
     }
     echo json_encode($res);
 }
@@ -226,7 +265,7 @@ function filemanager__action_remove($out=null)
                 if (!$engine AND is_file($dst)) {wbFileRemove($dst);}
         }
         echo json_encode(array("res"=>$_POST["method"],"action"=>"reload_list"));
-		die;
+	die;
 }
 
 function filemanager__check_engine($path) {
@@ -266,7 +305,9 @@ function filemanager__action_newdir()
     $newname=$_POST["newname"];
     $path=$dir."/".$newname;
     if (!is_dir($path) and $newname>"") {
-        $res=mkdir($path);
+	$umask=umask(0);
+	$res=mkdir($path,0777,true);
+	umask($umask);
     }
     if (!$res) {
         return $res;

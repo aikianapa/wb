@@ -76,4 +76,4 @@
 		</div>
 </div>
 </div>
-<script type="text/locale" data-wb-role="inlclude" src="pages_edit"></script>
+<script type="text/locale" data-wb-role="include" src="pages_edit"></script>

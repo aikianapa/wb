@@ -1,0 +1,88 @@
+    #modFormBuilder #filemanagerModalSrc .btn-edit-close {
+        position: absolute;
+        right: 0;
+        z-index: 1;
+    }
+
+
+
+    #modFormBuilder .content-left {
+        position:fixed;
+        top:inherit;
+        left:inherit;
+        height: calc( 100vh - 200px );
+        overflow-y:auto;
+    }
+
+	#modFormBuilder #modFormBuilderView .modal {
+		display: block;
+		position:relative;
+		opacity:1;
+		padding:10px!important;
+	}
+	#modFormBuilder #modFormBuilderView .modal-dialog {
+		transform:none;
+		min-width:100%!important;
+		max-width:100%!important;
+		width:100%!important;
+		margin:0;
+		box-shadow: 1px 2px 6px 2px rgba(0, 0, 0, 0.2);
+	}
+
+.modFormBuilderPlaceholder {
+	border: medium dotted red; height: 36px; margin: 4px;
+	width:100%;
+	display:block;
+}
+
+#modFormBuilder #modFormBuilderView [data-wb-role=include]:not(script) {
+	display:block;
+	height:50px;
+	width:100%;
+	border:1px rgba(158, 158, 158, 0.25) dashed;
+}
+
+#modFormBuilder #modFormBuilderView [data-wb-role=include]:before {
+	content: attr(src);
+}
+
+#modFormBuilder #modFormBuilderView .tab-pane[data-wb-role=include]:not(.active) {
+	display:none;
+}
+
+#modFormBuilder #modFormBuilderView [class*='col-'] {
+	border:1px rgba(158, 158, 158, 0.16) dotted;
+}
+
+#modFormBuilder #modFormBuilderView .ui-sortable-handle {
+	margin:3px;
+}
+
+#modFormBuilder #modFormBuilderView .ui-sortable-handle:hover {
+	box-shadow: 0px 0px 2px 1px rgba(0, 150, 136, 0.47);
+	cursor:move!important;
+}
+
+#modFormBuilder #modFormBuilderMenu, #modFormBuilder #modFormBuilderMenu * {
+	overflow-x:hidden;
+}
+
+#modFormBuilder #modFormBuilderMenu .nav-tabs {
+	flex-direction: initial!important;
+}
+#modFormBuilder #modFormBuilderMenu .nav-snip  {
+	height:auto;
+}
+
+#modFormBuilder #modFormBuilderMenu .nav-snip > div {
+	margin:0;
+	zoom: 60%;
+	width:100%;
+}
+
+#modFormBuilderMenu .nav-link.disabled {display:none;}
+
+#modFormBuilder .popover-body {
+	width:300px;
+	min-height:40px;
+}

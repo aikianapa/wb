@@ -48,6 +48,23 @@ function ajax__pagination_vars() {
     // return wbJsonEncode($res);
 }
 
+function ajax__callfunc() {
+	$func=$_ENV["route"]["params"][0];
+	$res = false;
+	if (is_callable($func)) {
+		$i=0;
+		$params=array();
+		foreach($_POST as $key => $val) {
+			$p[$i] = $val;
+			$params[]='$p['.$i.']';
+			$i++;
+		}
+		$params=implode(",",$params);
+		$res = eval('return $func('.$params.');');
+	}
+	return base64_encode(json_encode($res));
+}
+
 function ajax__settings() {
     $sett=$_ENV["settings"];
     $mrch=wbMerchantList();
@@ -184,7 +201,11 @@ function ajax__rmitem($form=null) {
 	}
 }
 
-function ajax__getlocale($type="tpl",$name="default.php") {
+function ajax__getlocale($type=null,$name=null) {
+	if (isset($_POST["type"])) $type=$_POST["type"];
+	if (isset($_POST["name"])) $name=$_POST["name"];
+	if ($type==null) $type="tpl";
+	if ($name==null) $name="default.php";
         if ($type=="tpl") {
                 $out=wbGetTpl($name);
         } else if ($type=="form") {
@@ -195,15 +216,12 @@ function ajax__getlocale($type="tpl",$name="default.php") {
                 $name=implode("_",$arr);
                 $out=wbGetForm($form,$name);
         } else if ($type=="file") {
-                $out=wbFromString(file_get_contents(__DIR__ . $name));
-                $locale=$out->wbGetFormLocale();
-                $locale[$_SESSION["lang"]];
+                $out=wbFromFile($_ENV["path_app"].$name);
         } else if ($type=="url") {
                 $out=wbFromString(file_get_contents($name));
-                $locale=$out->wbGetFormLocale();
-                $locale[$_SESSION["lang"]];
-
         }
+	$locale=$out->wbGetFormLocale();
+	$locale=$locale[$_SESSION["lang"]];
         return base64_encode(json_encode($locale));
 }
 

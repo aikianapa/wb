@@ -15,6 +15,7 @@
 			fsize = 12;
 			$(document).data("modEditAreaFsize",fsize);
 		}
+		var locale = wbapp.getlocale("file","/engine/modules/editarea/editarea_ui.php");
 
 		var editor = ace.edit(id);
 		$(editor.container).css("height", height).css("margin", 0);
@@ -150,10 +151,17 @@
                 file: file,
                 text: editor.getValue()
             }, function(data) {
+		    data=$.parseJSON(data);
                 if ($.bootstrapGrowl) {
-                    $.bootstrapGrowl(locale.saved, {
+			if (data.result==true) {
+				var type = "success";
+			} else {
+				var type = "danger";
+			}
+			var text = locale[data.error];
+                    $.bootstrapGrowl(text, {
                         ele: 'body',
-                        type: 'success',
+                        type: type,
                         offset: {
                             from: 'top',
                             amount: 20
@@ -164,7 +172,9 @@
                         allow_dismiss: true,
                         stackup_spacing: 10
                     });
-                }
+                } else {
+			alert(text);
+		}
             });
     }
 

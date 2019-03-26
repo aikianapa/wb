@@ -35,14 +35,30 @@ function wb_init() {
     var wb_getlocale = function(type,name) {
         var url = "/ajax/getlocale/";
         var msg = null;
-        if (type == "url") {
-            url = name;
-        }
+        //if (type == "url") url = name;
         wbapp.postWait(url, {"type":type,"name":name}, function(data) {
             msg = $.parseJSON(base64_decode(data));
         });
         return msg;
     }
+
+
+	$.fn.wbChangeWatcher = function(mode) {
+		if (mode==undefined) mode="start";
+		if (mode=="start" && $(this).data('DOMSubtreeModified')==undefined) {
+			$(this).bind( 'DOMSubtreeModified',function(e){
+				$(this).trigger("change");
+				$(this).data("_changed",true);
+			});
+		} else if (mode=="stop") {
+			$(this).data('DOMSubtreeModified',undefined);
+			$(this).data("_changed",false);
+			$(this).unbind( 'DOMSubtreeModified');
+		}
+	}
+
+
+
 
 
     wbapp.ajaxWait = function(options) {
@@ -115,6 +131,9 @@ success: function(data) {
     wbapp.modal = function(id,selector) {
 	return wb_modal(id,selector);
     }
+    wbapp.func = function(func,params) {
+	    return wb_func(func,params);
+    }
 
     wb_alive();
     wb_delegates();
@@ -181,7 +200,6 @@ function wb_gettreedict(tree) {
 
 
 function wb_ajaxWait(ajaxObjs, fn) {
-
     if (!ajaxObjs) {
         return;
     }
@@ -205,6 +223,18 @@ function wb_ajaxWait(ajaxObjs, fn) {
 	// wait all done
     }
     fn();
+}
+
+function wb_func(func,params) {
+	if (params == undefined) params=[];
+	var obj = {};
+	for (var i = 0; i < params.length; ++i) obj[i] = params[i];
+	var res;
+        wbapp.postWait("/ajax/callfunc/" + func, obj, function(data) {
+		res=$.parseJSON(base64_decode(data));
+
+	});
+        return res;
 }
 
 function wb_getsnippet(snippet) {
@@ -349,6 +379,159 @@ function wb_tree() {
             $(this).treeStore();
         });
     });
+
+	$.fn.wbSource = function(options={}) {
+		var $source = $(this);
+		var $editor;
+		var $toolbar;
+		if ($source.is(".wb-plugin")) return;
+		if ($source.attr("id")==undefined || $source.attr("id")=="") {$source.attr("id",wb_newid());}
+		var id = $source.attr("id");
+		$source.hide().addClass("wb-plugin");
+		wbapp.postWait("/module/filemanager/getfile/",{file:"/modules/editarea/editarea_ui.php"},function(data){
+			$editor = $("<div>"+data+"</div>");
+			$editor = $editor.find(".mod_editarea");
+		});
+		var theme = "chrome";
+		var height = $source.height();
+		var mode = "php";
+		var value = $source.text();
+		var fsize = $source.data("modEditAreaFsize");
+		if (fsize == undefined || fsize == "") {
+			fsize = 12;
+			$(document).data(id,fsize);
+		}
+		$editor.attr("id","ed_"+id);
+		$editor.find("textarea").attr("id","source_"+id);
+		$source.after($editor);
+		var editor = ace.edit($editor.find("textarea").attr("id"));
+		if (height==0) height=300;
+		if ($source.attr("data-height")!==undefined) {height = $editor.attr("data-height");}
+		if ($source.attr("data-theme")!==undefined) {theme = $editor.attr("data-theme");}
+		if ($source.attr("data-mode")!==undefined) {mode = $editor.attr("data-mode");}
+		if (options.height !==undefined) {height=options.height}
+		if (options.theme !==undefined) {height=options.theme}
+		if (options.mode !==undefined) {mode=options.mode}
+		$(editor.container).css("height", height).css("margin", 0);
+		editor.setTheme("ace/theme/"+theme);
+		editor.setOptions({
+			enableBasicAutocompletion: true,
+			enableSnippets: true
+		});
+		editor.getSession().setUseWrapMode(true);
+		editor.getSession().setUseSoftTabs(true);
+		editor.getSession().getUndoManager().markClean()
+		editor.setDisplayIndentGuides(true);
+		editor.setHighlightActiveLine(false);
+		editor.setAutoScrollEditorIntoView(true);
+		editor.getSession().setMode("ace/mode/"+mode);
+		editor.getSession().setValue(value);
+		editor.resize(true);
+		editor.gotoLine(0, 0);
+
+		editor.getSession().on("change", function() {
+			update();
+		});
+
+		function update() {
+			var value = editor.getSession().getValue();
+			$source.text(value);
+			$source.val(value);
+		}
+
+		function toolbar() {
+			$toolbar = $("#ed_"+id+" .mod_editarea_toolbar");
+			$("#ed_"+id+" .mod_editarea_toolbar button").on("click",function(){
+
+			if ($(this).hasClass("btnCopy")) {
+			$(document).data("modEditAreaClipboard", editor.getCopyText());
+			}
+			if ($(this).hasClass("btnPaste")) {
+			editor.insert($(document).data("modEditAreaClipboard"));
+			}
+			if ($(this).hasClass("btnUndo")) {
+			editor.execCommand("undo");
+			}
+			if ($(this).hasClass("btnRedo")) {
+			editor.execCommand("redo");
+			}
+			if ($(this).hasClass("btnFind")) {
+			editor.execCommand("find");
+			}
+			if ($(this).hasClass("btnReplace")) {
+			editor.execCommand("replace");
+			}
+			if ($(this).hasClass("btnLight")) {
+			editor.setTheme("ace/theme/chrome");
+			setcookie("sourceEditorTheme", "ace/theme/chrome");
+			}
+			if ($(this).hasClass("btnDark")) {
+			editor.setTheme("ace/theme/monokai");
+			setcookie("sourceEditorTheme", "ace/theme/monokai");
+			}
+			if ($(this).hasClass("btnClose")) {
+			editor.setValue("");
+			$(document).data("sourceFile", null);
+			$("#sourceEditorToolbar .btnSave").removeClass("btn-danger");
+			}
+			if ($(this).hasClass("btnFontDn")) {
+			if (fsize > 8) {
+			fsize = fsize * 1 - 1;
+			}
+			editor.setFontSize(fsize);
+			$source.data("modEditAreaFsize",fsize);
+			}
+			if ($(this).hasClass("btnFontUp")) {
+			if (fsize < 20) {
+			fsize = fsize * 1 + 1;
+			}
+			editor.setFontSize(fsize);
+			$source.data("modEditAreaFsize",fsize);
+			}
+			if ($(this).hasClass("btnFullScr")) {
+			var div = $(this).parents(toolbar).parent();
+			div.parents(".modal").toggleClass("fullscr");
+			if (div.parents(".modal").hasClass("fullscr")) {
+			var offset = div.find("pre.ace_editor").offset();
+			div.find("pre.ace_editor").height($(window).height() - offset.top - 15);
+			} else {
+			div.find("pre.ace_editor").height(400);
+			}
+			editor.resize();
+			document.getElementById(id).requestFullScreen();
+			window.dispatchEvent(new Event('resize'));
+			}
+			if ($(this).hasClass("btnSave")) {
+			$.post("/module/filemanager/putfile/", {
+			file: file,
+			text: editor.getValue()
+			}, function(data) {
+			if ($.bootstrapGrowl) {
+			$.bootstrapGrowl(locale.saved, {
+			ele: 'body',
+			type: 'success',
+			offset: {
+			from: 'top',
+			amount: 20
+			},
+			align: 'right',
+			width: "auto",
+			delay: 4000,
+			allow_dismiss: true,
+			stackup_spacing: 10
+			});
+			}
+			});
+			}
+
+
+			return false;
+			});
+		}
+		toolbar();
+		return editor;
+	}
+
 
     $.fn.treeStore = function() {
         var name = $(this).attr("name");
@@ -1110,6 +1293,16 @@ empty: 'fa fa-star-o'
 		$(".content-box, .modal-body").perfectScrollbar();
 		$("#treeEditForm").find(".tree-view,.tree-edit > div").perfectScrollbar();
 	}
+	if ($("textarea.source:not(.wb-plugin)").length){
+		wbapp.scriptWait("/engine/js/ace/ace.js");
+		wbapp.scriptWait("/engine/js/ace/theme-chrome.js");
+		wbapp.scriptWait("/engine/js/ace/mode-php.js");
+		wbapp.scriptWait("/engine/modules/editarea/editarea.js");
+		$("textarea.source:not(.wb-plugin)").wbSource();
+	};
+
+
+
 	$(window).on('resize',function(){
 		$(".modal:visible").wbFixModal();
 	});

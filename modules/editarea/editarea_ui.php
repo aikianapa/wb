@@ -33,3 +33,13 @@
 	wbapp.scriptWait("/engine/js/ace/mode-php.js");
 	wbapp.scriptWait("/engine/modules/editarea/editarea.js");
 </script>
+<script type="text/locale">
+[eng]
+success = "File saved"
+unknown = "File save error!"
+invalid = "File not saved! Invalid PHP code."
+[rus]
+success = "Файл сохранён"
+unknown = "Ошибка сохранения файла!"
+invalid = "Ошибка PHP кода. Файл не сохранён!"
+</script>
