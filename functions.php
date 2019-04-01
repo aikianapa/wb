@@ -39,7 +39,10 @@ function wbInitEnviroment()
         $new = false;
     }
     wbTrigger('func', __FUNCTION__, 'before');
-    $_ENV['path_app'] = $_SERVER['DOCUMENT_ROOT'];
+    $dir=explode("/",__DIR__);
+    array_pop($dir);
+    $dir=implode("/",$dir);
+    $_ENV['path_app'] = ($_SERVER['DOCUMENT_ROOT']>"") ? $_SERVER['DOCUMENT_ROOT'] : $dir ;
     $_ENV['path_engine'] = $_ENV['path_app'].'/engine';
     $_ENV['path_system'] = __DIR__;
     $_ENV['path_tpl'] = $_ENV['path_app'].'/tpl';
@@ -150,6 +153,7 @@ function wbMailer(
 }
 
 
+
 function wbMail(
     $from = null, $sent = null, $subject = null, $message = null, $attach = null
 ) {
@@ -199,16 +203,11 @@ function wbMail(
 		$mail->SMTPSecure = $sett["secure"];
 		intval($sett["port"]) > 0 ? $mail->Port = intval($sett["port"]) : $mail->Port = 587;
 	}
-
-
         $mail->setFrom($from[0], $from[1]);
         $mail->addReplyTo($from[0], $from[1]);
-
-        foreach($sent as $s) {
-            $mail->addAddress($s[0], $s[1]);
-        }
-        $mail->isHTML();
+        $mail->isHTML(true);
         $mail->Subject = $subject;
+        foreach($sent as $s) $mail->addAddress($s[0], $s[1]);
         //Read an HTML message body from an external file, convert referenced images to embedded,
         //convert HTML into a basic plain-text alternative body
         $mail->msgHTML($message, dirname(__FILE__));
@@ -217,14 +216,8 @@ function wbMail(
         $mail->AltBody = strip_tags($message);
         //Attach an image file
 
-        if (!is_array($attach) AND is_string($attach)) {
-            $attach=array($attach);
-        }
-        if (is_array($attach)) {
-            foreach($attach as $a) {
-                $mail->addAttachment($attach);
-            }
-        }
+        if (!is_array($attach) AND is_string($attach)) $attach=array($attach);
+        if (is_array($attach)) foreach($attach as $a) $mail->addAttachment($a);
         //send the message, check for errors
         $mail->send();
         $error=$_ENV["error"][__FUNCTION__]=$mail->ErrorInfo;
@@ -250,7 +243,6 @@ function wbMail(
             return true;
         }
 }
-
 
 function wbCheckWorkspace()
 {
@@ -584,6 +576,10 @@ function wbFieldBuild($param, $data = array(),$locale=array())
 		$param['enum'][$line] = array('id' => $line, 'name' => $line);
         }
         $tpl->wbSetData($param);
+	if (isset($data["type"])) {
+		// если имя поля и одна из пропертей совпадает, то нужно фиксить
+		$tpl->find("[name=type]")->attr("value",$data["type"]);
+	}
         break;
     case 'image':
         if (isset($_POST['data-id']) AND $_POST['_form']=="tree") {
@@ -1161,7 +1157,6 @@ function wbItemRead($table = null, $id = null)
         $item = $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$id];
     } else {
         $list = wbItemList($table);
-
         if (isset($list[$id])) {
             $item = $list[$id];
         } else {
@@ -1310,15 +1305,10 @@ function wbItemSave($table, $item = null, $flush = true)
         return null;
     }
     if (!isset($_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])])) {
-        //$_ENV["cache"][md5($table)]=wbItemList($table);
         $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])] = array();
     }
     if (!isset($item['id']) or '_new' == $item['id']) {
         $item['id'] = wbNewId();
-    } else {
-        if (isset($_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$item['id']])) {
-            //$item=array_merge($_ENV["cache"][md5($table.$_ENV["lang"].$_SESSION["lang"])][$item["id"]],$item);
-        }
     }
     $item = wbItemSetTable($table, $item);
     $item = wbTrigger('form', __FUNCTION__, 'BeforeItemSave', func_get_args(), $item);
@@ -1395,6 +1385,7 @@ function wbItemSetTable($table, $item = null)
     $item['_lastdate'] = date('Y-m-d H:i:s');
     $item['_lastuser'] = $_SESSION['user_id'];
 
+    $item["_id"] = $item["id"];
     return $item;
 }
 

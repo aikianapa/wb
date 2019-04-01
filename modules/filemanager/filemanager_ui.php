@@ -106,7 +106,7 @@
                 <div class="d-flex">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb" data-wb-role="foreach" data-wb-from="path" data-wb-tpl="false" data-wb-size="false" data-wb-hide="wb">
-                            <li class="breadcrumb-item" data-name="{{0}}"><a href="#">{{0}}</a></li>
+                            <li class="breadcrumb-item" data-name="{{_current[0]}}"><a href="#">{{_current[0]}}</a></li>
                             <!--li class="breadcrumb-item active" aria-current="page">Data</li-->
                         </ol>
                         <li class="breadcrumb-item" data-wb-prepend="nav .breadcrumb"><a href="#" data-name=""><i class="fa fa-home"></i></a></li>

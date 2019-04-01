@@ -25,7 +25,6 @@ function engine__controller_login()
 		    $users=wbItemList("users",'email="'.$_POST["l"].'"');
 		    foreach($users as $key => $item) { $_POST["l"]=$item["id"]; break;}
 		}
-
 		if ($user=wbItemRead("users", $_POST["l"])) {
 			if (isset($user["lang"]) AND $user["lang"]>"") {
 				$_SESSION["lang"]=$_ENV["lang"]=$user["lang"];

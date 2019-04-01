@@ -18,7 +18,8 @@ class tagMultiInput extends kiNode  {
             $this->DOM->attr("name");
         }
         $tpl=wbFromString($this->DOM->html());
-        $template=$this->DOM->innerHtml();
+        $tpl->wbSetData();
+        $template=$tpl->outerHtml();
         $tplId=wbNewId();
         $this->DOM->after("<script type='text/template' id='{$tplId}'>".$template."</script>");
         $this->DOM->attr("data-wb-tpl","#".$tplId);

@@ -22,10 +22,7 @@ function wb_multiinput() {
 			var tpl = $multi.data("wb-multiinput-tpl");
 		}
 		row = str_replace("{{template}}", tpl, row);
-		row = wb_setdata(row, {
-		"form": "procucts",
-		"id": "_new"
-		}, true);
+
 		$multi.data("wb-multiinput-row",row);
 	}
 	var row = $multi.data("wb-multiinput-row");
@@ -135,7 +132,5 @@ function wb_multiinput() {
 	});
 }
 
-$(document).on("wb-delegates",function(){
-	wb_multiinput();
-});
-$(document).on("wbapp",function(){$(document).trigger("wb-delegates");});
+$(document).on("wbapp",function(){wb_multiinput();});
+$(document).on("wb-delegates",function(){wb_multiinput();});

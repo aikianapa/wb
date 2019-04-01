@@ -2242,8 +2242,10 @@ abstract class kiNode
         $tree=$Item;
         $branch=0;
         $parent=1;
+        $parent_id="";
         $pardis=0;
         $children=1;
+        $srcItem=$Item;
         if ($param==null) {
             include("wbattributes.php");
             $name=$this->attr("name");
@@ -2307,13 +2309,21 @@ abstract class kiNode
             $this->prepend("<option value='' class='placeholder'>".$this->attr("placeholder")."</option>");
         }
         $idx=0;
-        if (is_array($tree)) {
+        $srcItem=$srcVal;
+        if ((array)$srcItem === $srcItem) {
+            foreach($srcItem as $k => $v) {
+                $srcVal["%{$k}"]=$v;
+            };
+        }
+        if ((array)$tree === $tree) {
             foreach($tree as $i => $item) {
                 $lvl++;
                 $item=(array)$srcVal + (array)$item;
+                $item["_pid"]=$parent_id;
                 $item["_idx"]=$idx;
                 $item["_ndx"]=$idx+1;
                 $item["_lvl"]=$lvl-1;
+                if ($parent_id>"") $item["%id"]=$parent_id;
                 $line=wbFromString($tpl);
                 $line->wbSetData($item);
 
@@ -2323,7 +2333,7 @@ abstract class kiNode
                     }
                     $child=wbFromString($tpl);
                     if ($lvl>1) $parent=1;
-                    $child->tagTreeUl($item["children"],array("name"=>$name,"tag"=>$tag,"lvl"=>$lvl,"idx"=>$idx,"level"=>$level,"pardis"=>$pardis,"parent"=>$parent,"children"=>$children,"limit"=>$limit),$srcVal);
+                    $child->tagTreeUl($item["children"],array("name"=>$name,"tag"=>$tag,"lvl"=>$lvl,"idx"=>$idx,"level"=>$level,"parent_id"=>$item["id"],"pardis"=>$pardis,"parent"=>$parent,"children"=>$children,"limit"=>$limit),$srcVal);
                     if (($limit==-1 OR $lvl<=$limit)) {
                         if ($tag=="select") {
                             if ($parent!==1) {

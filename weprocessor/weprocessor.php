@@ -97,7 +97,7 @@ class WEProcessor {
 				case '_ENV':		$res = $_ENV;  break;
 				case '_REQ':		$res = $_REQUEST; break;
 				case '_REQUEST':	$res = $_REQUEST; break;
-				case '_ROUTE':		$res = $_EV["route"]; break;
+				case '_ROUTE':		$res = $_ENV["route"]; break;
 				case '_GET': 		$res = $_GET; break;
 				case '_POST':		$res = $_POST; break;
 				case '_CURRENT':	$res = $this->context; break;

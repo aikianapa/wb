@@ -1,4 +1,3 @@
-"use strict"
 var wbapp = new Object();
 $(function() {
 	if ($(document).data("wb_include")==undefined) {
@@ -596,7 +595,6 @@ open:
                     $(that).children(".dd3-btn").children("span").html(d.value);
                 }
             });
-
             var data = wb_tree_json_prep(wb_json_encode($(edid).find(".treeData > form").serializeArray()), dict);
             $(that).children("input").attr("data", wb_json_encode(data));
         }
@@ -1773,13 +1771,13 @@ function wb_check_required(form) {
         if ($(this).is(":not([disabled],[type=checkbox]):visible")) {
             if ($(this).val() == "") {
                 res = false;
-                console.log("trigger: wb_required_false");
+                console.log("trigger: wb_required_false ["+$(this).attr("name")+"]");
                 $(document).trigger("wb_required_false", [this]);
             } else {
                 if ($(this).attr("type") == "email" && !wb_check_email($(this).val())) {
                     res = false;
                     $(this).data("error", wbapp.sysmsg.email_correct);
-                    console.log("trigger: wb_required_false");
+                    console.log("trigger: wb_required_false ["+$(this).attr("name")+"]");
                     $(document).trigger("wb_required_false", [this]);
                 } else {
 		    console.log("trigger: wb_required_true");
@@ -1789,7 +1787,7 @@ function wb_check_required(form) {
         }
         if ($(this).is("[type=checkbox]") && $(this).is(":not(:checked)")) {
             res = false;
-            console.log("trigger: wb_required_false");
+            console.log("trigger: wb_required_false ["+$(this).attr("name")+"]");
             $(document).trigger("wb_required_false", [this]);
         }
         if ($(this).is("[type=password]")) {
@@ -1798,7 +1796,7 @@ function wb_check_required(form) {
                 if ($(this).val() !== $("input[type=password][name=" + pcheck + "]").val()) {
                     res = false;
                     $(this).data("error", wbapp.sysmsg.pass_match);
-                    console.log("trigger: wb_required_false");
+                    console.log("trigger: wb_required_false ["+$(this).attr("name")+"]");
                     $(document).trigger("wb_required_false", [this]);
                 }
             }
@@ -1809,7 +1807,7 @@ function wb_check_required(form) {
             if (lenstr < minlen) {
                 res = false;
                 $(this).data("error", wbapp.sysmsg.min_length+": " + minlen);
-                console.log("trigger: wb_required_false");
+                console.log("trigger: wb_required_false ["+$(this).attr("name")+"]");
                 $(document).trigger("wb_required_false", [this]);
             }
         }
@@ -1829,8 +1827,6 @@ function wb_ajax() {
     var that = this;
     var wb_ajax_process = function(that) {
         wb_ajax_loader();
-        console.log("trigger: wb_ajax_start");
-        $(document).trigger("wb_ajax_start", [link, src, data]);
         var ptpl = false;
         var link = that;
         var src = $(that).attr("data-wb-ajax");
@@ -1846,25 +1842,15 @@ function wb_ajax() {
         }
 
         var flag = true;
-        var data = {};
-        if ($(that).parents("form").length) {
-            form = $(that).parents("form");
-        }
-        if ($(that).is("form").length) {
-            form = $(that);
-        }
-        data = $(form).serializeArray();
-        if (data["_tpl"] == undefined && data["_form"] == undefined && $(that).attr("data-automail") !== "false") {
-            var data = {
-_message:
-                $(form).wbMailForm()
-            };
+        if ($(that).parents("form").length) form = $(that).parents("form");
+        if ($(that).is("form").length) form = $(that);
+
+        var formdata = {};
+        formdata = $(form).serializeArray();
+        if (formdata["_message"] == undefined && formdata["_tpl"] == undefined && formdata["_form"] == undefined && $(that).attr("data-automail") !== "false") {
+            formdata["_message"] = $(form).wbMailForm();
         }
 
-        if (start !== undefined && is_callable(start)) {
-            console.log(start);
-            (eval(start))(link, src, data);
-        }
 
         if (src > "") {
             var ajax = {};
@@ -1875,7 +1861,11 @@ _message:
                 if ($(that).parents("form").length) {
                     var form = $(that).parents("form");
                     flag = wb_check_required(form);
-                    ajax = $(form).serialize();
+                    ajax = $(form).serializeArray();
+			if ($(that).attr("data-automail") !== "false") {
+			    ajax.push({name:"_message",value:$(form).wbMailForm()});
+			}
+
                 }
                 if ($(that).attr("data-wb-json") !== undefined && $(that).attr("data-wb-json") > "") {
                     ajax = $.parseJSON($(that).attr("data-wb-json"));
@@ -1883,6 +1873,7 @@ _message:
             }
             if (flag == true) {
                 $(that).attr("disabled", true);
+                console.log(ajax);
                 $.post(src, ajax, function(data) {
                     var html = $("<div>" + data + "</div>");
                     var mid = "";
@@ -1927,9 +1918,20 @@ _message:
                     wb_delegates();
                     wb_ajax_loader_done();
                     $(that).removeAttr("disabled");
-                });
-            }
+                    if (form!==undefined) $(form).trigger('reset');
+                }).fail(function(data) {
+			console.log("trigger: wb_ajax_fail");
+			$(document).trigger("wb_ajax_fail", [link, src, data]);
+			wb_ajax_loader_done();
+			$(that).removeAttr("disabled");
+		});
+            } else {
+		        $(that).removeAttr("disabled");
+		        wb_ajax_loader_done();
+	    }
         } else {
+		$(that).removeAttr("disabled");
+		wb_ajax_loader_done();
             if ($(that).attr("data-wb-href") > "") {
                 document.location.href = $(that).attr("data-wb-href");
             }
@@ -2044,6 +2046,9 @@ delay: delay,
 allow_dismiss: true,
             stackup_spacing: 10
         });
+    } else {
+	    $(document).trigger("required_false",that,text);
+	    console.log("Trigger: require_false");
     }
 });
 

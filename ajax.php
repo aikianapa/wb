@@ -351,9 +351,9 @@ function ajax__mailer() {
 }
 
 function ajax__mail() {
-    if (!isset($_POST["_subject"])) {
-        $_POST["_subject"]=$_ENV['sysmsg']["mail_from_site"];
-    }
+    if (!isset($_POST["_subject"])) $_POST["_subject"]=$_ENV['sysmsg']["mail_from_site"];
+    if (!isset($_POST["subject"])) $_POST["subject"]=$_POST["_subject"];
+
     if (isset($_POST["_tpl"])) {
         $out=wbGetTpl($_POST["_tpl"]);
     }
@@ -366,35 +366,25 @@ function ajax__mail() {
     else {
         $out=wbGetTpl("mail.php");
     }
-    if (!isset($_POST["email"])) {
-        $_POST["email"]=$_ENV["route"]["mode"]."@".$_ENV["route"]["host"];
-    }
-    if (!isset($_POST["name"])) {
-        $_POST["name"]="Site Mailer";
-    }
-
+    if (!isset($_POST["email"])) $_POST["email"]=$_ENV["route"]["mode"]."@".$_ENV["route"]["host"];
+    if (!isset($_POST["name"]))  $_POST["name"]="Site Mailer";
     if (isset($_POST["_mailto"])) {
         $mailto=$_POST["_mailto"];
     }
     else {
         $mailto = $_ENV["settings"]["email"];
     }
-
-    $out->wbSetData($_POST);
+    $Item=$_POST;
+    $out->wbSetData($Item);
     $out=$out->outerHtml();
-
-    if ($_ENV["route"]["mode"]=="mailer") {
-        $res=wbMailer("{$_POST["email"]};{$_POST["name"]}","{$mailto};{$_ENV["settings"]["header"]}",$_POST["_subject"],$out);
-    } else {
-        $res=wbMail("{$_POST["email"]};{$_POST["name"]}","{$mailto};{$_ENV["settings"]["header"]}", $_POST["subject"], $out);
-    }
+    $res=wbMail("{$_POST["email"]};{$_POST["name"]}","{$mailto};{$_ENV["settings"]["header"]}", $_POST["subject"], $out);
     if (!$res) {
-        $result=json_encode(array("error"=>true,"msg"=>$_ENV['sysmsg']["mail_sent_error"].": ".$_ENV["error"]));
+        $result=json_encode(array("error"=>true,"msg"=>$_ENV['sysmsg']["mail_sent_error"].": ".$_ENV["error"]['wbMail']));
     } else {
         $result=json_encode(array("error"=>false,"msg"=>$_ENV['sysmsg']["mail_sent_success"]."!"));
     }
-    if (isset($_POST["callback"]) AND is_callable($_POST["_callback"])) {
-        @$_POST["_callback"]($result);
+    if (isset($_POST["_callback"]) AND is_callable($_POST["_callback"])) {
+        return @$_POST["_callback"]($result);
     }
     return $result;
 }

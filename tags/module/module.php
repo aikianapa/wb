@@ -23,8 +23,11 @@ class tagModule extends kiNode  {
         //$exclude=array("role","data-wb-role","class","src");
         $this->DOM->removeClass("wb-done");
         $exclude=array("data-wb-role","src");
-        $module=$_ENV["route"]["hostp"]."/module/{$src}/";
-        $out=wbFromFile($module);
+	$call=$src."_init"; if (is_callable($call)) {$out=@$call($this->DOM,$Item);}
+	$call=$src."__init"; if (is_callable($call)) {$out=@$call($this->DOM,$Item);}
+	if (!is_object($out)) {
+		$out=wbFromFile($_ENV["route"]["hostp"]."/module/{$src}/");
+	}
         $func=$src."_afterRead";
         $_func=$src."__afterRead";
         // функция вызывается после получения шаблона модуля
@@ -61,6 +64,7 @@ class tagModule extends kiNode  {
         }
         $out->wbSetData($Item);
         $this->DOM->replaceWith($out);
+        unset($_SESSION["{$src}_data"]);
     }
 
 

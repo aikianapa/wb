@@ -164,11 +164,10 @@ class tagForeach extends kiNode  {
         $count=count($Item);
         $inner="";
         $srcVal=array();
-        if (is_array($srcItem)) {
+        if ((array)$srcItem === $srcItem) {
             foreach($srcItem as $k => $v) {
                 $srcVal["%{$k}"]=$v;
             };
-            unset($v); //$srcVal["_parent"]=$srcItem;
         }
         $ndx=0;
         $n=0;
