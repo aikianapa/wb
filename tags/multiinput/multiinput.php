@@ -21,7 +21,7 @@ class tagMultiInput extends kiNode  {
         $tpl->wbSetData();
         $template=$tpl->outerHtml();
         $tplId=wbNewId();
-        $this->DOM->after("<script type='text/template' id='{$tplId}'>".$template."</script>");
+        $this->DOM->after("<script type='text/template' id='{$tplId}'>".htmlspecialchars($template)."</script>");
         $this->DOM->attr("data-wb-tpl","#".$tplId);
         if (isset($Item[$name]) AND is_array($Item[$name])) {
             $this->tagMultiInputSetData($Item[$name]);

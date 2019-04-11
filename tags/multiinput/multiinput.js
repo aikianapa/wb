@@ -21,7 +21,7 @@ function wb_multiinput() {
 		} else {
 			var tpl = $multi.data("wb-multiinput-tpl");
 		}
-		row = str_replace("{{template}}", tpl, row);
+		row = str_replace("{{template}}", htmlspecialchars_decode(tpl), row);
 
 		$multi.data("wb-multiinput-row",row);
 	}
