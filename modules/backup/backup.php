@@ -20,7 +20,6 @@ function backup__ui() {
         $dir=str_replace($_ENV["path_app"],"",$dir);
 	$js=$out->find('script[src*="backup.js"]');
 	if (is_object($js)) {$js->attr("src",$dir."/backup.js");}
-        $Item=array("backups"=>array());
         foreach ($backups as $key => $name) {
             $size=sprintf("%u", filesize($_ENV["path_app"]."/backup/".$name) / 1024 / 1024 )."Мб";
             $tmp=explode("-", $name);
@@ -28,7 +27,10 @@ function backup__ui() {
             $date=$date[0];
             $date=substr($date, 0, 4)."-".substr($date, 4, 2)."-".substr($date, 6, 2)." ".substr($date, 8, 2).":".substr($date, 10, 2).":".substr($date, 12, 2);
             if ($tmp[1]=="a") {
-                $Item["backups"][]=array("type"=>"app+db","size"=>$size,"_created"=>$date,"name"=>$name,"date"=>date("d.m.Y H:i:s", strtotime($date)));
+                $Item["backups"][]=array("type"=>"application","size"=>$size,"_created"=>$date,"name"=>$name,"date"=>date("d.m.Y H:i:s", strtotime($date)));
+            }
+            if ($tmp[1]=="d") {
+                $Item["backups"][]=array("type"=>"database","size"=>$size,"_created"=>$date,"name"=>$name,"date"=>date("d.m.Y H:i:s", strtotime($date)));
             }
             if ($tmp[1]=="e") {
                 $Item["backups"][]=array("type"=>"engine","size"=>$size,"_created"=>$date,"name"=>$name,"date"=>date("d.m.Y H:i:s", strtotime($date)));
@@ -51,7 +53,10 @@ function backup__list() {
             $date=$date[0];
             $date=substr($date, 0, 4)."-".substr($date, 4, 2)."-".substr($date, 6, 2)." ".substr($date, 8, 2).":".substr($date, 10, 2).":".substr($date, 12, 2);
             if ($tmp[1]=="a") {
-                $list[]=array("type"=>"app+db","size"=>$size,"_created"=>$date,"name"=>$name,"date"=>date("d.m.Y H:i:s", strtotime($date)));
+                $list[]=array("type"=>"application","size"=>$size,"_created"=>$date,"name"=>$name,"date"=>date("d.m.Y H:i:s", strtotime($date)));
+            }
+            if ($tmp[1]=="d") {
+                $list[]=array("type"=>"database","size"=>$size,"_created"=>$date,"name"=>$name,"date"=>date("d.m.Y H:i:s", strtotime($date)));
             }
             if ($tmp[1]=="e") {
                 $list[]=array("type"=>"engine","size"=>$size,"_created"=>$date,"name"=>$name,"date"=>date("d.m.Y H:i:s", strtotime($date)));
@@ -78,7 +83,7 @@ function ajax__backup()
 
 function _backupBackup($Item, $mode)
 {
-	set_time_limit(600000);
+	set_time_limit(999999);
 	$out=wbFromFile(__DIR__ ."/backup_ui.php",true);
 	$_LANG=$out->wbGetFormLocale();
 	$_LANG=$_LANG[$_SESSION["lang"]];
@@ -111,9 +116,7 @@ function _backupBackup($Item, $mode)
         "date"=>date("d.m.Y H:i:s", strtotime($date))
       );
         $out=$out->find("#backup_confirm", 0);
-        if ($type=="e" OR $type=="u") {
-            $out->find(".checks")->remove();
-        }
+
         $out->wbSetData($Item);
         return $out;
     } else {
@@ -137,34 +140,38 @@ function _backupBackup($Item, $mode)
                           break;
                       case 1:
                       unlink($engine);
-                          exec("rm -rf {$engine} && cd {$root}/backup && unzip {$name} -d {$root}");
+                          exec("rm -rf {$engine} && cd {$root}/backup && unzip {$name} -d {$root}  && chmod -R 0777 {$engine}");
                           $res=array("next"=>"{$_LANG['restore_complete']}","error"=>0);
                           break;
                 }
+            } elseif ($type[1]=="d") {
+                switch ($step) {
+                    case 0:
+                        $res=array("next"=>"{$_LANG['remove_current']}, {$_LANG['wait']}...<br>{$name}","error"=>0,"count"=>2);
+                        break;
+                    case 1:
+                        exec("cd {$root} && rm -rf {$root}/database");
+                        $res=array("next"=>"{$_LANG['restore_from']}, {$_LANG['wait']}...<br>{$name}","error"=>0,"count"=>2);
+			break;
+                    case 2:
+                        exec("cd {$root} && unzip -q -o backup/{$name} && chmod -R 0777 ./database");
+                        $res=array("next"=>"{$_LANG['restore_complete']}","error"=>0);
+                        break;
+                }
+
             } elseif ($type[1]=="a") {
                 switch ($step) {
                     case 0:
                         $res=array("next"=>"{$_LANG['remove_current']}, {$_LANG['wait']}...<br>{$name}","error"=>0,"count"=>2);
                         break;
                     case 1:
-                        if ($_POST["db"]=="on") {
-                            //exec("cd {$root} && rm -rf {$root}/uploads");
-                        }
-                        if ($_POST["app"]=="on") {
-                            // remove all, except .htaccess|index.php|engine|database|uploads
-                            exec("cd {$root} && find -maxdepth 1 -type f -name '.*' -not -name '.htaccess' -not -name  'engine' -not -name 'index.php' -exec rm -f {} \;");
-                            exec("cd {$root} && find -maxdepth 1 -type d -not -name 'backup' -not -name 'engine' -not -name 'database' -not -name 'uploads' -exec rm -rf {} \;");
-                        }
+                        // remove all, except .htaccess|index.php|engine|database|uploads
+                        exec("cd {$root} && find -maxdepth 1 -type f -name '.*' -not -name '.htaccess' -not -name  'engine' -not -name 'index.php' -exec rm -f {} \;");
+                        exec("cd {$root} && find -maxdepth 1 -type d -not -name 'backup' -not -name 'engine' -not -name 'database' -not -name 'uploads' -exec rm -rf {} \;");
                         $res=array("next"=>"{$_LANG['restore_from']}, {$_LANG['wait']}...<br>{$name}","error"=>0,"count"=>2);
-                    break;
+			break;
                     case 2:
-                        if ($_POST["db"]=="on") {
-                            // remove database there, else database create before restore and prevent unpack
-                            exec("cd {$root} && rm -rf {$root}/database && unzip -q -o ./backup/{$name} database/* uploads/*");
-                        }
-                        if ($_POST["app"]=="on") {
-                            exec("cd {$root} && unzip -q -o backup/{$name} -x 'database/*' 'uploads/*';");
-                        }
+                        exec("cd {$root} && unzip -q -o backup/{$name} -x 'database/*' 'uploads/*';  && chmod -R 0777 ./*");
                         $res=array("next"=>"{$_LANG['restore_complete']}","error"=>0);
                         break;
                 }
@@ -176,37 +183,54 @@ function _backupBackup($Item, $mode)
                     case 1:
                         exec("cd {$root} && rm -rf {$root}/uploads");
                         $res=array("next"=>"{$_LANG['restore_from']}, {$_LANG['wait']}...<br>{$name}","error"=>0,"count"=>2);
-                    break;
+			break;
                     case 2:
-                        exec("cd {$root} && unzip -q -o backup/{$name}");
+                        exec("cd {$root} && unzip -q -o backup/{$name}  && chmod -R 0777 {$root}/uploads");
                         $res=array("next"=>"{$_LANG['restore_complete']}","error"=>0);
                         break;
                 }
             }
         } elseif ($action=="backup") {
           if (!is_dir($root."/backup")) {
-              @mkdir($root."/backup",0766);
-          }
+		$u=umask();
+		@mkdir($root."/backup",0766);
+		umask($u);
+	  }
+          $options=$_POST["options"];
             switch ($step) {
           case 0:
-                $res=array("next"=>"{$_LANG["backup"]} {$_LANG["type_e"]}, {$_LANG['wait']}...","error"=>0,"count"=>3);
+                $res=array("next"=>"{$_LANG["backup"]} {$_LANG["type_e"]}, {$_LANG['wait']}...","error"=>0,"count"=>4,"options"=>$options);
                 break;
           case 1:
                 $name="backup-e-".date("YmdHis").".zip";
-                exec("cd {$root} && zip -r backup/{$name} engine/ -x '*.git*' -x '*_cache*'");
-                $res=array("next"=>"{$_LANG["backup"]} {$_LANG["type_a"]}, {$_LANG['wait']}...","error"=>0);
+                if ($options["engine"]=="on") {
+			exec("cd {$root} && zip -r backup/{$name} engine/ -x '*.git*' -x '*_cache*'");
+		}
+                $res=array("next"=>"{$_LANG["backup"]} {$_LANG["type_a"]}, {$_LANG['wait']}...","error"=>0,"options"=>$options);
                 break;
           case 2:
                 $name="backup-a-".date("YmdHis").".zip";
-                exec("cd {$root} && zip -r backup/{$name} . -x '*engine*' -x '*backup*' -x '*_cache*' -x '*uploads*'");
-                $res=array("next"=>"{$_LANG["backup"]} {$_LANG["type_u"]}, {$_LANG['wait']}","error"=>0);
+                if ($options["app"]=="on") {
+			exec("cd {$root} && zip -r backup/{$name} . -x '*engine*' -x '*backup*' -x '*_cache*' -x '*database*' -x '*uploads*'");
+		}
+                $res=array("next"=>"{$_LANG["backup"]} {$_LANG["type_d"]}, {$_LANG['wait']}","error"=>0,"options"=>$options);
                 break;
           case 3:
+		$name="backup-d-".date("YmdHis").".zip";
+                if ($options["db"]=="on") {
+			exec("cd {$root} && zip -r backup/{$name} database/");
+		}
+		$res=array("next"=>"{$_LANG["backup"]} {$_LANG["type_u"]}, {$_LANG['wait']}","error"=>0,"options"=>$options);
+		break;
+          case 4:
                 $name="backup-u-".date("YmdHis").".zip";
-                exec("cd {$root} && zip -r backup/{$name} uploads/");
-                $res=array("next"=>"{$_LANG["backup_complete"]}","error"=>0);
+                if ($options["upl"]=="on") {
+			exec("cd {$root} && zip -r backup/{$name} uploads/");
+		}
+                $res=array("next"=>"{$_LANG["backup_complete"]}","error"=>0,"options"=>$options);
                 break;
         }
+        exec("cd {$root} && chmod -R 0777 ./backup");
         } elseif ($action=="remove") {
             switch ($step) {
           case 0:

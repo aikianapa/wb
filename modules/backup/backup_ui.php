@@ -53,8 +53,8 @@
                 </div>
             </div>
 
-<div class="modal fade" id="backup_confirm" data-keyboard="false" data-backdrop="true" role="dialog" aria-hidden="true" data-wb-allow="admin" data-wb-where='"{{_ENV[route][mode]}}"="backup"'>
-  <meta name="file" value="{{name}}">
+<div class="modal fade {{_ENV[route][mode]}}" id="backup_confirm" data-keyboard="false" data-backdrop="true" role="dialog" aria-hidden="true" data-wb-allow="admin" data-wb-where='"{{_ENV[route][mode]}}"="backup"'>
+  <meta name="file" value="{{name}}" data-wb-where='action <> "backup"'>
   <meta name="action" value="{{action}}">
   <div class="modal-dialog modal" role="document">
 	<div class="modal-content">
@@ -65,19 +65,31 @@
           <h5 class="modal-title">{{action_name}}</h5>
         </div>
         <div class="modal-body">
+		<div class="checks msg" data-wb-where='"{{_ENV[route][params][1]}}"="backup"'>
+			{{_LANG.create}}
+			<div class="row">
+				<label class="col-6 text-right form-control-sm">{{_LANG[backup]}} {{_LANG[type_a]}}</label>
+				<div class="col-2"><label class="switch switch-success"><input type="checkbox" value="on" name="options[app]"><span></span></label></div>
+			</div>
+			<div class="row">
+				<label class="col-6 text-right form-control-sm">{{_LANG[backup]}} {{_LANG[type_d]}}</label>
+				<div class="col-2"><label class="switch switch-success"><input type="checkbox" value="on" name="options[db]"><span></span></label></div>
+			</div>
+			<div class="row">
+				<label class="col-6 text-right form-control-sm">{{_LANG[backup]}} {{_LANG[type_u]}}</label>
+				<div class="col-2"><label class="switch switch-success"><input type="checkbox" value="on" name="options[upl]"><span></span></label></div>
+			</div>
+			<div class="row">
+				<label class="col-6 text-right form-control-sm">{{_LANG[backup]}} {{_LANG[type_e]}}</label>
+				<div class="col-2"><label class="switch switch-success"><input type="checkbox" value="on" name="options[engine]"><span></span></label></div>
+			</div>
+		</div>
+          <div class="checks" data-wb-where='"{{_ENV[route][params][1]}}"="restore"'>
+
           <div class="msg pd-b-20">
           {{_LANG[backup]}} <u>{{typetext}}</u> {{_LANG[from]}} {{date}}<br>
           {{action_name}} {{name}}?
           </div>
-          <div class="checks" data-wb-where='"{{_ENV[route][params][1]}}"="restore"'>
-          <div class="form-control-sm row">
-        		<label class="col text-right form-control-sm">{{_LANG[restore_db]}}</label>
-        		<div class="col-sm-2"><label class="switch switch-success"><input type="checkbox" value="on" name="db"><span></span></label></div>
-        	</div>
-          <div class="form-control-sm row">
-        		<label class="col text-right form-control-sm">{{_LANG[restore_app]}}</label>
-        		<div class="col-sm-2"><label class="switch switch-success"><input type="checkbox" value="on" name="app"><span></span></label></div>
-        	</div>
         </div>
         </div>
 		  <div class="modal-footer">
@@ -113,6 +125,7 @@
 	type_e		= "engine"
 	type_a		= "app"
 	type_u		= "uploads"
+	type_d		= "database"
 	filesize	= "File size"
 	filename	= "File name"
 	action		= "Action"
@@ -127,6 +140,7 @@
 	remove_complete = "Remove file complete"
 	remove_error	= "Error, unable to remove file"
 	remove_current	= "Remove current version"
+	create		= "Confirm to create Backup"
 [rus]
 	header		= "Резервные копии и восстановление"
 	backup		= "Резервная копия"
@@ -143,6 +157,7 @@
 	type		= "Тип"
 	type_e		= "системы"
 	type_a		= "приложения"
+	type_d		= "базы данных"
 	type_u		= "загрузок"
 	filesize	= "Размер"
 	filename	= "Имя файла"
@@ -158,4 +173,5 @@
 	remove_complete = "Удаление файла выполнено"
 	remove_error	= "Ошибка, не удалось удалить файл"
 	remove_current	= "Удаление текущей версии"
+	create		= "Подтвердите создание резервной копии"
 </script>

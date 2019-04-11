@@ -14,22 +14,29 @@ $(document).ready(function () {
         });
     });
 
-	function backup_process(step,count) {
+	$(document).undelegate("#backup_confirm","show.bs.modal");
+	$(document).delegate("#backup_confirm","show.bs.modal",function(){
+		var action = $(this).find("meta[name=action]").attr("value");
+		var name  = $(this).find("meta[name=file]").attr("value")
+		if (action=="remove") {
+			$(this).find(".msg").html(name);
+		}
+	});
+
+	function backup_process(step,count,options=null) {
 	  $("#module_backup_confirm").hide();
 	  $("#backup_confirm .sk-three-bounce").removeClass("hidden");
 	  $("#backup_confirm .checks").hide();
 	  var action=$("#backup_confirm meta[name=action]").attr("value");
 	  var file=$("#backup_confirm meta[name=file]").attr("value");
 	  var url="/ajax/backup/backup/"+action+"/"+file+"/";
-
-	  console.log(action);
-
 	  if (step==undefined) {step=0;} else {url=url+"?step="+step;}
 	  if (count==undefined) {var count = 0;}
 	  var data={};
-	  $("#backup_confirm.restore input").each(function(){
+	  $("#backup_confirm input").each(function(){
 	    if ($(this).prop("checked")) {data[$(this).attr("name")]="on";} else {data[$(this).attr("name")]="";}
 	  });
+	  if (options!==null) {data.options=options;}
 	    $.ajax({
 		async: true
 		, type: 'POST'
@@ -39,10 +46,11 @@ $(document).ready(function () {
 		    var data = JSON.parse(data);
 		    if (data.count !== undefined) {count=data.count;}
 		    if (data.next !== undefined) {var msg=data.next;} else {var msg="";}
+		    if (data.options == undefined) {data.options=null;}
 		    $("#backup_confirm .modal-body .msg").html(msg);
 		    if (step !== count) {
 		      step++;
-		      backup_process(step,count);
+		      backup_process(step,count,data.options);
 		    } else {
 		      $("#backup_confirm .modal-body .msg").html(data.next);
 		      $("#backup_confirm .sk-three-bounce").addClass("hidden");
