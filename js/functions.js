@@ -1556,6 +1556,7 @@ function wb_formsave_obj(formObj) {
         var name = form = formObj.attr("data-wb-form");
         var item = formObj.attr("data-wb-item");
         var oldi = formObj.attr("data-wb-item-old");
+        var item_id;
         $(document).trigger("wb_before_formsave", [name, item, form, true]);
         console.log("call: wb_before_formsave");
         $(document).trigger(name + "_before_formsave", [name, item, form, true]);
@@ -1581,9 +1582,9 @@ function wb_formsave_obj(formObj) {
             }
         });
         if (formObj.find("input[name=id]").length && formObj.find("input[name=id]").val() > "") {
-            var item_id = formObj.find("input[name=id]").val();
+            item_id = formObj.find("input[name=id]").val();
         } else {
-            var item_id = formObj.attr("data-wb-item");
+            item_id = formObj.attr("data-wb-item");
             if (item_id == "_new") {
                 item_id = wb_newid();
                 formObj.find("input[name=id]").val(item_id)
@@ -1671,6 +1672,7 @@ allow_dismiss: true,
                     if (ptpl !== undefined && padd !== "false") {
                         var tpl = $(document).find("#" + ptpl).html();
                         var list = $(document).find("[data-wb-tpl=" + ptpl + "]");
+                        console.log(item_id);
                         var post = {
 tpl:
                             tpl,
@@ -1873,7 +1875,6 @@ function wb_ajax() {
             }
             if (flag == true) {
                 $(that).attr("disabled", true);
-                console.log(ajax);
                 $.post(src, ajax, function(data) {
                     var html = $("<div>" + data + "</div>");
                     var mid = "";

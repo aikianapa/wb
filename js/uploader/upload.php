@@ -51,10 +51,11 @@ $targetDir = $path;
 $cleanupTargetDir = true; // Remove old files
 $maxFileAge = 5 * 3600; // Temp file age in seconds
 
-
 // Create target dir
 if (!file_exists($targetDir)) {
+	$u=umask(0);
 	@mkdir($targetDir, 0766, true);
+	umask($u);
 }
 
 // Get a file name

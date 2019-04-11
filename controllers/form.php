@@ -143,7 +143,7 @@ function form__controller__edit() {
 	if (!isset($out)) {
 		$_ENV["DOM"]=wbGetForm($form,$mode);
 		$data=wbItemRead(wbTable($form),$item);
-		if (!$data) {$data=array("id"=>wbNewId());}
+		if (!$data) {$data=array("id"=>$_ENV["route"]["item"]);}
 	} else {
 		if (is_string($out)) {$out=wbFromString($out);}
 		$_ENV["DOM"]=$out;
