@@ -22,7 +22,7 @@
   <div class="media-body text-justify">
 	<h4 class="media-heading">
 		<a href="/news/{{id}}">
-		{{date("d.m.Y",strtotime("{{date}}"))}} {{lang[{{_SESS.lang}}].name}}
+		{{date("d.m.Y",strtotime({{date}}))}} {{lang[{{_SESS.lang}}].name}}
 		</a>
 	</h4>
     {{lang[{{_SESS.lang}}].data.text->wbGetWords(@,90)}}
