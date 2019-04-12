@@ -43,6 +43,7 @@ class tagThumbnail extends kiNode  {
         }
         $offset=$this->DOM->attr("offset");
         $contain=$this->DOM->attr("contain");
+        if ($contain=="true") $bkg = true;
 
         if ($form>"" && $item>"") {
             $Item=wbItemRead($form,$item);
@@ -161,6 +162,7 @@ class tagThumbnail extends kiNode  {
         } else {
             $top="15%";
             $left="50%";
+            if ($bkg==true AND $contain=="true") $top="50%";
         }
 
         if (!is_file($_ENV["path_app"].$src) && !is_file($_SERVER["DOCUMENT_ROOT"].$src)) {
@@ -219,7 +221,7 @@ class tagThumbnail extends kiNode  {
             $ext=substr($img,-3);
         }
 
-        if ($ext!=="svg") {
+        if ($ext!=="svg" AND $contain!=="true") {
             if ($contain=="true") {
                 $thumb="thumbc";
             }
@@ -251,10 +253,12 @@ class tagThumbnail extends kiNode  {
 
         if ($bkg==true) {
             if (!in_array($srcExt,$exts) OR $contain=="true") {
-                $bSize="contain";
+                $bSize="background-size:contain;";
+                $cBox="";
             }
             else {
-                $bSize="cover";
+                $bSize="background-size:cover;";
+                $cBox="background-clip: content-box;";
             }
             if (is_numeric($width)) {
                 $width.="px";
@@ -263,7 +267,7 @@ class tagThumbnail extends kiNode  {
                 $height.="px";
             }
             //$style="width:{$width}; height: {$height}; background: url('{$src}') {$left} {$top} no-repeat; display:inline-block; background-size: {$bSize}; background-clip: content-box;".$style;
-            $style="background: url('{$src}') {$left} {$top} no-repeat; display:inline-block; background-size: {$bSize}; background-clip: content-box;".$style;
+            $style="background: url('{$src}') {$left} {$top} no-repeat; display:inline-block;{$bSize} {$cBox} {$style}";
             $this->DOM->attr("src","/engine/uploads/__system/transparent.png");
             $this->DOM->attr("width",$width);
             $this->DOM->attr("height",$height);
