@@ -868,57 +868,64 @@ function wbItemList($table = 'pages', $where = '', $sort = null)
 {
     ini_set('max_execution_time', 900);
     ini_set('memory_limit', '1024M');
-    $where=wbSetValuesStr($where);
-    $list = array();
-    $table = wbTable($table);
-    $tname = wbTableName($table);
-    if (!is_file($table)) {
-        wbError('func', __FUNCTION__, 1001, func_get_args());
-
-        return array();
-    }
     wbTrigger('form', __FUNCTION__, 'BeforeItemList', func_get_args(), array());
-    if (isset($_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])])) {
-        $list = $_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])];
+    $drv=wbItemDriver(__FUNCTION__,func_get_args());
+    if ($drv!==false) {
+	    $list = $drv["result"];
     } else {
-        $list = wb_file_get_contents($table);
-        if (substr($list,0,1)=="{") {
-            $list = json_decode($list,true);
-        }
-        else {
-            $list=unserialize($list);
-        }
+	    $where=wbSetValuesStr($where);
+	    $list = array();
+	    $table = wbTable($table);
+	    $tname = wbTableName($table);
+	    if (!is_file($table)) {
+		wbError('func', __FUNCTION__, 1001, func_get_args());
 
-        if (is_array($list)) {
-            foreach ($list as $key => $item) {
-                $item['_table'] = $tname;
-                if ($tname!=="tree") $item=wbItemToArray($item);
-                $item = wbTrigger('form', __FUNCTION__, 'AfterItemRead', func_get_args(), $item);
-                if (
-                    ('_' == substr($item['id'], 0, 1) and 'admin' !== $_SESSION['user_role'])
-                    or
-                    (null == $item)
+		return array();
+	    }
+	    if (isset($_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])])) {
+		$list = $_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])];
+	    } else {
+		$list = wb_file_get_contents($table);
+		if (substr($list,0,1)=="{") {
+		    $list = json_decode($list,true);
+		}
+		else {
+		    $list=unserialize($list);
+		}
 
-                    or (isset($item['_removed']) and true == $item['_removed'])
-                ) {
-                    unset($list[$key]);
-                }
-                elseif ($where > '' and !wbWhereItem($item, $where)) {
-                    unset($list[$key]);
-                } else {
-                    $list[$key] = $item;
-                }
-            }
-        }
-    }
-    if (!is_array($list)) {
-        $list = array();
+		if (is_array($list)) {
+		    foreach ($list as $key => $item) {
+			$item['_table'] = $tname;
+			if ($tname!=="tree") $item=wbItemToArray($item);
+			$item = wbTrigger('form', __FUNCTION__, 'AfterItemRead', func_get_args(), $item);
+			if (
+			    ('_' == substr($item['id'], 0, 1) and 'admin' !== $_SESSION['user_role'])
+			    or
+			    (null == $item)
+
+			    or (isset($item['_removed']) and true == $item['_removed'])
+			) {
+			    unset($list[$key]);
+			}
+			elseif ($where > '' and !wbWhereItem($item, $where)) {
+			    unset($list[$key]);
+			} else {
+			    $list[$key] = $item;
+			}
+		    }
+		}
+	    }
+	    if (!is_array($list)) {
+		$list = array();
+	    }
+
+	    if (null !== $sort) {
+		$list = wbArraySortMulti($list, $sort);
+	    }
+	    $_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])] = $list;
+
     }
 
-    if (null !== $sort) {
-        $list = wbArraySortMulti($list, $sort);
-    }
-    $_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])] = $list;
     $list = wbTrigger('form', __FUNCTION__, 'AfterItemList', func_get_args(), $list);
     $list = wbTrigger('func', __FUNCTION__, 'after', func_get_args(), $list);
 
@@ -1143,6 +1150,18 @@ function wbJsonEncodeAlt($a=false)
   }
 }
 
+function wbItemDriver($func,$args=array()) {
+	if (isset($_ENV["settings"]["dbdrv"]) AND $_ENV["settings"]["dbdrv"]) {
+		$func=str_replace("wb",$_ENV["settings"]["dbdrv"],$func);
+		if (!is_callable($func)) return false;
+		$result=null; // нужно придумать вы
+		return [
+			"func"=>$func,
+			"result"=>$result
+		];
+	} else {return false;}
+}
+
 function wbItemRead($table = null, $id = null)
 {
     if (null == $table) {
@@ -1152,17 +1171,22 @@ function wbItemRead($table = null, $id = null)
         $id = $_ENV['route']['item'];
     }
     wbTrigger('form', __FUNCTION__, 'BeforeItemRead', func_get_args(), array());
-    $table = wbTable($table);
-    if (isset($_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$id])) {
-        $item = $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$id];
+    $drv=wbItemDriver(__FUNCTION__,func_get_args());
+    if ($drv!==false) {
+	    $item=$drv["result"];
     } else {
-        $list = wbItemList($table);
-        if (isset($list[$id])) {
-            $item = $list[$id];
-        } else {
-            wbError('func', __FUNCTION__, 1006, func_get_args());
-            $item = null;
-        }
+	    $table = wbTable($table);
+	    if (isset($_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$id])) {
+		$item = $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$id];
+	    } else {
+		$list = wbItemList($table);
+		if (isset($list[$id])) {
+		    $item = $list[$id];
+		} else {
+		    wbError('func', __FUNCTION__, 1006, func_get_args());
+		    $item = null;
+		}
+	    }
     }
     if (null !== $item) {
         if (isset($item['images'])) {
@@ -1248,39 +1272,43 @@ function wbCacheName($table, $id = null)
 function wbItemRemove($table = null, $id = null, $flush = true)
 {
     $res = false;
-    $table = wbTable($table);
-    if (!is_file($table)) {
-        wbError('func', __FUNCTION__, 1001, func_get_args());
-        return null;
+    $drv=wbItemDriver(__FUNCTION__,func_get_args());
+    if ($drv!==false) {
+	    $res = $drv["result"];
+    } else {
+	    $table = wbTable($table);
+	    if (!is_file($table)) {
+		wbError('func', __FUNCTION__, 1001, func_get_args());
+		return null;
+	    }
+	    if (is_array($id)) {
+		foreach($id as $iid) {
+		    wbItemRemove($table, $iid, false);
+		}
+		if ($flush==true) {
+		    wbTableFlush($table);
+		}
+	    } else if (is_string($id)) {
+		if (strpos($id," ") OR strpos($id,'"') OR strpos($id,'=') OR strpos($id,'>') OR strpos($id,'<')) {
+		    $list=wbItemList($table,$id);
+		    foreach($list as $item) {
+			wbItemRemove($table, $item["id"], false);
+		    }
+		    if ($flush==true) {
+			wbTableFlush($table);
+		    }
+		} else {
+		    $item = wbItemRead($table, $id);
+		    if ($item == null)  return;
+		    wbTrigger('form', __FUNCTION__, 'BeforeItemRemove', func_get_args(), $item);
+		    if (is_array($item)) {
+			$item['_removed'] = true;
+			$_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$id] = $item;
+		    }
+		    $res = wbItemSave($table, $item, $flush);
+		}
+	    }
     }
-    if (is_array($id)) {
-        foreach($id as $iid) {
-            wbItemRemove($table, $iid, false);
-        }
-        if ($flush==true) {
-            wbTableFlush($table);
-        }
-    } else if (is_string($id)) {
-        if (strpos($id," ") OR strpos($id,'"') OR strpos($id,'=') OR strpos($id,'>') OR strpos($id,'<')) {
-            $list=wbItemList($table,$id);
-            foreach($list as $item) {
-                wbItemRemove($table, $item["id"], false);
-            }
-            if ($flush==true) {
-                wbTableFlush($table);
-            }
-        } else {
-            $item = wbItemRead($table, $id);
-            if ($item == null)  return;
-            wbTrigger('form', __FUNCTION__, 'BeforeItemRemove', func_get_args(), $item);
-            if (is_array($item)) {
-                $item['_removed'] = true;
-                $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$id] = $item;
-            }
-            $res = wbItemSave($table, $item, $flush);
-        }
-    }
-
     //if (!$res) {wbError('func', __FUNCTION__, 1007, func_get_args());}
     wbTrigger('form', __FUNCTION__, 'AfterItemRemove', func_get_args(), $item);
     return $res;
@@ -1297,26 +1325,31 @@ function wbSetChmod($ext = '.json')
 
 function wbItemSave($table, $item = null, $flush = true)
 {
-    $table = wbTable($table);
-    $res = null;
-    if (!is_file($table)) {
-        wbError('func', __FUNCTION__, 1001, func_get_args());
-
-        return null;
-    }
-    if (!isset($_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])])) {
-        $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])] = array();
-    }
-    if (!isset($item['id']) or '_new' == $item['id']) {
-        $item['id'] = wbNewId();
-    }
-    $item = wbItemSetTable($table, $item);
     $item = wbTrigger('form', __FUNCTION__, 'BeforeItemSave', func_get_args(), $item);
-    $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$item['id']] = $item;
-    wbTrigger('form', __FUNCTION__, 'AfterItemSave', func_get_args(), $item);
-    $res = true;
-    if ($flush == true) {
-        $res = wbTableFlush($table);
+    $drv=wbItemDriver(__FUNCTION__,func_get_args());
+    if ($drv!==false) {
+	    $item = $drv["result"];
+    } else {
+	    $table = wbTable($table);
+	    $res = null;
+	    if (!is_file($table)) {
+		wbError('func', __FUNCTION__, 1001, func_get_args());
+		return null;
+	    }
+
+	    if (!isset($_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])])) {
+		$_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])] = array();
+	    }
+	    if (!isset($item['id']) or '_new' == $item['id']) {
+		$item['id'] = wbNewId();
+	    }
+	    $item = wbItemSetTable($table, $item);
+	    $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$item['id']] = $item;
+	    wbTrigger('form', __FUNCTION__, 'AfterItemSave', func_get_args(), $item);
+	    $res = true;
+	    if ($flush == true) {
+		$res = wbTableFlush($table);
+	    }
     }
     return $item["id"];
 }

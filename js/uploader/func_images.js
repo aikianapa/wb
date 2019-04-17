@@ -255,7 +255,7 @@ function wbImagesToField(id) {
 	var store=$('#'+ id + ' > input[name]');
 	$("#"+id+" ul li.thumbnail").each(function(i){
 		if ($(this).hasClass("selected")) {var sel=1;} else {var sel=0;}
-    if ($("#"+id).hasClass("single")) {var sel=1};
+		if ($("#"+id).hasClass("single")) {var sel=1};
 		if ($(this).attr("data-name")>"") {
 			var img = {
 				img: $(this).attr("data-name"),
@@ -263,6 +263,7 @@ function wbImagesToField(id) {
 				alt: $(this).attr("alt"),
 				visible: sel
 			}
+			console.log(img);
 			images.push(img);
 		}
 	});

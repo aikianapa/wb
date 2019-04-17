@@ -137,7 +137,7 @@ function form__controller__edit() {
 	$form=$_ENV["route"]["form"];
 	$item=$_ENV["route"]["item"];
 	$mode=$_ENV["route"]["mode"];
-    if ($item=="" OR $item=="_new") {$item=$_GET["item"]=$_ENV["route"]["item"]=wbNewId();}
+    if ($item=="" OR $item=="_new") {$item=$_GET["item"]=$_ENV["route"]["item"]=wbNewId(); $_ENV["route"]["_new"]=true;}
 	$aCall=$form."_".$mode; $eCall=$form."__".$mode;
 	if (is_callable($aCall)) {$out=$aCall();} elseif (is_callable($eCall)) {$out=$eCall();}
 	if (!isset($out)) {

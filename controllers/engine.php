@@ -65,17 +65,14 @@ function engine__controller_login_success($user) {
         if (isset($user["group_".$user["role"]]["login_url"]) AND $user["group_".$user["role"]]["login_url"]>"") {
                 $point=$user["group_".$user["role"]]["login_url"];
         }
-        if (!isset($user["name"])) {
-            $user["name"]=$user["id"];
-        }
+        if (!isset($user["name"])) $user["name"]=$user["id"];
+
         if (isset($user["avatar"])) {
-            if (!is_array($user["avatar"])) {
-                $user["avatar"]=json_decode($user["avatar"], true);
-                $user["avatar"]=$user["avatar"][0];
-            }
+            if (!is_array($user["avatar"])) $user["avatar"]=json_decode($user["avatar"], true);
+            $user["avatar"]=$user["avatar"][0];
             $user["avatar"]="/uploads/users/{$user["id"]}/{$user["avatar"]["img"]}";
         } else {
-            $user["avatar"]="/engine/uploads/__system/person.svg";
+            $user["avatar"]="/engine/tpl/img/person.svg";
         }
 
         if (isset($user["group_".$user["role"]]["logout_url"]) AND $user["group_".$user["role"]]["logout_url"]>"") {
