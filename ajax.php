@@ -79,25 +79,30 @@ function ajax__getsysmsg() {
 }
 
 function ajax__alive() {
-    $ret=false;
-    if (isset($_SESSION["user_role"]) && $_SESSION["user_role"]>"") {
-        if ($_POST["data"]=="wb_get_user_role") {
-            $ret["user_role"]=$_SESSION["user_role"];
-            $ret["mode"]="wb_set_user_role";
+	$ret=false;
+	if (isset($_POST["data"]) && $_POST["data"]=="wb_get_user_role") {
+		if (isset($_SESSION["user_role"]) && $_SESSION["user_role"]>"" && isset($_POST["user_role"]) && $_POST["user_role"]==$_SESSION["user_role"]) $ret=true;
+		if (!isset($_POST["user_role"])) $ret=true;
+	}
+
+
+    if ($ret==true) {
+	$ret=[
+		"user_role"=>$_SESSION["user_role"],
+		"mode"=>"wb_set_user_role"
+	];
+	if (isset($_POST["modal"]) && $_POST["modal"]=="true") {
             $out=wbGetForm("common","modal");
             $out->find(".modal")->attr("id","wb_session_die");
             $out->find(".modal")->addClass("in show");
-            $out->find(".modal-header")->html("<h6 class='text-danger'><i class='fa fa-exclamation-triangle'></i> Сессия завершена</h6>");
-            $out->find(".modal-body")->html("<center>Истёк период ожидания сессиии!<br>Пожалуйста, выполните <a href='/login'>вход в систему</a> заново.</center>");
-            $out->find(".modal-footer")->html("<a class='btn btn-primary' href='/login'><i class='fa fa-sign-in'></i> Войти в систему</a>");
-            $ret["msg"]=$out->outerHtml();
-        }
-        elseif ($_POST["data"]==$_SESSION["user_role"]) {
-            $ret=true;
-        }
-        elseif ($_POST["data"]=="wb_session_die") {
-            $ret["mode"]=$_POST["data"];
-        }
+            $out->find(".modal-header")->html("<h6 class='text-danger'><i class='fa fa-exclamation-triangle'></i> {$_ENV["sysmsg"]["session_expired"]}</h6>");
+            $out->find(".modal-body")->html("<i class='fa fa-clock-o fa-3x tx-danger absolute pull-left'></i><p class='text-center'>{$_ENV["sysmsg"]["session_expired_msg"]}</p>");
+            $out->find(".modal-footer")->html("<a class='btn btn-primary' href='/login'><i class='fa fa-sign-in'></i> {$_ENV["sysmsg"]["session_expired_login"]}</a>");
+            $ret["modal"]=$out->outerHtml();
+	}
+
+    } else {
+            $ret=["mode"=>"wb_session_die"];
     }
     // Clear cache
 
@@ -117,9 +122,7 @@ function ajax__alive() {
             }
         }
     }
-
-
-    return json_encode($ret);
+    return base64_encode(json_encode($ret));
 }
 
 function ajax__gettree() {

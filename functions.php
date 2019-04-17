@@ -2422,12 +2422,19 @@ function wbRouterRead($file = null)
 }
 
 
-function wbAuthGetContents($url,$username,$password) {
+function wbAuthGetContents($url,$get=null,$username=null,$password=null) {
+	if (func_num_args()==3) {
+		$password=$username;
+		$username=$get;
+		$get=array();
+	}
+	if (!is_array($get)) $get=(array)$get;
     $cred = sprintf('Authorization: Basic %s', base64_encode("$username:$password") );
     $opts = array(
                 'http'=>array(
                     'method'=>'GET',
-                    'header'=>$cred
+                    'header'=>$cred,
+                    'content'=>$get
                 )
             );
     $context = stream_context_create($opts);
@@ -2441,7 +2448,14 @@ function wbAuthGetContents($url,$username,$password) {
     return stream_get_contents($handle);
 }
 
-function wbAuthPostContents($url, $post, $username,$password) {
+function wbAuthPostContents($url, $post=null, $username=null,$password=null) {
+	if (func_num_args()==3) {
+		$password=$username;
+		$username=$get;
+		$post=array();
+	}
+	if (!is_array($post)) $post=(array)$post;
+
     $cred = sprintf('Authorization: Basic %s', base64_encode("$username:$password") );
     $post=http_build_query($post);
     $opts = array(
@@ -2452,7 +2466,7 @@ function wbAuthPostContents($url, $post, $username,$password) {
                 )
             );
     $context = stream_context_create($opts);
-    $result = file_get_contents($_ENV["ajax_update"], false, $context);
+    $result = file_get_contents($url, false, $context);
     return $result;
 }
 

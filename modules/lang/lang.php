@@ -15,9 +15,14 @@ function lang_init() {
 	if (isset($_ENV["route"]["params"][0])) $p=$_ENV["route"]["params"][0];
 	if (in_array($p,$langs)) {$lang=$p;}
 	$_SESSION["lang"]=$lang;
+	$check=explode("/",$_SERVER["REQUEST_URI"]);
 	session_write_close();
 	Header("HTTP/1.0 200 OK");
-	header("Refresh:0; url=".$_SERVER["HTTP_REFERER"]);
+	if (count($check)>2 AND $check[1]=="module" AND $check[2]=="lang") {
+		header("Refresh:0; url=/");
+	} else {
+		header("Refresh:0; url=".$_SERVER["HTTP_REFERER"]);
+	}
 	exit;
 }
 ?>

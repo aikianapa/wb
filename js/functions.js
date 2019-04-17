@@ -270,32 +270,26 @@ function wb_alive() {
         $("[data-wb-cache]").each(function(i) {
             list.push($(this).attr("data-wb-cache"));
         });
-        var post = "wb_get_user_role";
+        var post = {data:"wb_get_user_role"};
+        if (!$(".modal#wb_session_die").length) post.modal = true;
         setInterval(function() {
-            $.ajax({
+		if ($(document).data("user_role")!==undefined) post.user_role = $(document).data("user_role");
+		if (!$(".modal#wb_session_die").length) {post.modal = true;} else {post.modal = false;}
+		$.ajax({
 url: "/ajax/alive"
 ,type: "POST"
 ,async: true
 ,data: post
-,cache: list
-            }, function(ret) {
-                ret = wb_json_decode(ret);
-                if (ret == false) {
-                    post = "wb_session_die";
-                }
+,cache: list}).done(function(ret){
+                ret = $.parseJSON(base64_decode(ret));
+                if ($(document).data("user_role")==undefined && ret.user_role!==undefined) $(document).data("user_role",ret.user_role);
+                if (ret == "false") ret["mode"] = "wb_session_die";
+                if (!$(".modal#wb_session_die").length && ret.modal !== undefined) $("body").append(ret.modal);
                 if (ret["mode"] !== undefined && ret["mode"] == "wb_session_die") {
-                    $(".modal#wb_session_die").modal("show");
-                    console.log("session_die");
+			$(".modal#wb_session_die").modal("show");
+			console.log("session_die");
                 }
-                if (ret["mode"] !== undefined && ret["mode"] == "wb_set_user_role" && ret["user_role"] !== undefined && ret["user_role"] > "") {
-                    if (!$(".modal#wb_session_die").length) {
-                        $("body").append(ret.msg);
-                    }
-                    $(document).data("user_role", ret["user_role"]);
-                    post = $(document).data("user_role");
-                }
-                //if (ret==false && document.location.pathname=="/admin") {document.location.href="/login";}
-            });
+	    });
         }, 60000);
     }
 }
@@ -1864,7 +1858,7 @@ function wb_ajax() {
                     var form = $(that).parents("form");
                     flag = wb_check_required(form);
                     ajax = $(form).serializeArray();
-			if ($(that).attr("data-automail") !== "false") {
+			if ($(that).attr("data-automail") !== "false" && $(that).attr("data-wb-ajax")=="/ajax/mail/") {
 			    ajax.push({name:"_message",value:$(form).wbMailForm()});
 			}
 

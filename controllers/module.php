@@ -5,15 +5,14 @@ function module__controller() {
 	if (is_callable($call)) {
 		$_ENV["DOM"]=$call();
 	} else {
-		echo __FUNCTION__ .": {$_ENV['sysmsg']['err_func_lost']} ".$call."()";
-		die;
+		module__controller__init($_ENV["route"]["mode"]);
 	}
 	wbTrigger("func",__FUNCTION__,"after");
 	return $_ENV["DOM"];
 }
 
-function module__controller__init() {
-	$module=$_ENV["route"]["name"];
+function module__controller__init($module=null) {
+	if ($module==null) $module=$_ENV["route"]["name"];
 	$aModule=$_ENV["path_app"]."/modules/{$module}/{$module}.php";
 	$eModule=$_ENV["path_engine"]."/modules/{$module}/{$module}.php";
 	if (is_file($aModule)) {include_once($aModule);} elseif (is_file($eModule)) {include_once($eModule);}
