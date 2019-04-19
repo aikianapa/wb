@@ -207,10 +207,10 @@ class tagInclude extends kiNode  {
             $this_content->find(":first")->attr("id",$did);
         }
         if ($dad=="false") {
-            $this_content->find("[data-wb-formsave]")->attr("data-add",$dad);
+            $this_content->find("[data-wb-formsave]")->attr("data-wb-add",$dad);
         }
         if ($dfs>"") {
-            $this_content->find("[data-wb-formsave]")->attr("data-formsave",$dfs);
+            $this_content->find("[data-wb-formsave]")->attr("data-wb-formsave",$dfs);
         }
         if ($dfs=="false") {
             $this_content->find("[data-wb-formsave]")->remove();

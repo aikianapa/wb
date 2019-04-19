@@ -1051,8 +1051,6 @@ function wb_plugins() {
             $("[type=datepicker]:not(.wb-plugin)").each(function() {
                 if ($(this).attr("data-date-format") == undefined) {
                     $(this).attr("data-date-format", "dd.mm.yyyy"); // Plugin Format
-                } else {
-                    $(this).attr("data-date-format", "dd.mm.yyyy");
                 }
                 if ($(this).val() > "") {
                     $(this).val(wb_oconv_object(this));
@@ -1074,8 +1072,6 @@ todayBtn: true,
             $("[type=datetimepicker]:not(.wb-plugin)").each(function() {
                 if ($(this).attr("data-date-format") == undefined) {
                     $(this).attr("data-date-format", "dd.mm.yyyy hh:ii"); // Plugin Format
-                } else {
-                    $(this).attr("data-date-format", "dd.mm.yyyy hh:ii");
                 }
                 if ($(this).val() > "") {
                     $(this).val(wb_oconv_object(this));

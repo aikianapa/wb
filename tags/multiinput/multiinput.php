@@ -10,6 +10,7 @@ class tagMultiInput extends kiNode  {
     }
 
     public function tagMultiInput($Item) {
+	if ($this->DOM->hasClass("wb-done")) return;
         include($_ENV["path_engine"]."/wbattributes.php");
         if ($this->DOM->attr("name") AND !isset($name)) {
             $name=$this->DOM->attr("name");

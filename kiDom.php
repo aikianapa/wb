@@ -1332,10 +1332,10 @@ abstract class kiNode
         $exit=false;
         while($exit !== true) {
             $nodes=$this->find("*:not(.wb-done)");
-            $this->addClass("wb-done");
+            //$this->addClass("wb-done");
             foreach($nodes as $inc) {
                 if (!$inc->parents("[type=text/template]")->length AND !$inc->parents("script")->length) {
-                    $inc->addClass("wb-done");
+                    //$inc->addClass("wb-done");
                     $inc->wbUserAllow();
                     $inc->wbWhere($Item);
                     $tag=$inc->wbCheckTag();
@@ -1345,7 +1345,7 @@ abstract class kiNode
                             if (strpos($inc->attr("data-wb-json"),"}}")) $inc->attr("data-wb-json",wbSetValuesStr($inc->attr("data-wb-json"),$Item));
                         }
                         if ($inc->is("[data-wb-tpl=true]")) $inc->addTemplate();
-                        if ($tag>"") {$func="tag".$tag; $inc->$func($Item);}
+                        if ($tag>"") {$func="tag".$tag; $inc->$func($Item); $inc->addClass("wb-done");}
                         $inc->tagHideAttrs();
                         $inc->addClass("wb-done");
                     }
