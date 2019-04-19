@@ -37,15 +37,15 @@ function form__controller__common__controller() {
 	$out=false;
 	if (is_callable($aCall)) {$out=$aCall($item);} elseif (is_callable($eCall)) {$out=$eCall($item);}
 	if ($out==false) {
-        if ($item>"") {$mode.="_".$item;}
+    //    if ($item>"") {$mode.="_".$item;}
         $out=wbGetForm($form,$mode);
-        if ($out=="") return false;
-        $out=wbFromString($out);
-        $_ENV["DOM"]=$out;
-    }
+        $out->wbSetData();
+        //if ($out=="") return false;
+      //  $out=wbFromString($out);
+        //$_ENV["DOM"]=$out;
+	}
     if (!is_object($out)) {$out=wbFromString($out);}
     $_ENV["DOM"]=$out;
-    unset($out);
     return true;
 }
 
