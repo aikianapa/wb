@@ -1360,6 +1360,7 @@ abstract class kiNode
             $this->tagHideAttrs();
             $this->find(".wb-value")->removeClass("wb-value");
 	    $this->wbAppends($Item);
+	    $this->addClass("wb-done");
             $check=$this->find("[data-wb-role]:not(.wb-done),[role]:not(.wb-done)");
             if ($check->length) {
                 $exit=true;
@@ -1651,9 +1652,7 @@ abstract class kiNode
 
 
     public function wbExcludeTags($Item=array()) {
-        if (!isset($_ENV["ta_save"])) {
-            $_ENV["ta_save"]=array();
-        }
+        if (!isset($_ENV["ta_save"])) $_ENV["ta_save"]=array();
         $list=$this->find("textarea,[type=text/template],.wb-value,pre,.nowb,[data-role=module],[data-wb-role=module]");
         foreach ($list as $ta) {
             $id=wbNewId();
@@ -1681,9 +1680,7 @@ abstract class kiNode
     }
 
     public function wbSetValues($Item=array(),$obj=TRUE) {
-        if (!is_array($Item)) {
-            $Item=array($Item);
-        }
+        if ( !( (array)$Item === $Item ) ) $Item=array($Item);
         $this->wbSetAttributes($Item);
         if (isset($Item["form"])) {
             $Item=wbTrigger("form",__FUNCTION__,"BeforeSetValues",func_get_args(),$Item);
@@ -1757,9 +1754,7 @@ abstract class kiNode
         $this->wbExcludeTags($Item);
         if (strpos($this->outerHtml(),"}}")) $this->wbSetValuesStr($Item);
         $this->wbIncludeTags($Item);
-        if ($obj==FALSE) {
-            return $this->outerHtml();
-        }
+        if ($obj==FALSE) return $this->outerHtml();
     }
 
     public function wbSetValuesStr($Item=array()) {

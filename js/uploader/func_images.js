@@ -27,7 +27,7 @@ jQuery.fn.wbUploaderInit = function() {
 			for(i=0; i<ext.length; i++) {types.push({title : ext[i], extensions : ext[i]});}
 		} else {
 			var types= [
-					{title : "Image files", extensions : "jpg,gif,png"},
+					{title : "Image files", extensions : "jpg,gif,png,svg"},
 					{title : "Zip files", extensions : "zip"},
 					{title : "Pdf files", extensions : "pdf"}
 				]
@@ -62,7 +62,7 @@ jQuery.fn.wbUploaderInit = function() {
 			},
 			FilesAdded: function(up, files) {
 				plupload.each(files, function(file) {
-					$('#'+id+' #filelist').append('<div class="list-group-item" id="' + file.id + '"><span class="glyphicon glyphicon-upload"></span>&nbsp;<b>' + file.name + '</b>  <span class="badge">' + plupload.formatSize(file.size) + '</span></div>');
+					$('#'+id+' #filelist').append('<div class="list-group-item" id="' + file.id + '"><span class="fa fa-upload"></span>&nbsp;<b>' + file.name + '</b>  <span class="badge">' + plupload.formatSize(file.size) + '</span></div>');
 				});
 				uploader.start();
 			},
@@ -205,7 +205,7 @@ function wbImagesList(id) {
 			ext=trim(str_replace(","," ",ext));
 			var exts=explode(" ",ext);
 		} else {
-			var exts=new Array("jpg","png","gif","pdf");
+			var exts=new Array("jpg","png","gif","svg","pdf");
 		}
 		$("#"+id).data("images",images);
 		if (images!=="") {

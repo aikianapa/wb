@@ -2060,12 +2060,13 @@ function wbRecurseDelete($src)
 
 function wbRecurseCopy($src, $dst)
 {
+	$mask=umask();
     if (is_file($src)) {
         copy($src, $dst);
     } else {
         $dir = opendir($src);
         if (is_resource($dir)) {
-            mkdir($dst);
+            if (!is_dir($dst)) mkdir($dst);
             while (false !== ($file = readdir($dir))) {
                 if (('.' !== $file) && ('..' !== $file)) {
                     if (is_dir($src.'/'.$file)) {
@@ -2080,6 +2081,7 @@ function wbRecurseCopy($src, $dst)
             closedir($dir);
         }
     }
+    umask($mask);
 }
 
 function wbQuery($sql)
