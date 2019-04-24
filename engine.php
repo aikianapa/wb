@@ -27,10 +27,13 @@ if ($cache["check"] === false OR $cache["check"] === null) {
 	$_ENV["DOM"]->wbTargeter();
 	$_ENV["DOM"]->wbClearClass();
 	if ( isset($_ENV["settings"]["beautifyHtml"]) AND $_ENV["settings"]["beautifyHtml"]=="on" ) {
-		$html = $_ENV["DOM"]->beautyHtml();
-	} else {
-		$html = $_ENV["DOM"]->outerHtml();
+		$scripts=$_ENV["DOM"]->find("script");
+		foreach($scripts as $sc) $sc->html(base64_encode($sc->html()));
+		$_ENV["DOM"] = wbFromString($_ENV["DOM"]->beautyHtml());
+		$scripts=$_ENV["DOM"]->find("script");
+		foreach($scripts as $sc) $sc->html(base64_decode($sc->html()));
 	}
+	$html = $_ENV["DOM"]->outerHtml();
 }
 
 if ($cache["check"]===null) {

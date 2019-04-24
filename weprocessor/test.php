@@ -84,6 +84,7 @@ $_ENV = array("1" => 111111);
 $_ENV["variables"]["prop"] = "prop";
 
 $exprs = array(
+	'<script>$("body").append("<div>");</script>' => '<script>$("body").append("<div>");</script>',
 	'{{0}}' => 'Zero',
 	'{{var42}}' => '42',
 	'{{ 42 + 2 * 3 - 6}}' => '42',
