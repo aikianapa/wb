@@ -1189,14 +1189,8 @@ function wbItemRead($table = null, $id = null)
 	    }
     }
     if (null !== $item) {
-        if (isset($item['images'])) {
-            $item = wbImagesToText($item);
-        }
-        if (is_array($item) and isset($item['_removed'])) { // если стоит флаг удаления, то возвращаем null
-            if ('remove' == $item['_removed']) {
-                $item = null;
-            }
-        }
+        if (isset($item['images']) && $_ENV["route"]["mode"]!=="edit") $item = wbImagesToText($item);
+        if (isset($item['_removed']) && 'remove' == $item['_removed']) $item = null; // если стоит флаг удаления, то возвращаем null
         $item = wbTrigger('form', __FUNCTION__, 'AfterItemRead', func_get_args(), $item);
     } else {
         $item = wbTrigger('form', __FUNCTION__, 'EmptyItemRead', func_get_args(), $item);

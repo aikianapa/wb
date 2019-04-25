@@ -129,9 +129,7 @@ class tagInclude extends kiNode  {
             $form="";
             $mode="";
             $arr=explode("_",$name);
-            if (isset($arr[0])) {
-                $form=$arr[0];
-            }
+            if (isset($arr[0])) $form=$arr[0];
             if (isset($arr[1])) {
                 unset($arr[0]);
                 $mode=implode("_",$arr);
@@ -240,8 +238,12 @@ class tagInclude extends kiNode  {
             }
 
         }
+        if (isset($find)) {echo $this_content; die;}
         $this_content->tagInclude_inc($Item);
         $this_content->wbSetData($Item);
+
+
+
         $this->DOM->append($this_content);
 
         if ($this->DOM->find("include")->length) {

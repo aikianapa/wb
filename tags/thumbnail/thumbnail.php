@@ -14,40 +14,25 @@ class tagThumbnail extends kiNode  {
         $bkg=false;
         $img="";
         $src=$this->DOM->attr("src");
-        if ($src=="") {
-            $src="0";
-        }
+        if ($src=="") $src="0";
         $noimg=$this->DOM->attr("data-wb-noimg");
         $form=$this->DOM->attr("data-wb-form");
-        if ($form=="" && isset($Item["form"])) {
-            $form=$Item["form"];
-        }
+        if ($form=="" && isset($Item["form"])) $form=$Item["form"];
         $from=$this->DOM->attr("data-wb-from");
-        if ($from=="") {
-            $from="images";
-        }
+        if ($from=="") $from="images";
         $item=$this->DOM->attr("data-wb-item");
-        if ($item=="" && isset($Item["id"])) {
-            $item=$Item["id"];
-        }
+        if ($item=="" && isset($Item["id"])) $item=$Item["id"];
         $show=$this->DOM->attr("data-wb-show");
         $class=$this->DOM->attr("class");
         $style=$this->DOM->attr("style");
         $width=$this->DOM->attr("width");
-        if ($width=="") {
-            $width=$_ENV['thumb_width']."px";
-        }
+        if ($width=="") $width=$_ENV['thumb_width']."px";
         $height=$this->DOM->attr("height");
-        if ($height=="") {
-            $height=$_ENV['thumb_height']."px";
-        }
+        if ($height=="") $height=$_ENV['thumb_height']."px";
         $offset=$this->DOM->attr("offset");
         $contain=$this->DOM->attr("contain");
         if ($contain=="true") $bkg = true;
-
-        if ($form>"" && $item>"") {
-            $Item=wbItemRead($form,$item);
-        }
+        if ($form>"" && $item>"") $Item=wbItemRead($form,$item);
         $json=$this->DOM->attr('json');
         if ($json>"") {
             $images=json_decode($json,true);
