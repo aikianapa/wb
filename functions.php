@@ -869,63 +869,66 @@ function wbItemList($table = 'pages', $where = '', $sort = null)
     ini_set('max_execution_time', 900);
     ini_set('memory_limit', '1024M');
     wbTrigger('form', __FUNCTION__, 'BeforeItemList', func_get_args(), array());
-    $drv=wbItemDriver(__FUNCTION__,func_get_args());
-    if ($drv!==false) {
-	    $list = $drv["result"];
-    } else {
-	    $where=wbSetValuesStr($where);
-	    $list = array();
-	    $table = wbTable($table);
-	    $tname = wbTableName($table);
-	    if (!is_file($table)) {
-		wbError('func', __FUNCTION__, 1001, func_get_args());
-
-		return array();
-	    }
-	    if (isset($_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])])) {
-		$list = $_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])];
+    $call="wb".ucfirst(wbTableName($table))."ItemList";
+    if (is_callable($call)) $list=$call($table,$where,$sort);
+    if (!isset($list)) {
+	    $drv=wbItemDriver(__FUNCTION__,func_get_args());
+	    if ($drv!==false) {
+		    $list = $drv["result"];
 	    } else {
-		$list = wb_file_get_contents($table);
-		if (substr($list,0,1)=="{") {
-		    $list = json_decode($list,true);
-		}
-		else {
-		    $list=unserialize($list);
-		}
+		    $where=wbSetValuesStr($where);
+		    $list = array();
+		    $table = wbTable($table);
+		    $tname = wbTableName($table);
+		    if (!is_file($table)) {
+			wbError('func', __FUNCTION__, 1001, func_get_args());
 
-		if (is_array($list)) {
-		    foreach ($list as $key => $item) {
-			$item['_table'] = $tname;
-			if ($tname!=="tree") $item=wbItemToArray($item);
-			$item = wbTrigger('form', __FUNCTION__, 'AfterItemRead', func_get_args(), $item);
-			if (
-			    ('_' == substr($item['id'], 0, 1) and 'admin' !== $_SESSION['user_role'])
-			    or
-			    (null == $item)
-
-			    or (isset($item['_removed']) and true == $item['_removed'])
-			) {
-			    unset($list[$key]);
+			return array();
+		    }
+		    if (isset($_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])])) {
+			$list = $_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])];
+		    } else {
+			$list = wb_file_get_contents($table);
+			if (substr($list,0,1)=="{") {
+			    $list = json_decode($list,true);
 			}
-			elseif ($where > '' and !wbWhereItem($item, $where)) {
-			    unset($list[$key]);
-			} else {
-			    $list[$key] = $item;
+			else {
+			    $list=unserialize($list);
+			}
+
+			if (is_array($list)) {
+			    foreach ($list as $key => $item) {
+				$item['_table'] = $tname;
+				if ($tname!=="tree") $item=wbItemToArray($item);
+				$item = wbTrigger('form', __FUNCTION__, 'AfterItemRead', func_get_args(), $item);
+				if (
+				    ('_' == substr($item['id'], 0, 1) and 'admin' !== $_SESSION['user_role'])
+				    or
+				    (null == $item)
+
+				    or (isset($item['_removed']) and true == $item['_removed'])
+				) {
+				    unset($list[$key]);
+				}
+				elseif ($where > '' and !wbWhereItem($item, $where)) {
+				    unset($list[$key]);
+				} else {
+				    $list[$key] = $item;
+				}
+			    }
 			}
 		    }
-		}
-	    }
-	    if (!is_array($list)) {
-		$list = array();
-	    }
+		    if (!is_array($list)) {
+			$list = array();
+		    }
 
-	    if (null !== $sort) {
-		$list = wbArraySortMulti($list, $sort);
-	    }
-	    $_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])] = $list;
+		    if (null !== $sort) {
+			$list = wbArraySortMulti($list, $sort);
+		    }
+		    $_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])] = $list;
 
+	    }
     }
-
     $list = wbTrigger('form', __FUNCTION__, 'AfterItemList', func_get_args(), $list);
     $list = wbTrigger('func', __FUNCTION__, 'after', func_get_args(), $list);
 
@@ -1164,28 +1167,29 @@ function wbItemDriver($func,$args=array()) {
 
 function wbItemRead($table = null, $id = null)
 {
-    if (null == $table) {
-        $table = $_ENV['route']['form'];
-    }
-    if (null == $id) {
-        $id = $_ENV['route']['item'];
-    }
+    if (null == $table) $table = $_ENV['route']['form'];
+    if (null == $id) $id = $_ENV['route']['item'];
+    if ($table=="" OR $table==null) return;
     wbTrigger('form', __FUNCTION__, 'BeforeItemRead', func_get_args(), array());
-    $drv=wbItemDriver(__FUNCTION__,func_get_args());
-    if ($drv!==false) {
-	    $item=$drv["result"];
-    } else {
-	    $table = wbTable($table);
-	    if (isset($_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$id])) {
-		$item = $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$id];
+    $call="wb".ucfirst(wbTableName($table))."ItemRead";
+    if (is_callable($call)) $item=$call($table,$id);
+    if (!$item) {
+	    $drv=wbItemDriver(__FUNCTION__,func_get_args());
+	    if ($drv!==false) {
+		    $item=$drv["result"];
 	    } else {
-		$list = wbItemList($table);
-		if (isset($list[$id])) {
-		    $item = $list[$id];
-		} else {
-		    wbError('func', __FUNCTION__, 1006, func_get_args());
-		    $item = null;
-		}
+		    $table = wbTable($table);
+		    if (isset($_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$id])) {
+			$item = $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$id];
+		    } else {
+			$list = wbItemList($table);
+			if (isset($list[$id])) {
+			    $item = $list[$id];
+			} else {
+			    wbError('func', __FUNCTION__, 1006, func_get_args());
+			    $item = null;
+			}
+		    }
 	    }
     }
     if (null !== $item) {
@@ -1435,15 +1439,16 @@ function wbTrigger($type, $name, $trigger, $args = null, $data = null)
 	if (!isset($env_error[$type])) $_ENV['error'][$type] = array();
     switch ($type) {
     case 'form':
+	$_ENV["trigger"][$trigger]=$args;
 	$arg0 = $args[0];
         if ((string)$arg0 === $arg0) {
             $call = wbTableName($arg0).$trigger;
             if (is_callable($call)) {
-                $data = $call($data);
+                $data = $call($data,$args);
             } else {
                 $call = '_'.$call;
                 if (is_callable($call)) {
-                    $data = $call($data);
+                    $data = $call($data,$args);
                 }
             }
         }
@@ -1465,7 +1470,7 @@ function wbTrigger($type, $name, $trigger, $args = null, $data = null)
     case 'func':
         $call = $name.'_'.$trigger;
         if (is_callable($call)) {
-            $data = $call($data);
+            $data = $call($data,$args);
         } else {
             wbError($type, $name, null);
         }
@@ -2023,11 +2028,13 @@ function wbPutContents($dir, $contents)
     $parts = explode('/', $dir);
     $file = array_pop($parts);
     $dir = '';
+    $u=umask();
     foreach ($parts as $part) {
         if (!is_dir($dir .= "/$part")) {
             mkdir($dir);
         }
     }
+    umask($u);
 
     return file_put_contents("$dir/$file", $contents);
 }
@@ -2470,7 +2477,7 @@ function wbAuthGetContents($url,$get=null,$username=null,$password=null) {
     $handle = @fopen($url, 'r', false, $context);
 
     if (!$handle) {
-        echo ($http_response_header[0]);
+        print_r ($http_response_header[0]);
         return false;
     }
 
