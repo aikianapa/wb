@@ -49,6 +49,7 @@ class tagThumbnail extends kiNode  {
                 $images="";
             }
         }
+
         if (!isset($idx) AND is_numeric($src)) {
             $idx=$src;
         }
@@ -150,7 +151,14 @@ class tagThumbnail extends kiNode  {
             if ($bkg==true AND $contain=="true") $top="50%";
         }
 
-        if (!is_file($_ENV["path_app"].$src) && !is_file($_SERVER["DOCUMENT_ROOT"].$src)) {
+		if (substr($src,0,7)=="http://" OR substr($src,0,8)=="https://") {
+			$info = pathinfo($src);
+			$ext=$info["extension"];
+			$src="/".$src;
+			$remote=true;
+		} else {$remote=false;}
+
+        if (!$remote && !is_file($_ENV["path_app"].$src) && !is_file($_SERVER["DOCUMENT_ROOT"].$src)) {
             if (isset($Item["img"]) && !isset($Item[$from]) && isset($Item["%{$from}"]) && !is_file($src)) {
                 $tmpItem=array();
                 $tmpItem[$from]=$Item["%{$from}"];
@@ -175,15 +183,12 @@ class tagThumbnail extends kiNode  {
             }
         }
 
-        $img=explode("/",trim($src));
-        $img=$img[count($img)-1];
-        $ext=explode(".",trim($src));
-        $ext=$ext[count($ext)-1];
-        $this->DOM->src=$src;
+        $info = pathinfo($src);
+		$ext=$info["extension"];
+        $this->DOM->src=urlencode($src);
 
-        if ($src==array()) {
-            $src="";
-        }
+        if ($src==array()) $src="";
+
         if ($img=="" AND $bkg==true) {
             $src="/engine/uploads/__system/image.svg";
             $img="image.svg";

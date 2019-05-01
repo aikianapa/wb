@@ -18,33 +18,46 @@ function thumbnails__controller() {
 }
 
 function thumbnail__view() {
-    $file=$_ENV["path_app"]."/".$_GET["src"];
+	$remote = false;
+	if (isset($_ENV["route"]["http"])) {$remote=true; $p="http";}
+	if (isset($_ENV["route"]["https"])) {$remote=true; $p="https";}
+	if ($remote) {
+		$file=$p."://".implode("/",$_ENV["route"]["params"]);
+		$ext = pathinfo($file, PATHINFO_EXTENSION);
+		$image=file_get_contents($file);
+		$file=$_ENV["path_app"]."/uploads/_remote/".md5($file).".".$ext;
+		wbPutContents($file,$image);
+	} else {
+		$file=$_ENV["path_app"]."/".$_GET["src"];
+	}
     if (is_file($file)) {
         list($width, $height, $type) = $size = getimagesize ($file);
         $ext = pathinfo($file, PATHINFO_EXTENSION);
         $mime=$size["mime"];
         $cachefile=md5($file."_".filemtime($file)."_".$_GET["w"]."_".$_GET["h"]).".".$ext;
         $cachedir=$_ENV["path_app"]."/uploads/_cache/".substr($cachefile,0,2);
-        if (!is_dir($cachedir)) {mkdir ( $cachedir, 0755 , true );}
-        if (!is_file($cachedir."/".$cachefile)) {
-		if (class_exists("Imagick") ) {
-		    $image = new \Imagick(realpath($file));
-		    if ($_GET["zc"]==1) {
-			$image->cropThumbnailImage($_GET["w"], $_GET["h"], true);
-		    } else {
-			$image->thumbnailImage($_GET["w"], $_GET["h"], true);
-		    }
-		    file_put_contents($cachedir."/".$cachefile, $image);
+        if (!is_dir($cachedir)) {$u=umask($cachedir); mkdir ( $cachedir, 0755 , true ); umask($u);}
+        if (!is_file($cachedir."/".$cachefile) OR $remote) {
+			if (class_exists("Imagick") ) {
+				$image = new \Imagick(realpath($file));
+				if ($remote) unlink($file);
+				if ($_GET["zc"]==1) {
+				$image->cropThumbnailImage($_GET["w"], $_GET["h"], true);
+				} else {
+				$image->thumbnailImage($_GET["w"], $_GET["h"], true);
+				}
+				file_put_contents($cachedir."/".$cachefile, $image);
+			} else {
+				$image=thumbnail__view__gd(realpath($file),$_GET["w"], $_GET["h"]);
+				if ($remote) unlink($file);
+				header('Content-type: image/jpeg');
+				if ($type==3) imagepng($image);
+				if ($type==2) imagejpeg($image);
+				if ($type==1) imagegif($image);
+				file_put_contents($cachedir."/".$cachefile, $image);
+				die;
+			}
 		} else {
-			$image=thumbnail__view__gd(realpath($file),$_GET["w"], $_GET["h"]);
-			header('Content-type: image/jpeg');
-			if ($type==3) imagepng($image);
-			if ($type==2) imagejpeg($image);
-			if ($type==1) imagegif($image);
-			file_put_contents($cachedir."/".$cachefile, $image);
-			die;
-		}
-	} else {
             $image=file_get_contents($cachedir."/".$cachefile);
         }
         header("Content-Type: ".$mime);

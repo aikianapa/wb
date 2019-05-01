@@ -446,7 +446,9 @@ function wbItemToArray(&$Item = array(),$convid = true)
 function wbGetDataWbFrom($Item, $str)
 {
     $str = trim($str);
-    $str_1=wbSetValuesStr("{{".$str."}}",$Item);
+    $str_1=json_decode(wbSetValuesStr("{{".$str."}}",$Item),true);
+    if (is_array($str_1)) return $str_1;
+
     if (substr($str,0,1)=="_" AND $str !== $str_1) {
         // если в атрибуте data-wb-from указанна общая переменная (типа _ENV, _SESS)
         $tmp=json_encode($str_1,true);
@@ -459,7 +461,6 @@ function wbGetDataWbFrom($Item, $str)
     }
     if (strpos($str,"}}")) $str = wbSetValuesStr($str, $Item);
 
-    //$Item = wbItemToArray($Item);
     $pos = strpos($str, '[');
     if ($pos) {
         $fld = '['.substr($str, 0, $pos).']';
@@ -542,7 +543,7 @@ function wbFieldBuild($param, $data = array(),$locale=array())
     $label=$param['label'];
     if (isset($lang["labels"]) AND isset($lang["labels"][$_SESSION["lang"]]) AND $lang["labels"][$_SESSION["lang"]]["name"]>"") $label=$param['label']=$lang["labels"][$_SESSION["lang"]]["name"];
 
-
+	if ($param["name"]=="" AND $paran["label"]=="") return ;
     switch ($param['type']) {
     case 'number':
         if (isset($opt['min'])) {
@@ -2953,7 +2954,7 @@ function wbListTpl()
     if (is_dir($dir)) {
         $list = wbListFilesRecursive($dir, true);
         foreach ($list as $l => $val) {
-            if (('.php' == substr($val['file'], -4) or '.htm' == substr($val['file'], -4) or '.html' == substr($val['file'], -5)) and !strpos('.inc.', $val['file'])) {
+            if (('.php' == substr($val['file'], -4) or '.htm' == substr($val['file'], -4) or '.tpl' == substr($val['file'], -4)) and !strpos('.inc.', $val['file'])) {
                 $path = str_replace($dir, '', $val['path']);
                 $res = substr($path.'/'.$val['file'], 1);
                 $result[] = $res;

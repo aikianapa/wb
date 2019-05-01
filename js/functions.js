@@ -2141,7 +2141,8 @@ function wb_pagination(pid) {
     $.each($(document).find(slr), function(idx) {
         var that = this;
         var id = $(this).attr("id");
-        var tplid = substr(id, 5);
+        if (id==undefined) return;
+        var tplid = id.substr(5);
         $(this).data("route", $(this).attr("data-wb-route")).removeAttr("data-wb-route");
         if ($(this).is(":not([data-wb-idx])")) {
             $(this).attr("data-wb-idx", idx);
