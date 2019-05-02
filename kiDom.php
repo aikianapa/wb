@@ -1795,7 +1795,7 @@ abstract class kiNode
             if (isset($Item[$fldname])) {
                 preg_match_all('/\[(.*)\]/',$name,$sub);
                 $sub=$sub[1][0];
-                $value=$Item[$fldname][$sub];
+				if ($sub=="") {$value="";} else {$value=$Item[$fldname][$sub];}
                 if ($this->attr("type")=="checkbox") {
                     if ($value=="on" OR $this->attr("value")=="1") {
                         $this->attr("checked","checked");

@@ -25,11 +25,11 @@ class Jsonq
         if (!is_null($jsonFile)) {
             $path = pathinfo($jsonFile);
             $extension = isset($path['extension']) ? $path['extension'] : null;
-            
+
             if ($extension != 'json') {
                 throw new InvalidJsonException();
             }
-            
+
             $this->import($jsonFile);
         }
     }
@@ -107,6 +107,17 @@ class Jsonq
 
         return $this;
     }
+
+	/**
+	 * set empty value to condition
+	 * if field not in dataset
+	 */
+
+	public function empty($value) {
+		$this->emptyValue=$value;
+		return $this;
+	}
+
 
     /**
      * getting prepared data

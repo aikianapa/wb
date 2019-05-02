@@ -193,7 +193,7 @@ trait JsonQueriable
      *
      * @param string $value
      * @param bool $isReturnMap
-     * 
+     *
      * @return bool|array
      */
     public function isJson($value, $isReturnMap = false)
@@ -201,13 +201,13 @@ trait JsonQueriable
         if (is_array($value) || is_object($value)) {
             return false;
         }
-        
+
         $data = json_decode($value, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             return false;
         }
-        
+
         return $isReturnMap ? $data : true;
     }
 
@@ -300,11 +300,11 @@ trait JsonQueriable
             $context = stream_context_create($opts);
             $data = file_get_contents($file, 0, $context);
             $json = $this->isJson($data, true);
-            
+
             if (!$json) {
                 throw new InvalidJsonException();
             }
-            
+
             return $json;
         }
 
@@ -332,8 +332,12 @@ trait JsonQueriable
 
             foreach ($path as $val) {
                 if (!array_key_exists($val, $map)) {
-                    $terminate = true;
-                    break;
+					if (isset($this->emptyValue)) {
+						return $this->emptyValue;
+					} else {
+						$terminate = true;
+						break;
+					}
                 }
 
                 $map = &$map[$val];
@@ -379,10 +383,10 @@ trait JsonQueriable
                         if (!method_exists(Condition::class, $function)) {
                             throw new ConditionNotAllowedException("Exception: $function condition not allowed");
                         }
-                        
+
                         $function = [Condition::class, $function];
                     }
-                    
+
                     $value = $this->getFromNested($val, $rule['key']);
                     $return = $value instanceof ValueNotFound ? false :  call_user_func_array($function, [$value, $rule['value']]);
                     $tmp &= $return;
