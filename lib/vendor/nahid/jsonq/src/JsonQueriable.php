@@ -331,7 +331,7 @@ trait JsonQueriable
             $path = explode('.', $node);
 
             foreach ($path as $val) {
-                if (!array_key_exists($val, $map)) {
+                if (!array_key_exists($val, (array)$map)) {
 					if (isset($this->emptyValue)) {
 						return $this->emptyValue;
 					} else {
