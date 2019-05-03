@@ -181,7 +181,7 @@ function wbMail(
     }
 
     if ($_ENV["settings"]["phpmailer"]=="on") {
-        require __DIR__.'/modules/phpmailer/phpmailer/PHPMailerAutoload.php';
+        require_once __DIR__.'/modules/phpmailer/phpmailer/PHPMailerAutoload.php';
         $sett=$_ENV["settings"]["phmail"];
         $mail = ($sett["func"]=="sendmail") ? new PHPMailer(true) : new PHPMailer();
         /*
@@ -1299,9 +1299,9 @@ function wbItemRemove($table = null, $id = null, $flush = true)
 		} else {
 		    $item = wbItemRead($table, $id);
 		    if ($item == null)  return;
-		    wbTrigger('form', __FUNCTION__, 'BeforeItemRemove', func_get_args(), $item);
 		    if (is_array($item)) {
 			$item['_removed'] = true;
+			$item=wbTrigger('form', __FUNCTION__, 'BeforeItemRemove', func_get_args(), $item);
 			$_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$id] = $item;
 		    }
 		    $res = wbItemSave($table, $item, $flush);
@@ -1324,12 +1324,13 @@ function wbSetChmod($ext = '.json')
 
 function wbItemSave($table, $item = null, $flush = true)
 {
+	$table = wbTable($table);
+	$item = wbItemSetTable($table, $item);
     $item = wbTrigger('form', __FUNCTION__, 'BeforeItemSave', func_get_args(), $item);
     $drv=wbItemDriver(__FUNCTION__,func_get_args());
     if ($drv!==false) {
 	    $item = $drv["result"];
     } else {
-	    $table = wbTable($table);
 	    $res = null;
 	    if (!is_file($table)) {
 		wbError('func', __FUNCTION__, 1001, func_get_args());
@@ -1342,7 +1343,7 @@ function wbItemSave($table, $item = null, $flush = true)
 	    if (!isset($item['id']) or '_new' == $item['id']) {
 		$item['id'] = wbNewId();
 	    }
-	    $item = wbItemSetTable($table, $item);
+
 	    $_ENV['cache'][md5($table.$_ENV["lang"].$_SESSION["lang"])][$item['id']] = $item;
 	    wbTrigger('form', __FUNCTION__, 'AfterItemSave', func_get_args(), $item);
 	    $res = true;
@@ -1443,6 +1444,9 @@ function wbTrigger($type, $name, $trigger, $args = null, $data = null)
 	$_ENV["trigger"][$trigger]=$args;
 	$arg0 = $args[0];
         if ((string)$arg0 === $arg0) {
+            $call = "wb".$trigger;
+            if (is_callable($call)) $data = $call($data,$args);
+
             $call = wbTableName($arg0).$trigger;
             if (is_callable($call)) {
                 $data = $call($data,$args);
