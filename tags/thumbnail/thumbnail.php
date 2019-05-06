@@ -14,6 +14,7 @@ class tagThumbnail extends kiNode  {
         $bkg=false;
         $img="";
         $src=$this->DOM->attr("src");
+        $src=str_replace("//","/",$src);
         if ($src=="") $src="0";
         $noimg=$this->DOM->attr("data-wb-noimg");
         $form=$this->DOM->attr("data-wb-form");
@@ -182,14 +183,13 @@ class tagThumbnail extends kiNode  {
                 }
             }
         }
-
         $info = pathinfo($src);
 		$ext=$info["extension"];
         $this->DOM->src=urlencode($src);
 
         if ($src==array()) $src="";
 
-        if ($img=="" AND $bkg==true) {
+        if ($src=="" AND $bkg==true) {
             $src="/engine/uploads/__system/image.svg";
             $img="image.svg";
             $ext="svg";
