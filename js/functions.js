@@ -133,20 +133,23 @@ success: function(data) {
     wbapp.func = function(func,params) {
 	    return wb_func(func,params);
     }
-
-    wb_alive();
-    wb_delegates();
     $("body").removeClass("cursor-wait");
     $(document).trigger("wbapp");
 }
 
+$(document).on("wbapp",function(){
+	wb_alive();
+	wb_delegates();
+});
+
+
 function wb_delegates() {
-    wb_ajax();
     wb_pagination();
     wb_formsave();
     wb_base_fix();
     wb_plugins();
     wb_tree();
+    wb_ajax();
     $(document).trigger("wb-delegates");
 }
 
@@ -945,6 +948,7 @@ function wb_ajax_loader() {
         ajax_loader();
     } else {
         $("body").addClass("cursor-wait");
+        if ($(".kt-loading").length) $(".kt-loading").css({"opacity":"1","z-index":"999999","background-color":"rgba(255, 255, 255, 0.5)"});
     }
 }
 
@@ -952,7 +956,8 @@ function wb_ajax_loader_done() {
     if (is_callable("ajax_loader_done")) {
         ajax_loader_done();
     } else {
-        $("body").removeClass("cursor-wait");
+        if ($(".kt-loading").length) $(".kt-loading").css({"opacity":"0","z-index":"-1"});
+		$("body").removeClass("cursor-wait");
     }
 }
 
@@ -1905,7 +1910,6 @@ function wb_ajax() {
 			},5);
                     console.log("trigger: wb_ajax_done");
                     $(document).trigger("wb_ajax_done", [link, src, data]);
-                    wb_plugins();
                     wb_delegates();
                     wb_ajax_loader_done();
                     $(that).removeAttr("disabled");
@@ -2381,47 +2385,6 @@ scrollTop: scrollTop
     });
 }
 
-
-function is_callable(v, syntax_only, callable_name) {
-    // Returns true if var is callable.
-    //
-    // version: 902.821
-    // discuss at: http://phpjs.org/functions/is_callable
-    // +   original by: Brett Zamir
-    // %        note 1: The variable callable_name cannot work as a string variable passed by reference as in PHP (since JavaScript does not support passing strings by reference), but instead will take the name of a global variable and set that instead
-    // %        note 2: When used on an object, depends on a constructor property being kept on the object prototype
-    // *     example 1: is_callable('is_callable');
-    // *     returns 1: true
-    // *     example 2: is_callable('bogusFunction', true);
-    // *     returns 2:true // gives true because does not do strict checking
-    // *     example 3: function SomeClass () {}
-    // *     example 3: SomeClass.prototype.someMethod = function(){};
-    // *     example 3: var testObj = new SomeClass();
-    // *     example 3: is_callable([testObj, 'someMethod'], true, 'myVar');
-    // *     example 3: alert(myVar); // 'SomeClass::someMethod'
-    var name = '',
-        obj = {},
-        method = '';
-    if (typeof v === 'string') {
-        obj = window;
-        method = v;
-        name = v;
-    } else if (v instanceof Array && v.length === 2 && typeof v[0] === 'object' && typeof v[1] === 'string') {
-        obj = v[0];
-        method = v[1];
-        name = (obj.constructor && obj.constructor.name) + '::' + method;
-    } else {
-        return false;
-    }
-    if (syntax_only || typeof obj[method] === 'function') {
-        if (callable_name) {
-            window[callable_name] = name;
-        }
-        return true;
-    }
-    return false;
-}
-
 function setcookie(name, value, exp_y, exp_m, exp_d, path, domain, secure) {
     var cookie_string = name + "=" + escape(value);
     if (exp_y) {
@@ -2449,142 +2412,6 @@ function getcookie(cookie_name) {
     }
 }
 
-function base64_decode(data) { // Decodes data encoded with MIME base64
-    //
-    // +   original by: Tyler Akins (http://rumkin.com)
-
-
-    var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-    var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
-                                          enc = '';
-
-    do { // unpack four hexets into three octets using index points in b64
-        h1 = b64.indexOf(data.charAt(i++));
-        h2 = b64.indexOf(data.charAt(i++));
-        h3 = b64.indexOf(data.charAt(i++));
-        h4 = b64.indexOf(data.charAt(i++));
-
-        bits = h1 << 18 | h2 << 12 | h3 << 6 | h4;
-
-        o1 = bits >> 16 & 0xff;
-        o2 = bits >> 8 & 0xff;
-        o3 = bits & 0xff;
-
-        if (h3 == 64) enc += String.fromCharCode(o1);
-        else if (h4 == 64) enc += String.fromCharCode(o1, o2);
-        else enc += String.fromCharCode(o1, o2, o3);
-    } while (i < data.length);
-
-    return enc;
-}
-
-function base64_encode(str) {
-
-    function decodeSurrogatePair(hi, lo) {
-        var resultChar = 0x010000;
-        resultChar += lo - 0xDC00;
-        resultChar += (hi - 0xD800) << 10;
-        return resultChar;
-    }
-
-    var bytes = [0, 0, 0];
-    var byteIndex = 0;
-    var result = [];
-
-    function output(s) {
-        result.push(s);
-    }
-
-    function emitBase64() {
-
-        var digits =
-            'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
-            'abcdefghijklmnopqrstuvwxyz' +
-            '0123456789+/';
-
-        function toDigit(value) {
-            return digits[value];
-        }
-
-        // --Byte 0--    --Byte 1--    --Byte 2--
-        // 1111  1122    2222  3333    3344  4444
-
-        var d1 = toDigit(bytes[0] >> 2);
-        var d2 = toDigit(
-                     ((bytes[0] & 0x03) << 4) |
-                     (bytes[1] >> 4));
-        var d3 = toDigit(
-                     ((bytes[1] & 0x0F) << 2) |
-                     (bytes[2] >> 6));
-        var d4 = toDigit(
-                     bytes[2] & 0x3F);
-
-        if (byteIndex === 1) {
-            output(d1 + d2 + '==');
-        } else if (byteIndex === 2) {
-            output(d1 + d2 + d3 + '=');
-        } else {
-            output(d1 + d2 + d3 + d4);
-        }
-    }
-
-    function emit(chr) {
-        bytes[byteIndex++] = chr;
-        if (byteIndex == 3) {
-            emitBase64();
-            bytes[0] = 0;
-            bytes[1] = 0;
-            bytes[2] = 0;
-            byteIndex = 0;
-        }
-    }
-
-    function emitLast() {
-        if (byteIndex > 0) {
-            emitBase64();
-        }
-    }
-
-    // Converts the string to UTF8:
-
-    var i, chr;
-    var hi, lo;
-    for (i = 0; i < str.length; i++) {
-        chr = str.charCodeAt(i);
-
-        // Test and decode surrogate pairs in the string
-        if (chr >= 0xD800 && chr <= 0xDBFF) {
-            hi = chr;
-            lo = str.charCodeAt(i + 1);
-            if (lo >= 0xDC00 && lo <= 0xDFFF) {
-                chr = decodeSurrogatePair(hi, lo);
-                i++;
-            }
-        }
-
-        // Encode the character as UTF-8.
-        if (chr < 0x80) {
-            emit(chr);
-        } else if (chr < 0x0800) {
-            emit((chr >> 6) | 0xC0);
-            emit(((chr >> 0) & 0x3F) | 0x80);
-        } else if (chr < 0x10000) {
-            emit((chr >> 12) | 0xE0);
-            emit(((chr >> 6) & 0x3F) | 0x80);
-            emit(((chr >> 0) & 0x3F) | 0x80);
-        } else if (chr < 0x110000) {
-            emit((chr >> 18) | 0xF0);
-            emit(((chr >> 12) & 0x3F) | 0x80);
-            emit(((chr >> 6) & 0x3F) | 0x80);
-            emit(((chr >> 0) & 0x3F) | 0x80);
-        }
-    }
-
-    emitLast();
-
-    return result.join('');
-}
-
-function is_object(val) {
-    return val instanceof Object;
-}
+function base64_decode(n){for(var r,e,o,t,f,i,a="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",c=0,d="";r=(i=a.indexOf(n.charAt(c++))<<18|a.indexOf(n.charAt(c++))<<12|(t=a.indexOf(n.charAt(c++)))<<6|(f=a.indexOf(n.charAt(c++))))>>16&255,e=i>>8&255,o=255&i,d+=64==t?String.fromCharCode(r):64==f?String.fromCharCode(r,e):String.fromCharCode(r,e,o),c<n.length;);return d}function base64_encode(n){var r,e,o,t,f,i=[0,0,0],a=0,c=[];function d(n){c.push(n)}function h(){function n(n){return"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[n]}var r=n(i[0]>>2),e=n((3&i[0])<<4|i[1]>>4),o=n((15&i[1])<<2|i[2]>>6),t=n(63&i[2]);d(1===a?r+e+"==":2===a?r+e+o+"=":r+e+o+t)}function u(n){i[a++]=n,3==a&&(h(),i[0]=0,i[1]=0,i[2]=0,a=0)}for(r=0;r<n.length;r++)55296<=(e=n.charCodeAt(r))&&e<=56319&&(o=e,56320<=(t=n.charCodeAt(r+1))&&t<=57343&&(f=void 0,f=65536,f+=t-56320,e=f+=o-55296<<10,r++)),e<128?u(e):e<2048?(u(e>>6|192),u(e>>0&63|128)):e<65536?(u(e>>12|224),u(e>>6&63|128),u(e>>0&63|128)):e<1114112&&(u(e>>18|240),u(e>>12&63|128),u(e>>6&63|128),u(e>>0&63|128));return 0<a&&h(),c.join("")}
+function is_object(val) {return val instanceof Object;}
+function is_callable(t,n,o){var e="",r={},i="";if("string"==typeof t)r=window,e=i=t;else{if(!(t instanceof Array&&2===t.length&&"object"==typeof t[0]&&"string"==typeof t[1]))return!1;r=t[0],i=t[1],e=(r.constructor&&r.constructor.name)+"::"+i}return!(!n&&"function"!=typeof r[i])&&(o&&(window[o]=e),!0)}

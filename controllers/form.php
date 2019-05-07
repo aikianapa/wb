@@ -46,6 +46,12 @@ function form__controller__common__controller() {
 	}
     if (!is_object($out)) {$out=wbFromString($out);}
     $_ENV["DOM"]=$out;
+        if (isset($_REQUEST["confirm"]) AND $_REQUEST["confirm"]=="true") {
+			$_ENV["DOM"]->find("script[data-wb-tag=success]")->remove();
+		} else {
+			wbItemRemove($_ENV["route"]["form"],$_ENV["route"]["item"]);
+			$_ENV["DOM"]->find(".modal")->remove();
+		}
     return true;
 }
 

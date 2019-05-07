@@ -1676,12 +1676,9 @@ function wbOconv($value, $oconv)
 function wbGetForm($form = null, $mode = null, $engine = null)
 {
     $_ENV['error'][__FUNCTION__] = '';
-    if (null == $form) {
-        $form = $_ENV['route']['form'];
-    }
-    if (null == $mode) {
-        $mode = $_ENV['route']['mode'];
-    }
+    if (null == $form) $form = $_ENV['route']['form'];
+    if (null == $mode) $mode = $_ENV['route']['mode'];
+
     $aCall = $form.'_'.$mode;
     $eCall = $form.'__'.$mode;
 
@@ -1721,11 +1718,18 @@ function wbGetForm($form = null, $mode = null, $engine = null)
         }
         unset($form);
         if ('' == $current) {
+			$out=null;
             $current = "{$_ENV['path_engine']}/forms/common/common_{$mode}.php";
             if (is_file($current)) {
                 $out = wbFromFile($current);
                 $ini = substr($current,0,-4).".ini";
-            } else {
+            }
+            $current = "{$_ENV['path_app']}/forms/common/common_{$mode}.php";
+            if (is_file($current)) {
+                $out = wbFromFile($current);
+                $ini = substr($current,0,-4).".ini";
+            }
+            if ($out==null) {
                 $cur = wbNormalizePath("/forms/{$_ENV["route"]["form"]}_{$_ENV["route"]["mode"]}.php");
                 $out = wbErrorOut(wbError('func', __FUNCTION__, 1012, array($cur)), true);
                 $_ENV['error'][__FUNCTION__] = 'noform';

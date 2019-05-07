@@ -130,7 +130,9 @@ function wb_multiinput() {
 		}
 
 	});
+	$(document).data("wb_multiinput",true);
 }
 
 $(document).on("wbapp",function(){wb_multiinput();});
 $(document).on("wb-delegates",function(){wb_multiinput();});
+if ($(document).data("wb_multiinput")==undefined) wb_multiinput();
