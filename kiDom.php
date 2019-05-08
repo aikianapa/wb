@@ -2026,6 +2026,7 @@ abstract class kiNode
             }
         };
         unset($attrs);
+		if (isset($ext)) $out->find(".wb-uploader")->children("input[name]")->attr("data-wb-ext",$ext);
         if (isset($form) AND isset($item) AND !isset($path)) {
             $Item["path"]="/uploads/{$form}/{$item}";
             $out->find(".wb-uploader")->attr("data-wb-path",$Item["path"]);

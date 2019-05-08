@@ -11,6 +11,7 @@ class tagForeach extends kiNode  {
     }
 
     public function tagForeach($Item=array()) {
+	if (!is_object($this->DOM)) return;
 	ini_set('max_execution_time', 900);
 	ini_set('memory_limit', '1024M');
 	if ($this->DOM->hasClass("wb-done")) return;

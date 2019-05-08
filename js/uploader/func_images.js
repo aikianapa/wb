@@ -74,6 +74,7 @@ jQuery.fn.wbUploaderInit = function() {
 				$(".wbImagesAll ul.gallery li:last").trigger("click");
                 $("#"+id).wbUploaderResizer();
                 $("#"+id).children("input").trigger("change");
+                $("#"+id).trigger("wb_upload_done",$.parseJSON($("#"+id).children("input").val()));
 			},
 			UploadProgress: function(up, file) {
 				document.getElementById(file.id).getElementsByTagName('b')[0].innerHTML = '<span>' + file.percent + "%</span>";
@@ -263,7 +264,6 @@ function wbImagesToField(id) {
 				alt: $(this).attr("alt"),
 				visible: sel
 			}
-			console.log(img);
 			images.push(img);
 		}
 	});
