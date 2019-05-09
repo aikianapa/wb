@@ -14,6 +14,7 @@ class Threads {
     private $timeout = 1;
 
     public function newThread($filename, $params=array()) {
+		ini_set("max_execution_time", 9999999);
 	if (substr($filename,0,7)=="http://" OR substr($filename,0,8)=="https://") {
 		$params = http_build_query($params);
 		$command = $this->wgetPath.' -q -O - '.$filename.'?'.$params;

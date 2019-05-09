@@ -40,9 +40,9 @@ function form__controller__common__controller() {
     //    if ($item>"") {$mode.="_".$item;}
         $out=wbGetForm($form,$mode);
         $out->wbSetData();
-        //if ($out=="") return false;
-      //  $out=wbFromString($out);
-        //$_ENV["DOM"]=$out;
+        if ($out=="") return false;
+        $_ENV["DOM"]=$out;
+        return $_ENV["DOM"];
 	}
     if (!is_object($out)) {$out=wbFromString($out);}
     $_ENV["DOM"]=$out;
