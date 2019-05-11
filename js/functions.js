@@ -1798,8 +1798,30 @@ function wb_check_required(form) {
                 }
             }
         }
-        if ($(this).is("[minlength]")) {
-            var minlen = $(this).attr("minlength") * 1
+        if ($(this).is("[min]:visible")) {
+			var min = $(this).attr("min") * 1;
+			var minstr = $(this).val() * 1;
+			if (minstr < min) {
+                res = false;
+                $(this).data("error", wbapp.sysmsg.min_val+": " + minstr);
+                console.log("trigger: wb_required_false ["+$(this).attr("name")+"]");
+                $(document).trigger("wb_required_false", [this]);
+			}
+		}
+
+        if ($(this).is("[max]:visible")) {
+			var max = $(this).attr("max") * 1;
+			var maxstr = $(this).val() * 1;
+			if (maxstr > max) {
+                res = false;
+                $(this).data("error", wbapp.sysmsg.max_val+": " + maxstr);
+                console.log("trigger: wb_required_false ["+$(this).attr("name")+"]");
+                $(document).trigger("wb_required_false", [this]);
+			}
+		}
+
+        if ($(this).is("[minlength]:visible")) {
+            var minlen = $(this).attr("minlength") * 1;
                          var lenstr = strlen($(this).val());
             if (lenstr < minlen) {
                 res = false;

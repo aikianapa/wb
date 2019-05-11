@@ -1409,10 +1409,11 @@ function wbTableFlush($table)
 function wbItemSetTable($table, $item = null)
 {
     $item['_table'] = wbTableName($table);
-    if (!isset($item['_created']) or '' == $item['_created']) {
+    $tmp=wbItemRead($item["_table"],$item["id"]);
+    if (!$tmp or !isset($tmp['_created']) or '' == $tmp['_created']) {
         $item['_created'] = date('Y-m-d H:i:s');
     }
-    if (!isset($item['_creator']) or '' == $item['_creator']) {
+    if (!$tmp or !isset($tmp['_creator']) or '' == $tmp['_creator']) {
         $item['_creator'] = $_SESSION['user_id'];
     }
     $item['_lastdate'] = date('Y-m-d H:i:s');
@@ -2947,9 +2948,9 @@ function wbNormalizePath($path)
 	return realpath($path);
 }
 
-function wbClearValues($out)
+function wbClearValues($out,$rep='')
 {
-    $out = preg_replace('/\{\{([^\}]+?)\}\}+|<script.*text\/template.*?>.*?<\/script>(*SKIP)(*F)/isumx', '', $out);
+    $out = preg_replace('/\{\{([^\}]+?)\}\}+|<script.*text\/template.*?>.*?<\/script>(*SKIP)(*F)/isumx', $rep, $out);
 
     return $out;
 }
