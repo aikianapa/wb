@@ -2401,15 +2401,8 @@ error: function(data) {
                 }
                 $(this).parents("ul").find("li").removeClass("active");
                 $(this).parent("li").addClass("active");
-                if (offset !== undefined) {
-                    var scrollTop = $("[data-wb-tpl=" + tid + "]").offset().top - offset;
-                    if (scrollTop < 0) {
-                        scrollTop = 0;
-                    }
-                    $('body,html').animate({
-scrollTop: scrollTop
-                    }, 1000);
-                }
+
+				$("[data-wb-tpl=" + tid + "]").parents().scrollTop(0);
                 //$(document).trigger("after_pagination_click",[id,page,arr[2]]);
             }
 

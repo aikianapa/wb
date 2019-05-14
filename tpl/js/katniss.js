@@ -69,6 +69,10 @@
             $(".kt-pagetitle").html("<h5 class='w-100'>"+$(".content-box .element-header").html()+"</h5>");
             $(".content-box .element-header").remove();
         }
+        if ($(b).parents(".kt-sideleft").length) {
+			$("body").removeClass("show-left");
+			$(".kt-pagebody").scrollTop(0);
+		}
     });
 
 	$(document).delegate(".nav-tabs .nav-link.disabled","click",function(){
@@ -83,5 +87,4 @@
 	    $tab.parent(".tab-content").find(".tab-pane").removeClass("active");
 	    $tab.addClass("active");
     });
-
 });
