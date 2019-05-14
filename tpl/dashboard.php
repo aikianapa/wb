@@ -5,7 +5,8 @@
   <div class="card-body">
     <meta role="variable" var="target" value=".content-box" data-wb-where='"{{data[ajax]}}">""'>
     <meta role="variable" var="target" value='{{data[target]}}' data-wb-where='"{{data[ajax]}}">"" AND "{{data[target]}}">""'>
-    <meta role="variable" var="target" value="" data-wb-where='"{{data[url]}}">""'>
+	<meta role="variable" var="target" value="" data-wb-where='"{{data[url]}}">""'>
+    <meta role="variable" var="target" value='{{data[target]}}' data-wb-where='"{{data[url]}}">"" AND "{{data[target]}}">""'>
 
     <h5 class="card-title hidden-ovf">{{_VAR[dash_card_name]}}</h5>
     <p class="card-text"></p>

@@ -133,6 +133,8 @@ success: function(data) {
     wbapp.func = function(func,params) {
 	    return wb_func(func,params);
     }
+    wbapp.user = wb_user();
+
     $("body").removeClass("cursor-wait");
     $(document).trigger("wbapp");
 }
@@ -169,6 +171,18 @@ function wb_settings() {
     }
 }
 
+function wb_user() {
+	var user;
+	if ($(document).data("wbapp_user")!==undefined) {
+		return $(document).data("wbapp_user");
+	} else {
+		wbapp.getWait("/ajax/getuser/", {}, function(data) {
+			user = $.parseJSON(base64_decode(data));
+			if (user!==false) $(document).data("wbapp_user",user);
+		});
+		return user;
+	}
+}
 
 function wb_gettree(tree, branch, parent, childrens) {
     if (branch == undefined) {
@@ -1128,7 +1142,7 @@ todayBtn: true
             });
         }
         if (wb_plugins_loaded() && $('.select2:not(.wb-plugin)').length) {
-            $('.select2:not(.wb-plugin').each(function() {
+            $('.select2:not(.wb-plugin)').each(function() {
                 var that = this;
                 if ($(this).is("[data-wb-ajax]")) {
                     var url = $(this).attr("data-wb-ajax");
@@ -1137,52 +1151,45 @@ todayBtn: true
                     var val = $(this).attr("value");
                     var plh = $(this).attr("placeholder");
                     var min = $(this).attr("min");
-                    if (min == undefined) {
-                        min = 1;
-                    }
-                    if (plh == undefined) {
-                        plh = "Search...";
-                    }
+                    if (min == undefined) min = 1;
+                    if (plh == undefined) plh = wbapp.sysmsg.search;
                     $(this).select2({
-language: wbapp.settings.js_locale,
-placeholder: plh,
-minimumInputLength: min,
-ajax: {
-url: url,
-async: true,
-method: "post",
-dataType: 'json',
-data: function(term, page) {
-                                return {
-value:
-                                    term.term,
-page:
-                                    page,
-where:
-                                    where,
-tpl:
-                                    tpl
-                                };
-                            },
-processResults: function(data) {
-                                $(that).data("wb-ajax-data", data);
-                                $(that).trigger("wb_ajax_done", [that, url, data]);
-                                $(that).data("item", data);
-                                return {
-results:
-                                    data
-                                };
-                            },
-                        },
-                    });
+					language: wbapp.settings.js_locale,
+					placeholder: plh,
+					minimumInputLength: min,
+					ajax: {
+							url: url,
+							async: true,
+							method: "post",
+							dataType: 'json',
+							data: function(term, page) {
+									return {
+										value:	term.term,
+										page:	page,
+										where:	where,
+										tpl:	tpl
+									};
+								},
+							processResults:
+								function(data) {
+									$(that).data("wb-ajax-data", data);
+									$(that).trigger("wb_ajax_done", [that, url, data]);
+									$(that).data("item", data);
+									return {
+							results:
+										data
+									};
+								},
+					},
+					});
                     wbapp.postWait(url, {id:val,tpl:tpl},function(data) {
                         var option = new Option(data.text, data.id, true, true);
                         $(that).append(option).trigger('change');
                         $(document).data("item", data.item);
                         $(that).trigger({
-type: 'select2:select',
-params: {
-data: data
+								type: 'select2:select',
+								params: {
+								data: data
                             }
                         });
                     });
@@ -1204,6 +1211,8 @@ data: data
             });
             $('.select2').addClass("wb-plugin");
         }
+
+
         if (wb_plugins_loaded() && $('.input-tags').length) {
             $('.input-tags').each(function() {
                 if ($(this).attr("placeholder") !== undefined) {
@@ -1845,6 +1854,7 @@ function wb_check_required(form) {
 function wb_ajax() {
     var that = this;
     var wb_ajax_process = function(that) {
+		if ($(that).is(".select2")) return;
         wb_ajax_loader();
         var ptpl = false;
         var link = that;
@@ -1956,8 +1966,8 @@ function wb_ajax() {
     }
 
 
-    $(document).undelegate("[data-wb-ajax]", "click");
-    $(document).delegate("[data-wb-ajax]", "click", function(e) {
+    $(document).undelegate("[data-wb-ajax]:not(.select2)", "click");
+    $(document).delegate("[data-wb-ajax]:not(.select2)", "click", function(e) {
 	    $(this).parents("ul").find(".active[data-wb-ajax]").removeClass("active");
 	    $(this).addClass("active");
 	    var act=[];
@@ -1986,8 +1996,8 @@ function wb_ajax() {
         }
     });
 
-    $(document).undelegate("[data-wb-ajax]:input", "change");
-    $(document).delegate("[data-wb-ajax]:input", "change", function() {
+    $(document).undelegate("[data-wb-ajax]:input:not(.select2)", "change");
+    $(document).delegate("[data-wb-ajax]:input:not(.select2)", "change", function() {
         wb_ajax_process(this);
     });
 

@@ -48,6 +48,12 @@ function ajax__pagination_vars() {
     // return wbJsonEncode($res);
 }
 
+function ajax__getuser() {
+	$res=false;
+	if (isset($_SESSION["user"])) $res=$_SESSION["user"];
+	return base64_encode(json_encode($res));
+}
+
 function ajax__callfunc() {
 	$func=$_ENV["route"]["params"][0];
 	$res = false;
