@@ -1,6 +1,6 @@
     var editor;
     var $=jQuery.noConflict();
-    var locale = wbapp.getlocale("url","/module/filemanager/locale");
+//    var locale = wbapp.getlocale("url","/module/filemanager/locale");
     filemanagerGetDir('');
     filemanagerSideMenu();
     filemanagerListEvents();
