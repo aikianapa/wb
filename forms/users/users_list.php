@@ -9,7 +9,6 @@
 
 
 		<div class="col-sm-3">
-			<div class="row">
 				<div class="content-left">
 	<label class="content-left-label">{{_LANG[groups]}}</label>
 	<ul id="{{_form}}Catalog" data-wb-role="foreach" data-wb-form="users" data-wb-where='isgroup="on" AND active="on"' class="nav mg-t-1-force">
@@ -19,7 +18,6 @@
 			</a>
 		</li>
 	</ul>
-				</div>
 			</div>
 		</div>
 

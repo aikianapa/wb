@@ -95,6 +95,7 @@
               <li><a href=""><i class="icon ion-ios-star-outline"></i> Favorites</a></li>
               <li><a href=""><i class="icon ion-ios-folder-outline"></i> Collections</a></li-->
                         <li><a href data-wb-ajax="/form/profile/admin" data-wb-html=".content-box"><i class="icon fa fa-user"></i> {{_LANG[profile]}}</a></li>
+                        <li data-wb-where='"{{_SESS.user.isgroup}}"="on"'><a href data-wb-ajax="/form/group/users/" data-wb-html=".content-box"><i class="icon fa fa-users"></i> {{_LANG[group]}}</a></li>
                         <li><a href="/logout"><i class="icon ion-power"></i> {{_LANG[exit]}}</a></li>
                     </ul>
                 </div>
@@ -152,10 +153,12 @@
         navigation      = "Navigation"
         dashboard       = "Dashboard"
         cpanel          = "Control Panel"
+        group			= "Group"
 [rus]
         exit            = "Выйти"
         profile         = "Профиль"
         navigation      = "Навигация"
         dashboard       = "Инструменты"
         cpanel          = "Панель управления"
+        group			= "Группа"
 </script>

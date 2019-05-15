@@ -1812,7 +1812,7 @@ function wb_check_required(form) {
 			var minstr = $(this).val() * 1;
 			if (minstr < min) {
                 res = false;
-                $(this).data("error", wbapp.sysmsg.min_val+": " + minstr);
+                $(this).data("error", ucfirst($(this).attr("name")) + " " + wbapp.sysmsg.min_val+": " + min);
                 console.log("trigger: wb_required_false ["+$(this).attr("name")+"]");
                 $(document).trigger("wb_required_false", [this]);
 			}
@@ -1823,7 +1823,7 @@ function wb_check_required(form) {
 			var maxstr = $(this).val() * 1;
 			if (maxstr > max) {
                 res = false;
-                $(this).data("error", wbapp.sysmsg.max_val+": " + maxstr);
+                $(this).data("error", ucfirst($(this).attr("name")) + " " + wbapp.sysmsg.max_val+": " + max);
                 console.log("trigger: wb_required_false ["+$(this).attr("name")+"]");
                 $(document).trigger("wb_required_false", [this]);
 			}
