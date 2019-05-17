@@ -262,6 +262,7 @@ function ajax__setdata() {
         $dr->removeClass("wb-done");
     }
     $tpl->wbSetData($Item);
+    $tpl->find("empty")->remove();
     $tpl->tagHideAttrs();
     return $tpl;
 }
