@@ -1,6 +1,6 @@
 <?php
 
-function thumbnails__controller() {
+function thumbnails_controller() {
     $params=$_ENV["route"]["params"];
 	if (!isset($_GET)) {
         $_GET=array();
@@ -13,11 +13,11 @@ function thumbnails__controller() {
         $_GET["src"].="/".implode("/",$params);
     }
 	$_GET["zc"]=$_ENV["route"]["zc"];
-    thumbnail__view();
+    thumbnail_view();
 	die;
 }
 
-function thumbnail__view() {
+function thumbnail_view() {
 	$remote = false;
 	if (isset($_ENV["route"]["http"])) {$remote=true; $p="http";}
 	if (isset($_ENV["route"]["https"])) {$remote=true; $p="https";}
@@ -36,7 +36,7 @@ function thumbnail__view() {
         $mime=$size["mime"];
         $cachefile=md5($file."_".filemtime($file)."_".$_GET["w"]."_".$_GET["h"]).".".$ext;
         $cachedir=$_ENV["path_app"]."/uploads/_cache/".substr($cachefile,0,2);
-        if (!is_dir($cachedir)) {$u=umask($cachedir); mkdir ( $cachedir, 0755 , true ); umask($u);}
+        if (!is_dir($cachedir)) {$u=umask(); mkdir ( $cachedir, 0755 , true ); umask($u);}
         if (!is_file($cachedir."/".$cachefile) OR $remote) {
 			if (class_exists("Imagick") ) {
 				$image = new \Imagick(realpath($file));
@@ -48,13 +48,12 @@ function thumbnail__view() {
 				}
 				file_put_contents($cachedir."/".$cachefile, $image);
 			} else {
-				$image=thumbnail__view__gd(realpath($file),$_GET["w"], $_GET["h"]);
-				if ($remote) unlink($file);
-				header('Content-type: image/jpeg');
-				if ($type==3) imagepng($image);
-				if ($type==2) imagejpeg($image);
-				if ($type==1) imagegif($image);
-				file_put_contents($cachedir."/".$cachefile, $image);
+				$image=thumbnail_view_gd(realpath($file),$_GET["w"], $_GET["h"]);
+				header("Content-Type: ".$mime);
+				if ($type==3) imagepng($image,$cachedir."/".$cachefile);
+				if ($type==2) imagejpeg($image,$cachedir."/".$cachefile);
+				if ($type==1) imagegif($image,$cachedir."/".$cachefile);
+				$image=file_get_contents($cachedir."/".$cachefile);
 			}
 		} else {
             $image=file_get_contents($cachedir."/".$cachefile);
@@ -64,7 +63,7 @@ function thumbnail__view() {
     }
 }
 
-function thumbnail__view__gd($imgSrc,$thumbnail_width,$thumbnail_height) { //$imgSrc is a FILE - Returns an image resource.
+function thumbnail_view_gd($imgSrc,$thumbnail_width,$thumbnail_height) { //$imgSrc is a FILE - Returns an image resource.
     //getting the image dimensions
     list($width_orig, $height_orig, $type) = getimagesize($imgSrc);
 	// Image is PNG:
