@@ -15,6 +15,8 @@ class tagThumbnail extends kiNode  {
         $img="";
         $src=$this->DOM->attr("src");
         $src=str_replace("//","/",$src);
+        $src=str_replace("http:/","http://",$src);
+        $src=str_replace("https:/","https://",$src);
         if ($src=="") $src="0";
         $noimg=$this->DOM->attr("data-wb-noimg");
         $form=$this->DOM->attr("data-wb-form");
@@ -279,3 +281,4 @@ class tagThumbnail extends kiNode  {
 
 
 }
+?>

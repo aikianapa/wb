@@ -55,7 +55,6 @@ function thumbnail__view() {
 				if ($type==2) imagejpeg($image);
 				if ($type==1) imagegif($image);
 				file_put_contents($cachedir."/".$cachefile, $image);
-				die;
 			}
 		} else {
             $image=file_get_contents($cachedir."/".$cachefile);

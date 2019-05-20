@@ -1,5 +1,5 @@
 <div id="wb_cookies_alert" class="alerf alert-primary" data-wb-where='"{{_COOK.wbcookies}}"=""' data-wb-hide="wb">
-	<button class="btn btn-success" onClick="document.cookie = 'wbcookies = true'; $('#wb_cookies_alert').remove();">{{_LANG.wb_cook_accept}}</button>
+	<button class="btn btn-success" onClick="var cookdate = new Date(new Date().getTime() + 60 * 1000 * 60 * 60 *24 *365 ); document.cookie = 'wbcookies = true; path=/; expires=\"' + cookdate + '\"'; $('#wb_cookies_alert').remove();">{{_LANG.wb_cook_accept}}</button>
 	<p>{{_LANG.wb_cook_alert}}</p>
 	<style>
 		#wb_cookies_alert {
