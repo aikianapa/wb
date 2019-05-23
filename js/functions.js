@@ -1941,6 +1941,7 @@ function wb_ajax() {
 				});
 			},5);
                     console.log("trigger: wb_ajax_done");
+					$(link).trigger("wb_ajax_done", [link, src, data]);
                     $(document).trigger("wb_ajax_done", [link, src, data]);
                     wb_delegates();
                     wb_ajax_loader_done();
@@ -1948,6 +1949,7 @@ function wb_ajax() {
                     if (form!==undefined) $(form).trigger('reset');
                 }).fail(function(data) {
 			console.log("trigger: wb_ajax_fail");
+			$(link).trigger("wb_ajax_fail", [link, src, data]);
 			$(document).trigger("wb_ajax_fail", [link, src, data]);
 			wb_ajax_loader_done();
 			$(that).removeAttr("disabled");
