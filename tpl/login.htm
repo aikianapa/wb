@@ -24,34 +24,115 @@
       <div class="signbox">
         <div class="signbox-header">
           <i class="pb-3 fa fa-user-circle fa-4x text-white"></i>
-          <p class="mg-b-0">{{_LANG[prompt]}}</p>
+          <p class="mg-b-0 login-block">{{_LANG[prompt]}}</p>
+          <p class="mg-b-0 recovery-block d-none">{{_LANG[change]}}</p>
         </div><!-- signbox-header -->
         <div class="signbox-body">
             <form action="" method="post">
-          <div class="form-group">
-              <div class="input-group">
-              <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                    <input class="form-control" placeholder="{{_LANG[login]}}" name="l" type="text">
-              </div>
-          </div><!-- form-group -->
-          <div class="form-group">
-              <div class="input-group">
-              <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                  <input class="form-control" placeholder="{{_LANG[password]}}" name="p" type="password">
-              </div>
-          </div><!-- form-group -->
-          <button class="btn btn-dark btn-block">{{_LANG[signin]}} &nbsp; <i class="fa fa-sign-in"></i></button>
-          <div class="tx-center bd pd-10 mg-t-20">{{_LANG[reg]}} <a href="/signup">{{_LANG[signup]}}</a></div>
-          <div class="form-group mg-t-20">
-            <div data-wb-role="module" src="ulogin" data-wb-where='"{{_SETT[ulogin]}}"="on"'></div>
-          </div><!-- form-group -->
+				<div data-wb-where='"{{_ENV.route.mode}}" != "recovery"' data-wb-hide="wb" class="main-block">
+					<div class="form-group">
+						<div class="input-group">
+						<span class="input-group-addon"><i class="fa fa-user"></i></span>
+							<input class="form-control" placeholder="{{_LANG[login]}}" name="l" type="text">
+						</div>
+					</div>
+					<div class="login-block">
+					  <div class="form-group">
+						  <div class="input-group">
+						  <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+							  <input class="form-control" placeholder="{{_LANG[password]}}" name="p" type="password">
+						  </div>
+					  </div>
+					  <a href="javascript:void(0);" class="forgot-link">{{_LANG[forgot]}}?</a>
+					  <button class="btn btn-dark btn-block mg-t-10">{{_LANG[signin]}} &nbsp; <i class="fa fa-sign-in"></i></button>
+					  <div class="form-group mg-t-20">
+						<div data-wb-role="module" src="ulogin" data-wb-where='"{{_SETT[ulogin]}}"="on"'></div>
+					  </div>
+					</div>
+
+					<div class="recovery-block d-none">
+						<div class="form-group">
+							<div class="input-group">
+							<span class="input-group-addon"><i class="fa fa-lock"></i></span>
+								<input class="form-control" placeholder="{{_LANG[forgot]}}" type="password" disabled>
+							</div>
+						</div>
+						<a href="javascript:void(0);" class="forgot-link">{{_LANG[signin]}} &nbsp; <i class="fa fa-sign-in"></i></a>
+						<button value="password" name="recovery" class="btn btn-primary btn-block mg-t-10">{{_LANG[recovery]}} &nbsp; <i class="fa fa-gears"></i></button>
+						<div class="d-none recovery-letter">
+							{{_lang.letter}}
+						</div>
+					</div>
+				</div>
+				<div class="recovery-password" data-wb-where='"{{_ENV.route.mode}}" = "recovery"' data-wb-hide="*">
+						<input type="hidden" name="_email">
+						<input type="hidden" name="_token">
+					  <div class="form-group">
+						  <div class="input-group">
+						  <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+							  <input class="form-control" minlength="3" placeholder="{{_LANG[newpass]}}" autocomplete="off" required name="_pwd1" type="password">
+						  </div>
+						  <small>{{_LANG[change_text1]}}</small>
+					  </div>
+					  <div class="form-group">
+						  <div class="input-group">
+						  <span class="input-group-addon"><i class="fa fa-unlock-alt"></i></span>
+							  <input class="form-control" minlength="3" placeholder="{{_LANG[checkpass]}}" autocomplete="off" required name="_pwd2" type="password">
+						  </div>
+						  <small>{{_LANG[change_text2]}}</small>
+					  </div>
+
+					  <button value="password" name="recovery" disabled class="btn btn-primary btn-block mg-t-10">{{_LANG[update]}} &nbsp; <i class="fa fa-gears"></i></button>
+				</div>
+				<div class="recovery-success d-none">
+					<div class="alert alert-success">
+						{{_LANG[success]}}
+					</div>
+					<a href="/login" class="btn btn-dark btn-block mg-t-10">{{_LANG[title]}} &nbsp; <i class="fa fa-sign-in"></i></a>
+				</div>
+				<div class="recovery-info d-none">
+					<div class="alert alert-info">
+						{{_LANG[change_text3]}}
+					</div>
+					<a href="/login" class="btn btn-dark btn-block mg-t-10">{{_LANG[title]}} &nbsp; <i class="fa fa-sign-in"></i></a>
+				</div>
+				<div class="recovery-wrong d-none">
+					<div class="alert alert-danger">
+						{{_LANG[change_text4]}}
+					</div>
+					<a href="/login" class="btn btn-dark btn-block mg-t-10">{{_LANG[title]}} &nbsp; <i class="fa fa-sign-in"></i></a>
+				</div>
+				<div class="tx-center bd pd-10 mg-t-20">{{_LANG[reg]}} <a href="/signup">{{_LANG[signup]}}</a></div>
             </form>
-        </div><!-- signbox-body -->
-      </div><!-- signbox -->
-    </div><!-- signpanel-wrapper -->
+        </div>
+      </div>
+    </div>
 
         <script data-wb-src="jquery"></script>
         <script data-wb-src="bootstrap4js"></script>
+        <script>
+			$(".forgot-link").click(function(){
+				$('.login-block, .recovery-block').toggleClass('d-none');
+				$('input[name=p]').val("");
+			});
+			$("input[type=password]").on("keyup",function(){
+				if ($(this).is("[name=_pwd1]") || $(this).is("[name=_pwd2]")) {
+					if ($(this).val().length<$(this).attr("minlength")) {
+						$(this).parents(".input-group").find(".input-group-addon .fa").addClass("tx-danger");
+					} else {
+						$(this).parents(".input-group").find(".input-group-addon .fa").removeClass("tx-danger");
+					}
+					if ($("[name=_pwd1]").val() == $("[name=_pwd2]").val() && $("[name=_pwd1]").val().length >= $(this).attr("minlength")) {
+						$(this).parents(".recovery-password").find(".input-group-addon .fa").addClass("tx-success");
+						$("button[name=recovery]").removeAttr("disabled");
+					} else {
+						$("button[name=recovery]").attr("disabled",true);
+						$(this).parents(".recovery-password").find(".input-group-addon .fa").removeClass("tx-success");
+					}
+
+				}
+			});
+		</script>
   </body>
 </html>
 
@@ -64,6 +145,18 @@
         prompt          = "Please, fill in your login and password to sign in"
         reg             = "Not registred?"
         title           = "Sign in to the system"
+        recovery			= "Send recovery link"
+        forgot			= "Forgot password"
+        letter			= "<p>Hello!</p><p>To recovery your password in the {{_SETT[header]}} site, please go to recovery link: <a href='{{link}}'>RECOVERY PASSWORD</a>.<br>If your don't request recovery, do nothing.</p>"
+        update			= "Update password"
+        change          = "Change password"
+		newpass         = "New password"
+		checkpass       = "New password (check)"
+		change_text1	= "Enter new password (min length: 3 symbols)"
+		change_text2	= "Re-Enter new password (min length: 3 symbols)"
+		change_text3	= "Check your email box {{email}} and ckick Recovery link in new message from {{site}} site."
+		change_text4	= "Something is wrong, please repeat the procedure"
+		success			= "Password successfully changed"
 [rus]
         login           = "Логин"
         password        = "Пароль"
@@ -72,4 +165,16 @@
         prompt          = "Пожалуйста, введите ваш логин и пароль"
         reg             = "Не зарегестрированы?"
         title           = "Вход в систему"
+        recovery			= "Восстановить пароль"
+        forgot			= "Забыли пароль"
+        letter			= "<p>Приветствуем!</p><p>Для восстановления пароля на сайте {{_SETT[header]}}, перейдите по сыылке: <a href='{{link}}'>ВОССТАНОВИТЬ ПАРОЛЬ</a>.<br>Если вы не запрашивали восстановление пароля, ничего не делайте.</p>"
+        update			= "Изменить пароль"
+        change           = "Изменение пароля"
+		newpass         = "Новый пароль"
+		checkpass       = "Новый пароль (повторите)"
+		change_text1	= "Введите новый пароль (минимум: 3 символа)"
+		change_text2	= "Повторите новый пароль (минимум: 3 символа)"
+		change_text3	= "Проверьте свой почтовый ящик {{email}} нажмите ссылку восстановления с сайта {{site}}"
+		change_text4	= "Что-то не так, пожалуйста, повторите процедуру заново"
+		success			= "Пароль успешно изменён"
 </script>

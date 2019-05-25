@@ -18,8 +18,9 @@ function engine__controller_login()
     //$user=array("id"=>"admin","password"=>md5("admin"),"role"=>"admin","point"=>"/admin/","active"=>"on");
     //wbItemSave("users",$user);
     if (is_callable("wbUserLogin")) {
-	return wbUserLogin();
+		return wbUserLogin();
     } else {
+	if (isset($_POST["recovery"]) AND $_POST["recovery"]=="password") {__engineRecoveryPassword();}
 	if (isset($_POST["l"]) AND $_POST["l"]>"") {
 		if (strpos($_POST["l"],"@")) {
 		    $users=wbItemList("users",'email="'.$_POST["l"].'"');
@@ -200,6 +201,90 @@ function engine__controller_logout()
         echo "{$_ENV['sysmsg']['logout_wait']}...";
         die;
 }
+
+function engine__controller_recovery() {
+	$token=base64_decode($_ENV["route"]["token"]);
+	$param=explode(";",$token);
+	$out=wbGetTpl("login.htm");
+	if (count($param)!==3) {
+		header('Location: /login');
+		die;
+	}
+	if (strpos($param[1],"@")) {
+		$users=wbItemList("users",'email="'.$param[1].'"');
+		foreach($users as $key => $item) {
+			$user_id=$item["id"];
+			break;
+		}
+	}
+	if ($user=wbItemRead("users", $user_id)) {
+		if ($user["pwdtoken"]==$param[2] AND $user["email"]==$param[1] AND $user["password"]==$param[0]) {
+			if (isset($_POST["_token"]) AND $user["pwdtoken"]==$_POST["_token"] AND $_POST["_pwd1"] == $_POST["_pwd2"]) {
+				$user["password"]=md5($_POST["_pwd1"]);
+				$user["pwdtoken"]=null;
+				$res=wbItemSave("users",$user,true);
+				$out->find(".recovery-success")->removeClass("d-none");
+				$out->find('.login-block')->addClass('d-none');
+				$out->find('.recovery-password')->addClass('d-none');
+				$out->find('.recovery-block')->addClass('d-none');
+				$out->wbSetData();
+				echo $out;
+				die;
+			} else if (!isset($_POST["_token"])) {
+				$out->find('.login-block')->addClass('d-none');
+				$out->find('.recovery-block')->removeClass('d-none');
+				$out->wbSetData(["login"=>$param[1],"_token"=>$param[2],"_email"=>$param[1]]);
+				echo $out;
+			}
+		} else {
+			header("HTTP/1.0 404 Not Found");
+			die;
+		}
+	} else {
+		header('Location: /login');
+		die;
+	}
+			header("HTTP/1.0 404 Not Found");
+			die;
+}
+
+function __engineRecoveryPassword() {
+	$out=wbGetTpl("login.htm");
+	$out->wbSetData();
+	if (isset($_POST["l"]) AND $_POST["l"]>"") {
+		if (strpos($_POST["l"],"@")) {
+		    $users=wbItemList("users",'email="'.$_POST["l"].'"');
+		    foreach($users as $key => $item) { $_POST["l"]=$item["id"]; break;}
+		}
+		if ($user=wbItemRead("users", $_POST["l"])) {
+			if (isset($user["lang"]) AND $user["lang"]>"") {
+				$_SESSION["lang"]=$_ENV["lang"]=$user["lang"];
+			}
+			$user["pwdtoken"]=wbNewId();
+			wbItemSave("users",$user,true);
+			$letter=$out->find(".recovery-letter",0);
+			$link=$_ENV["route"]["hostp"]."/login/recovery/".base64_encode($user["password"].";".$user["email"].";".$user["pwdtoken"]);
+			$letter->wbSetData(["link"=>$link]);
+			$subject=$out->find(".signbox-header .recovery-block")->text();
+			$res=wbMail($_ENV["settings"]["email"].";".$_ENV["settings"]["header"],"oleg_frolov@mail.ru",$subject,$letter->outerHtml());
+			$out->find(".recovery-block")->removeClass("d-none");
+			$out->find('.main-block')->addClass('d-none');
+			$out->find('.recovery-password')->addClass('d-none');
+			$out->find('.login-block')->addClass('d-none');
+			$out->wbSetData(["email"=>$user["email"],"site"=>$_ENV["settings"]["header"]]);
+			if ($res) {
+				$out->find(".recovery-info")->removeClass("d-none");
+				echo $out;
+			} else {
+				$out->find(".recovery-wrong")->removeClass("d-none");
+				echo $out;
+
+			}
+		}
+	}
+	die;
+}
+
 
 function engine__controller_include()
 {
