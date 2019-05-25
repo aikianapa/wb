@@ -75,6 +75,10 @@
 		}
     });
 
+	$(document).delegate(".modal-header","dblclick",function(){
+		$(this).parents(".modal").toggleClass("modal-fullscreen");
+	});
+
 	$(document).delegate(".nav-tabs .nav-link.disabled","click",function(){
 		return false;
 	});

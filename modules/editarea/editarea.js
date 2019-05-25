@@ -134,16 +134,16 @@
 	$(document).data("modEditAreaFsize",fsize);
     }
     if ($(this).hasClass("btnFullScr")) {
-      var div = $(this).parents(toolbar).parent();
-      div.parents(".modal").toggleClass("fullscr");
-      if (div.parents(".modal").hasClass("fullscr")) {
-        var offset = div.find("pre.ace_editor").offset();
-        div.find("pre.ace_editor").height($(window).height() - offset.top - 15);
+      var div = $(this).parents($toolbar).parent();
+      var modal = $(this).parents(".modal");
+      modal.toggleClass("modal-fullscreen");
+      if (modal.hasClass("modal-fullscreen")) {
+        div.find("pre.ace_editor").height($(window).height() - $(modal).find(".modal-content > .nav-active-primary",0).height() - $toolbar.height() - 15);
       } else {
         div.find("pre.ace_editor").height(400);
       }
       editor.resize();
-      document.getElementById(id).requestFullScreen();
+      //document.getElementById(id).requestFullScreen();
       window.dispatchEvent(new Event('resize'));
     }
     if ($(this).hasClass("btnSave")) {

@@ -20,7 +20,7 @@
 			<button class="btn btn-sm btn-default btnLight"><i class="fa fa-sticky-note-o"></i></button>
 			<button class="btn btn-sm btn-default btnDark"><i class="fa fa-sticky-note"></i></button>
 		</div>
-			<!--button class="btn btn-sm btn-default btnFullScr"><i class="fa fa-arrows-alt "></i></button-->
+			<button class="btn btn-sm btn-default btnFullScr"><i class="fa fa-arrows-alt "></i></button>
 			<button class="btn btn-sm btn-default btnSave"><i class="fa fa-save "></i></button>
 	</div>
 	<textarea></textarea>
