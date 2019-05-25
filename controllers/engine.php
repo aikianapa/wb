@@ -130,6 +130,13 @@ function engine__controller_signup()
                 ,"password"         => md5($_POST["password"])
                 ,"email"            => $_POST["email"]
             );
+            $ukeys=array_keys($user);
+			foreach($_POST as $key => $val) {
+				if (substr($val,1)!=="_" AND !in_array($key,$ukeys)) {
+					$user[$key]=$val;
+				}
+			}
+
 		$unsave=array_keys($user);
             foreach($_POST as $key => $value) {
                 if (!in_array($key,$unsave)) {

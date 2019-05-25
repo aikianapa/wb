@@ -130,8 +130,8 @@ success: function(data) {
     wbapp.modal = function(id,selector) {
 	return wb_modal(id,selector);
     }
-    wbapp.func = function(func,params) {
-	    return wb_func(func,params);
+    wbapp.func = function(func,params,fn=undefined) {
+	    return wb_func(func,params,fn);
     }
     wbapp.user = wb_user();
 
@@ -241,16 +241,20 @@ function wb_ajaxWait(ajaxObjs, fn) {
     fn();
 }
 
-function wb_func(func,params) {
+function wb_func(func,params,fn=undefined) {
 	if (params == undefined) params=[];
 	var obj = {};
 	for (var i = 0; i < params.length; ++i) obj[i] = params[i];
 	var res;
-        wbapp.postWait("/ajax/callfunc/" + func, obj, function(data) {
-		res=$.parseJSON(base64_decode(data));
-
+    wbapp.postWait("/ajax/callfunc/" + func, obj, function(res) {
+		res = $.parseJSON(base64_decode(res));
+		if (fn == undefined) {
+			return res;
+		} else {
+			fn(res);
+		}
 	});
-        return res;
+    return res;
 }
 
 function wb_getsnippet(snippet) {
