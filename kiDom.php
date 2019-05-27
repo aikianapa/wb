@@ -179,7 +179,7 @@ final class wbRouter {
             }
         }
         $_ENV["route"]["hostp"]=$_ENV["route"]["scheme"]."://".$_ENV["route"]["host"];
-        if ($_ENV["route"]["port"]!=="80") {
+        if ($_ENV["route"]["port"]!=="80" AND $_ENV["route"]["port"]!=="443") {
             $_ENV["route"]["hostp"].=":".$_ENV["route"]["port"];
         }
         if ($form=='default_form' && $mode='default_mode' && $_SERVER["QUERY_STRING"]>"") {
