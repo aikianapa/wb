@@ -1790,7 +1790,7 @@ function wb_check_required(form) {
                     console.log("trigger: wb_required_false ["+$(this).attr("name")+"]");
                     $(document).trigger("wb_required_false", [this]);
                 } else {
-		    console.log("trigger: wb_required_true");
+					console.log("trigger: wb_required_true");
                     $(document).trigger("wb_required_true", [this]);
                 }
             }
@@ -2053,7 +2053,7 @@ $.fn.wbMailForm = function() {
 
 
 $(document).unbind("wb_required_false");
-$(document).on("wb_required_false", function(event, that, text) {
+$(document).bind("wb_required_false", function(event, that, text) {
     var delay = (4000 + $(that).data("idx") * 250) * 1;
     var text = $(that).data("error");
     if (!text > "") {
