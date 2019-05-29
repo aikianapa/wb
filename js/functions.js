@@ -1680,7 +1680,6 @@ allow_dismiss: true,
                     if (ptpl !== undefined && padd !== "false") {
                         var tpl = $(document).find("#" + ptpl).html();
                         var list = $(document).find("[data-wb-tpl=" + ptpl + "]");
-                        console.log(item_id);
                         var post = {
 tpl:
                             tpl,
@@ -1835,7 +1834,7 @@ function wb_check_required(form) {
 
         if ($(this).is("[minlength]:visible")) {
             var minlen = $(this).attr("minlength") * 1;
-                         var lenstr = strlen($(this).val());
+            var lenstr = strlen($(this).val());
             if (lenstr < minlen) {
                 res = false;
                 $(this).data("error", wbapp.sysmsg.min_length+": " + minlen);
@@ -1843,6 +1842,16 @@ function wb_check_required(form) {
                 $(document).trigger("wb_required_false", [this]);
             }
         }
+
+        if ($(this).is("button")) {
+			if (
+				($(this).attr("value") !== undefined && $(this).val() == "")
+				||
+				($(this).attr("value")  == undefined && $(this).html() == "")
+			) {
+				res = false;
+			}
+		}
     });
     if (res == true) {
 	console.log("trigger: wb_required_success");
