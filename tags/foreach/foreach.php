@@ -258,8 +258,10 @@ class tagForeach extends kiNode  {
             unset($Item[$key]);
         };
         $count=$n;
+        $this->DOM->attr("data-rows",$count);
         if ($ndx==0 AND is_object($empty)) {
-            $inner=$empty->html();
+			$empty->children()->addClass("wb-empty");
+            $inner=$empty->outerHtml();
         }
 
 

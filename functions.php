@@ -717,7 +717,8 @@ function wbTable($table = 'data', $engine = false)
         } else if ($table[1]=="create" OR $table[1]=="c") {
 		$create = true;
 	}
-        $table=$table[0];
+        //$table=$table[0];
+        $table=$table[1];
     }
 
     if (substr($table,0,strlen($_ENV['dbe'])) == $_ENV['dbe']) {

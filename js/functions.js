@@ -1446,9 +1446,9 @@ function wb_formsave() {
         if ($(this).attr("data-wb-add") == "false") {
             $(formObj).attr("data-wb-add", "false");
         }
-        $(this).find("span.glyphicon").addClass("loader");
+        $(this).find("span.fa").addClass("loader");
         var save = wb_formsave_obj(formObj);
-        //$(this).find("span.glyphicon").removeClass("loader glyphicon-save").addClass("glyphicon-ok");
+        $(this).find("span.fa").removeClass("loader fa-save").addClass("fa-check");
         if (save) {
             return save;
         } else {
@@ -1690,6 +1690,7 @@ _id:
                         };
                         var ret = false;
                         if (list.attr("data-wb-add") + "" !== "false") {
+							list.find(".wb-empty").addClass("d-none");
                             ret = wb_setdata(tpl, post, true);
                             if (list.find("[idx=" + item_id + "]").length) {
                                 list.find("[idx=" + item_id + "]").after(ret);
