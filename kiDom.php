@@ -1324,7 +1324,7 @@ abstract class kiNode
     }
 
 
-    public function wbSetData($Item=array()) {
+    public function wbSetData($Item=array(),$clear=false) {
         $this->wbSetFormLocale();
         $this->wbExcludeTags($Item);
         $this->wbSetAttributes($Item);
@@ -1359,8 +1359,8 @@ abstract class kiNode
             $this->wbTargeter($Item);
             $this->tagHideAttrs();
             $this->find(".wb-value")->removeClass("wb-value");
-	    $this->wbAppends($Item);
-	    $this->addClass("wb-done");
+			$this->wbAppends($Item);
+			$this->addClass("wb-done");
             $check=$this->find("[data-wb-role]:not(.wb-done),[role]:not(.wb-done)");
             if ($check->length) {
                 $exit=true;
@@ -1375,6 +1375,7 @@ abstract class kiNode
                 $exit=true;
             }
         }
+        if ($clear) $this->html(wbClearValues($this->html()));
         return $this;
     }
 

@@ -10,7 +10,7 @@ class tagFormdata extends kiNode  {
     }
 
     public function tagFormData($Item=array()) {
-
+		$clear;
         include($_ENV["path_engine"]."/wbattributes.php");
 
         $srcItem=$Item;
@@ -51,7 +51,8 @@ class tagFormdata extends kiNode  {
         }
         $Item=wbCallFormFunc("BeforeShowItem",$Item,$table,$mode);
         $Item=wbCallFormFunc("BeforeItemShow",$Item,$table,$mode);
-        $this->DOM->wbSetData($Item);
+        if ($clear=="true") {$clear=true;} else {$clear=false;}
+		$this->DOM->wbSetData($Item,$clear);
     }
 
 

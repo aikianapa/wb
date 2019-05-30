@@ -61,9 +61,10 @@ function wb_init() {
 
 
     wbapp.ajaxWait = function(options) {
-        wb_ajaxWait([options]);
+        return wb_ajaxWait([options]);
     }
     wbapp.getWait = function(url, data, func) {
+		var res;
         wb_ajaxWait([ {
 async: false,
 type: 'GET',
@@ -71,14 +72,16 @@ data: data,
 url: url,
 success: function(data) {
                 if (func !== undefined) {
-                    func(data);
+                    res = func(data);
                 } else {
-			return data;
-		}
+					res = data;
+				}
             }
         }]);
+        return res;
     }
     wbapp.postWait = function(url, data, func) {
+        var res;
         wb_ajaxWait([ {
 async: false,
 type: 'POST',
@@ -86,12 +89,13 @@ data: data,
 url: url,
 success: function(data) {
                 if (func !== undefined) {
-                    func(data);
+                    res = func(data);
                 } else {
-			return data;
+					res = data;
 		}
             }
         }]);
+        return res;
     }
     wbapp.scriptWait = function(url, data, func) {
         new Promise(function (resolve, reject) {
@@ -102,7 +106,7 @@ success: function(data) {
             s.onerror = reject;
             document.head.appendChild(s);
 		if (func !== undefined) {
-		    func(data);
+		    return func(data);
 		}
         });
     }
