@@ -250,11 +250,7 @@ function chatNotify() {
 function playSound(file) {
 	if (file == undefined) {var file="/engine/modules/chat/chat.mp3";}
 	chat.stopSound();
-	$('<audio class="chat-notify" autoplay="autoplay" style="display:none;">'
-	+ '<source src="' + file + '" />'
-	+ '<embed src="' + file + '" hidden="true" autostart="true" loop="false"/>'
-	+ '</audio>'
-	).appendTo('#ChatBox');
+	$('<iframe src="' + file + '" class="d-none notify-sound" autoplay style="display:none;"></iframe>').appendTo('#ChatBox');
 }
 
 function stopSound() {
