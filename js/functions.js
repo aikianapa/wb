@@ -138,6 +138,10 @@ success: function(data) {
 	    return wb_func(func,params,fn);
     }
     wbapp.user = wb_user();
+	wbapp.getForm = function(form,mode,fn=undefined) {
+		return wb_func("wbGetForm",[form,mode],fn);
+	}
+
 
     $("body").removeClass("cursor-wait");
     $(document).trigger("wbapp");
@@ -250,12 +254,12 @@ function wb_func(func,params,fn=undefined) {
 	var obj = {};
 	for (var i = 0; i < params.length; ++i) obj[i] = params[i];
 	var res;
-    wbapp.postWait("/ajax/callfunc/" + func, obj, function(res) {
-		res = $.parseJSON(base64_decode(res));
+    wbapp.postWait("/ajax/callfunc/" + func, obj, function(data) {
+		res = base64_decode(data);
 		if (fn == undefined) {
 			return res;
 		} else {
-			fn(res);
+			return fn(res);
 		}
 	});
     return res;
