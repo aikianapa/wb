@@ -1320,7 +1320,7 @@ empty: 'fa fa-star-o'
 }
 
 $.fn.wbFixModal = function () {
-    	$(this).find(".modal-dialog").css( 'height' ,'').css("margin","");
+   	$(this).find(".modal-dialog").css( 'height' ,'').css("margin","");
 	$(this).find(".modal-content").css( 'height' ,'');
 	$(this).find(".modal-body").css( 'height' ,'');
 
@@ -1517,15 +1517,14 @@ function wb_iconv_object(obj) {
 }
 
 function wb_iconv(value, type) {
-    if (substr(type, 0, 4) == "date") {
         if (type == "date" || type == "datepicker") {
             var mask = "Y-m-d";
+            value = date(mask, strtotime(value));
         }
         if (type == "datetime" || type == "datetimepicker") {
             var mask = "Y-m-d H:i";
+            value = date(mask, strtotime(value));
         }
-        value = date(mask, strtotime(value));
-    }
     return value;
 }
 
