@@ -70,11 +70,12 @@ function ajax__callfunc() {
 	}
 	if (is_array($res)) {
 		header('Content-Type: application/json');
-		$res=json_encode($res);
+		echo json_encode($res);
 	} else {
-		base64_encode($res);
+		header('Content-Type: text/html; charset=utf-8');
+		echo base64_encode($res);
 	}
-	return $res;
+	die;
 }
 
 function ajax__settings() {
@@ -312,6 +313,7 @@ function ajax__remove() {
 
 function ajax__getform() {
         $out = wbGetForm($_ENV["route"]["params"][0],$_ENV["route"]["params"][1]);
+        header('Content-Type: text/html; charset=utf-8');
         echo $out;
         die;
 }

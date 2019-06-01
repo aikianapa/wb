@@ -135,7 +135,12 @@ success: function(data) {
 	return wb_modal(id,selector);
     }
     wbapp.func = function(func,params,fn=undefined) {
-	    return wb_func(func,params,fn);
+		res = wb_func(func,params,fn);
+		if (is_object) {
+			return res;
+		} else {
+			return base64_decode(res);
+		}
     }
     wbapp.user = wb_user();
 	wbapp.getForm = function(form,mode,fn=undefined) {
