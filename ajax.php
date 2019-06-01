@@ -68,8 +68,13 @@ function ajax__callfunc() {
 		$params=implode(",",$params);
 		$res = eval('return $func('.$params.');');
 	}
-	if (is_array($res)) $res=json_encode($res);
-	return base64_encode($res);
+	if (is_array($res)) {
+		header('Content-Type: application/json');
+		$res=json_encode($res);
+	} else {
+		base64_encode($res);
+	}
+	return $res;
 }
 
 function ajax__settings() {

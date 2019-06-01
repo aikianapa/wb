@@ -255,7 +255,7 @@ function wb_func(func,params,fn=undefined) {
 	for (var i = 0; i < params.length; ++i) obj[i] = params[i];
 	var res;
     wbapp.postWait("/ajax/callfunc/" + func, obj, function(data) {
-		res = base64_decode(data);
+		if (is_object(data)) {res=data;} else {res = base64_decode(data);}
 		if (fn == undefined) {
 			return res;
 		} else {
