@@ -2163,13 +2163,8 @@ abstract class kiNode
         $this->wbSetAttributes($Item);
         include("wbattributes.php");
         $name=$this->attr("name");
-        if (isset($from)) {
-            $name=$from;
-        }
-
-        if ($name=="" AND isset($item)) {
-            $name=$item;
-        }
+        if (isset($from)) $name=$from;
+        if ($name=="" AND isset($item)) $name=$item;
         $type=$this->attr("type");
         if (isset($dict)) {
             $dictdata=wbItemRead("tree",$dict);
@@ -2181,6 +2176,7 @@ abstract class kiNode
             }
             unset($dictdata);
         }
+
         if (($this->hasAttr("name") OR $this->is("input")) AND !$this->is("select") ) {
             $tree=wbGetForm("common","tree_ol");
             $this->append("<input type='hidden' name='{$name}'><input type='hidden' name='_{$name}__dict_' data-name='dict'>");
@@ -2246,13 +2242,8 @@ abstract class kiNode
         if ($param==null) {
             include("wbattributes.php");
             $name=$this->attr("name");
-            if (isset($from)) {
-                $name=$from;
-            }
-
-            if ($name=="" AND isset($item)) {
-                $name=$item;
-            }
+            if (isset($from)) $name=$from;
+            if ($name=="" AND isset($item)) $name=$item;
             if (!is_array($Item[$name])) {
                 $tree=json_decode($Item[$name],true);
             }
@@ -2294,13 +2285,15 @@ abstract class kiNode
             }
             $tree=$Item;
         }
-        if (!isset($level)) {
-            $level="";
-        }
+        if (!isset($level)) $level="";
         $tpl=$this->html();
         $this->html("");
         if ($branch!==0) {
-            $tree=wbTreeFindBranch($tree,$branch);
+			if ($tree==NULL AND $branch>"") {
+				$tree=wbTreeFindBranch($Item["children"],$branch);
+			} else {
+				$tree=wbTreeFindBranch($tree,$branch);
+			}
         }
         if ($this->hasAttr("placeholder") AND $this->is("select")) {
             $this->prepend("<option value='' class='placeholder'>".$this->attr("placeholder")."</option>");

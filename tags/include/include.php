@@ -10,19 +10,7 @@ class tagInclude extends kiNode  {
     }
 
     public function tagInclude($Item = array()) {
-	    $_attributes=$this->DOM->attributes();
-	    if ($_attributes) {
-                    $_ENV["attributes"]=array();
-                    if ($_attributes) {
-                        $attrs=new IteratorIterator($_attributes);
-                        foreach ($attrs as $attr) {
-                                $tmp=$attr->name;
-                                if (strpos($tmp,"ata-wb-")) {$tmp=str_replace("data-wb-","",$tmp); $_ENV["attributes"][$tmp]=$$tmp=$attr->value()."";} else {
-                                        $_ENV["attributes"][$attr->name]=$attr->value();
-                                }
-                        }; unset($attrs);
-                    }
-	    }
+		include($_ENV["path_engine"]."/wbattributes.php");
         if (!isset($src)) {
             $src=$ssrc=$this->DOM->attr("src");
         }
