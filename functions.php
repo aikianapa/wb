@@ -45,7 +45,8 @@ function wbInitEnviroment()
     $_ENV['path_app'] = ($_SERVER['DOCUMENT_ROOT']>"") ? $_SERVER['DOCUMENT_ROOT'] : $dir ;
     $_ENV['path_engine'] = $_ENV['path_app'].'/engine';
     $_ENV['path_system'] = __DIR__;
-    $_ENV['path_tpl'] = $_ENV['path_app'].'/tpl';
+    $_ENV['base'] = "/tpl/";
+    $_ENV['path_tpl'] = $_ENV['path_app'].$_ENV['base'];
     $_ENV['dbe'] = $_ENV['path_engine'].'/database'; 			// Engine data
     $_ENV['dba'] = $_ENV['path_app'].'/database';	// App data
     $_ENV['dbec'] = $_ENV['path_engine'].'/database/_cache'; 			// Engine data
@@ -872,7 +873,7 @@ function wbItemList($table = 'pages', $where = '', $sort = null)
     ini_set('memory_limit', '1024M');
     wbTrigger('form', __FUNCTION__, 'BeforeItemList', func_get_args(), array());
     $call="wb".ucfirst(wbTableName($table))."ItemList";
-    if (is_callable($call)) $list=$call($table,$where,$sort);
+    if (is_callable($call) AND $call !== __FUNCTION__) $list=$call($table,$where,$sort);
     if (!isset($list)) {
 	    $drv=wbItemDriver(__FUNCTION__,func_get_args());
 	    if ($drv!==false) {

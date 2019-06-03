@@ -91,6 +91,10 @@ function form__controller__show() {
                 if (!is_object($_ENV["DOM"])) {$_ENV["DOM"]=wbFromString($_ENV["DOM"]);}
             }
         }
+        if ($_ENV["DOM"]->find("head")->length AND !$_ENV["DOM"]->find("base")->length) {
+
+			$_ENV["DOM"]->find("head")->prepend('<base href="'.$_ENV["base"].'">');
+		}
 		$_ENV["DOM"]->wbSetData($Item);
 	}
 	return $_ENV["DOM"];
