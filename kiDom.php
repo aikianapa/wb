@@ -1621,11 +1621,16 @@ abstract class kiNode
                         $com=str_replace("data-wb-","",$attribute);
                         if ($com=="replace") $com="replaceWith";
                         if ($$attribute>""  AND $com>"" AND $com!=="selector") {
-				if ($com=="prependto" OR $com=="appendto") {
-					if ($this->find($$attribute)->length AND $this->find($selector)->length ) {
-						$this->find($selector)->$com($$attribute);
-						$inc->remove();
-					}
+
+				if ($com=="prependto" OR $com=="appendto" OR $com=="replaceWith") {
+						if ($com=="replaceWith" AND $this->find($$attribute)->length AND $this->find($selector)->length) {
+							$this->find($$attribute)->$com($this->find($selector));
+						} else {
+							if ($this->find($$attribute)->length AND $this->find($selector)->length ) {
+								$this->find($selector)->$com($$attribute);
+								$inc->remove();
+							}
+						}
 				} else {
 				    $res=$this->find($selector);
 				    if ($res->length) {

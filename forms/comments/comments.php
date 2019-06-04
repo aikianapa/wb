@@ -14,7 +14,7 @@ function comments__edit() {
 	$out=wbGetForm("comments","edit");
 	$Item=wbItemRead("comments",$_ENV["route"]["item"]);
 	$Item=_commentsBeforeItemShow($Item);
-	$out->wbSetData($Item);
+	$out->wbSetData($Item,true);
 	return $out->outerHtml();
 }
 

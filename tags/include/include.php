@@ -201,7 +201,7 @@ class tagInclude extends kiNode  {
         if ($dfs=="false") {
             $this_content->find("[data-wb-formsave]")->remove();
         }
-        if ($class>"") {
+        if ($class>"" AND ( $this->DOM->attr("data-wb-hide")=="*" OR $this->DOM->is("meta") OR $this->DOM->is("link") )) {
             $this_content->find(":first")->addClass($class);
         }
 
@@ -226,7 +226,7 @@ class tagInclude extends kiNode  {
             }
 
         }
-        if (isset($find)) {echo $this_content; die;}
+
         $this_content->tagInclude_inc($Item);
         $this_content->wbSetData($Item);
 

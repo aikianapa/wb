@@ -58,14 +58,16 @@ function form__controller__common__controller() {
 function form__controller__show() {
 	$form=$_ENV["route"]["form"];
 	$item=$_ENV["route"]["item"];
+	$tpl = null;
+	if (isset($_ENV["route"]["tpl"]) AND $_ENV["route"]["tpl"]>"") $tpl=$_ENV["route"]["tpl"];
 	$mode="show";
     $Item=$_ENV["ITEM"]=wbItemRead($form,$item);
     if (!$Item) {
         $fid=wbFurlGet($form,$item);
-        if ($fid) {$item=$fid;} else {return form__controller__error_404();}
+        if ($fid) {$item=$fid;} else if (!$tpl) {return form__controller__error_404();}
         $Item=$_ENV["ITEM"]=wbItemRead($form,$item);
     }
-    $Item=wbItemToArray($Item);
+
     if (is_callable("wbBeforeShowItem")) {$Item=$_ENV["ITEM"]=wbBeforeShowItem($Item);}
     $Item=$_ENV["ITEM"]=wbCallFormFunc("BeforeShowItem",$Item,$form,$mode);
 
@@ -82,12 +84,16 @@ function form__controller__show() {
         } else {
             $out=wbGetForm($form,$mode);
             if ($_ENV["error"]["wbGetForm"]!=="noform") { $_ENV["DOM"]=$out; } else {
-                if (!isset($Item["template"]) OR $Item["template"]=="") {
-			//$Item["template"]="default.php";
-			$_ENV["DOM"]=wbFromString("<html>{{text}}</html>");
-		} else {
-			$_ENV["DOM"]=wbGetTpl($Item["template"]);
-		}
+				if ($tpl) {
+					$_ENV["DOM"]=wbGetTpl($tpl);
+				} else {
+					if (!isset($Item["template"]) OR $Item["template"]=="") {
+						//$Item["template"]="default.php";
+						$_ENV["DOM"]=wbFromString("<html>{{text}}</html>");
+					} else {
+						$_ENV["DOM"]=wbGetTpl($Item["template"]);
+					}
+				}
                 if (!is_object($_ENV["DOM"])) {$_ENV["DOM"]=wbFromString($_ENV["DOM"]);}
             }
         }
@@ -158,7 +164,7 @@ function form__controller__edit() {
 		if (is_string($out)) {$out=wbFromString($out);}
 		$_ENV["DOM"]=$out;
 	}
-	$_ENV["DOM"]->wbSetData($data);
+	$_ENV["DOM"]->wbSetData($data,true);
 	return $_ENV["DOM"];
 }
 
