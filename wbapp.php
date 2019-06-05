@@ -24,7 +24,7 @@ class wbApp {
                 }
                 return $res;
         } else if (!is_callable($func)) {
-            die("Функция {$wbfunc} не существует");
+            die("Function {$wbfunc} not defined");
         } else {
             return call_user_func_array($func,$params);
         }
