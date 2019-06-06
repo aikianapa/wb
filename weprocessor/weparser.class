@@ -7,13 +7,13 @@ public function __construct($d) {
 }
 var $qi = 0;
 var $i = array (
-  0 => 
+  0 =>
   array (
     'EXT_START' => 's 1',
     'webExpr' => 's 45',
     '\'start\'' => 'a \'start\'',
   ),
-  1 => 
+  1 =>
   array (
     'EXT_START' => 's 1',
     'expr' => 's 2',
@@ -31,7 +31,7 @@ var $i = array (
     'EXT_NUM' => 's 24',
     'let_set_left' => 's 39',
   ),
-  2 => 
+  2 =>
   array (
     'EXT_END' => 's 3',
     '\'+\'' => 's 4',
@@ -39,7 +39,7 @@ var $i = array (
     '\'*\'' => 's 8',
     '\'/\'' => 's 10',
   ),
-  3 => 
+  3 =>
   array (
     '#' => 'r 0',
     '\'.\'' => 'r 0',
@@ -54,7 +54,7 @@ var $i = array (
     '\',\'' => 'r 0',
     '\']\'' => 'r 0',
   ),
-  4 => 
+  4 =>
   array (
     'EXT_START' => 's 1',
     'expr' => 's 5',
@@ -72,7 +72,7 @@ var $i = array (
     'EXT_NUM' => 's 24',
     'let_set_left' => 's 39',
   ),
-  5 => 
+  5 =>
   array (
     '\'+\'' => 'r 1',
     '\'-\'' => 'r 1',
@@ -82,7 +82,7 @@ var $i = array (
     '\')\'' => 'r 1',
     '\',\'' => 'r 1',
   ),
-  6 => 
+  6 =>
   array (
     'EXT_START' => 's 1',
     'expr' => 's 7',
@@ -100,7 +100,7 @@ var $i = array (
     'EXT_NUM' => 's 24',
     'let_set_left' => 's 39',
   ),
-  7 => 
+  7 =>
   array (
     '\'+\'' => 'r 2',
     '\'-\'' => 'r 2',
@@ -110,7 +110,7 @@ var $i = array (
     '\')\'' => 'r 2',
     '\',\'' => 'r 2',
   ),
-  8 => 
+  8 =>
   array (
     'EXT_START' => 's 1',
     'expr' => 's 9',
@@ -128,7 +128,7 @@ var $i = array (
     'EXT_NUM' => 's 24',
     'let_set_left' => 's 39',
   ),
-  9 => 
+  9 =>
   array (
     '\'+\'' => 'r 3',
     '\'-\'' => 'r 3',
@@ -138,7 +138,7 @@ var $i = array (
     '\')\'' => 'r 3',
     '\',\'' => 'r 3',
   ),
-  10 => 
+  10 =>
   array (
     'EXT_START' => 's 1',
     'expr' => 's 11',
@@ -156,7 +156,7 @@ var $i = array (
     'EXT_NUM' => 's 24',
     'let_set_left' => 's 39',
   ),
-  11 => 
+  11 =>
   array (
     '\'+\'' => 'r 4',
     '\'-\'' => 'r 4',
@@ -166,7 +166,7 @@ var $i = array (
     '\')\'' => 'r 4',
     '\',\'' => 'r 4',
   ),
-  12 => 
+  12 =>
   array (
     'EXT_START' => 's 1',
     'expr' => 's 13',
@@ -184,7 +184,7 @@ var $i = array (
     'EXT_NUM' => 's 24',
     'let_set_left' => 's 39',
   ),
-  13 => 
+  13 =>
   array (
     '\'+\'' => 's 4',
     '\'-\'' => 's 6',
@@ -192,7 +192,7 @@ var $i = array (
     '\'/\'' => 's 10',
     '\')\'' => 's 14',
   ),
-  14 => 
+  14 =>
   array (
     'EXT_END' => 'r 5',
     '\'/\'' => 'r 5',
@@ -202,7 +202,7 @@ var $i = array (
     '\')\'' => 'r 5',
     '\',\'' => 'r 5',
   ),
-  15 => 
+  15 =>
   array (
     'EXT_END' => 'r 6',
     '\'/\'' => 'r 6',
@@ -212,7 +212,7 @@ var $i = array (
     '\')\'' => 'r 6',
     '\',\'' => 'r 6',
   ),
-  16 => 
+  16 =>
   array (
     '\'[\'' => 's 17',
     '\'.\'' => 's 25',
@@ -225,7 +225,7 @@ var $i = array (
     '\',\'' => 'r 7',
     'EXT_LET' => 'r 28',
   ),
-  17 => 
+  17 =>
   array (
     'EXT_START' => 's 1',
     'num' => 's 18',
@@ -235,7 +235,7 @@ var $i = array (
     'index' => 's 22',
     'EXT_NUM' => 's 24',
   ),
-  18 => 
+  18 =>
   array (
     '\']\'' => 'r 20',
     '\'.\'' => 'r 20',
@@ -249,7 +249,7 @@ var $i = array (
     '\',\'' => 'r 20',
     'EXT_LET' => 'r 20',
   ),
-  19 => 
+  19 =>
   array (
     '\']\'' => 'r 21',
     '\'.\'' => 'r 21',
@@ -263,7 +263,7 @@ var $i = array (
     '\',\'' => 'r 21',
     'EXT_LET' => 'r 21',
   ),
-  20 => 
+  20 =>
   array (
     '\']\'' => 'r 22',
     '\'.\'' => 'r 22',
@@ -277,7 +277,7 @@ var $i = array (
     '\',\'' => 'r 22',
     'EXT_LET' => 'r 22',
   ),
-  21 => 
+  21 =>
   array (
     '\']\'' => 'r 23',
     '\'.\'' => 'r 23',
@@ -291,11 +291,11 @@ var $i = array (
     '\',\'' => 'r 23',
     'EXT_LET' => 'r 23',
   ),
-  22 => 
+  22 =>
   array (
     '\']\'' => 's 23',
   ),
-  23 => 
+  23 =>
   array (
     '\'.\'' => 'r 24',
     '\'[\'' => 'r 24',
@@ -308,7 +308,7 @@ var $i = array (
     '\',\'' => 'r 24',
     'EXT_LET' => 'r 24',
   ),
-  24 => 
+  24 =>
   array (
     '\'.\'' => 'r 26',
     '\'[\'' => 'r 26',
@@ -322,7 +322,7 @@ var $i = array (
     '\',\'' => 'r 26',
     'EXT_LET' => 'r 26',
   ),
-  25 => 
+  25 =>
   array (
     'EXT_START' => 's 1',
     'num' => 's 18',
@@ -332,7 +332,7 @@ var $i = array (
     'index' => 's 26',
     'EXT_NUM' => 's 24',
   ),
-  26 => 
+  26 =>
   array (
     '\'.\'' => 'r 25',
     '\'[\'' => 'r 25',
@@ -345,7 +345,7 @@ var $i = array (
     '\',\'' => 'r 25',
     'EXT_LET' => 'r 25',
   ),
-  27 => 
+  27 =>
   array (
     'EXT_END' => 'r 8',
     '\'/\'' => 'r 8',
@@ -355,7 +355,7 @@ var $i = array (
     '\')\'' => 'r 8',
     '\',\'' => 'r 8',
   ),
-  28 => 
+  28 =>
   array (
     '\'(\'' => 's 29',
     '\'.\'' => 'r 18',
@@ -369,7 +369,7 @@ var $i = array (
     '\',\'' => 'r 18',
     'EXT_LET' => 'r 18',
   ),
-  29 => 
+  29 =>
   array (
     'EXT_START' => 's 1',
     'expr' => 's 30',
@@ -389,7 +389,7 @@ var $i = array (
     'EXT_NUM' => 's 24',
     'let_set_left' => 's 39',
   ),
-  30 => 
+  30 =>
   array (
     '\'+\'' => 's 4',
     '\'-\'' => 's 6',
@@ -398,7 +398,7 @@ var $i = array (
     '\',\'' => 's 31',
     '\')\'' => 'r 12',
   ),
-  31 => 
+  31 =>
   array (
     'EXT_START' => 's 1',
     'expr' => 's 30',
@@ -417,7 +417,7 @@ var $i = array (
     'EXT_NUM' => 's 24',
     'let_set_left' => 's 39',
   ),
-  32 => 
+  32 =>
   array (
     'EXT_END' => 'r 11',
     '\'/\'' => 'r 11',
@@ -427,11 +427,11 @@ var $i = array (
     '\')\'' => 'r 11',
     '\',\'' => 'r 11',
   ),
-  33 => 
+  33 =>
   array (
     '\')\'' => 'r 13',
   ),
-  34 => 
+  34 =>
   array (
     '\'.\'' => 'r 14',
     '\'[\'' => 'r 14',
@@ -444,7 +444,7 @@ var $i = array (
     '\',\'' => 'r 14',
     'EXT_LET' => 'r 14',
   ),
-  35 => 
+  35 =>
   array (
     '\'.\'' => 'r 15',
     '\'[\'' => 'r 15',
@@ -457,7 +457,7 @@ var $i = array (
     '\',\'' => 'r 15',
     'EXT_LET' => 'r 15',
   ),
-  36 => 
+  36 =>
   array (
     '\'.\'' => 'r 16',
     '\'[\'' => 'r 16',
@@ -470,7 +470,7 @@ var $i = array (
     '\',\'' => 'r 16',
     'EXT_LET' => 'r 16',
   ),
-  37 => 
+  37 =>
   array (
     '\'.\'' => 'r 17',
     '\'[\'' => 'r 17',
@@ -483,7 +483,7 @@ var $i = array (
     '\',\'' => 'r 17',
     'EXT_LET' => 'r 17',
   ),
-  38 => 
+  38 =>
   array (
     '\'.\'' => 'r 19',
     '\'[\'' => 'r 19',
@@ -496,11 +496,11 @@ var $i = array (
     '\',\'' => 'r 19',
     'EXT_LET' => 'r 19',
   ),
-  39 => 
+  39 =>
   array (
     'EXT_LET' => 's 40',
   ),
-  40 => 
+  40 =>
   array (
     'EXT_START' => 's 1',
     'expr' => 's 41',
@@ -518,7 +518,7 @@ var $i = array (
     'EXT_NUM' => 's 24',
     'let_set_left' => 's 39',
   ),
-  41 => 
+  41 =>
   array (
     '\'+\'' => 'r 27',
     '\'-\'' => 'r 27',
@@ -528,7 +528,7 @@ var $i = array (
     '\')\'' => 'r 27',
     '\',\'' => 'r 27',
   ),
-  42 => 
+  42 =>
   array (
     'EXT_END' => 'r 9',
     '\'/\'' => 'r 9',
@@ -538,11 +538,11 @@ var $i = array (
     '\')\'' => 'r 9',
     '\',\'' => 'r 9',
   ),
-  43 => 
+  43 =>
   array (
     '\')\'' => 's 44',
   ),
-  44 => 
+  44 =>
   array (
     'EXT_END' => 'r 10',
     '\'/\'' => 'r 10',
@@ -552,7 +552,7 @@ var $i = array (
     '\')\'' => 'r 10',
     '\',\'' => 'r 10',
   ),
-  45 => 
+  45 =>
   array (
     '#' => 'r 29',
   ),
@@ -572,7 +572,7 @@ function reduce_1_expr_1($tokens, &$result) {
 $result = reset($tokens);
 $e1 =& $tokens[0];
 $e2 =& $tokens[2];
- $result = $this->d->add($e1, $e2); 
+ $result = $this->d->add($e1, $e2);
 }
 
 function reduce_2_expr_2($tokens, &$result) {
@@ -580,7 +580,7 @@ function reduce_2_expr_2($tokens, &$result) {
 # (2) expr :=  expr  '-'  expr
 #
 $result = reset($tokens);
- $result = $tokens[0] - $tokens[2]; 
+ $result = $tokens[0] - $tokens[2];
 }
 
 function reduce_3_expr_3($tokens, &$result) {
@@ -588,7 +588,7 @@ function reduce_3_expr_3($tokens, &$result) {
 # (3) expr :=  expr  '*'  expr
 #
 $result = reset($tokens);
- $result = $tokens[0] * $tokens[2]; 
+ $result = $tokens[0] * $tokens[2];
 }
 
 function reduce_4_expr_4($tokens, &$result) {
@@ -596,7 +596,12 @@ function reduce_4_expr_4($tokens, &$result) {
 # (4) expr :=  expr  '/'  expr
 #
 $result = reset($tokens);
- $result = $tokens[0] / $tokens[2]; 
+	if ($tokens[2]==0) {
+		$result = $tokens[0];
+	} else {
+		$result = $tokens[0] / $tokens[2];
+	}
+
 }
 
 function reduce_5_expr_5($tokens, &$result) {
@@ -628,7 +633,7 @@ function reduce_8_expr_8($tokens, &$result) {
 # (8) expr :=  '@'
 #
 $result = reset($tokens);
- $result = $this->d->getLet(); 
+ $result = $this->d->getLet();
 }
 
 function reduce_9_callfn_1($tokens, &$result) {
@@ -637,7 +642,7 @@ function reduce_9_callfn_1($tokens, &$result) {
 #
 $result = reset($tokens);
 $a =& $tokens[0];
- $result = $this->d->call_fn($a, array()); 
+ $result = $this->d->call_fn($a, array());
 }
 
 function reduce_10_callfn_2($tokens, &$result) {
@@ -647,7 +652,7 @@ function reduce_10_callfn_2($tokens, &$result) {
 $result = reset($tokens);
 $a =& $tokens[0];
 $p =& $tokens[2];
- $result = $this->d->call_fn($a, $p); 
+ $result = $this->d->call_fn($a, $p);
 }
 
 function reduce_11_callfn_3($tokens, &$result) {
@@ -664,7 +669,7 @@ function reduce_12_call_args_1($tokens, &$result) {
 #
 $result = reset($tokens);
 $e1 =& $tokens[0];
- $result = array($e1); 
+ $result = array($e1);
 }
 
 function reduce_13_call_args_2($tokens, &$result) {
@@ -674,7 +679,7 @@ function reduce_13_call_args_2($tokens, &$result) {
 $result = reset($tokens);
 $e1 =& $tokens[0];
 $e2 =& $tokens[2];
- $result = array_merge(array($e1), $e2); 
+ $result = array_merge(array($e1), $e2);
 }
 
 function reduce_14_access_1($tokens, &$result) {
@@ -715,7 +720,7 @@ function reduce_18_access_5($tokens, &$result) {
 #
 $result = reset($tokens);
 $n =& $tokens[0];
- $result = $this->d->get_variable($n); 
+ $result = $this->d->get_variable($n);
 }
 
 function reduce_19_access_6($tokens, &$result) {
@@ -765,7 +770,7 @@ function reduce_24_access_index_1($tokens, &$result) {
 $result = reset($tokens);
 $e =& $tokens[0];
 $i =& $tokens[2];
- $result = $this->d->call_index($e, $i); 
+ $result = $this->d->call_index($e, $i);
 }
 
 function reduce_25_access_field_1($tokens, &$result) {
@@ -775,7 +780,7 @@ function reduce_25_access_field_1($tokens, &$result) {
 $result = reset($tokens);
 $e =& $tokens[0];
 $i =& $tokens[2];
- $result = $this->d->call_field($e, $i); 
+ $result = $this->d->call_field($e, $i);
 }
 
 function reduce_26_num_1($tokens, &$result) {
@@ -784,7 +789,7 @@ function reduce_26_num_1($tokens, &$result) {
 #
 $result = reset($tokens);
 $n =& $tokens[0];
- $result = (double)$n; 
+ $result = (double)$n;
 }
 
 function reduce_27_let_set_1($tokens, &$result) {
@@ -801,7 +806,7 @@ function reduce_28_let_set_left_1($tokens, &$result) {
 #
 $result = reset($tokens);
 $e =& $tokens[0];
- $result = $this->d->setLet($e); 
+ $result = $this->d->setLet($e);
 }
 
 function reduce_29_start_1($tokens, &$result) {
@@ -845,181 +850,181 @@ var $method = array (
   29 => 'reduce_29_start_1',
 );
 var $a = array (
-  0 => 
+  0 =>
   array (
     'symbol' => 'webExpr',
     'len' => 3,
     'replace' => true,
   ),
-  1 => 
+  1 =>
   array (
     'symbol' => 'expr',
     'len' => 3,
     'replace' => true,
   ),
-  2 => 
+  2 =>
   array (
     'symbol' => 'expr',
     'len' => 3,
     'replace' => true,
   ),
-  3 => 
+  3 =>
   array (
     'symbol' => 'expr',
     'len' => 3,
     'replace' => true,
   ),
-  4 => 
+  4 =>
   array (
     'symbol' => 'expr',
     'len' => 3,
     'replace' => true,
   ),
-  5 => 
+  5 =>
   array (
     'symbol' => 'expr',
     'len' => 3,
     'replace' => true,
   ),
-  6 => 
+  6 =>
   array (
     'symbol' => 'expr',
     'len' => 1,
     'replace' => true,
   ),
-  7 => 
+  7 =>
   array (
     'symbol' => 'expr',
     'len' => 1,
     'replace' => true,
   ),
-  8 => 
+  8 =>
   array (
     'symbol' => 'expr',
     'len' => 1,
     'replace' => true,
   ),
-  9 => 
+  9 =>
   array (
     'symbol' => 'callfn',
     'len' => 3,
     'replace' => true,
   ),
-  10 => 
+  10 =>
   array (
     'symbol' => 'callfn',
     'len' => 4,
     'replace' => true,
   ),
-  11 => 
+  11 =>
   array (
     'symbol' => 'callfn',
     'len' => 1,
     'replace' => true,
   ),
-  12 => 
+  12 =>
   array (
     'symbol' => 'call_args',
     'len' => 1,
     'replace' => true,
   ),
-  13 => 
+  13 =>
   array (
     'symbol' => 'call_args',
     'len' => 3,
     'replace' => true,
   ),
-  14 => 
+  14 =>
   array (
     'symbol' => 'access',
     'len' => 1,
     'replace' => true,
   ),
-  15 => 
+  15 =>
   array (
     'symbol' => 'access',
     'len' => 1,
     'replace' => true,
   ),
-  16 => 
+  16 =>
   array (
     'symbol' => 'access',
     'len' => 1,
     'replace' => true,
   ),
-  17 => 
+  17 =>
   array (
     'symbol' => 'access',
     'len' => 1,
     'replace' => true,
   ),
-  18 => 
+  18 =>
   array (
     'symbol' => 'access',
     'len' => 1,
     'replace' => true,
   ),
-  19 => 
+  19 =>
   array (
     'symbol' => 'access',
     'len' => 1,
     'replace' => true,
   ),
-  20 => 
+  20 =>
   array (
     'symbol' => 'index',
     'len' => 1,
     'replace' => true,
   ),
-  21 => 
+  21 =>
   array (
     'symbol' => 'index',
     'len' => 1,
     'replace' => true,
   ),
-  22 => 
+  22 =>
   array (
     'symbol' => 'index',
     'len' => 1,
     'replace' => true,
   ),
-  23 => 
+  23 =>
   array (
     'symbol' => 'index',
     'len' => 1,
     'replace' => true,
   ),
-  24 => 
+  24 =>
   array (
     'symbol' => 'access_index',
     'len' => 4,
     'replace' => true,
   ),
-  25 => 
+  25 =>
   array (
     'symbol' => 'access_field',
     'len' => 3,
     'replace' => true,
   ),
-  26 => 
+  26 =>
   array (
     'symbol' => 'num',
     'len' => 1,
     'replace' => true,
   ),
-  27 => 
+  27 =>
   array (
     'symbol' => 'let_set',
     'len' => 3,
     'replace' => true,
   ),
-  28 => 
+  28 =>
   array (
     'symbol' => 'let_set_left',
     'len' => 1,
     'replace' => true,
   ),
-  29 => 
+  29 =>
   array (
     'symbol' => '\'start\'',
     'len' => 1,
