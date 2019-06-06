@@ -879,7 +879,11 @@ function wbItemList($table = 'pages', $where = '', $sort = null)
 	    if ($drv!==false) {
 		    $list = $drv["result"];
 	    } else {
-		    $where=wbSetValuesStr($where);
+		    if (is_string($where)) {
+				$where = $cWhere = wbSetValuesStr($where);
+			} else {
+				$cWhere=null;
+			}
 		    $list = array();
 		    $table = wbTable($table);
 		    $tname = wbTableName($table);
@@ -888,7 +892,7 @@ function wbItemList($table = 'pages', $where = '', $sort = null)
 
 			return array();
 		    }
-		    if (isset($_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])])) {
+		    if ($cWhere !== null AND isset($_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])])) {
 			$list = $_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])];
 		    } else {
 			$list = wb_file_get_contents($table);
@@ -899,10 +903,10 @@ function wbItemList($table = 'pages', $where = '', $sort = null)
 			    $list=unserialize($list);
 			}
 
-			if (is_array($list)) {
+			if ((array)$list === $list) {
 			    foreach ($list as $key => $item) {
 				$item['_table'] = $tname;
-				if ($tname!=="tree") $item=wbItemToArray($item);
+				//if ($tname!=="tree") $item=wbItemToArray($item);
 				$item = wbTrigger('form', __FUNCTION__, 'AfterItemRead', func_get_args(), $item);
 				if (
 				    ('_' == substr($item['id'], 0, 1) and 'admin' !== $_SESSION['user_role'])
@@ -913,8 +917,12 @@ function wbItemList($table = 'pages', $where = '', $sort = null)
 				) {
 				    unset($list[$key]);
 				}
-				elseif ($where > '' and !wbWhereItem($item, $where)) {
+				elseif (is_string($where) AND $where > '' AND !wbWhereItem($item, $where)) {
 				    unset($list[$key]);
+				} else if (!is_string($where) ) {
+					// не реализовано
+					//call_user_func_array($where,$list[$key]);
+					//unset($list[$key]);
 				} else {
 				    $list[$key] = $item;
 				}
@@ -928,7 +936,7 @@ function wbItemList($table = 'pages', $where = '', $sort = null)
 		    if (null !== $sort) {
 			$list = wbArraySortMulti($list, $sort);
 		    }
-		    $_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])] = $list;
+		    if ($cWhere !== null) $_ENV['cache'][md5($table.$where.$sort.$_ENV["lang"].$_SESSION["lang"])] = $list;
 
 	    }
     }

@@ -1163,7 +1163,8 @@ todayBtn: true
                 var that = this;
                 if ($(this).is("[data-wb-ajax]")) {
                     var url = $(this).attr("data-wb-ajax");
-                    var tpl = $("#" + $(this).attr("data-wb-tpl")).html();
+                    var tpl = $(this).html();
+                    if ($(this).attr("data-wb-tpl")!==undefined) tpl = $("#" + $(this).attr("data-wb-tpl")).html();
                     var where = $(this).attr("data-wb-where");
                     var val = $(this).attr("value");
                     var plh = $(this).attr("placeholder");
@@ -1915,7 +1916,7 @@ function wb_ajax() {
             if ($(that).is("button,:input")) {
                 if ($(that).parents("form").length) {
                     var form = $(that).parents("form");
-                    flag = wb_check_required(form);
+                    if ($(that).is("button") || $(that).is("input[type=button]")) flag = wb_check_required(form);
                     ajax = $(form).serializeArray();
 			if ($(that).attr("data-automail") !== "false" && $(that).attr("data-wb-ajax")=="/ajax/mail/") {
 			    ajax.push({name:"_message",value:$(form).wbMailForm()});

@@ -179,16 +179,38 @@ function form__controller__select2() {
     if (is_callable($custom)) {return $custom();} else {
         $result=array();
         $single=false;
+        $where="";
+        if (!isset($_POST["id"]) AND !isset($_POST["value"]) AND !isset($_POST["where"])) return;
         if (isset($_POST["where"]) AND $_POST["where"]>"") {$where=$_POST["where"];}
         if (isset($_POST["tpl"]) AND $_POST["tpl"]>"") {$tpl=$_POST["tpl"];}
         if (isset($_POST["value"]) AND $_POST["value"]>"") {$val=$_POST["value"];}
-        if (isset($_POST["id"]) AND $_POST["id"]>"") {$where='id="'.$_POST["id"].'"'; $single=true;}
-        $list=wbItemList($form,$where);
-        $iterator=new ArrayIterator($list);
-        foreach($iterator as $key => $r) {
-            $data=wbSetValuesStr(strip_tags($tpl),$r);
+        if (isset($_POST["id"]) AND $_POST["id"]>"") {$id=$_POST["id"]; $single=true;}
+        $cacheId=md5("select2".$form.$where);
+        if (isset($_ENV["cache"][$cacheId])) {
+			$list=$_ENV["cache"][$cacheId];
+		} else {
+			$list=wbItemList($form,$where);
+			$_ENV["cache"][$cacheId]=$list;
+		}
+        foreach($list as $key => $r) {
+            $data=wbSetValuesStr($tpl,$r);
             $res=preg_match("/{$val}/ui",$data);
-            if ($res) {$result[]=array("id"=>$r["id"],"text"=>$data,"item"=>$r);}
+            if ($res) {
+				$obj=wbFromString($data);
+				$oid=$obj->find("option")->attr("value");
+				$otx=$obj->text();
+				if ($single) {
+					if ($id==$oid) {
+						$result[]=array("id"=>$oid,"text"=>$otx,"item"=>$r);
+						break;
+					}
+
+				} else {
+					$result[]=array("id"=>$oid,"text"=>$otx,"item"=>$r);
+				}
+			} else {
+				unset($list[$key]);
+			}
         }
         if ($single AND count($result)>0) {$result=$result[0];}
         header('Content-Type: application/json');

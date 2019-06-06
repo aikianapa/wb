@@ -136,8 +136,7 @@ class WEProcessor {
 						if (empty($args)) {
 							// есть специальный случай. если мы вызываем функцию, у которой
 							$requiredParams = count(array_filter((new ReflectionFunction($name))->getParameters(), function($p) { return !$p->isOptional(); }));
-
-							if ($requiredParams == 1 && isset($this->let)) {
+							if ($requiredParams == 1 && isset($this->let) &&  (array)$this->let === $this->let) {
 								$res = call_user_func($name, $this->let);
 							} elseif ($requiredParams == 0) {
 								$res = call_user_func($name);
