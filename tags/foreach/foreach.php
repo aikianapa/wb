@@ -55,6 +55,7 @@ class tagForeach extends kiNode  {
         } else {
             $page=$page*1;
         }
+        /*
         if ( isset($from)) {
             if (isset($Item[$from]) AND !strpos("[",$from) AND  !strpos(".",$from)) {
                 //if (isset($Item["form"])) {$table=$Item["form"];} else {$table="";}
@@ -74,6 +75,14 @@ class tagForeach extends kiNode  {
                 if ($Item==null) $Item=array();
             }
         }
+        */
+        // Experemental
+        if ( isset($from)) {
+			$Item=wbItemToArray($Item);
+			$Item=wbGetDataWbFrom($Item,$from);
+            if ($Item==null) $Item=array();
+        }
+
 
 
         if (isset($json) AND $json> "") {
