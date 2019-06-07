@@ -1267,7 +1267,10 @@ abstract class kiNode
     }
 
     public function wbBaseHref() {
-        wbBaseHref($this);
+        if ($this->find("head")->length AND !$this->find("head base")->length) {
+			$this->find("head",0)->prepend("<base>");
+			$this->find("head base")->attr("href",str_replace("//","/",$_ENV["base"]."/"));
+		}
         return $this;
     }
 
@@ -2247,6 +2250,7 @@ abstract class kiNode
         $parent_id="";
         $pardis=0;
         $children=1;
+        $rand=0;
         $srcItem=$Item;
         if ($param==null) {
             include("wbattributes.php");
@@ -2262,6 +2266,7 @@ abstract class kiNode
             if (isset($call) AND $call > "" AND is_callable($call)) {
                 $tree=@$call();
             }
+            if (isset($rand) AND $rand=="true") $rand=1;
             $tag=$this->tag();
             if (!isset($limit) OR $limit=="false" OR $limit*1<0) {
                 $limit=-1;
@@ -2315,6 +2320,7 @@ abstract class kiNode
             };
         }
         if ((array)$tree === $tree) {
+			if ($rand) shuffle($tree);
             foreach($tree as $i => $item) {
                 $lvl++;
                 $item=(array)$srcVal + (array)$item;

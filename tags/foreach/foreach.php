@@ -201,13 +201,13 @@ class tagForeach extends kiNode  {
                 $Item=json_decode(base64_decode(file_get_contents($_ENV["dbac"]."/".$cacheId)),true);
             }
         }
-        $object = new ArrayObject($Item);
-        $iterator = new tagForeachFilter($object->getIterator(),array(
-                                             "id"=>$id,
-                                         ));
+
         $oddeven="even";
-        foreach($object as $key => $val) {
+        foreach($Item as $key => $val) {
             $n++;
+            if ( !( (array)$val === $val) ) {
+				$val=["_value"=>$val];
+			}
             if ($size!==false) $minpos=$size*$page-($size*1)+1;
             $maxpos=($size*$page);
             if ($size==false OR ($n<=$maxpos AND $n>=$minpos)) {
@@ -311,19 +311,3 @@ class tagForeach extends kiNode  {
     }
 }
 
-
-class tagForeachFilter extends FilterIterator {
-    private $data;
-    public function __construct(Iterator $iterator, $data ) {
-        parent::__construct($iterator);
-        $this->data = $data;
-    }
-
-    public function accept() {
-        $data = $this->getInnerIterator()->current();
-        if ( 0!== 0 ) {
-            return false;
-        }
-        return true;
-    }
-}

@@ -107,7 +107,8 @@ function wbInitEnviroment()
 
 
     if (isset($_ENV['settings']['path_tpl']) and $_ENV['settings']['path_tpl'] > '') {
-        $_ENV['path_tpl'] = $_ENV['path_app'].$_ENV['settings']['path_tpl'];
+		$_ENV['base']=$_ENV['settings']['path_tpl'];
+        $_ENV['path_tpl'] = $_ENV['path_app'].$_ENV['base'];
     }
     if (isset($_ENV['settings']['thumb_width']) and $_ENV['settings']['thumb_width'] > '0') {
         $_ENV['thumb_width'] = $_ENV['settings']['thumb_width'];
