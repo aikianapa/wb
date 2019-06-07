@@ -2250,7 +2250,7 @@ abstract class kiNode
         $parent_id="";
         $pardis=0;
         $children=1;
-        $rand=0;
+        $rand=false;
         $srcItem=$Item;
         if ($param==null) {
             include("wbattributes.php");
@@ -2266,7 +2266,7 @@ abstract class kiNode
             if (isset($call) AND $call > "" AND is_callable($call)) {
                 $tree=@$call();
             }
-            if (isset($rand) AND $rand=="true") $rand=1;
+            if (isset($rand) AND $rand=="true") {$rand=true;}
             $tag=$this->tag();
             if (!isset($limit) OR $limit=="false" OR $limit*1<0) {
                 $limit=-1;
@@ -2321,7 +2321,7 @@ abstract class kiNode
         }
         $tree=wbItemToArray($tree);
         if ((array)$tree === $tree) {
-			if ($rand) shuffle($tree);
+			if ($rand==true) shuffle($tree);
             foreach($tree as $i => $item) {
                 $lvl++;
                 $item=(array)$srcVal + (array)$item;
