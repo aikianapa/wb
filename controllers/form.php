@@ -75,7 +75,7 @@ function form__controller__show() {
     $Item=$_ENV["ITEM"]=wbCallFormFunc("BeforeItemShow",$Item,$form,$mode);
     $aCall=$form."_".$mode; $eCall=$form."__".$mode;
 	if (is_callable($aCall)) {$out=$aCall($Item);} elseif (is_callable($eCall)) {$out=$eCall($Item);}
-    if (!in_array($form,$_ENV["forms"]) OR $Item==false OR (isset($Item["active"]) AND $Item["active"]!=="on")) {
+    if (!in_array($form,$_ENV["forms"]) OR (isset($_ENV["route"]["item"]) AND $Item==false) OR (isset($Item["active"]) AND $Item["active"]!=="on")) {
 			echo form__controller__error_404();
 			die;
 	} else {
@@ -99,7 +99,7 @@ function form__controller__show() {
         }
         if ($_ENV["DOM"]->find("head")->length AND !$_ENV["DOM"]->find("base")->length) {
 
-			$_ENV["DOM"]->find("head")->prepend('<base href="'.$_ENV["base"].'">');
+			$_ENV["DOM"]->wbBaseHref();
 		}
 		$_ENV["DOM"]->wbSetData($Item);
 	}
