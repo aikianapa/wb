@@ -21,7 +21,8 @@ class tagVariable extends kiNode  {
     }
 
     public function tagVariable_set($Item) {
-	include($_ENV["path_engine"]."/wbattributes.php");
+		$this->wbSetAttributes($Item);
+		include($_ENV["path_engine"]."/wbattributes.php");
         if ($var>"") {
 			//if (isset($value)) {$value=preg_replace("~\{\{(.*)\}\}~","",wbSetValuesStr($value,$Item));}
 			//if (isset($else)) {$else=preg_replace("~\{\{(.*)\}\}~","",wbSetValuesStr($else,$Item));}
@@ -50,6 +51,7 @@ class tagVariable extends kiNode  {
 		} else {
 			$this->DOM->remove();
 		}
+		if ($hide!=="false") $this->DOM->remove();
         }
     }
 }
