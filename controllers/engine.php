@@ -15,6 +15,7 @@ function engine__controller()
 
 function engine__controller_login()
 {
+	if (is_callable("engine_controller_login")) return engine_controller_login();
     //$user=array("id"=>"admin","password"=>md5("admin"),"role"=>"admin","point"=>"/admin/","active"=>"on");
     //wbItemSave("users",$user);
     if (is_callable("wbUserLogin")) {
@@ -46,6 +47,7 @@ function engine__controller_login()
 }
 
 function engine__controller_login_success($user) {
+		if (is_callable("engine_controller_success")) return engine_controller_success($user);
         $_SESSION["user_id"]=$user["id"];
         $_SESSION["user_role"]=$user["role"];
         if (isset($user["isgroup"]) AND $user["isgroup"]=="on") {
@@ -94,6 +96,7 @@ function engine__controller_login_success($user) {
 
 function engine__controller_signup()
 {
+	if (is_callable("engine_controller_signup")) return engine_controller_signup();
     $res=false;
     $out=wbGetTpl("signup.htm");
     $exist=false;
@@ -175,6 +178,7 @@ function engine__controller_signup()
 
 function engine__controller_admin()
 {
+	if (is_callable("engine_controller_admin")) return engine_controller_admin();
     $_ENV["DOM"]=wbGetTpl("admin.htm");
     if (isset($_ENV["route"]["action"])) {
         $call=__FUNCTION__ ."_".$_ENV["route"]["action"];
@@ -198,6 +202,7 @@ function engine__controller_admin_ui()
 
 function engine__controller_logout()
 {
+		if (is_callable("engine_controller_logout")) return engine_controller_logout();
         if (isset($_SESSION["user_logout_url"]) AND $_SESSION["user_logout_url"]>"") {
                 $point=$_SESSION["user_logout_url"];
         } else {$point="/";}
@@ -210,6 +215,7 @@ function engine__controller_logout()
 }
 
 function engine__controller_recovery() {
+	if (is_callable("engine_controller_recovery")) return engine_controller_recovery();
 	$token=base64_decode($_ENV["route"]["token"]);
 	$param=explode(";",$token);
 	$out=wbGetTpl("login.htm");

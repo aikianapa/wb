@@ -147,6 +147,26 @@ success: function(data) {
 		return wb_func("wbGetForm",[form,mode],fn);
 	}
 
+	wbapp.baloon = function(text,type='info',delay=3000) {
+		if (!wb_plugins_loaded()) {
+			console.log("Error: wb_plugins not loaded!");
+			return;
+		}
+		$.bootstrapGrowl(text, {
+			ele: 'body',
+			type: type,
+			offset: {
+			from: 'top',
+					amount: 20
+			},
+			align: 'right',
+			width: "auto",
+			delay: delay,
+			allow_dismiss: true,
+				stackup_spacing: 10
+		});
+	}
+
 
     $("body").removeClass("cursor-wait");
     $(document).trigger("wbapp");

@@ -2529,6 +2529,15 @@ function wbAuthPostContents($url, $post=null, $username=null,$password=null) {
     return $result;
 }
 
+function wbCheckPassword($str,$pass) {
+	$res=false;
+	if (wbMakePassword($str) == $pass) $res=true;
+	return $res;
+}
+
+function wbMakePassword($str) {
+	return md5($str);
+}
 
 function wbRouterGet($requestedUrl = null)
 {
@@ -3089,6 +3098,12 @@ function wbTranslit($textcyr = null, $textlat = null)
     } else {
         return null;
     }
+}
+
+function is_email($email) {
+	$res=true;
+	if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $res=false;
+	return $res;
 }
 
 function wbBr2nl($str)

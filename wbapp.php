@@ -120,16 +120,26 @@ class wbApp {
 
         public function form($form="pages",$mode="show",$engine=false) {
                 $this->template=wbGetForm($form,$mode,$engine);
-                $this->dom= clone $this->template;
+                $this->dom=clone $this->template;
                 return $this->dom;
         }
 
-        public function dom($data="__wbVarNotAssigned__") {
-		if ($data!=="__wbVarNotAssigned__") {
-			$this->data($data);
+        public function fromTpl($tpl) {
+			$tpl=wbGetTpl($tpl);
+			$tpl->wbSetData($this->data,false);
+			$this->fromString($tpl->outerHtml());
+			return $this->dom;
 		}
-                $this->dom->wbSetData($this->data);
-                return $this->dom;
+
+
+        public function dom($data="__wbVarNotAssigned__",$clear=true) {
+			if ($data!=="__wbVarNotAssigned__") {
+				$this->data($data);
+			}
+			$tpl=wbFromString($this->dom);
+            $tpl->wbSetData($this->data,$clear);
+            $this->dom=$tpl->outerHtml();
+            return $this->dom;
         }
 
         public function html() {
