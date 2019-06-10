@@ -19,7 +19,7 @@ jQuery.fn.wbUploaderInit = function() {
 		var uid="upl-"+$(this).attr("id");
 		var store=$('#'+ id + ' > input[name]');
 		var path=$(this).attr("data-wb-path");
-		var max=store.attr("data-wb-max"); if (max==undefined) {max=30;}
+		var max=store.attr("data-wb-max"); if (max==undefined) {max=100;}
 		var ext=store.attr("data-wb-ext");
 		if (ext>"") {
 			var ext=explode(" ",ext);
@@ -56,9 +56,13 @@ jQuery.fn.wbUploaderInit = function() {
 					return false;
 				});
 				$("#"+id).data("images",store.val());
-				$("#"+id+" ul.gallery").sortable({	update: function() { wbImagesToField(id); }	});
+				if (!$("#"+id).hasClass("single")) {
+					$("#"+id+" ul.gallery").sortable({	update: function() { wbImagesToField(id); }	});
+				}
 				$("#"+id).wbImagesEvents();
                 $("#"+id).wbUploaderResizer();
+                $("#"+id).trigger("wb_uploader_init");
+                $(".wb-uploader").removeClass("hidden").removeClass("d-none");
 			},
 			FilesAdded: function(up, files) {
 				plupload.each(files, function(file) {
@@ -93,8 +97,8 @@ jQuery.fn.wbUploaderResizer = function() {
         var img=$(this).find(".gallery > li:first-child > img");
 				var that = this;
         if ($(img).length) {
-						setTimeout(function(){
-								var width=$(img).width();
+					setTimeout(function(){
+					var width=$(img).width();
 		            var height=$(img).height();
 		            $(that).find(".moxie-shim").css({"height":height,"width":width,"background":"transparent"});
 		            $(that).find(".gallery").css({"height":"auto","width":"auto"});

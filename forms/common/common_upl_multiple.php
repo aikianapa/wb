@@ -1,4 +1,4 @@
-<div class="wb-uploader">
+<div class="wb-uploader d-none hidden">
 	<input type="hidden" name="images">
 	<div id="filelist" class="list-group">{{_LANG[error]}}</div>
 	<br />

@@ -67,11 +67,12 @@ if (isset($_REQUEST["name"])) {
 	$fileName = uniqid("file_");
 }
 $ext = substr(strrchr($_REQUEST["name"],'.'),1);
-$fileName=wbNewId().".".$ext;
+$uniqName=wbNewId().".".$ext;
 
 $fileName=str_replace(array(" ",":",";","#","&"),array("_","_","_","_","_"),mb_strtolower(wbTranslit(trim($fileName))));
 
 $filePath = $targetDir . DIRECTORY_SEPARATOR . $fileName;
+$uniqPath = $targetDir . DIRECTORY_SEPARATOR . $uniqName;
 
 // Chunking might be enabled
 $chunk = isset($_REQUEST["chunk"]) ? intval($_REQUEST["chunk"]) : 0;
@@ -131,9 +132,10 @@ while ($buff = fread($in, 4096)) {
 // Check if file has been uploaded
 if (!$chunks || $chunk == $chunks - 1) {
 	// Strip the temp .part suffix off
-	rename("{$filePath}.part", $filePath);
+	rename("{$filePath}.part", $uniqPath);
 }
 
+$fileName=$uniqName;
 //fileResize($targetDir,$fileName);
 
 // Return Success JSON-RPC response

@@ -1,19 +1,15 @@
-<div class="wb-uploader single wbImagesAll" >
+<div class="wb-uploader single wbImagesAll d-none hidden">
 	<input type="hidden" name="{{name}}">
 	<div id="filelist" class="list-group">{{_LANG[error]}}</div>
 	<div class="uploader">
 		<ul class="gallery list-inline row" data-wb-role="foreach" data-wb-from="{{name}}" data-wb-limit="1" data-wb-hide="data-wb-role, data-wb-from, data-wb-limit">
 			<li class="col thumbnail" data-name="{{img}}" title="{{title}}" alt="{{alt}}" >
 				<img data-wb-role='thumbnail' size='{{_ENV[thumb_width]}};{{_ENV[thumb_height]}}' width="600" height="600" style='height:auto;' class='col img-fluid' src="{{%path}}/{{img}}" />
-				<!--a href="#" class="btn btn-outline-primary delete" data-toggle="dropdown"><span class="fa fa-trash"></span></a>
-				<a href="#" class="btn btn-outline-primary info"><span class="fa fa-info"></span></a-->
 			</li>
 			<empty>
 			<li class="col thumbnail" data-name="null" title="{{_LANG[addimg]}}" alt="{{_LANG[addimg]}}" idx="0">
 				<img class="col img-fluid" style="background: url('/engine/uploads/__system/image.svg') 50% 15% no-repeat; display:inline-block; background-size: cover; background-clip: content-box;width:100%;"
 				src="/engine/uploads/__system/transparent.png" >
-				<!--a href="#" class="btn btn-outline-primary delete" data-toggle="dropdown"><span class="fa fa-trash"></span></a>
-				<a href="#" class="btn btn-outline-primary info"><span class="fa fa-info"></span></a-->
 			</li>
 			</empty>
 		</ul>
