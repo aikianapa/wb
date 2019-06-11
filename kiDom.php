@@ -1389,18 +1389,17 @@ abstract class kiNode
     public function wbWhere($Item) {
         $where=$this->attr("data-wb-where");
         if ($where=="") $where=$this->attr("where");
-        if ($this->is("meta")) {
-            $this->addClass("wb-done");
-        }
-        if ($where>"" AND $this->hasRole("foreach")) {
+        if ($where=="") return;
+		$where=wbSetValuesStr($where,$Item);
+		$where=wbClearValues($where);
+        if ($this->is("meta")) $this->addClass("wb-done");
+        if ($this->hasRole("foreach")) {
             return;
         }
-        elseif ($where>"" AND !wbWhereItem($Item,$where)) {
+        elseif (!wbWhereItem($Item,$where)) {
             $this->remove();
         }
-        if ($this->attr("data-wb-hide")!=="false") {
-            $this->removeAttr("data-wb-where");
-        }
+        if ($this->attr("data-wb-hide")!=="false") $this->removeAttr("data-wb-where");
     }
 
 

@@ -2159,11 +2159,11 @@ function wbQuery($sql)
 
 function wbWhereItem($item, $where = null)
 {
+	if (null == $where) return true;
     $where = htmlspecialchars_decode($where);
     $res = true;
     if (strpos($where,"}}")) $where = wbSetValuesStr($where, $item);
 
-    if (!null == $where) {
         if ('%' == $where[0]) {
 		$phpif = substr($where, 1);
         } else {
@@ -2175,7 +2175,6 @@ function wbWhereItem($item, $where = null)
 		//echo $phpif."<br>";
             eval('return $res = ( '.$phpif.' );');
         }
-    }
 
     return $res;
 }

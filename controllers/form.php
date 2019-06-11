@@ -24,7 +24,11 @@ function form__controller() {
 		if (!is_object($out)) {$_ENV["DOM"]=wbFromString($out);}
 		$_ENV["DOM"]=$out;
 	}
-	unset($out);
+	if (isset($_COOKIE["wbcookies"]) AND $_COOKIE["wbcookies"]==true AND isset($_SESSION["user_id"]) AND isset($_SESSION["user"]) AND ( !isset($_SESSION["user"]["wbcookies"]) OR $_SESSION["user"]["wbcookies"] == "" OR $_SESSION["user"]["wbcookies"] == false)) {
+		$user=wbItemRead("users",$_SESSION["user_id"]);
+		$user["wbcookies"] = $_SESSION["user"]["wbcookies"] = $_COOKIE["wbcookies"];
+		wbItemSave("users",$user);
+	}
 	wbTrigger("func",__FUNCTION__,"after");
 	return $_ENV["DOM"];
 }
