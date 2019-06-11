@@ -83,7 +83,12 @@ $context["data"]["lang"]["ru"]["name"]="Russian";
 $_ENV = array("1" => 111111);
 $_ENV["variables"]["prop"] = "prop";
 
+$context["%tpllist"]=array("test1","test2","test3");
+$context["_idx"]=1;
+
+
 $exprs = array(
+	'<option value="{{%tpllist[{{_idx}}]}}">{{%tpllist[{{_idx}}]}}</option>' => '<option value="test2">test2</option>',
 	'<script>$("body").append("<div>");</script>' => '<script>$("body").append("<div>");</script>',
 	'{{0}}' => 'Zero',
 	'{{var42}}' => '42',

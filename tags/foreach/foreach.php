@@ -234,12 +234,8 @@ class tagForeach extends kiNode  {
                 if (!isset($val["_ndx"])) $val["_ndx"]=$ndx+1;
                 $val["_step"]=$stp;
                 $flag=true;
-                if ($flag==true AND isset($where)) {
-                    $flag=wbWhereItem($val,$where);
-                }
-                if ($flag==true AND $limit>"" AND $ndx>=$limit) {
-                    $flag=false;
-                }
+                if ($flag==true AND isset($where)) $flag=wbWhereItem($val,$where);
+                if ($flag==true AND $limit>"" AND $ndx>=$limit) $flag=false;
                 if ($flag==true) {
                     $ndx++;
                     $val=wbCallFormFunc("BeforeShowItem",$val,$itemform);

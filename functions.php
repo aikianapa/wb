@@ -429,12 +429,13 @@ function wbItemToArray(&$Item = array(),$convid = true)
 					}
 				}
 				$item = wbItemToArray($item,$convid);
-				if ( $convid == true AND (array)$item === $item AND isset($item['id'])) {
-					$tmpItem[$item['id']] = $item;
-				} else {
-					$tmpItem[$i] = $item;
-				}
 			}
+			if ( $convid == true AND (array)$item === $item AND isset($item['id'])) {
+				$tmpItem[$item['id']] = $item;
+			} else {
+				$tmpItem[$i] = $item;
+			}
+
         }
         $Item=$tmpItem;
     } else if ( !(array($item) === $item) AND $Item[0]=="{" OR $Item[0]=="[") {
