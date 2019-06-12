@@ -255,7 +255,7 @@ class tagForeach extends kiNode  {
                             $stp++;
                         }
                     } else { // иначе строим строку
-                        $inner.=wbClearValues($text->outerHtml());
+                        $inner.=$text->outerHtml();
                     }
                 }
 
