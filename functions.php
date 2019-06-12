@@ -910,7 +910,7 @@ function wbItemList($table = 'pages', $where = '', $sort = null)
 			if ((array)$list === $list) {
 			    foreach ($list as $key => $item) {
 				$item['_table'] = $tname;
-				//if ($tname!=="tree") $item=wbItemToArray($item);
+				if ($tname!=="tree") $item=wbItemToArray($item);
 				$item = wbTrigger('form', __FUNCTION__, 'AfterItemRead', func_get_args(), $item);
 				if (
 				    ('_' == substr($item['id'], 0, 1) and 'admin' !== $_SESSION['user_role'])

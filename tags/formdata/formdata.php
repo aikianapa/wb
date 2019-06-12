@@ -33,6 +33,7 @@ class tagFormdata extends kiNode  {
         if (isset($table) AND $table>"") {
             if (isset($item) AND $item>"") {
                 $Item=wbItemRead(wbTable($table),$item);
+                $Item=wbItemToArray($Item);
             }
         }
         if (isset($field) AND $field>"") {
