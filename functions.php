@@ -500,15 +500,13 @@ function wbMerchantList($type = 'both')
     }
     $dir = $_ENV["path_{$type}"].'/modules';
     if (is_dir($dir)) {
-        exec("ls {$dir} -R --ignore'=*_*.php' -D -1 ", $list);
+        exec("find {$dir} -maxdepth 2 -name '*.php'", $list);
         foreach ($list as $val) {
-            if (':' == substr($val, -1)) {
-                $dir = substr($val, 0, -1);
-            }
-            $file = "{$dir}/{$val}";
-            if (is_file($file)) {
+            $file = $val;
+            if (is_file($file) AND !strpos($file,"_")) {
                 $php = strtolower(trim(file_get_contents($file)));
-                $form = explode('.php', $val);
+                $form = array_pop(explode('/', $file));
+                $form = explode('.php', $form);
                 $form = $form[0];
                 if ((strpos($php, "function {$form}_checkout") and strpos($php, "function {$form}_success"))
                         or (strpos($php, "function {$form}__checkout") and strpos($php, "function {$form}__success"))) {
@@ -523,7 +521,6 @@ function wbMerchantList($type = 'both')
         }
     }
     unset($dir,$list,$val,$form,$php,$file,$arr);
-
     return $res;
 }
 
