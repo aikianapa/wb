@@ -1960,6 +1960,7 @@ function wb_ajax() {
             if (flag == true) {
                 $(that).prop("disabled", true);
                 $.post(src, ajax, function(data) {
+					$(that).prop("disabled", false);
                     var html = $("<div>" + data + "</div>");
                     var mid = "";
                     $(html).find("[id]").each(function(i) {
@@ -2008,7 +2009,7 @@ function wb_ajax() {
 					}
                     wb_delegates();
                     wb_ajax_loader_done();
-                    $(that).removeAttr("disabled");
+                    $(that).prop("disabled", false);
                     if (form!==undefined) $(form).trigger('reset');
                 }).fail(function(data) {
 					console.log("trigger: wb_ajax_fail");
