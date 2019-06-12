@@ -1852,7 +1852,7 @@ function wb_check_required(form) {
                 }
             }
         }
-        if ($(this).is("[min]:visible")) {
+        if ($(this).is("[min]:visible") && $(this).val() > "") {
 			var min = $(this).attr("min") * 1;
 			var minstr = $(this).val() * 1;
 			if (minstr < min) {
@@ -1863,7 +1863,7 @@ function wb_check_required(form) {
 			}
 		}
 
-        if ($(this).is("[max]:visible")) {
+        if ($(this).is("[max]:visible")  && $(this).val() > "") {
 			var max = $(this).attr("max") * 1;
 			var maxstr = $(this).val() * 1;
 			if (maxstr > max) {
@@ -1874,7 +1874,7 @@ function wb_check_required(form) {
 			}
 		}
 
-        if ($(this).is("[minlength]:visible")) {
+        if ($(this).is("[minlength]:visible") && $(this).val() > "") {
             var minlen = $(this).attr("minlength") * 1;
             var lenstr = strlen($(this).val());
             if (lenstr < minlen) {
@@ -2093,6 +2093,7 @@ $.fn.wbMailForm = function() {
     // создание автописьма из формы
     var tpl = "";
     $(this).find(":input").each(function() {
+		console.log($(this).attr("name"));
         if (!$(this).is("[type=button]") && !$(this).is("[data-mail=false]") && !in_array($(this).attr("name"),["_subject","_mailto"])) {
             var label = $(this).attr("data-label");
             if (label == undefined) label = $(this).wbGetInputLabel();
