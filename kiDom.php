@@ -2318,7 +2318,7 @@ abstract class kiNode
                 $srcVal["%{$k}"]=$v;
             };
         }
-        $tree=wbItemToArray($tree);
+        //$tree=wbItemToArray($tree);
         if ((array)$tree === $tree) {
 			if ($rand==true) shuffle($tree);
             foreach($tree as $i => $item) {
@@ -2349,7 +2349,7 @@ abstract class kiNode
                             if ($parent!==1) {
                                 $line->html($child);
                             } else {
-                                $line->append($child);
+                                if ($children == 1) $line->append($child);
                             }
                         } else {
                             if ($parent!==1) {

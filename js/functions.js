@@ -1810,6 +1810,14 @@ function wb_check_required(form) {
     var idx = 0;
     $(form).find("[required],[type=password],[minlength]").each(function(i) {
         idx++;
+		var label = $(this).attr("data-label");
+		if (label == undefined || label == "") label = $(this).prev("label").text();
+		if (label == undefined || label == "") label = $(this).next("label").text();
+		if ((label == undefined || label == "") && $(this).attr("id") !== undefined) label = $(this).parents("form").find("label[for="+$(this).attr("id")+"]").text();
+		if (label == undefined || label == "") label = $(this).parents(".form-group").find("label").text();
+		if (label == undefined || label == "") label = $(this).attr("placeholder");
+		if (label == undefined || label == "") label = $(this).attr("name");
+
         $(this).data("idx", idx);
         if ($(this).is(":not([disabled],[type=checkbox]):visible")) {
             if ($(this).val() == "") {
@@ -1849,7 +1857,7 @@ function wb_check_required(form) {
 			var minstr = $(this).val() * 1;
 			if (minstr < min) {
                 res = false;
-                $(this).data("error", ucfirst($(this).attr("name")) + " " + wbapp.sysmsg.min_val+": " + min);
+                $(this).data("error", ucfirst(label) + " " + wbapp.sysmsg.min_val+": " + min);
                 console.log("trigger: wb_required_false ["+$(this).attr("name")+"]");
                 $(document).trigger("wb_required_false", [this]);
 			}
@@ -1860,7 +1868,7 @@ function wb_check_required(form) {
 			var maxstr = $(this).val() * 1;
 			if (maxstr > max) {
                 res = false;
-                $(this).data("error", ucfirst($(this).attr("name")) + " " + wbapp.sysmsg.max_val+": " + max);
+                $(this).data("error", ucfirst(label) + " " + wbapp.sysmsg.max_val+": " + max);
                 console.log("trigger: wb_required_false ["+$(this).attr("name")+"]");
                 $(document).trigger("wb_required_false", [this]);
 			}
@@ -1871,7 +1879,7 @@ function wb_check_required(form) {
             var lenstr = strlen($(this).val());
             if (lenstr < minlen) {
                 res = false;
-                $(this).data("error", wbapp.sysmsg.min_length+": " + minlen);
+                $(this).data("error", ucfirst(label) + " " + wbapp.sysmsg.min_length+": " + minlen);
                 console.log("trigger: wb_required_false ["+$(this).attr("name")+"]");
                 $(document).trigger("wb_required_false", [this]);
             }
@@ -1905,6 +1913,7 @@ function wb_ajax() {
         wb_ajax_loader();
         var ptpl = false;
         var link = that;
+        var is_mail = false;
         var src = $(that).attr("data-wb-ajax");
         var start = $(that).attr("data-wb-ajax-start");
         var done = $(that).attr("data-wb-ajax-done");
@@ -1933,14 +1942,15 @@ function wb_ajax() {
             if ($(that).attr("data-wb-tpl") !== undefined) {
                 ajax.tpl = $($(that).attr("data-wb-tpl")).html();
             }
-            if ($(that).is("button,:input")) {
+            if ($(that).is("button,:input,[data-wb-ajax='/ajax/mail/']")) {
                 if ($(that).parents("form").length) {
                     var form = $(that).parents("form");
-                    if ($(that).is("button") || $(that).is("input[type=button]")) flag = wb_check_required(form);
+                    flag = wb_check_required(form);
                     ajax = $(form).serializeArray();
-			if ($(that).attr("data-automail") !== "false" && $(that).attr("data-wb-ajax")=="/ajax/mail/") {
-			    ajax.push({name:"_message",value:$(form).wbMailForm()});
-			}
+					if ($(that).attr("data-automail") !== "false" && $(that).attr("data-wb-ajax")=="/ajax/mail/") {
+						is_mail = true;
+						ajax.push({name:"_message",value:$(form).wbMailForm()});
+					}
 
                 }
                 if ($(that).attr("data-wb-json") !== undefined && $(that).attr("data-wb-json") > "") {
@@ -1948,7 +1958,7 @@ function wb_ajax() {
                 }
             }
             if (flag == true) {
-                $(that).attr("disabled", true);
+                $(that).prop("disabled", true);
                 $.post(src, ajax, function(data) {
                     var html = $("<div>" + data + "</div>");
                     var mid = "";
@@ -1990,23 +2000,29 @@ function wb_ajax() {
                     console.log("trigger: wb_ajax_done");
 					$(link).trigger("wb_ajax_done", [link, src, data]);
                     $(document).trigger("wb_ajax_done", [link, src, data]);
+                    if (is_mail) {
+						console.log("trigger: wb_mail_done");
+						$(that).prop("disabled",false);
+						$(link).trigger("wb_mail_done", [link, src, data]);
+						$(document).trigger("wb_mail_done", [link, src, data]);
+					}
                     wb_delegates();
                     wb_ajax_loader_done();
                     $(that).removeAttr("disabled");
                     if (form!==undefined) $(form).trigger('reset');
                 }).fail(function(data) {
-			console.log("trigger: wb_ajax_fail");
-			$(link).trigger("wb_ajax_fail", [link, src, data]);
-			$(document).trigger("wb_ajax_fail", [link, src, data]);
-			wb_ajax_loader_done();
-			$(that).removeAttr("disabled");
-		});
+					console.log("trigger: wb_ajax_fail");
+					$(link).trigger("wb_ajax_fail", [link, src, data]);
+					$(document).trigger("wb_ajax_fail", [link, src, data]);
+					wb_ajax_loader_done();
+					$(that).prop("disabled",false);
+				});
             } else {
-		        $(that).removeAttr("disabled");
+		        $(that).prop("disabled",false);
 		        wb_ajax_loader_done();
 	    }
         } else {
-		$(that).removeAttr("disabled");
+		$(that).prop("disabled",false);
 		wb_ajax_loader_done();
             if ($(that).attr("data-wb-href") > "") {
                 document.location.href = $(that).attr("data-wb-href");
@@ -2060,25 +2076,26 @@ function wb_ajax() {
     });
 }
 
+$.fn.wbGetInputLabel = function() {
+	var label = "";
+	if (label == undefined || label == "") label = $(this).prev("label").text();
+	if (label == undefined || label == "") label = $(this).next("label").text();
+	if ((label == undefined || label == "") && $(this).attr("id") !== undefined) label = $(this).parents("form").find("label[for="+$(this).attr("id")+"]").text();
+	if (label == undefined || label == "") label = $(this).parents(".form-group").find("label").text();
+	if (label == undefined || label == "") label = $(this).attr("placeholder");
+	if (label == undefined || label == "") label = $(this).attr("name");
+	if (label == undefined || label == "") label = $(this).attr("data-label");
+	return label;
+}
+
 $.fn.wbMailForm = function() {
     // создание автописьма из формы
     var tpl = "";
     $(this).find(":input").each(function() {
-        if (!$(this).is("[type=button]") && !$(this).is("[data-mail=false]")) {
-            var label = "";
+        if (!$(this).is("[type=button]") && !$(this).is("[data-mail=false]") && !in_array($(this).attr("name"),["_subject","_mailto"])) {
+            var label = $(this).attr("data-label");
+            if (label == undefined) label = $(this).wbGetInputLabel();
             var value = "";
-            if ($(this).attr("placeholder") !== undefined) {
-                label = $(this).attr("placeholder");
-            }
-            if ($(this).prev("label").length && $(this).prev("label").text() > "") {
-                label = $(this).prev("label").text();
-            }
-            if ($(this).parent("label").length && $(this).parent("label").text() > "") {
-                label = $(this).parent("label").text();
-            }
-            if ($(this).attr("data-label") !== undefined) {
-                label = $(this).attr("data-label");
-            }
             if ($(this).is("textarea")) {
                 value = $(this).val();
             } else {
@@ -2095,16 +2112,11 @@ $.fn.wbMailForm = function() {
 }
 
 $(document).bind("wb_required_false", function(event, that, text) {
+	var label = $(that).wbGetInputLabel();
     var delay = (4000 + $(that).data("idx") * 250) * 1;
     var text = $(that).data("error");
     if (!text > "") {
-        text = wbapp.sysmsg.fill_field+": " + $(that).attr("name");
-        if ($(that).parents(".form-group").find("label").text() > "") {
-            text = wbapp.sysmsg.fill_field+": " + $(that).parents(".form-group").find("label").text();
-        }
-        if ($(that).attr("placeholder") > "") {
-            text = wbapp.sysmsg.fill_field+": " + $(that).attr("placeholder");
-        }
+        text = wbapp.sysmsg.fill_field+": " + label;
     }
     if (wb_plugins_loaded()) {
         $.bootstrapGrowl(text, {
