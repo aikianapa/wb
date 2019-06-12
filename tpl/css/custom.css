@@ -14,7 +14,7 @@ body.cursor-wait * {
 
 body {
   height: 100vh;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .modal-content {
@@ -604,4 +604,13 @@ th.wb-asc[data-wb-sort]:before {
     display: block;
     opacity: 1;
   }
+}
+
+@media (max-width: 575px) {
+	.signbox {
+		width:unset;
+	}
+	.signbox-body {
+		width:unset;
+	}
 }

@@ -2094,8 +2094,6 @@ $.fn.wbMailForm = function() {
     return tpl;
 }
 
-
-$(document).unbind("wb_required_false");
 $(document).bind("wb_required_false", function(event, that, text) {
     var delay = (4000 + $(that).data("idx") * 250) * 1;
     var text = $(that).data("error");
