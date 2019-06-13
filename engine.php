@@ -1,6 +1,13 @@
 <?php
-session_start();
+$sessdir = $_SERVER["DOCUMENT_ROOT"]."/uploads/_cache/sess/";
+if (!is_dir($sessdir)) mkdir($sessdir,0766,true);
+ini_set('session.save_path', $sessdir);
+ini_set('session.gc_probability', 5);
+ini_set('session.gc_divisor', 100);
+ini_set('session.gc_maxlifetime', 100);
+ini_set('session.cookie_lifetime', 100);
 ini_set('display_errors', 1);
+session_start();
 require_once __DIR__."/functions.php";
 wbInit();
 if (is_callable("wbAfterInit")) {wbAfterInit();}

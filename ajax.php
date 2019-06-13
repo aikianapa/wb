@@ -48,6 +48,23 @@ function ajax__pagination_vars() {
     // return wbJsonEncode($res);
 }
 
+function ajax__onlineusers() {
+	if ( $directory_handle = opendir( session_save_path() ) ) {
+		$count = 0;
+		while ( false !== ( $file = readdir( $directory_handle ) ) ) {
+			if($file != '.' && $file != '..') {
+				if ( time()- filemtime(session_save_path() . '' . $file) < 3 * 60) {
+					$count++;
+				}
+			}
+		}
+		closedir($directory_handle);
+	}
+
+	header('Content-Type: application/json');
+	return json_encode(["count"=>$count]);
+}
+
 function ajax__getuser() {
 	$res=false;
 	if (isset($_SESSION["user"])) $res=$_SESSION["user"];
