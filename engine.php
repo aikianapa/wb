@@ -1,9 +1,10 @@
 <?php
-$sessdir = $_SERVER["DOCUMENT_ROOT"]."/uploads/_cache/sess/";
-if (!is_dir($sessdir)) mkdir($sessdir,0766,true);
+$sessdir = $_SERVER["DOCUMENT_ROOT"]."/uploads/_sess/";
+if (!is_dir($sessdir)) mkdir($sessdir,0777,true);
+
 ini_set('session.save_path', $sessdir);
 ini_set('session.gc_probability', 5);
-ini_set('session.gc_divisor', 100);
+ini_set('session.gc_divisor', 80);
 ini_set('session.gc_maxlifetime', 100);
 ini_set('session.cookie_lifetime', 100);
 ini_set('display_errors', 1);

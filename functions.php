@@ -681,18 +681,10 @@ function wbFieldBuild($param, $data = array(),$locale=array())
 function wbInitDatabase()
 {
     wbTrigger('func', __FUNCTION__, 'before');
-    if (!is_dir($_ENV['dbe'])) {
-        @mkdir($_ENV['dbe'], 0766);
-    }
-    if (!is_dir($_ENV['dba'])) {
-        @mkdir($_ENV['dba'], 0766);
-    }
-    if (!is_dir($_ENV['dbec'])) {
-        @mkdir($_ENV['dbec'], 0766);
-    }
-    if (!is_dir($_ENV['dbac'])) {
-        @mkdir($_ENV['dbac'], 0766);
-    }
+    if (!is_dir($_ENV['dbe'])) @mkdir($_ENV['dbe'], 0766);
+    if (!is_dir($_ENV['dba'])) @mkdir($_ENV['dba'], 0766);
+    if (!is_dir($_ENV['dbec'])) @mkdir($_ENV['dbec'], 0766);
+    if (!is_dir($_ENV['dbac'])) @mkdir($_ENV['dbac'], 0766);
 }
 
 function wbFlushDatabase()
