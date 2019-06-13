@@ -269,6 +269,7 @@ class tagForeach extends kiNode  {
             $inner=$empty->outerHtml();
         }
 
+		$inner=wbClearValues($inner);
 
         if ($this->DOM->tag()=="select") {
             $this->DOM->html($inner);

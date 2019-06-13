@@ -21,7 +21,7 @@ if ($cache["check"] === false OR $cache["check"] === null) {
 	if (!is_object($_ENV["DOM"])) {$_ENV["DOM"]=wbFromString($_ENV["DOM"]);}
 	if ($_ENV["route"]["controller"]!=="module") {
 		// чтобы вставки модуля не пометились .wb-done
-		$_ENV["DOM"]->wbSetData($_ENV["ITEM"]);
+		$_ENV["DOM"]->wbSetData($_ENV["ITEM"],true);
 		$hide=$_ENV["DOM"]->find("[data-wb-hide]");
 		foreach($hide as $h) {$h->tagHideAttrs();}
 	}

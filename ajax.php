@@ -268,7 +268,7 @@ function ajax__setdata() {
     foreach($tpl->find("[data-wb-role]") as $dr) {
         $dr->removeClass("wb-done");
     }
-    $tpl->wbSetData($Item);
+    $tpl->wbSetData($Item,true);
     $tpl->find("empty")->remove();
     $tpl->tagHideAttrs();
     return $tpl;
