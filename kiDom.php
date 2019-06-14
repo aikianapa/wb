@@ -2104,30 +2104,10 @@ abstract class kiNode
             foreach($attributes as $at) {
                 $atname=$at->name;
                 $atval=html_entity_decode($this->attr($atname));
-                if (strpos($atname,"}}") OR strpos($atname,"%")) {
-                    $atname=wbSetValuesStr($atname,$Item);
-                }
-                if (strpos($atval,"}}") OR strpos($atval,"%")) {
-                    if ($atval>"" && strpos($atval,"}}")) {
-                        $fld=str_replace(array("{{","}}"),array("",""),$atval);
-                        if (isset($Item[$fld]) AND $this->is(":input")) {
-                            $atval=$Item[$fld];
-                            if (is_array($atval)) {
-                                $atval=wbJsonEncode($atval);
-                            }
-                        } else {
-                            $atval=wbSetValuesStr($atval,$Item);
-                        }
-                        $this->attr($atname,$atval);
-                    };
-                    if ($atval>"" && substr($atval,0,1)=="%") {
-                        $ev=substr($atval,1);
-                        eval('$tmp = '.$ev.';');
-                        $this->attr($atname,$tmp);
-                    }
-                }
+                $atname=wbSetValuesStr($atname,$Item);
+                $atval=wbSetValuesStr($atval,$Item);
+                $this->attr($atname,$atval);
             };
-            unset($attributes);
             $this->addClass("wb-attrs");
         }
     }

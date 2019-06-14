@@ -105,7 +105,7 @@ function form__controller__show() {
 
 			$_ENV["DOM"]->wbBaseHref();
 		}
-		$_ENV["DOM"]->wbSetData($Item);
+		$_ENV["DOM"]->wbSetData($Item,true);
 	}
 	return $_ENV["DOM"];
 }
