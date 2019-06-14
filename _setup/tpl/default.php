@@ -16,7 +16,7 @@
 								<div class="push text-center">
 									<h1 class="animation-fadeInQuick2Inv"><strong>{{%lang[{{_SESS[lang]}}].name}}</strong></h1>
 									<h2 class="text-light-op animation-fadeInQuickInv push-bit"><strong>{{%footer}}</strong></h2>
-									<a href="http://wbcms.online/uploads/shop.zip" target="_blank" class="btn btn-lg btn-danger push-right-left">
+									<a href="https://github.com/aikianapa/wb/archive/master.zip" target="_blank" class="btn btn-lg btn-danger push-right-left">
 										<i class="fa fa-download"></i>
 										&nbsp;&nbsp;
 										<strong>{{_LANG[download]}}</strong>

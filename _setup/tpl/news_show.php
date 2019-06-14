@@ -13,7 +13,7 @@
 					<div class="col-sm-8 col-sm-push-4 push" >
 						<div class="media">
 						  <div class="media-body text-justify">
-						    <h4 class="media-heading">{{date("d.m.Y",strtotime("{{date}}"))}} {{lang[{{_SESS.lang}}].name}}</h4>
+						    <h4 class="media-heading">{{date("d.m.Y",strtotime({{date}}))}} {{lang[{{_SESS.lang}}].name}}</h4>
 						     {{lang[{{_SESS.lang}}].data.text}}
 						     {{text}}
 						  </div>

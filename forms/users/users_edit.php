@@ -134,7 +134,7 @@
 
                         </div>
                     </div>
-                </form>
+            </form>
             </div>
             <div class="modal-footer" data-wb-role="include" src="form" data-wb-name="common_close_save" data-wb-hide="wb">
             </div>
