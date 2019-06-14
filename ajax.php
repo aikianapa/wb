@@ -49,6 +49,7 @@ function ajax__pagination_vars() {
 }
 
 function ajax__onlineusers() {
+	clearstatcache();
 	if ( $directory_handle = opendir( session_save_path() ) ) {
 		$count = 0;
 		while ( false !== ( $file = readdir( $directory_handle ) ) ) {

@@ -853,6 +853,7 @@ open:
 		var type = $(this).parents(".wb-multiinput").find("[data-wb-field=type]").val();
 		var name = $(this).parents(".wb-multiinput").find("input[data-wb-field=name]").val();
 		var field = $(this).parents(".wb-multiinput").find("input[data-wb-field=prop]");
+		$(modal).find(".modal-dialog").addClass("modal-lg");
 		$("#treeEditDictProp .modal-body").html($(edid).find("script.wb-prop-fields").html());
 		$("#treeEditDictProp").find("[data-type-allow],[data-type-disallow]").each(function(){
 		if ( $(this).attr("data-type-allow") !== undefined ) {

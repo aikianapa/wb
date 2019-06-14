@@ -128,6 +128,7 @@ trait JsonQueriable
             $this->_conditions = [];
             $this->_node = '';
             $this->_isProcessed = true;
+            $this->caseInsensivity = false;
             return $this;
         }
 
@@ -388,6 +389,11 @@ trait JsonQueriable
                     }
 
                     $value = $this->getFromNested($val, $rule['key']);
+                    if ($this->caseInsensivity) {
+						if (is_string($value)) $value=strtolower($value);
+						if (is_string($rule['value'])) $rule['value']=strtolower($rule['value']);
+					}
+
                     $return = $value instanceof ValueNotFound ? false :  call_user_func_array($function, [$value, $rule['value']]);
                     $tmp &= $return;
                 }
@@ -584,11 +590,10 @@ trait JsonQueriable
      * @param string $value
      * @return $this
      */
-    public function whereContains($key, $value)
+    public function whereContains($key, $value, $sens=false)
     {
+		$this->caseInsensivity = $sens;
         $this->where($key, 'contains', $value);
-
-        return $this;
     }
 
     /**

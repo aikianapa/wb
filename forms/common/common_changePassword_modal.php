@@ -25,7 +25,8 @@
     </div>
     </div>
     <script>
-	var prefix = suffix = "";
+		var prefix = "";
+		var suffix = "";
         var parent=$("#{{_form}}_{{_mode}}");
         var modal=$("#{{_form}}_{{_mode}}_pswd");
         var form=$("#{{_form}}_{{_mode}}_pswdForm");
