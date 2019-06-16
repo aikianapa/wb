@@ -1928,9 +1928,7 @@ function wb_ajax() {
         }
 
         var flag = true;
-        if ($(that).parents("form").length) form = $(that).parents("form");
-        if ($(that).is("form").length) form = $(that);
-
+        if ($(that).is("form")) {var form = that;} else if ($(that).parents("form").length) {var form = $(that).parents("form",0);}
         var formdata = {};
         formdata = $(form).serializeArray();
         if (formdata["_message"] == undefined && formdata["_tpl"] == undefined && formdata["_form"] == undefined && $(that).attr("data-automail") !== "false") {
@@ -2094,7 +2092,6 @@ $.fn.wbMailForm = function() {
     // создание автописьма из формы
     var tpl = "";
     $(this).find(":input").each(function() {
-		console.log($(this).attr("name"));
         if (!$(this).is("[type=button]") && !$(this).is("[data-mail=false]") && !in_array($(this).attr("name"),["_subject","_mailto"])) {
             var label = $(this).attr("data-label");
             if (label == undefined) label = $(this).wbGetInputLabel();

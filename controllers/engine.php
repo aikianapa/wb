@@ -90,6 +90,7 @@ function engine__controller_login_success($user) {
         $_SESSION["user_login_url"]=$point;
         $_SESSION["user_lang"]=$user["lang"];
         $_SESSION["user"]=$user;
+        wbTrigger("func","wbLogin","success");
         header('Location: '.$point);
         die;
 }
@@ -113,6 +114,7 @@ function engine__controller_signup()
             wbItemSave("users",$user);
             $out->find(".signpanel-wrapper")->html($out->find(".signbox.success"));
             $out->find(".signbox.success")->removeClass("d-none");
+            wbTrigger("func","wbSignup","success",null,$user);
         }
 
     } elseif ($exist==true) {
@@ -140,12 +142,12 @@ function engine__controller_signup()
 				}
 			}
 
-		$unsave=array_keys($user);
+            $unsave=array_keys($user);
             foreach($_POST as $key => $value) {
                 if (!in_array($key,$unsave)) {
-			$value=htmlspecialchars($value,ENT_QUOTES);
-			$user[$key]=$value;
-		}
+                    $value=htmlspecialchars($value,ENT_QUOTES);
+                    $user[$key]=$value;
+                }
             }
             if (!isset($user["role"])) $user["role"]="user";
             $out->wbSetData($user);
@@ -155,14 +157,16 @@ function engine__controller_signup()
             $result=wbMail(array($_ENV["settings"]["email"],$_ENV["settings"]["header"]),array($_POST["email"],$nick),$subj->text(),$message);
             unset($msg,$subj);
             if ($result) {
-		    $out->find(".signpanel-wrapper")->html($out->find(".signbox.check"));
-		    $out->find(".signbox.check")->removeClass("d-none");
-		    wbItemSave("users",$user);
-	    } else {
-		    $out->find(".signpanel-wrapper")->html($out->find(".signbox.error"));
-		    $out->find(".signbox.error")->removeClass("d-none");
-		    $out->find(".signbox.error p.errmsg")->html($_ENV["error"]["wbMail"]);
-	    }
+                $out->find(".signpanel-wrapper")->html($out->find(".signbox.check"));
+                $out->find(".signbox.check")->removeClass("d-none");
+                wbItemSave("users",$user);
+                wbTrigger("func","wbSignup","done",null,$user);
+            } else {
+                $out->find(".signpanel-wrapper")->html($out->find(".signbox.error"));
+                $out->find(".signbox.error")->removeClass("d-none");
+                $out->find(".signbox.error p.errmsg")->html($_ENV["error"]["wbMail"]);
+                wbTrigger("func","wbSignup","error",null,user);
+            }
 
         } else {
             $out->find("[name=password]",0)->prev("label",0)->addClass("text-danger");
@@ -208,6 +212,7 @@ function engine__controller_logout()
         } else {$point="/";}
         setcookie("user_id", "", time()-3600, "/");
         unset($_COOKIE["user_id"]);
+        wbTrigger("func","wbLogout","done");
         session_destroy();
         header("Refresh: 0; URL=".$point);
         echo "{$_ENV['sysmsg']['logout_wait']}...";
@@ -304,4 +309,3 @@ function engine__controller_include()
     include_once($_ENV["path_app"].$_SERVER["SCRIPT_NAME"]);
     die;
 }
-
