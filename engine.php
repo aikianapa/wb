@@ -52,6 +52,4 @@ if ($cache["check"]===null) {
 }
 session_write_close();
 echo $html;
-// it reduce performance twice
-// gc_collect_cycles();
 ?>

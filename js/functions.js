@@ -6,11 +6,11 @@ $(function() {
 	} else {
 		// загрузка из wbengine
 	    var loading = setInterval(function() {
-		if ($(document).data("wb_include").length >= 3) {
+		if ($(document).data("wb_include").length >= 4) {
 		    wb_init();
 		    clearInterval(loading);
 		}
-	    },10);
+	    },1);
 	}
 });
 
@@ -41,6 +41,9 @@ function wb_init() {
         return msg;
     }
 
+    $.fn.outerHTML = function (s) {
+        return s ? this.before(s).remove() : jQuery("<p>").append(this.eq(0).clone()).html();
+    };
 
 	$.fn.wbChangeWatcher = function(mode) {
 		if (mode==undefined) mode="start";
@@ -55,10 +58,6 @@ function wb_init() {
 			$(this).unbind( 'DOMSubtreeModified');
 		}
 	}
-
-
-
-
 
     wbapp.ajaxWait = function(options) {
         return wb_ajaxWait([options]);
