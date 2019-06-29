@@ -421,8 +421,8 @@ function wbItemToArray(&$Item = array(),$convid = true)
     if ((array)$Item === $Item) {
         $tmpItem=array();
         foreach ($Item as $i => $item) {
-			if ($i[0] !== "%" AND $i !== "_parent") {
-				if (!((array)$item === $item) AND ( $item[0]=="{" OR $item[0]=="[") )  {
+			if (substr($i,0,1) !== "%" AND $i !== "_parent") {
+				if (!((array)$item === $item))  {
 					$tmp = json_decode($item, true);
 					if ((array)$tmp === $tmp) {
 						$item = wbItemToArray($tmp,$convid);
@@ -438,11 +438,10 @@ function wbItemToArray(&$Item = array(),$convid = true)
 
         }
         $Item=$tmpItem;
-    } else if ( !(array($item) === $item) AND $Item[0]=="{" OR $Item[0]=="[") {
+    } else if ( !(array($Item) === $Item)) {
         $tmp = json_decode($Item, true);
         if ((array)$tmp === $tmp) {
             $Item = wbItemToArray($tmp,$convid);
-            unset($tmp);
         }
     }
     return $Item;
@@ -954,7 +953,8 @@ function wbTreeRead($name)
     } else {
         $tree['dict'] = json_decode($tree['_tree__dict_'], true);
     }
-    $tree["assoc"] = wbItemToArray(wbTreeToArray($tree['tree']));
+    $tmp=wbTreeToArray($tree['tree']);
+    $tree["assoc"] = wbItemToArray($tmp);
     $tree = wbTrigger('form', __FUNCTION__, 'AfterTreeRead', func_get_args(), $tree);
 
     return $tree;
@@ -1177,7 +1177,7 @@ function wbItemRead($table = null, $id = null)
     wbTrigger('form', __FUNCTION__, 'BeforeItemRead', func_get_args(), array());
     $call="wb".ucfirst(wbTableName($table))."ItemRead";
     if (is_callable($call)) $item=$call($table,$id);
-    if (!$item) {
+    if (!isset($item)) {
 	    $drv=wbItemDriver(__FUNCTION__,func_get_args());
 	    if ($drv!==false) {
 		    $item=$drv["result"];
@@ -2202,7 +2202,7 @@ function wbWherePhp($str = '', $item = array())
 		$exc=isset($exclude[$sup]);
 		$con=in_array($fld,$cond);
 		if ($flag==1) $flag=2;
-		if ((array)$item[$fld] === $item[$fld] OR isset($tmpfld)) {
+		if ( (isset($item[$fld]) AND ( (array)$item[$fld] === $item[$fld] )) OR isset($tmpfld)) {
 			if (isset($arr[$index+1]) AND substr($arr[$index+1][0],0,1) == "[") {
 				if (!isset($tmpfld)) {
 					$tmpfld = str_replace("{$fld}", ' $item["'.$fld.'"]', $fld);

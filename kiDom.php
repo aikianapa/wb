@@ -953,6 +953,7 @@ protected function parseTag()
 
     $this->debug('Parser: Tag node');
 
+
     $this->linkNodes($node, true);
 
     if (!$node->selfClosed) {
@@ -1656,7 +1657,7 @@ abstract class kiNode
                 }
             }
         };
-        unset($inc,$attribute,$$attribute,$selector);
+
         $this->find("[data-wb-remove]")->remove();
         $this->find("[data-wb-clear]")->html("");
         $this->find("[data-wb-clear]")->removeAttr("data-wb-clear");
@@ -2184,7 +2185,7 @@ abstract class kiNode
         elseif ($type=="select") {
             $this->tagTreeUl($Item,null,$srcVal);
         } else {
-            if ($item>"") {
+            if (isset($item) AND $item>"") {
                 $tree=wbTreeRead($item);
                 $Item[$name]=$tree["assoc"];
                 $Item["_{$name}"]=$tree["dict"];
@@ -2236,11 +2237,14 @@ abstract class kiNode
             $name=$this->attr("name");
             if (isset($from)) $name=$from;
             if ($name=="" AND isset($item)) $name=$item;
-            if (!is_array($Item[$name])) {
-                $tree=json_decode($Item[$name],true);
-            }
-            else {
-                $tree=$Item[$name];
+            if (isset($Item[$name])) {
+				if (!is_array($Item[$name])) {
+					$tree=json_decode($Item[$name],true);
+				} else {
+					$tree=$Item[$name];
+				}
+            } else {
+                $tree=$Item["children"];
             }
             if (isset($call) AND $call > "" AND is_callable($call)) {
                 $tree=@$call();
