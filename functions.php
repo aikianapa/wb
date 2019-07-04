@@ -2793,31 +2793,15 @@ function wbListForms($exclude = true)
 
 function wbListModules()
 {
-    $list = array();
-    $eList = wbListFilesRecursive($_ENV['path_engine'].'/modules', true);
-    $aList = wbListFilesRecursive($_ENV['path_app'].'/modules', true);
-    $arr = $eList;
-    foreach ($aList as $a) {
-        $arr[] = $a;
-    }
-    unset($eList,$aList);
-    foreach ($arr as $i => $data) {
-        $name = $data['file'];
-        $path = $data['path'];
-        $path = str_replace(array($_ENV['path_engine'], $_ENV['path_app']), array('.', '.'), $path);
-        $inc = strpos($name, '.inc');
-        $ext = explode('.', $name);
-        $ext = $ext[count($ext) - 1];
-        $name = substr($name, 0, -(strlen($ext) + 1));
-        $name = explode('_', $name);
-        $name = $name[0];
-        if (('php' == $ext) && !$inc && $name > '' && !in_array($name, $list, true)) {
-            $list[] = $name;
+    $arr = [];
+    $p=[$_ENV['path_engine'].'/modules',$_ENV['path_app'].'/modules'];
+    foreach($p as $d) {
+        if (is_dir($d)) $list = scandir($d);
+        foreach ($list as $e) {
+            if (!in_array($e,[".",".."]) AND !in_array($e,$arr) AND is_dir($_ENV['path_engine'].'/modules/'.$e) AND is_file($_ENV['path_engine'].'/modules/'.$e.'/'.$e.".php")) $arr[] = $e;
         }
     }
-    unset($arr);
-
-    return $list;
+    return $arr;
 }
 
 function wbListTags()
