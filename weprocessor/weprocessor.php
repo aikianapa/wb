@@ -145,18 +145,18 @@ class WEProcessor {
 							// есть специальный случай. если мы вызываем функцию, у которой
 							$requiredParams = count(array_filter((new ReflectionFunction($name))->getParameters(), function($p) { return !$p->isOptional(); }));
 							if ($requiredParams == 1 && isset($this->let)) {
-								$res = call_user_func($name, $this->let);
+								$res = @call_user_func($name, $this->let);
 							} elseif ($requiredParams == 0) {
-								$res = call_user_func($name);
+								$res = @call_user_func($name);
 							} else {
 								$this->evalFail("fn '$name': requires '$requiredParams' arguments and @ is not set");
 								$res = null;
 							}
 						} else {
-							$res = call_user_func_array($name, array_values($args));
+							$res = @call_user_func_array($name, array_values($args));
 						}
 					} else {
-						$res = call_user_func($name, $args);
+						$res = @call_user_func($name, $args);
 					}
 				} catch (ReflectionException $e) {
 					$this->evalFail($e->getMessage());
