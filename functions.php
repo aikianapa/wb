@@ -15,9 +15,9 @@ function wbInit()
     wbInitEnviroment();
     wbInitDatabase();
     wbInitFunctions();
+//    wbTableList();
     wbRouterAdd();
     wbRouterGet();
-    wbTableList();
 }
 
 function wbInitEnviroment()

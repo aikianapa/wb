@@ -37,8 +37,15 @@ function form__controller__common__controller() {
 	$mode=$_ENV["route"]["mode"];
 	$form=$_ENV["route"]["form"];
 	$item=$_ENV["route"]["item"];
+	$tpl = null;
+	if (isset($_ENV["route"]["tpl"]) AND $_ENV["route"]["tpl"]>"") $tpl=$_ENV["route"]["tpl"];
 	$aCall=$form."_".$mode; $eCall=$form."__".$mode;
 	$out=false;
+    if ($tpl!==null AND $tpl>"") $out=wbGetTpl($tpl);
+    if (is_object($out)) {
+        $_ENV["DOM"]=$out;
+        return $_ENV["DOM"];
+    }
 	if (is_callable($aCall)) {$out=$aCall($item);} elseif (is_callable($eCall)) {$out=$eCall($item);}
 	if ($out==false) {
     //    if ($item>"") {$mode.="_".$item;}
