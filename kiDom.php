@@ -2105,6 +2105,29 @@ abstract class kiNode
             foreach($attributes as $at) {
                 $atname=$at->name;
                 $atval=html_entity_decode($this->attr($atname));
+                if (strpos($atname,"}}")) $atname=wbSetValuesStr($atname,$Item);
+                if ($atval>"" && strpos($atval,"}}")) {
+                    $fld=str_replace(array("{{","}}"),array("",""),$atval);
+                    if (isset($Item[$fld]) AND $this->is(":input")) {
+                        $atval=$Item[$fld];
+                        if ((array)$atval === $atval) $atval=wbJsonEncode($atval);
+                    } else {
+                        $atval=wbSetValuesStr($atval,$Item);
+                    }
+                    $this->attr($atname,$atval);
+                };
+            };
+            $this->addClass("wb-attrs");
+        }
+    }
+    
+    /* do not fork with qoutes in tree text
+    public function wbSetAttributes($Item=array()) {
+        $attributes=$this->attributes();
+        if (is_object($attributes) AND !$this->hasClass("wb-attrs")) {
+            foreach($attributes as $at) {
+                $atname=$at->name;
+                $atval=html_entity_decode($this->attr($atname));
                 $atname=wbSetValuesStr($atname,$Item);
                 $atval=wbSetValuesStr($atval,$Item);
                 $this->attr($atname,$atval);
@@ -2112,6 +2135,7 @@ abstract class kiNode
             $this->addClass("wb-attrs");
         }
     }
+    */
 
     public function tagHideAttrs() {
         if (($this->is("[data-wb-role]") AND !$this->hasClass("wb-done") AND !$this->is("[data-wb-done]")) ) return;
