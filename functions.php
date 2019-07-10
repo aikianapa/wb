@@ -1290,7 +1290,7 @@ function wbItemRemove($table = null, $id = null, $flush = true)
 		if ($flush==true) {
 		    wbTableFlush($table);
 		}
-	    } else if (is_string($id)) {
+	    } else if (is_string($id) OR is_numeric($id)) {
 		if (strpos($id," ") OR strpos($id,'"') OR strpos($id,'=') OR strpos($id,'>') OR strpos($id,'<')) {
 		    $list=wbItemList($table,$id);
 		    foreach($list as $item) {
