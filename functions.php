@@ -990,18 +990,13 @@ function wbTreeFindBranchById($Item, $id)
     $res = false;
     if (is_array($Item)) {
         foreach ($Item as $item) {
-            if ($item['id'] == $id) {
-                return $item;
-            }
+            if ($item['id'] === $id) return $item;
             if (is_array($item['children'])) {
                 $res = wbTreeFindBranchById($item['children'], $id);
-                if ($res) {
-                    return $res;
-                }
+                if ($res) return $res;
             }
         }
     }
-
     return $res;
 }
 
@@ -1014,12 +1009,8 @@ function wbTreeFindBranch($tree, $branch = '', $parent = 'true', $childrens = 't
         foreach ($br as $b) {
             $tree = array(wbTreeFindBranchById($tree, rtrim(ltrim($b))));
         }
-        if ('false' == $childrens) {
-            unset($tree['children']);
-        }
-        if ('false' == $parent) {
-            $tree = $tree[0]['children'];
-        }
+        if ('false' == $childrens) unset($tree['children']);
+        if ('false' == $parent) $tree = $tree[0]['children'];
     }
     return $tree;
 }
@@ -2945,152 +2936,132 @@ function wbNormalizePath($path)
 
 function wbClearValues($out,$rep='')
 {
-    $out = preg_replace('/\{\{([^\}]+?)\}\}+|<script.*text\/template.*?>.*?<\/script>(*SKIP)(*F)/isumx', $rep, $out);
-
-    return $out;
-}
-
-function wbListTpl()
-{
-    $dir = $_ENV['path_tpl'];
-    $list = array();
-    $result = array();
-    if (is_dir($dir)) {
-        $list = wbListFilesRecursive($dir, true);
-        foreach ($list as $l => $val) {
-            if (('.php' == substr($val['file'], -4) or '.htm' == substr($val['file'], -4) or '.tpl' == substr($val['file'], -4)) and !strpos('.inc.', $val['file'])) {
-                $path = str_replace($dir, '', $val['path']);
-                $res = substr($path.'/'.$val['file'], 1);
-                $result[] = $res;
-            }
-        }
+    $out = preg_replace('/\{\{([^\}]+?)\}\}+|<script.*text\/template.*?>.*?<\/script>(*SKIP)(*F)/isumx', $rep, $out); return $out; } function wbListTpl() { $dir=$_ENV['path_tpl']; $list=array(); $result=array(); if (is_dir($dir)) { $list=wbListFilesRecursive($dir, true); foreach ($list as $l=> $val) {
+    if (('.php' == substr($val['file'], -4) or '.htm' == substr($val['file'], -4) or '.tpl' == substr($val['file'], -4)) and !strpos('.inc.', $val['file'])) {
+    $path = str_replace($dir, '', $val['path']);
+    $res = substr($path.'/'.$val['file'], 1);
+    $result[] = $res;
+    }
+    }
     }
     sort($result);
 
     return $result;
-}
+    }
 
-function wbListFilesRecursive($dir, $path = false)
-{
+    function wbListFilesRecursive($dir, $path = false)
+    {
     $list = array();
     if (is_dir($dir)) {
-        $stack[] = $dir;
+    $stack[] = $dir;
     }
     else {
-        $stack=array();
+    $stack=array();
     }
     while ($stack) {
-        $thisdir = array_pop($stack);
-        if (is_dir($thisdir) and $dircont = scandir($thisdir)) {
-            $i = 0;
-            $idx = 0;
-            while (isset($dircont[$i])) {
-                if ('.' !== $dircont[$i] && '..' !== $dircont[$i]) {
-                    $current_file = "{$thisdir}/{$dircont[$i]}";
-                    if (is_file($current_file)) {
-                        if (true == $path) {
-                            $list[] = array(
-                                          'file' => "{$dircont[$i]}",
-                                          'path' => "{$thisdir}",
-                                      );
-                        } else {
-                            $list[] = "{$dircont[$i]}";
-                        }
-                        ++$idx;
-                    }
-                    elseif (is_dir($current_file)) {
-                        $stack[] = $current_file;
-                    }
-                }
-                ++$i;
-            }
-        }
+    $thisdir = array_pop($stack);
+    if (is_dir($thisdir) and $dircont = scandir($thisdir)) {
+    $i = 0;
+    $idx = 0;
+    while (isset($dircont[$i])) {
+    if ('.' !== $dircont[$i] && '..' !== $dircont[$i]) {
+    $current_file = "{$thisdir}/{$dircont[$i]}";
+    if (is_file($current_file)) {
+    if (true == $path) {
+    $list[] = array(
+    'file' => "{$dircont[$i]}",
+    'path' => "{$thisdir}",
+    );
+    } else {
+    $list[] = "{$dircont[$i]}";
+    }
+    ++$idx;
+    }
+    elseif (is_dir($current_file)) {
+    $stack[] = $current_file;
+    }
+    }
+    ++$i;
+    }
+    }
     }
 
     return $list;
-}
+    }
 
-function wbArrayWhere($arr, $where)
-{
-    $res  = array();
+    function wbArrayWhere($arr, $where)
+    {
+    $res = array();
     $where=wbSetValuesStr($where);
     foreach ($arr as $key => $val) {
-        if (wbWhereItem($val, $where)) {
-            $res[]=$arr[$key];
-        }
-        unset($arr[$key]);
+    if (wbWhereItem($val, $where)) {
+    $res[]=$arr[$key];
+    }
+    unset($arr[$key]);
     }
     unset($arr);
     return $res;
-}
+    }
 
-function wbCallFormFunc($name, $Item, $form = null, $mode = null)
-{
+    function wbCallFormFunc($name, $Item, $form = null, $mode = null)
+    {
     if (!isset($_GET['mode'])) $_GET['mode'] = '';
     if (!isset($_GET['form'])) $_GET['form'] = '';
     if (null == $mode) $mode = $_GET['mode'];
     if ('' == $mode) $mode = 'list';
     if (null == $form) {
-        if (isset($Item['form']) && $Item['form'] > '') {
-            $form = $Item['form'];
-        } else {
-            $form = $_GET['form'];
-        }
+    if (isset($Item['form']) && $Item['form'] > '') {
+    $form = $Item['form'];
+    } else {
+    $form = $_GET['form'];
+    }
     }
     $sf = $_GET['form'];
     $_GET['form'] = $form;
-    //	formCurrentInclude($form);
+    // formCurrentInclude($form);
     $func = $form.$name;
     $_func = '_'.$func;
     //$Item=wbItemToArray($Item);
     if (is_callable($func)) {
-        $Item = $func($Item, $mode);
+    $Item = $func($Item, $mode);
     } else {
-        if (is_callable($_func)) {
-            $Item = $_func($Item, $mode);
-        }
+    if (is_callable($_func)) {
+    $Item = $_func($Item, $mode);
+    }
     }
     $_GET['form'] = $sf;
 
     return $Item;
-}
+    }
 
-function wbTranslit($textcyr = null, $textlat = null)
-{
+    function wbTranslit($textcyr = null, $textlat = null)
+    {
     $cyr = array(
-               'ё', 'ж',  'ч',  'щ',   'ш',  'ю',  'а', 'б', 'в', 'г', 'д', 'е', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ъ', 'ы', 'ь', 'э', 'я',
-               'Ё', 'Ж',  'Ч',  'Щ',   'Ш',  'Ю',  'А', 'Б', 'В', 'Г', 'Д', 'Е', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ъ', 'Ы', 'Ь', 'Э', 'Я', );
+    'ё', 'ж', 'ч', 'щ', 'ш', 'ю', 'а', 'б', 'в', 'г', 'д', 'е', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ъ', 'ы', 'ь', 'э', 'я',
+    'Ё', 'Ж', 'Ч', 'Щ', 'Ш', 'Ю', 'А', 'Б', 'В', 'Г', 'Д', 'Е', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ъ', 'Ы', 'Ь', 'Э', 'Я', );
     $lat = array(
-               'e', 'j', 'ch', 'sch', 'sh', 'u', 'a', 'b', 'v', 'g', 'd', 'e', 'z', 'i', 'i', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'f', 'h', 'c', '`', 'y', '', 'e', 'ya',
-               'E', 'j', 'Ch', 'Sch', 'Sh', 'U', 'A', 'B', 'V', 'G', 'D', 'E', 'Z', 'I', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'F', 'H', 'c', '`', 'Y', '', 'E', 'ya', );
+    'e', 'j', 'ch', 'sch', 'sh', 'u', 'a', 'b', 'v', 'g', 'd', 'e', 'z', 'i', 'i', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'f', 'h', 'c', '`', 'y', '', 'e', 'ya',
+    'E', 'j', 'Ch', 'Sch', 'Sh', 'U', 'A', 'B', 'V', 'G', 'D', 'E', 'Z', 'I', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'F', 'H', 'c', '`', 'Y', '', 'E', 'ya', );
     if ($textcyr) {
-        return str_replace($cyr, $lat, $textcyr);
+    return str_replace($cyr, $lat, $textcyr);
     }
     elseif ($textlat) {
-        return str_replace($lat, $cyr, $textlat);
+    return str_replace($lat, $cyr, $textlat);
     } else {
-        return null;
+    return null;
     }
-}
+    }
 
-function is_email($email) {
-	$res=true;
-	if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $res=false;
-	return $res;
-}
+    function is_email($email) {
+    $res=true;
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $res=false;
+    return $res;
+    }
 
-function wbBr2nl($str)
-{
+    function wbBr2nl($str)
+    {
     $str = preg_replace('/(rn|n|r)/', '', $str);
-    return preg_replace('=<br */?>=i', 'n', $str);
-}
-
-function wbCheckPhpCode($code) {
-	$file=$_ENV["path_app"]."/uploads/".wbNewId().".php";
-	$umask=umask(0);
-	file_put_contents($file,$code);
-	umask($umask);
-	exec("php -l ".$file, $error, $code);
+    return preg_replace('=<br */?>=i', 'n' , $str); } function wbCheckPhpCode($code) { $file=$_ENV["path_app"]."/uploads/".wbNewId().".php"; $umask=umask(0); file_put_contents($file,$code); umask($umask); exec("php -l ".$file, $error, $code);
 	wbFileRemove($file);
 	// ошибок нет
 	if ($code == 0) return true;
