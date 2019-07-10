@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: charset=utf-8');
 if (isset($_GET["getsysmsg"])) {
         require_once __DIR__."/functions.php";
         wbInitEnviroment();
