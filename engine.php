@@ -15,8 +15,8 @@ if (is_callable("wbAfterInit")) {wbAfterInit();}
 $cache=wbCacheCheck();
 if ($cache["check"] === false OR $cache["check"] === null) {
 	$_ENV["ITEM"]=array();
+    $exclude=in_array($_ENV["route"]["controller"],array("module","ajax","thumbnails"));
 	if (!isset($_ENV["route"]["form"]) OR $_ENV["route"]["form"]!=="default_form") {
-		$exclude=in_array($_ENV["route"]["controller"],array("module","ajax","thumbnails"));
 		$_ENV["DOM"]=wbFromString(""); $_ENV["ITEM"]=array();
 		if (is_callable("wbBeforeEngine") AND !$exclude) {$_ENV["ITEM"] = wbBeforeEngine();}
 		if (is_callable("wbCustomEngine") AND !$exclude) {$_ENV["DOM"]  = wbCustomEngine();} else {wbLoadController();}
@@ -42,7 +42,12 @@ if ($cache["check"] === false OR $cache["check"] === null) {
 		$scripts=$_ENV["DOM"]->find("script");
 		foreach($scripts as $sc) $sc->html(base64_decode($sc->html()));
 	}
-	$html = $_ENV["DOM"]->outerHtml();
+    if (is_callable("wbBeforeOutput") AND !$exclude)  {
+        $html = wbBeforeOutput();
+        if (is_object($html)) $html = $html->outerHtml();
+    } else {
+        $html = $_ENV["DOM"]->outerHtml();
+    }
 }
 
 if ($cache["check"]===null) {
