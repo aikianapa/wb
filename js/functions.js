@@ -2237,6 +2237,8 @@ function wb_pagination(pid) {
         var id = $(this).attr("id");
         if (id==undefined) return;
         var tplid = id.substr(5);
+        var more = $("[data-wb-tpl='"+tplid+"'").attr("data-wb-more");
+        
         $(this).data("route", $(this).attr("data-wb-route")).removeAttr("data-wb-route");
         if ($(this).is(":not([data-wb-idx])")) {
             $(this).attr("data-wb-idx", idx);
@@ -2321,7 +2323,6 @@ function wb_pagination(pid) {
             } else {
                 $(".pagination[id="+id+"] [data-page]:eq(1) a").trigger("click");
             }
-
         });
 
 
@@ -2427,7 +2428,12 @@ url: url,
 cache: false,
 success: function(data) {
                             var data = wb_json_decode(data);
-                            $("[data-wb-tpl=" + tid + "]").html(data.data);
+                            if (more !== undefined && $(more).length)  {
+                                $("[data-wb-tpl=" + tid + "]").append(data.data);
+                            } else {
+                                $("[data-wb-tpl=" + tid + "]").html(data.data);    
+                            }
+                            
                             if (data.pages > "1") {
                                 $(".pagination[id=ajax-" + pid + "]").show();
                                 var pid = $(data.pagr).attr("id");
@@ -2460,11 +2466,19 @@ error: function(data) {
                 $(this).parents("ul").find("li").removeClass("active");
                 $(this).parent("li").addClass("active");
 
-				$("[data-wb-tpl=" + tid + "]").parents().scrollTop(0);
+				if (more == undefined || !$(more).length) $("[data-wb-tpl=" + tid + "]").parents().scrollTop(0);
                 //$(document).trigger("after_pagination_click",[id,page,arr[2]]);
             }
 
         });
+        
+        if (more !== undefined && $(more).length)  {
+            $(slr).hide();
+            $(document).undelegate(more,"click");
+            $(document).delegate(more,"click",function(){
+                $(".pagination[id="+id+"] li[data-page=next] a").trigger("click");
+            });
+        }
     });
 }
 
