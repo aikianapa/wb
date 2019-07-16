@@ -118,6 +118,20 @@ class Jsonq
 		return $this;
 	}
 
+    
+    public function mongoJson() {
+        $this->prepare();
+        $output=[];
+        $data = $this->_map;
+        if ($this->isMultiArray($data)) {
+            foreach ($data as $key => $val) {
+                $val = $this->takeColumn($val);
+                $val["_id"]=$val["id"];
+                $output[] = $isObject ? (object) $val : $val;
+            }
+        }
+        return json_encode($output);
+    }
 
     /**
      * getting prepared data
