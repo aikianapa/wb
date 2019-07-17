@@ -1199,6 +1199,11 @@ function wbItemRead($table = null, $id = null)
 
 function wbCacheCheck() {
     $cache = array("check"=>false,"id"=>false,"path"=>false,"data"=>false);
+    if (isset($_ENV["route"]["params"]) AND $_ENV["route"]["params"]["wbcache"] AND in_array($_ENV["route"]["params"]["wbcache"],["update","false"])) {
+        unset($_ENV["route"]["params"]["wbcache"]);
+        if (!count($_ENV["route"]["params"])) unset($_ENV["route"]["params"]);
+        return $cache;
+    }
     if (isset($_ENV["settings"]["cache"]) AND is_array($_ENV["settings"]["cache"])) {
         foreach($_ENV["settings"]["cache"] as $line) {
             $c=wbAttrToArray($line["controller"]);
