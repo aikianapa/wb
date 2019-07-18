@@ -12,7 +12,7 @@
 </div>
 
 <script data-wb-append="body" defer>
-$(document).ready(function(){
+$(document).on("wbapp",function(){
 var loc="{{_SETT[js_locale]}}";
 if (loc==undefined || loc=="") {loc="en";}
 
