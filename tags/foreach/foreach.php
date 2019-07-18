@@ -193,7 +193,7 @@ class tagForeach extends kiNode  {
         }
         if (!$this->DOM->hasClass("pagination") AND $form=="" AND $table=="" AND $cacheId !== "flase" ) {
             // если список формируется функцией, то используем кэш
-            $checkCache=md5($_SESSION["user_id"].$_ENV["lang"].$_SESSION["lang"]).md5($_ENV["route"]["uri"].$sort.$find);
+            $checkCache=md5($_SESSION["user_id"].$_ENV["lang"].$from).md5($_ENV["route"]["uri"].$sort.$find);
             if ($cacheId!==$checkCache) {
                 $cacheId=$checkCache;
                 file_put_contents($_ENV["dbac"]."/".$cacheId,base64_encode(wbJsonEncode($Item)));

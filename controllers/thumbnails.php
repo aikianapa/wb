@@ -22,22 +22,25 @@ function thumbnail_view() {
 	if (isset($_ENV["route"]["http"])) {$remote=true; $p="http";}
 	if (isset($_ENV["route"]["https"])) {$remote=true; $p="https";}
 	if ($remote) {
-		$file=$p."://".implode("/",$_ENV["route"]["params"]);
-		$ext = pathinfo($file, PATHINFO_EXTENSION);
-		$image=file_get_contents($file);
-		$file=$_ENV["path_app"]."/uploads/_remote/".md5($file).".".$ext;
-		wbPutContents($file,$image);
+		$url=$p."://".implode("/",$_ENV["route"]["params"]);
+		$ext = pathinfo($url, PATHINFO_EXTENSION);
+		$file=$_ENV["path_app"]."/uploads/_remote/".md5($url).".".$ext;
+		if (!is_file($file)) {
+			$image=file_get_contents($url);
+			wbPutContents($file,$image);
+		}
 	} else {
 		$file=$_ENV["path_app"]."/".$_GET["src"];
 	}
+
     if (is_file($file)) {
         list($width, $height, $type) = $size = getimagesize ($file);
         $ext = pathinfo($file, PATHINFO_EXTENSION);
         $mime=$size["mime"];
-        $cachefile=md5($file."_".filemtime($file)."_".$_GET["w"]."_".$_GET["h"]).".".$ext;
+        $cachefile=md5($file."_".$_GET["w"]."_".$_GET["h"]).".".$ext;
         $cachedir=$_ENV["path_app"]."/uploads/_cache/".substr($cachefile,0,2);
         if (!is_dir($cachedir)) {$u=umask(); mkdir ( $cachedir, 0755 , true ); umask($u);}
-        if (!is_file($cachedir."/".$cachefile) OR $remote) {
+        if (!is_file($cachedir."/".$cachefile) ) {
 			if (class_exists("Imagick") ) {
 				$image = new \Imagick(realpath($file));
 				if ($remote) unlink($file);
