@@ -22,16 +22,9 @@ function wbInit()
 
 function wbInitEnviroment()
 {
-    if (!isset($_SESSION['user'])) {
-        $_SESSION['user'] = '';
-    }
-
-    if (!isset($_SESSION['user_role'])) {
-        $_SESSION['user_role'] = '';
-    }
-    if (!isset($_SESSION['trigger'])) {
-        $_SESSION['trigger'] = array();
-    }
+    if (!isset($_SESSION['user'])) $_SESSION['user'] = '';
+    if (!isset($_SESSION['user_role'])) $_SESSION['user_role'] = '';
+    if (!isset($_SESSION['trigger'])) $_SESSION['trigger'] = array();
     if (!isset($_SESSION['order_id']) or '' == $_SESSION['order_id']) {
         $_SESSION['order_id'] = wbNewId();
         $new = true;
@@ -298,30 +291,18 @@ function wbFormUploadPath()
 function wbInitFunctions()
 {
     wbTrigger('func', __FUNCTION__, 'before');
-    if (is_file($_ENV['path_app'].'/functions.php')) {
-        require_once $_ENV['path_app'].'/functions.php';
-    }
+    if (is_file($_ENV['path_app'].'/functions.php')) require_once $_ENV['path_app'].'/functions.php';
     foreach ($_ENV['forms'] as $form) {
         $inc = array(
                    "{$_ENV['path_engine']}/forms/{$form}.php", "{$_ENV['path_engine']}/forms/{$form}/{$form}.php",
                    "{$_ENV['path_app']}/forms/{$form}.php", "{$_ENV['path_app']}/forms/{$form}/{$form}.php",
                );
         foreach ($inc as $k => $file) {
-            if (is_file("{$file}")) {
-                include_once "{$file}";
-            }
+            if (is_file("{$file}")) require_once "{$file}";
         }
     }
-    foreach ($_ENV['modules'] as $module) {
-        $inc = array(
-                   "{$_ENV['path_engine']}/modules/{$module}.php", "{$_ENV['path_engine']}/modules/{$module}/{$module}.php",
-                   "{$_ENV['path_app']}/modules/{$module}.php", "{$_ENV['path_app']}/modules/{$module}/{$module}.php",
-               );
-        foreach ($inc as $k => $file) {
-            if (!is_callable($module.'__init') && !is_callable($module.'_init') && is_file($file)) {
-                include_once $file;
-            }
-        }
+    foreach ($_ENV['modules'] as $module => $file) {
+                require_once $file;
     }
 }
 
@@ -2794,7 +2775,7 @@ function wbListModules()
     foreach($p as $d) {
         if (is_dir($d)) $list = scandir($d);
         foreach ($list as $e) {
-            if (!in_array($e,[".",".."]) AND !in_array($e,$arr) AND is_dir($_ENV['path_engine'].'/modules/'.$e) AND is_file($_ENV['path_engine'].'/modules/'.$e.'/'.$e.".php")) $arr[] = $e;
+            if (!in_array($e,[".",".."]) AND substr($e,1)!=="_" AND !in_array($e,$arr) AND is_dir($d.'/'.$e) AND is_file($d.'/'.$e.'/'.$e.".php")) $arr[$e] = $d.'/'.$e.'/'.$e.".php";
         }
     }
     return $arr;
