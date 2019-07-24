@@ -1201,6 +1201,7 @@ function wbCacheCheck() {
                 AND     $line["active"] == "on"
             )
             {
+            
                 $cacheId = wbGetCacheId();
                 $cacheFile = wbGetCacheId(true);
                 if (!is_file($cacheFile)) {
@@ -1246,7 +1247,7 @@ function wbGetCacheId($file=false) {
     // return Cache ID or Cache Filename
     $cacheId = md5(json_encode($_ENV["route"]).$_ENV["lang"]);
     if ($file==true) {
-        $cacheDir = substr(md5($cacheId),0,4);
+        $cacheDir = substr(md5($cacheId),0,6);
         $cacheFile = "{$_ENV["dbac"]}/{$cacheDir}/{$cacheId}.htm";
         return $cacheFile;
     } else {
