@@ -1247,7 +1247,7 @@ function wbGetCacheId($file=false) {
     // return Cache ID or Cache Filename
     $cacheId = md5(json_encode($_ENV["route"]).$_ENV["lang"]);
     if ($file==true) {
-        $cacheDir = substr(md5($cacheId),0,6);
+        $cacheDir = substr(md5($cacheId),0,4);
         $cacheFile = "{$_ENV["dbac"]}/{$cacheDir}/{$cacheId}.htm";
         return $cacheFile;
     } else {
