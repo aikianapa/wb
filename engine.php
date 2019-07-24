@@ -11,10 +11,10 @@ ini_set('display_errors', 1);
 session_start();
 require_once __DIR__."/functions.php";
 wbInit();
-if (is_callable("wbAfterInit")) {wbAfterInit();}
 $cache=wbCacheCheck();
 if (!$cache["check"]) {
-	$_ENV["ITEM"]=array();
+    if (is_callable("wbAfterInit")) {wbAfterInit();}
+    $_ENV["ITEM"]=array();
     $exclude=in_array($_ENV["route"]["controller"],array("module","ajax","thumbnails"));
 	if (!isset($_ENV["route"]["form"]) OR $_ENV["route"]["form"]!=="default_form") {
 		$_ENV["DOM"]=wbFromString(""); $_ENV["ITEM"]=array();
@@ -48,10 +48,10 @@ if (!$cache["check"]) {
     } else {
         $html = $_ENV["DOM"]->outerHtml();
     }
-}
-
-if ($cache["check"]===null) {
-	file_put_contents($cache["path"],$html);
+	if ($cache["save"]==true) {
+        
+        wbPutContents($cache["path"],$html);
+    }
 } else if ($cache["check"]===true) {
 	$html=$cache["data"];
 }

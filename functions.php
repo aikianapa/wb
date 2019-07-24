@@ -18,6 +18,7 @@ function wbInit()
 //    wbTableList();
     wbRouterAdd();
     wbRouterGet();
+    wbCacheEnvState();
 }
 
 function wbInitEnviroment()
@@ -1179,10 +1180,13 @@ function wbItemRead($table = null, $id = null)
 }
 
 function wbCacheCheck() {
-    $cache = array("check"=>false,"id"=>false,"path"=>false,"data"=>false);
-    if (isset($_ENV["route"]["params"]) AND $_ENV["route"]["params"]["wbcache"] AND in_array($_ENV["route"]["params"]["wbcache"],["update","false"])) {
-        unset($_ENV["route"]["params"]["wbcache"]);
-        if (!count($_ENV["route"]["params"])) unset($_ENV["route"]["params"]);
+    $cache = array("check"=>false,"id"=>false,"path"=>false,"data"=>false,"save"=>false);
+    if (in_array($_ENV["cache_state"],["update","false"])) {
+        $save = true;
+        if ($_ENV["cache_state"]=="false") $save = false;
+        $cacheId = wbGetCacheId();
+        $cacheFile = wbGetCacheId(true);
+        $cache = array("check"=>null,"id"=>$cacheId,"path"=>$cacheFile,"data"=>false,"save"=>$save);
         return $cache;
     }
     if (isset($_ENV["settings"]["cache"]) AND is_array($_ENV["settings"]["cache"])) {
@@ -1197,18 +1201,18 @@ function wbCacheCheck() {
                 AND     $line["active"] == "on"
             )
             {
-                $cacheId = md5(json_encode($_ENV["route"]).$_ENV["lang"].$_SESSION["lang"]);
-                $cacheFile = $_ENV["dbac"]."/".$cacheId.".htm";
+                $cacheId = wbGetCacheId();
+                $cacheFile = wbGetCacheId(true);
                 if (!is_file($cacheFile)) {
-                    $cache = array("check"=>null,"id"=>$cacheId,"path"=>$cacheFile,"data"=>false);
+                    $cache = array("check"=>null,"id"=>$cacheId,"path"=>$cacheFile,"data"=>false,"save"=>true);
                 } else {
                     $lastmod = filemtime($cacheFile);
                     $expired = $lastmod + $line["lifetime"]*1;
                     if (time() > $expired) {
-                        $cache = array("check"=>null,"id"=>$cacheId,"path"=>$cacheFile,"data"=>false);
+                        $cache = array("check"=>null,"id"=>$cacheId,"path"=>$cacheFile,"data"=>false,"save"=>true);
                     } else {
                         $data = file_get_contents($cacheFile);
-                        $cache = array("check"=>true,"id"=>$cacheId,"path"=>$cacheFile,"data"=>$data);
+                        $cache = array("check"=>true,"id"=>$cacheId,"path"=>$cacheFile,"data"=>$data,"save"=>false);
                     }
 
                 }
@@ -1218,6 +1222,37 @@ function wbCacheCheck() {
     return $cache;
 }
 
+function wbCacheEnvState() {
+    $_ENV["cache_state"]=null;
+    if (isset($_ENV["route"]["params"]) AND $_ENV["route"]["params"]["wbcache"] AND in_array($_ENV["route"]["params"]["wbcache"],["update","false"])) {
+        if (isset($_ENV["route"]["params"]) AND isset($_ENV["route"]["params"]["wbcache"])) {
+            $_ENV["cache_state"]=$_ENV["route"]["params"]["wbcache"];
+            if (strpos($_ENV["route"]["uri"],"?wbcache=".$_ENV["route"]["params"]["wbcache"]."&")) {
+                $_ENV["route"]["uri"]=str_replace("wbcache=".$_ENV["route"]["params"]["wbcache"]."&","",$_ENV["route"]["uri"]);
+            } else 
+            if (strpos($_ENV["route"]["uri"],"?wbcache=".$_ENV["route"]["params"]["wbcache"])) {
+                $_ENV["route"]["uri"]=str_replace("?wbcache=".$_ENV["route"]["params"]["wbcache"],"",$_ENV["route"]["uri"]);
+            } else 
+            if (strpos($_ENV["route"]["uri"],"&wbcache=".$_ENV["route"]["params"]["wbcache"])) {
+                $_ENV["route"]["uri"]=str_replace("&wbcache=".$_ENV["route"]["params"]["wbcache"],"",$_ENV["route"]["uri"]);
+            }
+            unset($_ENV["route"]["params"]["wbcache"]);
+            if (isset($_ENV["route"]["params"]) AND !count($_ENV["route"]["params"])) unset($_ENV["route"]["params"]);
+        }
+    }
+}
+
+function wbGetCacheId($file=false) {
+    // return Cache ID or Cache Filename
+    $cacheId = md5(json_encode($_ENV["route"]).$_ENV["lang"]);
+    if ($file==true) {
+        $cacheDir = substr(md5($cacheId),0,4);
+        $cacheFile = "{$_ENV["dbac"]}/{$cacheDir}/{$cacheId}.htm";
+        return $cacheFile;
+    } else {
+        return $cacheId;    
+    }
+}
 
 function wbCacheName($table, $id = null)
 {
