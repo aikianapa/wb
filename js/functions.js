@@ -579,14 +579,14 @@ function wb_tree() {
 	}
 
 
-    $.fn.treeStore = function() {
+    $.fn.treeStore = function(init) {
         var name = $(this).attr("name");
         var store = $(this).find("input[name='" + name + "']");
-        $(store).val(wb_json_encode($(this).treeBranchStore()));
+        $(store).val(wb_json_encode($(this).treeBranchStore(init)));
         $(".modal:visible").wbFixModal();
     };
 
-    $.fn.treeBranchStore = function() {
+    $.fn.treeBranchStore = function(init) {
         var store = [];
         $(this).children("ol").each(function() {
             $(this).children("li").each(function() {
@@ -595,6 +595,14 @@ function wb_tree() {
                 } else {
                     $(this).attr("data-open", true);
                 }
+                if ($(this).data("init") == undefined ) {
+                    var name = $(this).children("input").attr("value");
+                    $(this).attr("data-name",name);
+                    $(this).data("init",true);
+                    // При инициализации берём отсюда
+                    // Фикс ошибки с кавычками
+                }
+                
                 var branch = {
 id:
                     $(this).attr("data-id"),
