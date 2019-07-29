@@ -21,14 +21,16 @@ function thumbnail_view() {
 	$remote = false;
 	if (isset($_ENV["route"]["http"])) {$remote=true; $p="http";}
 	if (isset($_ENV["route"]["https"])) {$remote=true; $p="https";}
+    if (isset($_ENV["route"]["params"]) AND isset($_ENV["route"]["params"][0])) {
+        $tmp=base64_decode($_ENV["route"]["params"][0]);
+        if (strpos($tmp,"ttp://") OR strpos($tmp,"ttps://")) {
+            $remote = true;
+            $url = $tmp;
+        }
+    }
+
 	if ($remote) {
-        //echo strpos($_ENV["route"]["uri"],"://");
-        //print_r($_ENV["route"]);
-        //die;
-		$url=$p."://".implode("/",$_ENV["route"]["params"]);
-        
-        $url=$p.substr($_ENV["route"]["uri"],strpos($_ENV["route"]["uri"],"://"));
-        
+        if (!isset($url)) $url=$p.substr($_ENV["route"]["uri"],strpos($_ENV["route"]["uri"],"://"));
 		$ext = pathinfo($url, PATHINFO_EXTENSION);
 		$file=$_ENV["path_app"]."/uploads/_remote/".md5($url).".".$ext;
 		if (!is_file($file)) {
