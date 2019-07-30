@@ -765,9 +765,9 @@ function wbTableRemove($table = null, $engine = false)
     if (wbRole('admin')) {
         $cache = wbTableCachePath($table, $engine);
         $table = wbTablePath($table, $engine);
-        wbRrecurseDelete($cache);
+        wbRecurseDelete($cache);
         if (is_file($table)) {
-            wbRrecurseDelete($cache);
+            wbRecurseDelete($cache);
             unlink($table);
             if (is_file($table)) { // не удалилось
                 wbError('func', __FUNCTION__, 1003, func_get_args());

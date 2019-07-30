@@ -19,8 +19,11 @@ function thumbnails_controller() {
 
 function thumbnail_view() {
 	$remote = false;
+    $cache = true;
 	if (isset($_ENV["route"]["http"])) {$remote=true; $p="http";}
 	if (isset($_ENV["route"]["https"])) {$remote=true; $p="https";}
+    if (isset($_ENV["route"]["params"]) AND in_array("nocache",$_ENV["route"]["params"])) $cache=false;
+    
     if (isset($_ENV["route"]["params"]) AND isset($_ENV["route"]["params"][0])) {
         $tmp=base64_decode($_ENV["route"]["params"][0]);
         if (strpos($tmp,"ttp://") OR strpos($tmp,"ttps://")) {
@@ -33,7 +36,7 @@ function thumbnail_view() {
         if (!isset($url)) $url=$p.substr($_ENV["route"]["uri"],strpos($_ENV["route"]["uri"],"://"));
 		$ext = pathinfo($url, PATHINFO_EXTENSION);
 		$file=$_ENV["path_app"]."/uploads/_remote/".md5($url).".".$ext;
-		if (!is_file($file)) {
+		if (!is_file($file) OR !$cache) {
 			$image=file_get_contents($url);
 			wbPutContents($file,$image);
 		}
@@ -48,7 +51,7 @@ function thumbnail_view() {
         $cachefile=md5($file."_".$_GET["w"]."_".$_GET["h"]).".".$ext;
         $cachedir=$_ENV["path_app"]."/uploads/_cache/".substr($cachefile,0,2);
         if (!is_dir($cachedir)) {$u=umask(); mkdir ( $cachedir, 0755 , true ); umask($u);}
-        if (!is_file($cachedir."/".$cachefile) ) {
+        if (!is_file($cachedir."/".$cachefile) AND $cache ) {
 			if (class_exists("Imagick") ) {
 				$image = new \Imagick(realpath($file));
 				if ($remote) unlink($file);

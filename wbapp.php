@@ -30,15 +30,15 @@ class wbApp {
         }
     }
 
-	public function json($data) {
-		$json = new Jsonq();
-		if (is_string($data)) {
-			$data=wbItemList($data);
-		} else if (!is_array($data)) {
-			$data=(array)$data;
-		}
-		return $json->collect($data);
-	}
+        public function json($data) {
+            $json = new Jsonq();
+            if (is_string($data)) {
+                $data=wbItemList($data);
+            } else if (!is_array($data)) {
+                $data=(array)$data;
+            }
+            return $json->collect($data);
+        }
 
         public function settings() {
         $this->settings=$_ENV["settings"];
@@ -74,11 +74,11 @@ class wbApp {
 
         public function fromString($string="") {
 		if (substr($string,0,1)!=="<") {$string="<span>{$string}</span>";}
-                $this->template=new DomQuery($string);
-                $this->dom = clone $this->template;
-                return $this->dom;
+            $dom=new DomQuery($string);
+            $dom->app = $this;
+            return $dom;
         }
-
+    
         public function fromFile($file="") {
         $res = "";
         if ($file=="") {

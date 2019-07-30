@@ -15,7 +15,6 @@ class DomQuery extends DomQueryNodes
      * @var array
      */
     private static $node_data = array();
-
     /**
      * Get the combined text contents of each element in the set of matched elements, including their descendants,
      * or set the text contents of the matched elements.
@@ -61,6 +60,10 @@ class DomQuery extends DomQueryNodes
         }
         // get html for first node
         return $this->getInnerHtml();
+    }
+    
+    public function innerHtml($html_string=null) {
+        return $this->html($html_string);
     }
 
     /**
@@ -1228,4 +1231,61 @@ class DomQuery extends DomQueryNodes
     {
         return $this->__get($name) !== null;
     }
+    
+    /* ======================================================= 
+                        WEB BASIC EXTENSIONS
+    ======================================================= */
+    
+    
+    public function fetch($Item=[]) {
+        $wbi = $this->find("[data-wb*]");
+        foreach($wbi as &$wb) {
+            $wb->app = $this->app;
+            $params = $wb->fetchParams();
+            if (isset($params["role"])) {
+                $tag="tag".$params["role"];
+                $wb->$tag($Item,$params);
+            }
+        }
+        $this->setValues($Item);
+        return $this;
+    }
+    
+    public function setValues($item) {
+        $this->find(":root")->html( wbSetValuesStr($this->outerHtml(),$item) );
+        return $this;
+    }
+    
+    public function fetchParams() {
+        $wbd = $this->attr("data-wb");
+        if (substr($wbd,0,1) == "{" AND substr($wbd,-1,1) == "}") {
+            $params=json_decode($wbd,true);
+        } else {
+            parse_str($wbd,$params);
+        }
+        foreach($this->attributes as $attr) {
+            $tmp=$attr->name;
+            if (strpos($tmp,"ata-wb-")) {
+                $tmp=str_replace("data-wb-","",$tmp);
+                $params[$tmp]=$attr->value; 
+            }
+        }
+        return $params;
+    }
+    
+    
+
+    
+    public function tagForeach($Item=array(),$params) {
+        $tpl=$this->children()->clone();
+        $this->html("");
+        foreach($Item as $key => $val) {
+            $tmptpl=$tpl->clone();
+            $tmptpl->fetch($val);
+            $this->append($tmptpl);
+        }
+        return $this;
+    }
+
+    
 }
