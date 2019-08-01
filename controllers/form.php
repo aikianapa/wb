@@ -48,8 +48,11 @@ function form__controller__common__controller() {
     }
 	if (is_callable($aCall)) {$out=$aCall($item);} elseif (is_callable($eCall)) {$out=$eCall($item);}
 	if ($out==false) {
-    //    if ($item>"") {$mode.="_".$item;}
         $out=wbGetForm($form,$mode);
+        if ($_ENV["error"]["wbGetForm"]=="noform" AND $item>"") {
+            $mode.="_".$item;
+            $out=wbGetForm($form,$mode);
+        }
         $out->wbSetData();
         if ($out=="") return false;
         $_ENV["DOM"]=$out;
