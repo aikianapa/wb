@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__.'/wbrouter.php';
 require_once __DIR__.'/lib/vendor/autoload.php';
 require_once __DIR__.'/kiDom.php';
 require_once __DIR__.'/wbapp.php';
@@ -19,6 +20,7 @@ function wbInit()
     wbRouterAdd();
     wbRouterGet();
     wbCacheEnvState();
+    if (is_callable("wbAfterInit")) {wbAfterInit();}
 }
 
 function wbInitEnviroment()
@@ -243,7 +245,7 @@ function wbMail(
 function wbCheckWorkspace()
 {
     if (!is_readable($_ENV['path_app']) or !is_writable($_ENV['path_app'])) {
-        @chmod($_ENV['path_app'], 0766);
+        @chmod($_ENV['path_app'], 0777);
         if (!is_readable($_ENV['path_app']) or !is_writable($_ENV['path_app'])) {
             $out = wbGetTpl('setup.htm');
             $error = $out->find('#errors #rights');

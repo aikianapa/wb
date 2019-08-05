@@ -13,7 +13,6 @@ require_once __DIR__."/functions.php";
 wbInit();
 $cache=wbCacheCheck();
 if (!$cache["check"]) {
-    if (is_callable("wbAfterInit")) {wbAfterInit();}
     $_ENV["ITEM"]=array();
     $exclude=in_array($_ENV["route"]["controller"],array("module","ajax","thumbnails"));
 	if (!isset($_ENV["route"]["form"]) OR $_ENV["route"]["form"]!=="default_form") {
