@@ -59,6 +59,7 @@
             }
             if (isset($dom->params->limit) AND $ndx >= $dom->params->limit*1) break;
         }
+        $dom->done = true;
         return $dom;
     }
 ?>

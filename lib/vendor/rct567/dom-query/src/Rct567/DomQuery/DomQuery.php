@@ -1237,26 +1237,73 @@ class DomQuery extends DomQueryNodes
     ======================================================= */
     
     
-    public function fetch($Item=[]) {
+    public function fetch($Item=null) {
+        if ($this->done) return $this;
+        if ($Item == null AND isset($this->data)) {
+            $Item = $this->data;
+        } else if ($Item!==null) {
+            $this->data = $Item;    
+        }
+        $this->fetchParams();
         $wbi = $this->find("[data-wb*]");
         foreach($wbi as &$wb) {
             $wb->app = $this->app;
-            $params = $wb->fetchParams();
-            if (isset($params["role"])) {
-                $tag="tag".$params["role"];
-                $wb->$tag($Item,$params);
+            $wb->data = $this->data;
+            if ($wb->fetchParams()->hasRole() AND !$wb->done) {
+                $func="tag".ucfirst($wb->params->role);
+                $func($wb);
             }
         }
-        $this->setValues($Item);
+        $this->setValues();
         return $this;
     }
     
-    public function setValues($item) {
-        $this->find(":root")->html( wbSetValuesStr($this->outerHtml(),$item) );
+    public function clear() {
+        $this->html("");
+        return $this;
+    }
+    
+    public function hasRole($role=null) {
+        if ($role == null && isset($this->params->role)) {
+            return $this->params->role;
+        } else if ($role !== null AND $role == $this->params->role) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public function setValues($Item=null) {
+        if ($Item == null) $Item = $this->data;
+        $this->html( wbSetValuesStr($this->html(),$Item) );
+        return $this;
+    }
+    
+    public function setAttributes($Item=null) {
+        if ($Item == null) $Item = $this->data;
+        $attributes=$this->attributes;
+        if (count($attributes)) {
+            foreach($attributes as $at) {
+                $atname=$at->name;
+                $atval=html_entity_decode($this->attr($atname));
+                if (strpos($atname,"}}")) $atname=wbSetValuesStr($atname,$Item);
+                if ($atval>"" && strpos($atval,"}}")) {
+                    $fld=str_replace(array("{{","}}"),array("",""),$atval);
+                    if (isset($Item[$fld]) AND $this->is(":input")) {
+                        $atval=$Item[$fld];
+                        if ((array)$atval === $atval) $atval=wbJsonEncode($atval);
+                    } else {
+                        $atval=wbSetValuesStr($atval,$Item);
+                    }
+                    $this->attr($atname,$atval);
+                };
+            };
+        }
         return $this;
     }
     
     public function fetchParams() {
+        $this->setAttributes();
         $wbd = $this->attr("data-wb");
         if (substr($wbd,0,1) == "{" AND substr($wbd,-1,1) == "}") {
             $params=json_decode($wbd,true);
@@ -1270,22 +1317,12 @@ class DomQuery extends DomQueryNodes
                 $params[$tmp]=$attr->value; 
             }
         }
-        return $params;
-    }
-    
-    
-
-    
-    public function tagForeach($Item=array(),$params) {
-        $tpl=$this->children()->clone();
-        $this->html("");
-        foreach($Item as $key => $val) {
-            $tmptpl=$tpl->clone();
-            $tmptpl->fetch($val);
-            $this->append($tmptpl);
+        $this->params=(object)$params;
+        if (isset($this->params->role)) {
+            $this->role = $this->params->role;
+        } else {
+            $this->role = false;
         }
         return $this;
     }
-
-    
 }

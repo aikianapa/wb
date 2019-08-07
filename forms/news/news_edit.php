@@ -14,7 +14,8 @@
 
                     <div class="form-group row">
                         <label class="col-sm-2 form-control-label">{{_LANG[datetime]}}</label>
-                        <div class="col-sm-4"><input type="datetimepicker" class="form-control" data-format="" name="date" placeholder="{{_LANG[datetime]}}" required></div>
+                        <meta data-wb-role="variable" var="date" data-wb-if='date>""' value='{{date("Y-m-d H:i:s",{{strtotime({{date}})}})}}' else='{{date("Y-m-d H:i:s")}}' data-wb-hide="*">
+                        <div class="col-sm-4"><input type="datetimepicker" class="form-control" data-format="" name="date" value="{{_var.date}}" placeholder="{{_LANG[datetime]}}" required></div>
                         <label class="col-sm-2 form-control-label">{{_LANG[visible]}}</label>
                         <div class="col-sm-2"><label class="switch switch-success"><input type="checkbox" name="active"><span></span></label></div>
                     </div>

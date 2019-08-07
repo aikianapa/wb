@@ -882,7 +882,8 @@ function wbItemList($table = 'pages', $where = '', $sort = null)
 			if ((array)$list === $list) {
 			    foreach ($list as $key => $item) {
 				$item['_table'] = $tname;
-				if ($tname!=="tree") $item=wbItemToArray($item);
+				//if ($tname!=="tree") $item=wbItemToArray($item);
+                if (isset($item['images']) && $_ENV["route"]["mode"]!=="edit") $item = wbImagesToText($item);
 				$item = wbTrigger('form', __FUNCTION__, 'AfterItemRead', func_get_args(), $item);
 				if (
 				    ('_' == substr($item['id'], 0, 1) and 'admin' !== $_SESSION['user_role'])
@@ -2739,7 +2740,7 @@ function wbRole($role, $userId = null)
 function wbControls($set = '')
 {
     $res = '*';
-    $controls = '[data-wb-role]';
+    $controls = '[data-wb-role],[data-wb]';
     $allow = '[data-wb-allow], [data-wb-disallow], [data-wb-disabled], [data-wb-enabled], [data-wb-readonly], [data-wb-writable]';
     $target = '[data-wb-prepend], [data-wb-append], [data-wb-remove], [data-wb-before], [data-wb-after], [data-wb-html], [data-wb-replace], [data-wb-selector], [data-wb-addclass], [data-wb-removeclass], [data-wb-prependto], [data-wb-appendto], [data-wb-htmlto], [data-wb-removeattr], [data-wb-attr], [data-wb-src], [data-wb-clear]';
     $tags = array('dict', 'tree', 'gallery', 'imageloader', 'thumbnail', 'uploader','multiinput', 'where');

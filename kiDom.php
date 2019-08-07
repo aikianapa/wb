@@ -2391,21 +2391,22 @@ abstract class kiNode
         contentAppends($this);
     }
 
-    public function hasRole($role=null) {
-        if ($role!==null) {
+    public function hasRole($checkrole=null) {
+        if ($checkrole!==null) {
             $tl=array();
             if ($this->hasAttr("data-wb-role")) {
                 $tl=wbAttrToArray($this->attr("data-wb-role"));
             }
             elseif 	($this->hasAttr("role")) 		{
                 $tl=wbAttrToArray($this->attr("role"));
-            } elseif ($this->hasAttr("data-wb-".$role)) {
-		return true;
+            } elseif ($this->hasAttr("data-wb-".$checkrole)) {
+		    return true;
 	    }
-            if (in_array($role,$tl)) {
+            include("wbattributes.php");
+            if ($role == $checkrole) {return true;}
+            if (in_array($checkrole,$tl)) {
                 return true;
-            }
-            else {
+            } else {
                 return false;
             }
         } else {

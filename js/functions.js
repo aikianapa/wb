@@ -2356,7 +2356,8 @@ function wb_pagination(pid) {
                 }
                 var page = explode("/", $(this).attr("data-wb-ajaxpage"));
                 var c = count(page);
-                var page = "ajax-" + page[c - 3] + "-" + page[c - 2];
+                var pagenum = page[c - 2];
+                var page = "ajax-" + page[c - 3] + "-" + pagenum;
                 var sort = null;
                 var desc = null;
                 if (substr(page, 0, 4) == "page") {
@@ -2438,6 +2439,10 @@ success: function(data) {
                             var data = wb_json_decode(data);
                             if (more !== undefined && $(more).length)  {
                                 $("[data-wb-tpl=" + tid + "]").append(data.data);
+                                if (data.pages == pagenum) {
+                                    $(more).remove();
+                                    $(slr).remove();
+                                }
                             } else {
                                 $("[data-wb-tpl=" + tid + "]").html(data.data);    
                             }

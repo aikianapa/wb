@@ -1,6 +1,5 @@
 <?php
-function tagFormData(&$dom,$Item=null) {
-    echo $dom ; die;
+function tagFormdata(&$dom,$Item=null) {
     $mode="show";
     if ($Item==null && isset($dom->data)) $Item=$dom->data;
     if ($Item==null && !isset($dom->data)) $Item=[];
@@ -33,11 +32,7 @@ function tagFormData(&$dom,$Item=null) {
         if (isset($field) AND $field>"") $Item=wbGetDataWbFrom($Item,$field);
         if (isset($vars) AND $vars>"") $Item=wbAttrAddData($vars,$Item);
         if (isset($call) AND is_callable($call)) $Item=$call($Item);
-        if ((array)$srcItem === $srcItem) {
-            foreach($srcItem as $k => $v) {
-                $Item["%{$k}"]=$v;
-            };
-        }
+
         if (isset($table)) {
 				$Item=wbCallFormFunc("BeforeShowItem",$Item,$table,$mode);
 				$Item=wbCallFormFunc("BeforeItemShow",$Item,$table,$mode);
@@ -45,6 +40,8 @@ function tagFormData(&$dom,$Item=null) {
         if (isset($clear) AND $clear=="true") {$clear=true;} else {$clear=false;}
         $Item["_parent"] = $srcItem;
         $dom->data = $Item;
-        return $dom->setValues();
+        $dom->fetch();
+        $dom->done=true;
+        return $dom;
 }
 ?>
