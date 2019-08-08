@@ -10,8 +10,7 @@ class wbApp {
 
     public function __construct() {
         include_once (__DIR__."/functions.php");
-        //include_once (__DIR__."/wbfunctions.php");
-        wbInit();
+        if (!isset($_ENV['settings'])) wbInit();
 require_once $_ENV["path_engine"]."/tags/foreach.php";
 require_once $_ENV["path_engine"]."/tags/formdata.php";
     }
