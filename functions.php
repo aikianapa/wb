@@ -590,7 +590,7 @@ function wbFieldBuild($param, $data = array(),$locale=array())
     case 'forms':
         $env=$_ENV;
         $get=$_GET;
-	$par=$param;
+	    $par=$param;
         $param=wbItemToArray($param);
         $form=$param["prop"]["form"];
         $mode=$param["prop"]["mode"];
@@ -616,11 +616,11 @@ function wbFieldBuild($param, $data = array(),$locale=array())
         break;
     case 'multiinput':
         $tpl->wbSetValues($param);
-	$wrp=wbGetForm('common','multiinput_wrapper');
+	   $wrp=wbGetForm('common','multiinput_wrapper');
         $field=$param["name"];
         $flds = wbFromString('');
         if (isset($param["prop"]["multiflds"])) {
-	$arr=$param["prop"]["multiflds"];
+	   $arr=$param["prop"]["multiflds"];
         foreach ($arr as $i => $multi) {
 		if (!isset($multi["style"])) $multi["style"]="";
 		if (!isset($multi["class"])) $multi["class"]="";
@@ -657,8 +657,25 @@ function wbFieldBuild($param, $data = array(),$locale=array())
     $set->find('.form-group > div')->html($tpl->outerHtml());
     $set->wbSetData($param);
     $set->wbSetValues($data);
-
-    return $set->outerHtml();
+    $out = $set->outerHtml();
+    /*
+    if ($param['type']=="forms") {
+        $out=wbFromString($out);
+        $inp=$out->find("[name]");
+        foreach($inp as $i) {
+            $name=$i->attr("name");
+            $spos=strpos($name,"[");
+            if ($spos) {
+                $name=$param['name']."[".substr($name,0,$spos)."]".substr($name,strpos($name,"]")+1);
+            } else {
+                $name=$param['name']."[".$name."]";
+            }
+            $i->attr("name",$name);
+        }
+        $out = $out->outerHtml();
+    }
+    */
+    return $out;
 }
 
 function wbInitDatabase()

@@ -976,6 +976,7 @@ open:
                     fldval = wb_iconv(fldval, di["type"]);
                     values[fldname] = fldval;
                 }
+                
                 if (strpos(fldname, "[")) {
                     var pos = strpos(fldname, "[");
                     var sub = substr(fldname, pos);
@@ -995,6 +996,28 @@ open:
                         cur++;
                     }
                 }
+                /*
+                if (strpos(fldname, "[")) {
+                    var f = explode("[",fldname);
+                    var l = f.length-1;
+                    var fld="";
+                    $(f).each(function(i,fl){
+                        fl=str_replace("]","",fl);
+                        if (fl>"") {
+                            if (i==0) {
+                                fld="values['"+fl+"']";
+                                eval("if (" + fld + "==undefined) {" + fld + " = {};}");
+                            } else if ( i < l) {
+                                fld+="['"+fl+"']";
+                                eval("if (" + fld + "==undefined) {" + fld + " = {};}");
+                            } else {
+                                fld+="['"+fl+"']";
+                                eval(fld + " = fldval;");
+                            }
+                        }
+                    });
+                }
+                */
             });
         });
         return values;

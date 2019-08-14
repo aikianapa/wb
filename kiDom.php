@@ -1569,15 +1569,17 @@ abstract class kiNode
 
                     if ($inp->is("select") AND $inp->attr("value")>"") {
                         if ($inp->is("[multiple]")) {
-				$value=json_decode($Item[$name],true);
-				foreach($value as $val) {
-					if ($val>"") $inp->find("option[value=".$val."]")->selected="selected";
-				}
-				$value=$value[0];
-			} else {
-				$value=$inp->attr("value");
-				$inp->find("option[value=".$value."]")->selected="selected";
-			}
+                            $value=json_decode($Item[$name],true);
+                            if ((array)$value === $value) {
+                                foreach($value as $val) {
+                                    if ($val>"") $inp->find("option[value=".$val."]")->selected="selected";
+                                }
+                            }
+				            $value=$value[0];
+                    } else {
+                        $value=$inp->attr("value");
+                        $inp->find("option[value=".$value."]")->selected="selected";
+                    }
                     }
                 };
                 $inp->wbSetMultiValue($Item);

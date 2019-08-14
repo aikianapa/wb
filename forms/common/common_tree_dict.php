@@ -108,7 +108,7 @@
 			<label class="col-sm-3 form-control-label">{{_LANG[form]}}</label>
 			<div class="col-sm-9">
 				<select class="form-control" name="form" placeholder="{{_LANG[form]}}" data-wb-role="foreach" data-wb-from="_ENV[forms]" data-wb-tpl="false">
-					<option value="{{0}}">{{0}}</option>
+					<option value="{{_value}}">{{_value}}</option>
 				</select>
 			</div>
 		</div>
