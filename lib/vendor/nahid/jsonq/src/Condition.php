@@ -245,7 +245,12 @@ class Condition
      */
     public static function contains($value, $comparable)
     {
-        return (strpos($value, $comparable) !== false);
+        if ((string)$value === $value) {
+            return (strpos($value, $comparable) !== false);    
+        } else if ((array)$value === $value AND (string)$comparable === $comparable ) {
+                return in_array($comparable,$value);
+        }
+        return "Error! Value must be String or Array";
     }
 
     /**
