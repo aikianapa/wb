@@ -1980,7 +1980,6 @@ function wb_ajax() {
 						is_mail = true;
 						ajax.push({name:"_message",value:$(form).wbMailForm()});
 					}
-
                 }
                 if ($(that).attr("data-wb-json") !== undefined && $(that).attr("data-wb-json") > "") {
                     ajax = $.parseJSON($(that).attr("data-wb-json"));
@@ -2060,7 +2059,20 @@ function wb_ajax() {
         }
     }
 
-
+    $("[data-wb-ajax='/ajax/mail/']").parents("form").find("input:file").on("change",function(){
+        var that = this;
+        var file = this.files[0];
+        var reader = new FileReader();
+            reader.onload = (function(file) {
+            return function(e) {
+                $(that).attr("data-base64",reader.result);
+            };
+        })(file);
+        reader.readAsDataURL(file);
+    });
+    
+    
+    
     $(document).undelegate("[data-wb-ajax]:not(.select2)", "click");
     $(document).delegate("[data-wb-ajax]:not(.select2)", "click", function(e) {
 	    $(this).parents("ul").find(".active[data-wb-ajax]").removeClass("active");
@@ -2121,18 +2133,22 @@ $.fn.wbGetInputLabel = function() {
 $.fn.wbMailForm = function() {
     // создание автописьма из формы
     var tpl = "";
-    $(this).find(":input").each(function() {
+    $(this).find(":input:not([type=radio]):not([type=checkbox]),:input[type=checkbox]:checked,:input[type=radio]:checked").each(function() {
         if (!$(this).is("[type=button]") && !$(this).is("[data-mail=false]") && !in_array($(this).attr("name"),["_subject","_mailto"])) {
             var label = $(this).attr("data-label");
             if (label == undefined) label = $(this).wbGetInputLabel();
             var value = "";
             if ($(this).is("textarea")) {
                 value = $(this).val();
+            } else if ($(this).is(":input[type=file]")) {
+                value = $(this).attr("data-base64");
+                value = "<img src='"+value+"'>"
+                console.log(value);
             } else {
                 value = $(this).val();
             }
             label = "<b>" + trim(strip_tags(label)) + "</b>: ";
-            value = trim(strip_tags(value));
+            if (!$(this).is(":input[type=file]")) {value = trim(strip_tags(value));}
             if (value > " ") {
                 tpl += label + value + "<br>\n\r";
             }
