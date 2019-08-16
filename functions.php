@@ -215,7 +215,20 @@ function wbMail(
         //Attach an image file
 
         if (!is_array($attach) AND is_string($attach)) $attach=array($attach);
-        if (is_array($attach)) foreach($attach as $a) $mail->addAttachment($a);
+        if (is_array($attach)) {
+            foreach($attach as $a) {
+                if (is_string($a) AND substr($a,0,5) == "data:") {
+                    preg_match('/^data:(.*);base64,/', substr($a,0,50), $matches, PREG_OFFSET_CAPTURE); 
+                    $mime = $matches[1][0];
+                    $ext = explode("/",$mime);
+                    $file = wbNewId().".".$ext[1];
+                    $base64 = substr($a,strlen("data:{$mime};base64,"));
+                    $mail->AddStringAttachment(base64_decode($base64), $file, 'base64', $mime);
+                } else {
+                    $mail->addAttachment($a);    
+                }
+            }
+        }
         //send the message, check for errors
         $mail->send();
         $error=$_ENV["error"][__FUNCTION__]=$mail->ErrorInfo;

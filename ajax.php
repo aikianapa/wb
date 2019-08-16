@@ -388,6 +388,7 @@ function ajax__mailer() {
 }
 
 function ajax__mail() {
+    $attachments=[];
     if (!isset($_POST["_subject"])) $_POST["_subject"]=$_ENV['sysmsg']["mail_from_site"];
     if (!isset($_POST["subject"])) $_POST["subject"]=$_POST["_subject"];
 
@@ -399,6 +400,11 @@ function ajax__mail() {
     }
     elseif (isset($_POST["_message"])) {
         $out=wbFromString($_POST["_message"]);
+        $b64img = $out->find("img[src^='data:']");
+        foreach($b64img as $b64) {
+            $attachments[] = $b64->attr("src");
+            $b64->remove();
+        }
     }
     else {
         $out=wbGetTpl("mail.php");
@@ -414,7 +420,7 @@ function ajax__mail() {
     $Item=$_POST;
     $out->wbSetData($Item);
     $out=$out->outerHtml();
-    $res=wbMail("{$_POST["email"]};{$_POST["name"]}","{$mailto};{$_ENV["settings"]["header"]}", $_POST["subject"], $out);
+    $res=wbMail("{$_POST["email"]};{$_POST["name"]}","{$mailto};{$_ENV["settings"]["header"]}", $_POST["subject"], $out, $attachments);
     if (!$res) {
         $result=json_encode(array("error"=>true,"msg"=>$_ENV['sysmsg']["mail_sent_error"].": ".$_ENV["error"]['wbMail']));
     } else {
