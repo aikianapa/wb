@@ -1,5 +1,6 @@
 <?php
 function tagFormdata(&$dom,$Item=null) {
+    if (isset($dom->done) AND $dom->done == true) return $dom;
     $mode="show";
     if ($Item==null && isset($dom->data)) $Item=$dom->data;
     if ($Item==null && !isset($dom->data)) $Item=[];
@@ -41,7 +42,7 @@ function tagFormdata(&$dom,$Item=null) {
         $Item["_parent"] = $srcItem;
         $dom->data = $Item;
         $dom->fetch();
-        $dom->done=true;
+        $dom->addClass("wb-done");
         return $dom;
 }
 ?>

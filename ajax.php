@@ -330,6 +330,14 @@ function ajax__remove() {
     die;
 }
 
+function ajax__rename() {
+    if (isset($_SESSION["user_id"]) AND in_array($_SESSION["user_role"],["admin","moder"])) {
+        return json_encode(wbItemRename($_ENV["route"]["form"],$_ENV["route"]["item"],$_POST["id"]));
+    }
+    die;
+}
+
+
 function ajax__getform() {
         $out = wbGetForm($_ENV["route"]["params"][0],$_ENV["route"]["params"][1]);
         header('Content-Type: text/html; charset=utf-8');

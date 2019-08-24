@@ -1317,6 +1317,26 @@ function wbCacheName($table, $id = null)
     return $cache;
 }
 
+function wbItemRename($table = null, $old = null, $new = null, $flush = true) {
+    if ($new == null OR $new == "") $new = wbNewId();
+    $item = wbItemRead($table, $old);
+    if ($item) {
+        $item=wbTrigger('form', __FUNCTION__, 'BeforeItemRename', func_get_args(), $item);
+        $item["_id"] = $item["id"] = $new;
+        wbItemSave($table, $item, $flush);
+        $path = "{$_ENV["path_app"]}/uploads/{$table}";
+        if (is_dir("{$path}/{$old}")) {
+            rename("{$path}/{$old}", "{$path}/{$new}");
+        }
+        wbItemRemove($table, $old, $flush);
+        $item=wbTrigger('form', __FUNCTION__, 'AfterItemRename', func_get_args(), $item);
+        return $item;
+    }
+    return false;
+}
+
+
+
 function wbItemRemove($table = null, $id = null, $flush = true)
 {
     $res = false;

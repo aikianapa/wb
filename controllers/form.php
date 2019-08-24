@@ -133,6 +133,20 @@ function form__controller__remove() {
 	}
 }
 
+function form__controller__rename() {
+	if (isset($_SESSION["user_id"]) AND in_array($_SESSION["user_role"],["admin","moder"])) {
+		$_ENV["DOM"]=wbGetForm("common","rename_confirm");
+        if (isset($_REQUEST["confirm"]) AND $_REQUEST["confirm"]=="true") {
+			$_ENV["DOM"]->find("script[data-wb-tag=success]")->remove();
+		} else {
+			//wbItemRename($_ENV["route"]["form"],$_ENV["route"]["item"]);
+			$_ENV["DOM"]->find(".modal")->remove();
+		}
+		return $_ENV["DOM"];
+	}
+}
+
+
 function form__controller__error_404($id=null) {
 	header("HTTP/1.0 404 Not Found");
 	$_ENV["route"]["error"]="404";

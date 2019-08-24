@@ -1237,24 +1237,77 @@ class DomQuery extends DomQueryNodes
     ======================================================= */
     
     
+    
+    
+    
     public function fetch($Item=null) {
-        if ($this->done) return $this;
         if ($Item == null AND isset($this->data)) {
             $Item = $this->data;
-        } else if ($Item!==null) {
+        } else if ($Item !== null) {
             $this->data = $Item;    
         }
+        $this->excludeTags();
         $this->fetchParams();
-        $wbi = $this->find("[data-wb*]");
-        foreach($wbi as &$wb) {
-            $wb->app = $this->app;
-            $wb->data = $this->data;
-            if ($wb->fetchParams()->hasRole() AND !$wb->done) {
-                $func="tag".ucfirst($wb->params->role);
-                $func($wb);
+        $this->find("[data-wb]")->each(function($wb){
+            if ($wb->done !== true) {
+                $wb->app = $this->app;
+                $wb->data = $this->data;
+                if ($wb->fetchParams()->hasRole()) {
+                    $func="tag".ucfirst($wb->params->role);
+                    $func($wb);
+                    $wb->setValues();
+                    $wb->addClass("wb-done");
+                }
+            }
+        });
+//        echo "<pre>".htmlspecialchars($this->outerHtml())."</pre>";
+        $this->setValues();
+        $this->includeTags();
+        $this->addClass("wb-done");
+        return $this;
+    }
+    
+    
+    function excludeTags($Item=array()) {
+        $list=$this->find("textarea,[type=text/template],.wb-done,.wb-value,pre,.nowb,[data-role=module],[data-wb-role=module],select.select2[data-wb-ajax] option");
+        foreach ($list as $ta) {
+            $id=wbNewId();
+            $ta->attr("wb-exclude-id",$id);
+            $ta->replaceWith(strtr($ta->outerHtml(),array("{{"=>"#~#~","}}"=>"~#~#")));
+        };
+    }
+    
+    function includeTags($Item=array()) {
+        $list=$this->find("[wb-exclude-id]");
+        foreach ($list as $ta) {
+            $ta->removeAttr("wb-exclude-id");
+            $ta->replaceWith(strtr($ta->outerHtml(),array("#~#~"=>"{{","~#~#"=>"}}")));
+        };
+    }
+    
+    
+    public function fetchParams() {
+        if (isset($this->params)) return $this;
+        $this->setAttributes();
+        $wbd = $this->attr("data-wb");
+        if (substr($wbd,0,1) == "{" AND substr($wbd,-1,1) == "}") {
+            $params=json_decode($wbd,true);
+        } else {
+            parse_str($wbd,$params);
+        }
+        foreach($this->attributes as $attr) {
+            $tmp=$attr->name;
+            if (strpos($tmp,"ata-wb-")) {
+                $tmp=str_replace("data-wb-","",$tmp);
+                $params[$tmp]=$attr->value; 
             }
         }
-        $this->setValues();
+        $this->params=(object)$params;
+        if (isset($this->params->role)) {
+            $this->role = $this->params->role;
+        } else {
+            $this->role = false;
+        }
         return $this;
     }
     
@@ -1301,28 +1354,5 @@ class DomQuery extends DomQueryNodes
         }
         return $this;
     }
-    
-    public function fetchParams() {
-        $this->setAttributes();
-        $wbd = $this->attr("data-wb");
-        if (substr($wbd,0,1) == "{" AND substr($wbd,-1,1) == "}") {
-            $params=json_decode($wbd,true);
-        } else {
-            parse_str($wbd,$params);
-        }
-        foreach($this->attributes as $attr) {
-            $tmp=$attr->name;
-            if (strpos($tmp,"ata-wb-")) {
-                $tmp=str_replace("data-wb-","",$tmp);
-                $params[$tmp]=$attr->value; 
-            }
-        }
-        $this->params=(object)$params;
-        if (isset($this->params->role)) {
-            $this->role = $this->params->role;
-        } else {
-            $this->role = false;
-        }
-        return $this;
-    }
+
 }

@@ -1,5 +1,6 @@
 <?php
     function tagForeach(&$dom,$Item=null) {
+        if (isset($dom->done) AND $dom->done == true) return $dom;
         $oddeven="even";
         $ndx=0;
         $n=0;
@@ -59,7 +60,7 @@
             }
             if (isset($dom->params->limit) AND $ndx >= $dom->params->limit*1) break;
         }
-        $dom->done = true;
+        $dom->addClass("wb-done");
         return $dom;
     }
 ?>
