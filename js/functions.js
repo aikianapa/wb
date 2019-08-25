@@ -1381,21 +1381,23 @@ empty: 'fa fa-star-o'
 }
 
 $.fn.wbFixModal = function () {
-   	$(this).find(".modal-dialog").css( 'height' ,'').css("margin","");
-	$(this).find(".modal-content").css( 'height' ,'');
-	$(this).find(".modal-body").css( 'height' ,'');
+	if ($(document).find(".kt-mainpanel").length) {
+		$(this).find(".modal-dialog").css( 'height' ,'').css("margin","");
+		$(this).find(".modal-content").css( 'height' ,'');
+		$(this).find(".modal-body").css( 'height' ,'');
 
-    var mh = $(this).height();
-    var wh = $(window).height();
-    var mhd = $(this).find(".modal-header").height();
-    var mft = $(this).find(".modal-footer").height();
-    var mbd = $(this).find(".modal-body").height();
-    if ( (mhd + mft + mbd) > wh ) {
-	$(this).find(".modal-dialog").height(wh).css({"overflow":"hidden","margin":"0"});
-	$(this).find(".modal-content").height(wh).css("overflow","hidden");;
-	$(this).find(".modal-body").height( wh - (mhd + mft) ).css("overflow","auto");
-	//$(this).height(wh).css("overflow","hidden");
-    }
+		var mh = $(this).height();
+		var wh = $(window).height();
+		var mhd = $(this).find(".modal-header").height();
+		var mft = $(this).find(".modal-footer").height();
+		var mbd = $(this).find(".modal-body").height();
+		if ( (mhd + mft + mbd) > wh ) {
+		$(this).find(".modal-dialog").height(wh).css({"overflow":"hidden","margin":"0"});
+		$(this).find(".modal-content").height(wh).css("overflow","hidden");;
+		$(this).find(".modal-body").height( wh - (mhd + mft) ).css("overflow","auto");
+		//$(this).height(wh).css("overflow","hidden");
+		}
+	}
 };
 
 function wb_plugins_loaded() {
