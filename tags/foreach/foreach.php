@@ -24,7 +24,7 @@ class tagForeach extends kiNode  {
         $id="";
         $limit="";
         $table="";
-//        $cacheId=0;
+        $cacheId=0;
         $form="";
         $where="";
         include($_ENV["path_engine"]."/wbattributes.php");
@@ -32,11 +32,11 @@ class tagForeach extends kiNode  {
         if ($form>"" AND $table=="") {
             $table=$form;
         }
-/*
+
         if (isset($cache)) {
             $cacheId=$cache;
         }
-*/
+
         if (isset($tpl) AND $tpl=="false") {
             $tplid=false;
         }
@@ -57,7 +57,7 @@ class tagForeach extends kiNode  {
         } else {
             $page=$page*1;
         }
-        /*
+
         if ( isset($from)) {
             if (isset($Item[$from]) AND !strpos("[",$from) AND  !strpos(".",$from)) {
                 //if (isset($Item["form"])) {$table=$Item["form"];} else {$table="";}
@@ -77,7 +77,6 @@ class tagForeach extends kiNode  {
                 if ($Item==null) $Item=array();
             }
         }
-        */
         // Experemental
         if ( isset($from)) {
 			$Item=wbItemToArray($Item);
@@ -193,7 +192,7 @@ class tagForeach extends kiNode  {
         if (isset($rand) AND $rand=="true") {
             shuffle($Item);
         }
-        /*
+
         if (!$this->DOM->hasClass("pagination") AND $form=="" AND $table=="" AND $cacheId !== "flase" ) {
             // если список формируется функцией, то используем кэш
             $checkCache=md5($_SESSION["user_id"].$_ENV["lang"].$from).md5($_ENV["route"]["uri"].$sort.$find);
@@ -204,7 +203,7 @@ class tagForeach extends kiNode  {
                 $Item=json_decode(base64_decode(file_get_contents($_ENV["dbac"]."/".$cacheId)),true);
             }
         }
-        */
+
 
         $oddeven="even";
         foreach($Item as $key => $val) {
