@@ -1213,6 +1213,7 @@ function wbItemRead($table = null, $id = null)
 }
 
 function wbCacheCheck() {
+    exec("find {$_ENV["dbac"]} -type f -mmin +120 -exec rm -rf {} \; &"); // clean old chaches
     $cache = array("check"=>false,"id"=>false,"path"=>false,"data"=>false,"save"=>false);
     if (in_array($_ENV["cache_state"],["update","false"])) {
         $save = true;

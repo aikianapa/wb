@@ -15,8 +15,9 @@ class wbDom extends DomQuery {
             $this->data = $Item;    
         }
         if (!$this->isDocument) {
-            $this->excludeTags();
             $this->fetchParams();
+        } else {
+            $this->setLocale();
         }
         $wbtags = $this->children(":not(.wb-done)");
         if (count($wbtags)) {
@@ -41,9 +42,7 @@ class wbDom extends DomQuery {
 //        echo "<pre>".htmlspecialchars($this->outerHtml())."</pre>";
         if (!$this->wbdone) {
             if (!$this->isDocument) {
-                $this->includeTags();
                 $this->setValues();
-                
             }
         }
         return $this;
@@ -52,6 +51,7 @@ class wbDom extends DomQuery {
 	public function outerHtml($clear = false) {
         if ($clear) {
             $this->find(".wb-done")->removeClass("wb-done");
+            $this->find("[wb-exclude-id]")->removeAttr("wb-exclude-id");
         }
 		return $this->prop('outerHTML');
 	}
@@ -95,11 +95,10 @@ class wbDom extends DomQuery {
     }
     
     function includeTags() {
-        $list=$this->find("[wb-exclude-id]");
-        foreach ($list as $ta) {
-            $ta->removeAttr("wb-exclude-id");
+        $list=$this->find("[wb-exclude-id]")->each(function($ta) {
             $ta->replaceWith(strtr($ta->outerHtml(),array("#~#~"=>"{{","~#~#"=>"}}")));
-        };
+            $ta->attr("wb-exclude-id",null);
+        });
         return $this;
     }
     
@@ -110,6 +109,55 @@ class wbDom extends DomQuery {
     
     public function tag() {
         return $this->tagName;
+    }
+    
+    public function getLocale($ini=null) {
+        $locale=null;
+        if ($this->find("[type='text/locale']")->length OR $ini!==null) {
+            $obj=$this->find("[type='text/locale']");
+            if ( $ini!==null AND is_file($ini) ) {
+                $loc=parse_ini_string(file_get_contents($ini),true);
+            } else {
+                if ($obj->is("[data-wb-role=include]") AND $ini!==null) {
+                    $obj->tagInclude();
+                    $obj->html("\n\r".$obj->html());
+                }
+                $loc=parse_ini_string($obj->html(),true);
+            }
+            if (count($loc)) {
+                $locale=array();
+                if (isset($loc["_global"]) AND $loc["_global"]==false) {
+                    $global=false;
+                }
+                else {
+                    $global=true;
+                }
+                foreach($loc as $lang => $variables) {
+                    if (!isset($locale[$lang])) {
+                        $locale[$lang]=array();
+                    }
+                    if (!isset($_ENV["locale"][$lang])) {
+                        $_ENV["locale"][$lang]=array();
+                    }
+                    foreach($variables as $var => $val) {
+                        $locale[$lang][$var]=$val;
+                        if ($global==true) {
+                            $_ENV["locale"][$lang][$var]=$val;
+                        }
+                    }
+                }
+            }
+            if (is_object($obj)) $obj->remove();
+        }
+        $this->locale = $locale;
+        return $locale;
+    }
+    
+    public function setLocale($ini=null) {
+        $locale = null;
+        if ($this->find("[text/locale]")) $locale=$this->getLocale($ini);
+        $this->locale = $locale;
+        return $locale;
     }
     
     public function hasRole($role=null) {
@@ -250,6 +298,78 @@ class wbApp {
             return $dom;
         }
     
+        public function getForm($form = null, $mode = null, $engine = null) {
+            $_ENV['error'][__FUNCTION__] = '';
+            if (null == $form) $form = $_ENV['route']['form'];
+            if (null == $mode) $mode = $_ENV['route']['mode'];
+
+            $aCall = $form.'_'.$mode;
+            $eCall = $form.'__'.$mode;
+
+            $loop=false;
+            foreach(debug_backtrace() as $func) {
+                if ($aCall==$func["function"]) {
+                    $loop=true;
+                }
+                if ($eCall==$func["function"]) {
+                    $loop=true;
+                }
+            }
+
+            if (is_callable($aCall) and $loop == false) {
+                $out = $aCall();
+            }
+            elseif (is_callable($eCall) and false !== $engine and $loop == false) {
+                $out = $eCall();
+            }
+
+            if (!isset($out)) {
+                $current = '';
+                $ini = null;
+                $flag = false;
+                $path = array("/forms/{$form}_{$mode}.php", "/forms/{$form}/{$form}_{$mode}.php", "/forms/{$form}/{$mode}.php");
+                foreach ($path as $form) {
+                    if (false == $flag) {
+                        if (is_file($_ENV['path_engine'].$form)) {
+                            $current = $_ENV['path_engine'].$form;
+                            $flag = $engine;
+                        }
+                        if (is_file($_ENV['path_app'].$form) && false == $flag) {
+                            $current = $_ENV['path_app'].$form;
+                            $flag = true;
+                        }
+                    }
+                }
+                unset($form);
+                if ('' == $current) {
+                    $out=null;
+                    $current = "{$_ENV['path_engine']}/forms/common/common_{$mode}.php";
+                    if (is_file($current)) {
+                        $out = $this->fromFile($current);
+                        $ini = substr($current,0,-4).".ini";
+                    }
+                    $current = "{$_ENV['path_app']}/forms/common/common_{$mode}.php";
+                    if (is_file($current)) {
+                        $out = $this->fromFile($current);
+                        $ini = substr($current,0,-4).".ini";
+                    }
+                    if ($out==null) {
+                        $cur = wbNormalizePath("/forms/{$_ENV["route"]["form"]}_{$_ENV["route"]["mode"]}.php");
+                        $out = wbErrorOut(wbError('func', __FUNCTION__, 1012, array($cur)), true);
+                        $_ENV['error'][__FUNCTION__] = 'noform';
+                    }
+
+                } else {
+                    $out = $this->fromFile($current);
+                    $ini = substr($current,0,-4).".ini";
+                }
+            }
+            if (is_string($out)) $out = $this->fromString($out);
+            $locale=$out->setLocale($ini);
+            if ($locale!==null) wbEnvData("form->{$aCall}->locale",$locale);
+            return $out;
+        }
+
         public function fromFile($file="") {
         $res = "";
         if ($file=="") {
@@ -259,15 +379,15 @@ class wbApp {
                 session_start();
             }
             $context = stream_context_create(array(
-                                                 'http'=>array(
-                                                         'method'=>"POST",
-                                                         'header'=>	'Accept-language:' . " en\r\n" .
-                                                         'Content-Type:' . " application/x-www-form-urlencoded\r\n" .
-                                                         'Cookie: ' . session_name()."=".session_id()."\r\n" .
-                                                         'Connection: ' . " Close\r\n\r\n",
-                                                         'content' => http_build_query($_POST)
-                                                 )
-                                             ));
+                 'http'=>array(
+                         'method'=>"POST",
+                         'header'=>	'Accept-language:' . " en\r\n" .
+                         'Content-Type:' . " application/x-www-form-urlencoded\r\n" .
+                         'Cookie: ' . session_name()."=".session_id()."\r\n" .
+                         'Connection: ' . " Close\r\n\r\n",
+                         'content' => http_build_query($_POST)
+                 )
+             ));
             session_write_close();
             $url=parse_url($file);
             if (is_file($file)) {

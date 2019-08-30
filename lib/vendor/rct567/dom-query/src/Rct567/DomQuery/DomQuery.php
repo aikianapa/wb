@@ -958,8 +958,8 @@ class DomQuery extends DomQueryNodes
      */
     private function importNodes($content, callable $import_function)
     {
-	if (\is_string($content) && strpos($arg, '<')==false) {$flag="string";} else {$flag="";}
-        if (\is_array($content)) {
+	if ((string)$content === $content && strpos($arg, '<')==false) {$flag="string";} else {$flag="";}
+        if ((array)$content === $content) {
             foreach ($content as $item) {
                 $this->importNodes($item, $import_function);
             }
@@ -1120,7 +1120,6 @@ class DomQuery extends DomQueryNodes
     public function replaceWith()
     {
         $removed_nodes = new self();
-
         $this->importNodes(\func_get_args(), function ($node, $imported_node) use (&$removed_nodes) {
             if ($node->nextSibling) {
                 $node->parentNode->insertBefore($imported_node, $node->nextSibling);
@@ -1130,13 +1129,11 @@ class DomQuery extends DomQueryNodes
             $removed_nodes->addDomNode($node);
             $node->parentNode->removeChild($node);
         });
-
         foreach (\func_get_args() as $new_content) {
             if (!\is_string($new_content)) {
                 self::create($new_content)->remove();
             }
         }
-
         return $removed_nodes;
     }
 
@@ -1231,128 +1228,4 @@ class DomQuery extends DomQueryNodes
     {
         return $this->__get($name) !== null;
     }
-    
-    /* ======================================================= 
-                        WEB BASIC EXTENSIONS
-    ======================================================= */
-    
-    
-    
-    
-    
-    public function fetch($Item=null) {
-        if ($Item == null AND isset($this->data)) {
-            $Item = $this->data;
-        } else if ($Item !== null) {
-            $this->data = $Item;    
-        }
-        $this->excludeTags();
-        $this->fetchParams();
-        $this->find("[data-wb]")->each(function($wb){
-            if ($wb->done !== true) {
-                $wb->app = $this->app;
-                $wb->data = $this->data;
-                if ($wb->fetchParams()->hasRole()) {
-                    $func="tag".ucfirst($wb->params->role);
-                    $func($wb);
-                    $wb->setValues();
-                    $wb->addClass("wb-done");
-                }
-            }
-        });
-//        echo "<pre>".htmlspecialchars($this->outerHtml())."</pre>";
-        $this->setValues();
-        $this->includeTags();
-        $this->addClass("wb-done");
-        return $this;
-    }
-    
-    
-    function excludeTags($Item=array()) {
-        $list=$this->find("textarea,[type=text/template],.wb-done,.wb-value,pre,.nowb,[data-role=module],[data-wb-role=module],select.select2[data-wb-ajax] option");
-        foreach ($list as $ta) {
-            $id=wbNewId();
-            $ta->attr("wb-exclude-id",$id);
-            $ta->replaceWith(strtr($ta->outerHtml(),array("{{"=>"#~#~","}}"=>"~#~#")));
-        };
-    }
-    
-    function includeTags($Item=array()) {
-        $list=$this->find("[wb-exclude-id]");
-        foreach ($list as $ta) {
-            $ta->removeAttr("wb-exclude-id");
-            $ta->replaceWith(strtr($ta->outerHtml(),array("#~#~"=>"{{","~#~#"=>"}}")));
-        };
-    }
-    
-    
-    public function fetchParams() {
-        if (isset($this->params)) return $this;
-        $this->setAttributes();
-        $wbd = $this->attr("data-wb");
-        if (substr($wbd,0,1) == "{" AND substr($wbd,-1,1) == "}") {
-            $params=json_decode($wbd,true);
-        } else {
-            parse_str($wbd,$params);
-        }
-        foreach($this->attributes as $attr) {
-            $tmp=$attr->name;
-            if (strpos($tmp,"ata-wb-")) {
-                $tmp=str_replace("data-wb-","",$tmp);
-                $params[$tmp]=$attr->value; 
-            }
-        }
-        $this->params=(object)$params;
-        if (isset($this->params->role)) {
-            $this->role = $this->params->role;
-        } else {
-            $this->role = false;
-        }
-        return $this;
-    }
-    
-    public function clear() {
-        $this->html("");
-        return $this;
-    }
-    
-    public function hasRole($role=null) {
-        if ($role == null && isset($this->params->role)) {
-            return $this->params->role;
-        } else if ($role !== null AND $role == $this->params->role) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
-    public function setValues($Item=null) {
-        if ($Item == null) $Item = $this->data;
-        $this->html( wbSetValuesStr($this->html(),$Item) );
-        return $this;
-    }
-    
-    public function setAttributes($Item=null) {
-        if ($Item == null) $Item = $this->data;
-        $attributes=$this->attributes;
-        if (count($attributes)) {
-            foreach($attributes as $at) {
-                $atname=$at->name;
-                $atval=html_entity_decode($this->attr($atname));
-                if (strpos($atname,"}}")) $atname=wbSetValuesStr($atname,$Item);
-                if ($atval>"" && strpos($atval,"}}")) {
-                    $fld=str_replace(array("{{","}}"),array("",""),$atval);
-                    if (isset($Item[$fld]) AND $this->is(":input")) {
-                        $atval=$Item[$fld];
-                        if ((array)$atval === $atval) $atval=wbJsonEncode($atval);
-                    } else {
-                        $atval=wbSetValuesStr($atval,$Item);
-                    }
-                    $this->attr($atname,$atval);
-                };
-            };
-        }
-        return $this;
-    }
-
 }

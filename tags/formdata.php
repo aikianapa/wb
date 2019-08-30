@@ -1,6 +1,6 @@
 <?php
-function tagFormdata(&$dom,$Item=null) {
-    if (isset($dom->done) AND $dom->done == true) return $dom;
+function tagFormdata(&$dom,&$Item=null) {
+    if ($dom->hasClass("wb-done")) return $dom;
     $mode="show";
     if ($Item==null && isset($dom->data)) $Item=$dom->data;
     if ($Item==null && !isset($dom->data)) $Item=[];
@@ -41,7 +41,7 @@ function tagFormdata(&$dom,$Item=null) {
         if (isset($clear) AND $clear=="true") {$clear=true;} else {$clear=false;}
         $Item["_parent"] = $srcItem;
         $dom->data = $Item;
-        $dom->fetch();
+        $dom->setValues();
         $dom->addClass("wb-done");
         return $dom;
 }

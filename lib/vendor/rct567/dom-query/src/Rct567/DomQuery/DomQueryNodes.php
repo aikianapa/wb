@@ -119,7 +119,7 @@ class DomQueryNodes implements \Countable, \IteratorAggregate, \ArrayAccess
                 $this->loadDomNodeList($arg);
             } elseif ($arg instanceof \DOMNode) {
                 $this->addDomNode($arg);
-            } elseif (\is_array($arg) && $arg[0] instanceof \DOMNode) {
+            } elseif ((array)$arg === $arg && $arg[0] instanceof \DOMNode) {
                 $this->addNodes($arg);
             } elseif ($arg instanceof \DOMXPath) {
                 $this->dom_xpath = $arg;
@@ -504,7 +504,7 @@ class DomQueryNodes implements \Countable, \IteratorAggregate, \ArrayAccess
 
             if ($return_value === null) {
                 continue;
-            } elseif (\is_array($return_value)) {
+            } elseif ((array)$return_value === $return_value) {
                 $result = \array_merge($result, $return_value);
             } else {
                 $result[] = $return_value;
@@ -661,7 +661,7 @@ class DomQueryNodes implements \Countable, \IteratorAggregate, \ArrayAccess
      */
     public function count()
     {
-        if (isset($this->nodes) && \is_array($this->nodes)) {
+        if (isset($this->nodes) && (array)$this->nodes === $this->nodes) {
             return \count($this->nodes);
         }
 
@@ -790,7 +790,7 @@ class DomQueryNodes implements \Countable, \IteratorAggregate, \ArrayAccess
     public function getIterator()
     {
         $iteration_result = array();
-        if (\is_array($this->nodes)) {
+        if ((array)$this->nodes === $this->nodes) {
             foreach ($this->nodes as $node) {
                 $iteration_result[] = $this->createChildInstance($node);
             }
