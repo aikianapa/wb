@@ -284,7 +284,7 @@ function __engineRecoveryPassword() {
 			$link=$_ENV["route"]["hostp"]."/login/recovery/".base64_encode($user["password"].";".$user["email"].";".$user["pwdtoken"]);
 			$letter->wbSetData(["link"=>$link]);
 			$subject=$out->find(".signbox-header .recovery-block")->text();
-			$res=wbMail($_POST["l"].";".$_ENV["settings"]["header"],"oleg_frolov@mail.ru",$subject,$letter->outerHtml());
+			$res=wbMail($_ENV["settings"]["email"].";".$_ENV["settings"]["header"],$_POST["l"],$subject,$letter->outerHtml());
 			$out->find(".recovery-block")->removeClass("d-none");
 			$out->find('.main-block')->addClass('d-none');
 			$out->find('.recovery-password')->addClass('d-none');
