@@ -97,16 +97,18 @@ success: function(data) {
         return res;
     }
     wbapp.scriptWait = function(url, data, func) {
-        new Promise(function (resolve, reject) {
+        var load = new Promise(function (resolve, reject) {
             var s;
             s = document.createElement('script');
             s.src = url;
             s.onload = resolve;
             s.onerror = reject;
             document.head.appendChild(s);
-		if (func !== undefined) {
-		    return func(data);
-		}
+        });
+        load.then(function(success){
+            if (func !== undefined) {
+                return func(data);
+            }            
         });
     }
 

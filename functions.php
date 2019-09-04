@@ -100,6 +100,7 @@ function wbInitEnviroment()
     }
     $_ENV["locales"]=wbListLocales();
     $_ENV["settings"]["js_locale"]=substr($_SESSION["lang"],0,2);
+    $_ENV["settings"]["i18n"]=strtolower($_ENV["settings"]["js_locale"])."-".strtoupper($_ENV["settings"]["js_locale"]);
 
 
     if (isset($_ENV['settings']['path_tpl']) and $_ENV['settings']['path_tpl'] > '') {
