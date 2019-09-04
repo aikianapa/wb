@@ -1652,6 +1652,8 @@ abstract class kiNode
     }
 
 	public function wbAppends($Item=array()) {
+        
+        if ($_ENV["route"]["controller"]=="engine") return;
 	    if ($this->find("head")->length) {
 		// Вставки в тэг HEAD
 		if (isset($Item["head_add"]) AND isset($Item["head_add_active"]) AND $Item["head_add_active"]=="on")  {$this->find("head")->append($Item["head_add"]);}
