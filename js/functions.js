@@ -1383,6 +1383,17 @@ empty: 'fa fa-star-o'
 }
 
 $.fn.wbFixModal = function () {
+    
+    $(this).find(".close[data-dismiss=modal]").off("click");
+    $(this).find(".close[data-dismiss=modal]").on("click",function(event){
+        var modal = $(this).parents(".modal")[0];
+        $(modal).modal("hide");
+        event.preventDefault();
+        return false;
+    });
+    
+    if ($(this).parents(".modal")) return;
+    
 	if ($(document).find(".kt-mainpanel").length) {
 		$(this).find(".modal-dialog").css( 'height' ,'').css("margin","");
 		$(this).find(".modal-content").css( 'height' ,'');

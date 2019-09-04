@@ -364,13 +364,13 @@ font-family: FontAwesome;
   overflow-y: hidden !important;
 }
 
-.tree-edit.modal .modal-dialog {
+.tree-edit.modal > .modal-dialog {
   margin: 0;
   height: 100vh;
   min-width: 50vw;
 }
 
-.tree-edit.modal .modal-body {
+.tree-edit.modal > .modal-dialog > .modal-content > .modal-body {
   height: calc(100vh - 43px);
   overflow-y: auto;
 }
