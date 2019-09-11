@@ -418,8 +418,8 @@ class wbApp {
         public function fromTpl($tpl) {
 			$tpl=wbGetTpl($tpl);
 			$tpl->wbSetData($this->data,false);
-			$this->fromString($tpl->outerHtml());
-			return $this->dom;
+			$this->dom=$tpl;
+			return $this;
 		}
 
 

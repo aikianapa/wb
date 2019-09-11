@@ -147,19 +147,18 @@
 <script type="text/locale" data-wb-role="include" src="users_common"></script>
 <script>
 	$("#{{_form}}_{{_mode}} [name=isgroup]").on("change",function(){
-		console.log($("#{{_form}}_{{_mode}} [name=isgroup]").val());
-		if ( $("#{{_form}}_{{_mode}} [name=isgroup]").val() !== "on" ) {
-			$("#{{_form}}Group").parents("form").find(".nav-tabs	").find(".nav-link").removeClass("active");
-			$("#{{_form}}Group").parents(".tab-content").find(".tab-pane").removeClass("show active");
-			if ($(this).is(":checked")) {
-				$("#{{_form}}Group").addClass("show active");
+		if ( $("#{{_form}}_{{_mode}} [name=isgroup]").prop("checked") == true ) {
+                $("#{{_form}}Group").addClass("show active");
 				$("[href='#{{_form}}Group']").show().addClass("active");
-			} else {
+				$("#{{_form}}Descr").removeClass("show active");
+				$("[href='#{{_form}}Descr']").removeClass("active"); 
+		} else {
+                $(this).parents("form").find(".tab-pane").removeClass("show active");
+            $("#{{_form}}Group").parents("form").find(".nav-tabs").find(".nav-link").removeClass("show active");
 				$("[href='#{{_form}}Group']").hide().removeClass("active");
 				$("#{{_form}}Descr").addClass("show active");
-				$("[href='#{{_form}}Descr']").show().addClass("active");
-			}
-		}
+				$("[href='#{{_form}}Descr']").show().addClass("active");         
+        }
 	});
 
 	$("#{{_form}}_{{_mode}} [name=isgroup]").trigger("change");
