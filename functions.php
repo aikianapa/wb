@@ -611,14 +611,23 @@ function wbFieldBuild($param, $data = array(),$locale=array())
         $_ENV["route"]["form"]=$param["_form"]=$_GET["form"]=$form;
         $_ENV["route"]["mode"]=$param["_mode"]=$_GET["mode"]=$mode;
         $tpl=wbGetForm($form,$mode);
+        $tpl->wbSetAttributes($param);
+        $tpl->wbSetData($data[$param["name"]],true);
+        $fld = $par["name"];
+        $inputs = $tpl->find("[name]");
+        foreach($inputs as $inp) {
+            $inp->attr("name","{$fld}[{$inp->attr("name")}]");
+        }
         if ($param["prop"]["selector"]>"") {$tpl=$tpl->find($param["prop"]["selector"],0)->clone();}
-        $tpl->wbSetValues($param);
-        $tpl->wbSetData($data);
+        
         $tpl->find(".nav-tabs .nav-item:first-child")->addClass("active");
         $_ENV=$env;
         $_GET=$get;
         $param=$par;
         unset($env,$get,$par);
+        break;
+    case 'snippet':
+            
         break;
     case 'module':
         if (!is_array($opt)) break;
@@ -654,7 +663,7 @@ function wbFieldBuild($param, $data = array(),$locale=array())
         }
 	}
         $tpl->find('[data-wb-role=multiinput]')->html($flds);
-	$tpl->wbSetData($data);
+	    $tpl->wbSetData($data);
         unset($flds);
         break;
     }
@@ -667,8 +676,13 @@ function wbFieldBuild($param, $data = array(),$locale=array())
 	if (isset($param["prop"]["class"])) $tpl->find(":first")->addClass($param["prop"]["class"]);
 	if (isset($param["prop"]["style"])) $tpl->find(":first")->attr("style",$param["prop"]["style"]);
 
-    $set->find('.form-group > label')->html($label);
-    $set->find('.form-group > div')->html($tpl->outerHtml());
+    if ($label == "_remove") {
+        $set = $tpl;
+    } else {
+        $set->find('.form-group > label')->html($label);
+        $set->find('.form-group > div')->html($tpl->outerHtml());
+    }
+    
     $set->wbSetData($param);
     $set->wbSetValues($data);
     $out = $set->outerHtml();
@@ -2822,9 +2836,7 @@ function wbListForms($exclude = true)
     $eList = wbListFilesRecursive($_ENV['path_engine'].'/forms', true);
     $aList = wbListFilesRecursive($_ENV['path_app'].'/forms', true);
     $arr = $eList;
-    foreach ($aList as $a) {
-        $arr[] = $a;
-    }
+    foreach ($aList as $a) $arr[] = $a;
     unset($eList,$aList);
     foreach ($arr as $i => $data) {
         $name = $data['file'];
@@ -2855,7 +2867,8 @@ function wbListForms($exclude = true)
     if (in_array('form', $list, true)) {
         unset($list[array_search('form', $list, true)]);
     }
-
+    $list[]="snippets";
+    sort($list);
     return $list;
 }
 

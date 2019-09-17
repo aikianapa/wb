@@ -637,10 +637,12 @@ open:
     }
 
     $.fn.treeBranchChange = function(edid) {
+        var branch = this;
+        setTimeout(function(){
         // edid - id редактора
         if ($(edid).find("form:first").length) {
-            var dict = $(this).treeDict();
-            var that = $(this).find(".wb-tree-item.wb-tree-current");
+            var dict = $(branch).treeDict();
+            var that = $(branch).find(".wb-tree-item.wb-tree-current");
             var data = $(edid).find("form:first").serializeArray();
             $(data).each(function(i, d) {
                 $(that).attr(d.name, d.value);
@@ -655,6 +657,7 @@ open:
             var data = wb_tree_json_prep(wb_json_encode($(edid).find(".treeData > form").serializeArray()), dict);
             $(that).children("input").attr("data", wb_json_encode(data));
         }
+        },100);
     };
 
     $.fn.treeDict = function() {
@@ -974,52 +977,29 @@ open:
             var fldname = d["name"];
             var fldval = d["value"];
             $(dict).each(function(z, di) {
+                var fldtype = di["type"];
+                fldval = wb_iconv(fldval, di["type"]);
                 if (di["name"] == fldname) {
-                    fldval = wb_iconv(fldval, di["type"]);
                     values[fldname] = fldval;
                 }
-                
                 if (strpos(fldname, "[")) {
-                    var pos = strpos(fldname, "[");
-                    var sub = substr(fldname, pos);
-                    var fldn = "values['" + substr(fldname, 0, pos) + "']";
-
-                    var myRe = /\[(.*?)\]/g;
-                    var cur = 1;
-                    var myArray = [];
-                    eval("if (" + fldn + "==undefined) {" + fldn + "={};};");
-                    while ((myArray = myRe.exec(sub)) != null) {
-                        eval("fldn+=\"['" + myArray[1] + "']\";");
-                        if (cur < myArray.length) {
-                            eval("if (" + fldn + "==undefined) {" + fldn + "={};};");
+                    var fldpath = fldname;
+                    fldpath = str_replace("]","",fldpath);
+                    fldpath = explode("[",fldpath);
+                    var fldn;
+                    $(fldpath).each(function(i,f){
+                        f = str_replace("]","",f);
+                        f = str_replace("[","",f);
+                        if (!is_numeric(f)) f = "'"+f+"'";
+                        if (i == 0) {
+                            fldn = "values[" + f + "]"
                         } else {
-                            eval(fldn + "=fldval;");
+                            fldn += "["+f+"]";
                         }
-                        cur++;
-                    }
-                }
-                /*
-                if (strpos(fldname, "[")) {
-                    var f = explode("[",fldname);
-                    var l = f.length-1;
-                    var fld="";
-                    $(f).each(function(i,fl){
-                        fl=str_replace("]","",fl);
-                        if (fl>"") {
-                            if (i==0) {
-                                fld="values['"+fl+"']";
-                                eval("if (" + fld + "==undefined) {" + fld + " = {};}");
-                            } else if ( i < l) {
-                                fld+="['"+fl+"']";
-                                eval("if (" + fld + "==undefined) {" + fld + " = {};}");
-                            } else {
-                                fld+="['"+fl+"']";
-                                eval(fld + " = fldval;");
-                            }
-                        }
+                        eval("if (" + fldn + "==undefined) {" + fldn + "={};};");
                     });
+                    eval(fldn + "=fldval;");
                 }
-                */
             });
         });
         return values;
