@@ -612,7 +612,11 @@ function wbFieldBuild($param, $data = array(),$locale=array())
         $_ENV["route"]["mode"]=$param["_mode"]=$_GET["mode"]=$mode;
         $tpl=wbGetForm($form,$mode);
         $tpl->wbSetAttributes($param);
-        $tpl->wbSetData($data[$param["name"]],true);
+            
+        $flddata = $data[$param["name"]];
+        $flddata["_form"] = $data["_form"];
+        $flddata["_item"] = $data["_item"];
+        $tpl->wbSetData($flddata,true);
         $fld = $par["name"];
         $inputs = $tpl->find("[name]");
         foreach($inputs as $inp) {

@@ -1854,8 +1854,8 @@ abstract class kiNode
             $out=wbGetForm("common","upl_single");
         }
         $out->find(".wb-uploader")->attr("id",$uid);
-        $attrs=new IteratorIterator($this->attributes());
 
+        $attrs=$this->attributes();
         foreach ($attrs as $attr) {
             $tmp=$attr->name;
             if (strpos($tmp,"ata-wb-")) {
@@ -2366,7 +2366,7 @@ abstract class kiNode
                 $inner->find(".comGallery")->html($this->html());
             }
         } else {
-            $file=$_SESSION["prj_path"].$src;
+            $file=$_SESSION["path_app"].$src;
             if (is_file($_SERVER["DOCUMENT_ROOT"].$file)) {
                 $src=$file;
             }
