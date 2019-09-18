@@ -638,7 +638,6 @@ open:
 
     $.fn.treeBranchChange = function(edid) {
         var branch = this;
-        setTimeout(function(){
         // edid - id редактора
         if ($(edid).find("form:first").length) {
             var dict = $(branch).treeDict();
@@ -657,7 +656,6 @@ open:
             var data = wb_tree_json_prep(wb_json_encode($(edid).find(".treeData > form").serializeArray()), dict);
             $(that).children("input").attr("data", wb_json_encode(data));
         }
-        },100);
     };
 
     $.fn.treeDict = function() {
