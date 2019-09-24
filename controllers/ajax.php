@@ -1,5 +1,6 @@
 <?php
 function ajax__controller() {
+    header('Content-Type: charset=utf-8');
     include_once(__DIR__."/../ajax.php");
     if (is_file($_ENV["path_app"]."/ajax.php")) {include_once($_ENV["path_app"]."/ajax.php");}
 	wbTrigger("func",__FUNCTION__,"before");

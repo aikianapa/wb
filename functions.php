@@ -633,6 +633,38 @@ function wbFieldBuild($param, $data = array(),$locale=array())
     case 'snippet':
             
         break;
+            
+    case 'select':
+        if (!is_array($opt)) break;
+        if (strpos($opt["from"],":")) {
+			$pos = strpos($opt["from"],":");
+			$type = substr($opt["from"],0,$pos);
+			$from = substr($opt["from"],$pos+1);
+            $from = explode(";",$from);
+            $select = $tpl->find("select",0);
+            $select->attr("placeholder",$param["label"])
+                ->attr("name",$param["name"])
+                ->addClass($opt["class"]);
+            if ($opt["fldval"]>"") $select->html("{{".$opt["fldval"]."}}");
+            if ($opt["fldkey"]>"") $select->attr("value","{{".$opt["fldkey"]."}}");
+			switch($type) {
+				case "tree":
+					$select->attr("data-wb-role","tree")
+                        ->attr("data-wb-item",$from[0]);
+					$tree = wbTreeRead($from[0]);
+                    $tree = $tree["tree"];
+                    if (isset($from[1])) $tree=wbTreeFindBranch($tree,$from[1]);
+					break;
+				case "form":
+				
+					break;
+			}
+
+
+		}
+            //$tpl->wbSetData($opt);
+            $tpl->wbSetData($tree);
+        break;
     case 'module':
         if (!is_array($opt)) break;
         foreach($opt as $key => $val) {

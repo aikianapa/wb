@@ -21,7 +21,6 @@
 			  <td class="nowrap">{{id}}</td>
 			  <td>{{header}}<br><small>{{techdescr}}</small></td>
 			  <td class="text-right" data-wb-role="include" src="form" data-wb-name="common_item_actions"></td>
-			  </td>
 			</tr>
 		  </tbody>
 		</table>

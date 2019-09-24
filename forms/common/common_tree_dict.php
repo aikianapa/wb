@@ -25,6 +25,7 @@
 					<option value="forms">forms</option>
 					<option value="editor">editor</option>
 					<option value="source">source</option>
+                    <option value="select">select</option>
 					<option value="gallery">gallery</option>
 					<option value="image">image</option>
 					<option value="multiinput">multiinput</option>
@@ -100,7 +101,7 @@
 
 	<script type="text/template" class="wb-prop-fields">
 		<form>
-		<div class="form-group row" data-type-disallow="multiinput">
+		<div class="form-group row" data-type-disallow="multiinput,select">
 			<label class="col-sm-3 form-control-label">{{_LANG[default]}}</label>
 			<div class="col-sm-9"><input class="form-control" placeholder="{{_LANG[default]}}" type="text" name="value"></div>
 		</div>
@@ -112,6 +113,22 @@
 				</select>
 			</div>
 		</div>
+
+        <div data-type-allow="select">
+            <div class="form-group row">
+                <label class="col-sm-3 form-control-label">{{_LANG[from]}}</label>
+                <div class="col-sm-9"><input class="form-control" placeholder="{{_LANG[from]}}" type="text" name="from"></div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-3 form-control-label">{{_LANG[fldkey]}}</label>
+                <div class="col-sm-9"><input class="form-control" placeholder="{{_LANG[fldkey]}}" type="text" name="fldkey"></div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-3 form-control-label">{{_LANG[fldval]}}</label>
+                <div class="col-sm-9"><input class="form-control" placeholder="{{_LANG[fldval]}}" type="text" name="fldval"></div>
+            </div>
+        </div>
+
 
 		<div class="form-group row" data-type-allow="multiinput">
 			<label class="col-12 form-control-label">{{_LANG[fldset]}}</label>
@@ -218,6 +235,9 @@
 	locales = "Locales"
 	lang 	= "Lang"
 	prop	= "Properties"
+    from    = "From"  
+    fldval  = "Value field"
+    fldkey  = "Key field"
 [rus]
 	fldset  = "Набор полей для мультиввода"
 	enum 	= "Перечисления"
@@ -236,6 +256,9 @@
 	locales = "Локализации"
 	lang 	= "Язык"
 	prop	= "Свойства"
+    from    = "Источник данных"
+    fldval  = "Поле со значением"
+    fldkey  = "Поле с ключом"
 </script>
 
 

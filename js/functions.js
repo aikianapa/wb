@@ -82,16 +82,16 @@ success: function(data) {
     wbapp.postWait = function(url, data, func) {
         var res;
         wb_ajaxWait([ {
-async: false,
-type: 'POST',
-data: data,
-url: url,
-success: function(data) {
-                if (func !== undefined) {
-                    res = func(data);
-                } else {
-					res = data;
-		}
+            async: false,
+            type: 'POST',
+            data: data,
+            url: url,
+            success: function(data) {
+                            if (func !== undefined) {
+                                res = func(data);
+                            } else {
+                                res = data;
+                    }
             }
         }]);
         return res;
@@ -148,6 +148,10 @@ success: function(data) {
 		return wb_func("wbGetForm",[form,mode],fn);
 	}
 
+	wbapp.getTpl = function(tpl,fn=undefined) {
+		return wb_func("wbGetTpl",[tpl],fn);
+	}
+    
 	wbapp.baloon = function(text,type='info',delay=3000) {
 		if (!wb_plugins_loaded()) {
 			console.log("Error: wb_plugins not loaded!");
@@ -279,15 +283,13 @@ function wb_func(func,params,fn=undefined) {
 	if (params == undefined) params=[];
 	var obj = {};
 	for (var i = 0; i < params.length; ++i) obj[i] = params[i];
-	var res;
-    wbapp.postWait("/ajax/callfunc/" + func, obj, function(data) {
-		if (is_object(data)) {res=data;} else {res = base64_decode(data);}
+	var res = wbapp.postWait("/ajax/callfunc/" + func, obj);
+        if (res["__data"] !== undefined) res = res["__data"];
 		if (fn == undefined) {
 			return res;
 		} else {
 			return fn(res);
 		}
-	});
     return res;
 }
 
@@ -1954,7 +1956,7 @@ function wb_ajax() {
         if ($(that).is("form")) {var form = that;} else if ($(that).parents("form").length) {var form = $(that).parents("form",0);}
         var formdata = {};
         formdata = $(form).serializeArray();
-        if (formdata["_message"] == undefined && formdata["_tpl"] == undefined && formdata["_form"] == undefined && $(that).attr("data-automail") !== "false") {
+        if (formdata["_message"] == undefined && formdata["_tpl"] == undefined && formdata["_form"] == undefined && $(that).attr("data-wb-tpl") == undefined && $(that).attr("data-automail") !== "false") {
             formdata["_message"] = $(form).wbMailForm();
         }
 
@@ -1972,7 +1974,14 @@ function wb_ajax() {
 					if ($(that).attr("data-automail") !== "false" && $(that).attr("data-wb-ajax")=="/ajax/mail/") {
 						is_mail = true;
 						ajax.push({name:"_message",value:$(form).wbMailForm()});
-					}
+					} else if ($(that).attr("data-wb-tpl") !== undefined && $(that).attr("data-wb-ajax")=="/ajax/mail/") {
+                        var tpl = wbapp.getTpl($(that).attr("data-wb-tpl"))
+                        var url = "/ajax/setdata/undefined/undefined";
+                        var param = {tpl: tpl, data: $(form).serialize() };
+                        param = base64_encode(JSON.stringify(param));
+                        var mail = wbapp.postWait(url, {data: param});
+                        ajax.push({name:"_message",value:mail});
+                    }
                 }
                 if ($(that).attr("data-wb-json") !== undefined && $(that).attr("data-wb-json") > "") {
                     ajax = $.parseJSON($(that).attr("data-wb-json"));

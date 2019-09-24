@@ -38,11 +38,11 @@
                                     <input type="checkbox" name="active"><span></span></label>
                             </div>
                             <label data-wb-where='super !== "on"' class="form-control-label col-sm-3">{{_LANG[use_as_group]}}</label>
-                            <div class="col-sm-3" data-wb-where='super !== "on"'>
+                            <div class="col-sm-3">
                                 <label class="switch switch-success">
                                     <input type="checkbox" name="isgroup"><span></span></label>
                             </div>
-                            <input type="hidden" name="isgroup" data-wb-where='super == "on"'>
+                            <input type="hidden" value="on" name="isgroup" data-wb-where='super == "on"'>
 
 		</div>
 
@@ -107,7 +107,6 @@
                         </div>
                         <div id="{{_form}}Group" class="tab-pane fade" role="tabpanel" data-wb-allow="admin">
                             <div class="form-group row" data-wb-allow="admin">
-
                                 <div class="col-sm-6">
                                         <label class="form-control-label">{{_LANG[login_url]}}</label>
                                         <input type="text" class="form-control" name="login_url" placeholder="{{_LANG[login_url]}}">

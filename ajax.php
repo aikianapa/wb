@@ -1,5 +1,4 @@
 <?php
-header('Content-Type: charset=utf-8');
 if (isset($_GET["getsysmsg"])) {
         require_once __DIR__."/functions.php";
         wbInitEnviroment();
@@ -87,12 +86,12 @@ function ajax__callfunc() {
 		$params=implode(",",$params);
 		$res = eval('return $func('.$params.');');
 	}
+    header('Content-Type: application/json; charset=utf-8');
 	if (is_array($res)) {
-		header('Content-Type: application/json');
 		echo json_encode($res);
 	} else {
-		header('Content-Type: text/html; charset=utf-8');
-		echo base64_encode($res);
+		$arr=["__data" => "{$res}"];
+        echo json_encode($arr);
 	}
 	die;
 }
@@ -270,7 +269,8 @@ function ajax__setdata() {
     if (isset($_REQUEST["data-wb-mode"])) $_REQUEST["mode"]=$_REQUEST["data-wb-mode"];
     if (!isset($_REQUEST["data-wb-mode"])) $_REQUEST["mode"]="list";
     if ($form!=="undefined" && $item!=="undefined") $Item=wbItemRead($form,$item);
-    if (!is_array($_REQUEST["data"])) $_REQUEST["data"]=array($_REQUEST["data"]);
+    if (!is_array($_REQUEST["data"])) parse_str($_REQUEST["data"],$_REQUEST["data"]);
+    $_POST = $_REQUEST["data"];
     $Item=wbItemToArray($Item);
     if (!is_array($Item)) $Item=array();
     $Item=array_merge($Item,$_REQUEST["data"]);
