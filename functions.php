@@ -963,7 +963,7 @@ function wbItemList($table = 'pages', $where = '', $sort = null)
 			if ((array)$list === $list) {
 			    foreach ($list as $key => $item) {
 				$item['_table'] = $tname;
-				//if ($tname!=="tree") $item=wbItemToArray($item);
+				if ($tname!=="tree") $item=wbItemToArray($item);
                 if (isset($item['images']) && $_ENV["route"]["mode"]!=="edit") $item = wbImagesToText($item);
 				$item = wbTrigger('form', __FUNCTION__, 'AfterItemRead', func_get_args(), $item);
 				if (
