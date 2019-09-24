@@ -43,7 +43,6 @@
                 <div class="status-pill yellow" data-title="{{_LANG[group]}}" data-wb-role="where" data='isgroup="on"' data-toggle="tooltip"></div>
               </td>
               <td class="text-right" data-wb-role="include" src="form" data-wb-name="common_item_actions"></td>
-              </td>
             </tr>
           </tbody>
         </table>

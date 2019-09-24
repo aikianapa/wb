@@ -253,6 +253,7 @@ function engine__controller_recovery() {
 				$out->find('.recovery-block')->removeClass('d-none');
 				$out->wbSetData(["login"=>$param[1],"_token"=>$param[2],"_email"=>$param[1]]);
 				echo $out;
+                die;
 			}
 		} else {
 			header("HTTP/1.0 404 Not Found");
@@ -262,8 +263,7 @@ function engine__controller_recovery() {
 		header('Location: /login');
 		die;
 	}
-			header("HTTP/1.0 404 Not Found");
-			die;
+    die;
 }
 
 function __engineRecoveryPassword() {
