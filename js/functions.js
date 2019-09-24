@@ -1975,6 +1975,7 @@ function wb_ajax() {
 						is_mail = true;
 						ajax.push({name:"_message",value:$(form).wbMailForm()});
 					} else if ($(that).attr("data-wb-tpl") !== undefined && $(that).attr("data-wb-ajax")=="/ajax/mail/") {
+                        is_mail = true;
                         var tpl = wbapp.getTpl($(that).attr("data-wb-tpl"))
                         var url = "/ajax/setdata/undefined/undefined";
                         var param = {tpl: tpl, data: $(form).serialize() };
