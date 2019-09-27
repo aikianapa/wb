@@ -82,7 +82,11 @@ class tagInclude extends kiNode  {
             $src="/engine/js/imgviewer.php";
             break;
         case "uploader":
-            $this_content=wbGetForm("common",$src);
+            if ($mode > "") {
+                $this_content=wbGetForm("common","upl_".$mode);
+            } else {
+                $this_content=wbGetForm("common",$src);
+            }
             break;
         case "editor":
             if ($name=="") {

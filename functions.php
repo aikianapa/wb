@@ -54,6 +54,7 @@ function wbInitEnviroment()
     $_ENV['forms'] = wbListForms(false);
     $_ENV['modules'] = wbListModules();
     $_ENV['tables'] = wbTableList();
+    $_ENV['templates'] = wbListTpl();
     $_ENV['thumb_width'] = 200;
     $_ENV['thumb_height'] = 160;
     $_ENV['intext_width'] = 320;
@@ -3062,7 +3063,13 @@ function wbNormalizePath($path)
 
 function wbClearValues($out,$rep='')
 {
-    $out = preg_replace('/\{\{([^\}]+?)\}\}+|<script.*text\/template.*?>.*?<\/script>(*SKIP)(*F)/isumx', $rep, $out); return $out; } function wbListTpl() { $dir=$_ENV['path_tpl']; $list=array(); $result=array(); if (is_dir($dir)) { $list=wbListFilesRecursive($dir, true); foreach ($list as $l=> $val) {
+    $out = preg_replace('/\{\{([^\}]+?)\}\}+|<script.*text\/template.*?>.*?<\/script>(*SKIP)(*F)/isumx', $rep, $out); return $out; 
+} 
+function wbListTpl() { 
+    $dir=$_ENV['path_tpl']; 
+    $list=array(); 
+    $result=array(); 
+    if (is_dir($dir)) { $list=wbListFilesRecursive($dir, true); foreach ($list as $l=> $val) {
     if (('.php' == substr($val['file'], -4) or '.htm' == substr($val['file'], -4) or '.tpl' == substr($val['file'], -4)) and !strpos('.inc.', $val['file'])) {
     $path = str_replace($dir, '', $val['path']);
     $res = substr($path.'/'.$val['file'], 1);

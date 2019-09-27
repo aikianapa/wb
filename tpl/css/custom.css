@@ -596,6 +596,10 @@ th.wb-asc[data-wb-sort]:before {
   border-radius: 0;
   border: none; }
 
+.modal.tree-edit form .moxie-shim.moxie-shim-html5 {
+    z-index:500!important;
+}
+
 @media screen {
   .wb-print-box {
     display: none;

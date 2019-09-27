@@ -27,6 +27,7 @@ class tagForeach extends kiNode  {
         $cacheId=0;
         $form="";
         $where="";
+        $if = "";
         include($_ENV["path_engine"]."/wbattributes.php");
 
         if ($form>"" AND $table=="") {
@@ -187,6 +188,7 @@ class tagForeach extends kiNode  {
 
 
         $oddeven="even";
+        if (isset($if)) $where=$if; 
         foreach($Item as $key => $val) {
             $n++;
             if ( !( (array)$val === $val) ) {
