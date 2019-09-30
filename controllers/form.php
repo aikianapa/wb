@@ -92,7 +92,7 @@ function form__controller__show() {
     $Item=$_ENV["ITEM"]=wbCallFormFunc("BeforeItemShow",$Item,$form,$mode);
     $aCall=$form."_".$mode; $eCall=$form."__".$mode;
 	if (is_callable($aCall)) {$out=$aCall($Item);} elseif (is_callable($eCall)) {$out=$eCall($Item);}
-    if (!in_array($form,$_ENV["forms"]) OR (isset($_ENV["route"]["item"]) AND $Item==false) OR (isset($Item["active"]) AND $Item["active"]!=="on") OR $tpl == null) {
+    if ( (!in_array($form,$_ENV["forms"]) OR (isset($_ENV["route"]["item"]) AND $Item==false) OR (isset($Item["active"]) AND $Item["active"]!=="on")) AND ($tpl == null AND !isset($out))  ) {
 			echo form__controller__error_404();
 			die;
 	} else {
