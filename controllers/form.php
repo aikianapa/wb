@@ -73,7 +73,10 @@ function form__controller__show() {
 	$form=$_ENV["route"]["form"];
 	$item=$_ENV["route"]["item"];
 	$tpl = null;
-	if (isset($_ENV["route"]["tpl"]) AND $_ENV["route"]["tpl"]>"") $tpl=$_ENV["route"]["tpl"];
+	if (isset($_ENV["route"]["tpl"]) AND $_ENV["route"]["tpl"]>"") {
+		$tpl=$_ENV["route"]["tpl"];
+		$out = wbGetTpl($tpl);
+	}
 	$mode="show";
     $Item=$_ENV["ITEM"]=wbItemRead($form,$item);
     if (!$Item) {
@@ -89,7 +92,7 @@ function form__controller__show() {
     $Item=$_ENV["ITEM"]=wbCallFormFunc("BeforeItemShow",$Item,$form,$mode);
     $aCall=$form."_".$mode; $eCall=$form."__".$mode;
 	if (is_callable($aCall)) {$out=$aCall($Item);} elseif (is_callable($eCall)) {$out=$eCall($Item);}
-    if (!in_array($form,$_ENV["forms"]) OR (isset($_ENV["route"]["item"]) AND $Item==false) OR (isset($Item["active"]) AND $Item["active"]!=="on")) {
+    if (!in_array($form,$_ENV["forms"]) OR (isset($_ENV["route"]["item"]) AND $Item==false) OR (isset($Item["active"]) AND $Item["active"]!=="on") OR $tpl == null) {
 			echo form__controller__error_404();
 			die;
 	} else {

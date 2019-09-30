@@ -407,7 +407,7 @@ class ki extends CLexer
                 flock ($fp, LOCK_UN);
                 fclose ($fp);
             }
-            session_start(); // reopen session after session_write_close()
+            @session_start(); // reopen session after session_write_close()
             return ki::fromString($res);
         }
     }
