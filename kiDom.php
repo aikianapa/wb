@@ -1540,11 +1540,13 @@ abstract class kiNode
                     if (substr($def,0,3)=="{{_") {
                         $def="";
                     }
-                    if (isset($Item[$name]) AND $inp->hasAttr("value") AND $inp->attr("value")=="") {
+                    if (isset($Item[$name]) AND $inp->attr("value")=="" AND !$inp->hasAttr("value")) {
                         if (is_array($Item[$name])) {
                             $Item[$name]=wbJsonEncode($Item[$name]);
                         }
                         $value=$Item[$name];
+                    } else if (isset($Item[$name]) AND $inp->attr("value")=="" AND $inp->hasAttr("value")) {
+                        $value="";
                     } else {
                         $value=$def;
                     }
