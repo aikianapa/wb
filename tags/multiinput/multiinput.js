@@ -122,6 +122,8 @@ function wb_multiinput() {
         $("[data-wb-role=multiinput][data-wb-tpl]").each(function(){
 		if ($(this).data("wb-multiinput-row") == undefined) {
 			$(this).sortable({
+                items: ".wb-multiinput",
+                handle: '.wb-multiinput-handle',
 				update: function(e) {
 					$(e.target).wbMultiInputSort();
 				}
