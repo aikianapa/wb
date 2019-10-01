@@ -92,7 +92,7 @@ function form__controller__show() {
     $Item=$_ENV["ITEM"]=wbCallFormFunc("BeforeItemShow",$Item,$form,$mode);
     $aCall=$form."_".$mode; $eCall=$form."__".$mode;
 	if (is_callable($aCall)) {$out=$aCall($Item);} elseif (is_callable($eCall)) {$out=$eCall($Item);}
-    if ( (!in_array($form,$_ENV["forms"]) OR (isset($_ENV["route"]["item"]) AND $Item==false) OR (isset($Item["active"]) AND $Item["active"]!=="on")) AND ($tpl == null AND !isset($out))  ) {
+    if (  (!in_array($form,$_ENV["forms"]) OR (isset($_ENV["route"]["item"]) AND $Item==false) OR (isset($Item["active"]) AND $Item["active"]!=="on")) AND ($tpl == null AND !isset($out))  ) {
 			echo form__controller__error_404();
 			die;
 	} else {
@@ -154,7 +154,8 @@ function form__controller__error_404($id=null) {
 	header("HTTP/1.0 404 Not Found");
 	$_ENV["route"]["error"]="404";
 	$_ENV["DOM"]=wbGetTpl("404.php");
-	if (is_object($_ENV["DOM"])) $_ENV["DOM"]->wbSetData();
+    $Item=$_ENV["ITEM"]=wbItemRead("pages","404");
+	if (is_object($_ENV["DOM"])) $_ENV["DOM"]->wbSetData($Item);
 	wbLog("func",__FUNCTION__,404,$_ENV["route"]);
 	return $_ENV["DOM"];
 }

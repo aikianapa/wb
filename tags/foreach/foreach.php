@@ -30,14 +30,12 @@ class tagForeach extends kiNode  {
         $if = "";
         include($_ENV["path_engine"]."/wbattributes.php");
 
-        if ($form>"" AND $table=="") {
-            $table=$form;
-        }
+        if ($form>"" AND $table=="") $table=$form;
 
-        if (isset($cache)) {
-            $cacheId=$cache;
-        }
-
+        if (isset($cache)) $cacheId=$cache;
+        
+        if (!isset($size) OR $size=="false") $size=false;
+        
         if (isset($tpl) AND $tpl=="false") {
             $tplid=false;
         }
@@ -45,9 +43,8 @@ class tagForeach extends kiNode  {
             $this->DOM->addTemplate();
             $tplid=$this->DOM->attr("data-wb-tpl");
         }
-        if (!isset($size) OR $size=="false") {
-            $size=false;
-        }
+
+
         if (!isset($page) OR 1*$page<=0) {
             if (!isset($_GET["page"]) OR $_GET["page"]=="") {
                 $page=1;
@@ -68,9 +65,7 @@ class tagForeach extends kiNode  {
 
 
 
-        if (isset($json) AND $json> "") {
-            $Item=json_decode($json,true);
-        }
+        if (isset($json) AND $json> "") $Item=json_decode($json,true);
 
         if (isset($count) AND $count>"") {
             $fcount=wbArrayAttr($count);
@@ -104,9 +99,8 @@ class tagForeach extends kiNode  {
             }
         }
 
-        if (isset($form) AND !isset($table)) {
-            $table=$form;
-        }
+        if (isset($form) AND !isset($table)) $table=$form;
+
         if ($table > "") {
             $table=wbTable($table);
             $itemform=wbTableName($table);
@@ -126,7 +120,7 @@ class tagForeach extends kiNode  {
             }
         }
         if (isset($call) AND is_callable($call)) {
-            $Item=@$call();
+            $Item=@$call($Item);
         }
         if (isset($oconv) AND is_callable($oconv)) {
             $Item=@$oconv($Item);
@@ -193,7 +187,9 @@ class tagForeach extends kiNode  {
             $n++;
             if ( !( (array)$val === $val) ) {
 				$val=["_value"=>$val];
-			}
+			} else {
+                $val["_value"] = $val;
+            }
             if ($size!==false) $minpos=$size*$page-($size*1)+1;
             $maxpos=($size*$page);
             if ($size==false OR ($n<=$maxpos AND $n>=$minpos)) {
@@ -219,6 +215,7 @@ class tagForeach extends kiNode  {
                 $val["_idx"]=$ndx;
                 if (!isset($val["_ndx"])) $val["_ndx"]=$ndx+1;
                 $val["_step"]=$stp;
+                $val["_sdx"] = $stepcount;
                 $flag=true;
                 if ($flag==true AND isset($where)) $flag=wbWhereItem($val,$where);
                 if ($flag==true AND $limit>"" AND $ndx>=$limit) $flag=false;

@@ -1540,7 +1540,7 @@ abstract class kiNode
                     if (substr($def,0,3)=="{{_") {
                         $def="";
                     }
-                    if (isset($Item[$name]) AND $inp->attr("value")=="") {
+                    if (isset($Item[$name]) AND $inp->hasAttr("value") AND $inp->attr("value")=="") {
                         if (is_array($Item[$name])) {
                             $Item[$name]=wbJsonEncode($Item[$name]);
                         }
@@ -1553,7 +1553,7 @@ abstract class kiNode
                     }
                     else {
                         if (!$inp->hasAttr("value") AND isset($Item[$name])) {
-				$tmpname=$Item[$name];
+				            $tmpname=$Item[$name];
                             if ((array)$tmpname === $tmpname) {
                                 $Item[$name]=wbJsonEncode($tmpname);
                             }

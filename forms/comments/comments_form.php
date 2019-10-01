@@ -7,7 +7,7 @@
         <div class="form-group row" data-wb-allow="admin">
             <label class="col-sm-3 form-control-label">{{_LANG[datetime]}}</label>
             <div class="col-sm-5">
-                <input type="datetimepicker" class="form-control" name="date" placeholder="{{_LANG[datetime]}}">
+                <input type="datetimepicker" class="form-control" name="date" value="{{date}}" placeholder="{{_LANG[datetime]}}">
             </div>
         </div>
 

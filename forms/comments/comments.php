@@ -15,7 +15,7 @@ function comments__edit() {
 	$Item=wbItemRead("comments",$_ENV["route"]["item"]);
 	$Item=_commentsBeforeItemShow($Item);
 	$out->wbSetData($Item,true);
-	return $out->outerHtml();
+	return wbClearValues($out->outerHtml());
 }
 
 function comments__getajax() {
