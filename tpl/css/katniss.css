@@ -12558,13 +12558,21 @@ textarea.parsley-success:focus {
 }
 .content-left .nav .nav-item + .nav-item {
   margin-top: 1px;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 .content-left .nav-link {
-  display: flex;
+  display: block;
   height: 40px;
   align-items: center;
   color: #868e96;
   background-color: #e9ecef;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
 }
 .content-left .nav-link i {
   margin-right: 7px;
