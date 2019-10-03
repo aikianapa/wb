@@ -492,7 +492,14 @@ select.form-control+.select2-container {
   position: relative;
   left:0;
   margin-bottom: 10px;
+  overflow:hidden; 
 }
+
+.content-left li.nav-item {
+    display: block!important;
+    width: 100%;
+}
+
 
 .card {
   overflow: hidden;
