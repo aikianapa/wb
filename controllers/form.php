@@ -154,6 +154,7 @@ function form__controller__error_404($id=null) {
 	header("HTTP/1.0 404 Not Found");
 	$_ENV["route"]["error"]="404";
     $_ENV["route"]["item"]="404";
+    $_ENV["route"]["form"]="pages";
 	$_ENV["DOM"]=wbGetTpl("404.php");
     $Item=$_ENV["ITEM"]=wbItemRead("pages","404");
 	if (is_object($_ENV["DOM"])) $_ENV["DOM"]->wbSetData($Item);
