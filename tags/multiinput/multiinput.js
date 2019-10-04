@@ -68,6 +68,8 @@ function wb_multiinput() {
             $(line).after(row);
             $multi.wbMultiInputSort();
             wb_plugins();
+            console.log("Trigger: multiinput_after_add");
+            $(document).trigger("multiinput_after_add", line);
             return false;
         });
 

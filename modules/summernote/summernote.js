@@ -2,9 +2,32 @@ wbapp.scriptWait("/engine/modules/summernote/dist/summernote-bs4.min.js",[],func
     wb_include("/engine/modules/summernote/dist/summernote-bs4.css");
     
     function start(that,lang) {
+        if ($(that).attr("data-height") !== undefined) {
+            var height = parseInt($(that).attr("data-height"));
+        } else {
+            var height = 200;
+        }
+        
+        if ($(that).attr("data-toolbar") == undefined) {
+              var toolbar = [
+                // [groupName, [list of button]]
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['font', ['strikethrough', 'superscript', 'subscript']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['height', ['height']]
+              ];
+                toolbar = undefined;
+            } else {
+                var toolbar = $(that).attr("data-toolbar");
+                toolbar = eval("toolbar = "+toolbar);
+            }
+        
         $(that).summernote({
-            height: 250,
+            height: height,
             lang: lang,
+            toolbar: toolbar,
             callbacks: {
                 onChange: function(contents, $editable) {
                     setTimeout(function(){
@@ -29,17 +52,24 @@ wbapp.scriptWait("/engine/modules/summernote/dist/summernote-bs4.min.js",[],func
     }
 
     
-    $('.summernote').each(function(){
-        var that = this;
-        if ($(that).data("wb-loaded") == undefined) {
-            var lang = wbapp.settings.i18n;
-            if (lang == "en-EN") {
-                start(that,"");
-            } else {
-                wbapp.scriptWait("/engine/modules/summernote/dist/lang/summernote-"+lang+".js",[],function(){
-                    start(that,lang);
-                });
-            }
-        }        
-    });     
+    
+    function init() {
+        $('.summernote').each(function(){
+            var that = this;
+            if ($(that).data("wb-loaded") == undefined) {
+                var lang = wbapp.settings.i18n;
+                if (lang == "en-EN") {
+                    start(that,"");
+                } else {
+                    wbapp.scriptWait("/engine/modules/summernote/dist/lang/summernote-"+lang+".js",[],function(){
+                        start(that,lang);
+                    });
+                }
+            }        
+        });
+    }
+    
+    init();
+    
+    $(document).on("multiinput_after_add",function(){init();});
 });
