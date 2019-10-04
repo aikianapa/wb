@@ -7,9 +7,21 @@ wbapp.scriptWait("/engine/modules/summernote/dist/summernote-bs4.min.js",[],func
             lang: lang,
             callbacks: {
                 onChange: function(contents, $editable) {
-                    $(that).html(contents);
-                    $(that).parents("form").trigger("change");
+                    setTimeout(function(){
+                        $(that).html(contents);
+                        $(that).parents("form").trigger("change");
+                    },50)
                     //console.log('onChange:', contents);
+                },
+                onInit: function() {
+                    var id = wbapp.newId();
+                    $(that).attr("data-id",id);
+                    if ($(that).parents(".modal").length) {
+                        $(that).parents(".modal").on("hide.bs.modal",function(){
+                            $(that).summernote('destroy');
+                        });
+                    }
+                    console.log('Summernote is launched');
                 }
             }
         });
