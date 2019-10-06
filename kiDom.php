@@ -1487,7 +1487,7 @@ abstract class kiNode
 
     public function wbExcludeTags($Item=array()) {
         if (!isset($_ENV["ta_save"])) $_ENV["ta_save"]=array();
-        $list=$this->find("textarea,[type=text/template],.wb-value,pre,.nowb,[data-role=module],[data-wb-role=module],select.select2[data-wb-ajax] option");
+        $list=$this->find("textarea,[type=text/template],.wb-value,pre,.nowb,[data-role=module],[data-wb-role=module]");
         foreach ($list as $ta) {
             $id=wbNewId();
             if (!$ta->is(".wb-attrs")) $ta->wbSetAttributes($Item);
