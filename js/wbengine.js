@@ -35,6 +35,8 @@ function wb_include(url,defer,async) {
                                 $(document).data("wb_include",loaded);
                                 $(document).trigger("wb_include",{url:url});
                         }
+    } else {
+        $(document).trigger("wb_include",{url:url});
     }
     return;
 }
