@@ -24,6 +24,8 @@ class tagFormdata extends kiNode  {
             if (isset($item) AND $item>"") {
                 $Item=wbItemRead(wbTable($table),$item);
                 $Item=wbItemToArray($Item);
+            } else {
+                $Item=[];
             }
         }
         if (isset($field) AND $field>"") $Item=wbGetDataWbFrom($Item,$field);
@@ -38,7 +40,6 @@ class tagFormdata extends kiNode  {
 				$Item=wbCallFormFunc("BeforeShowItem",$Item,$table,$mode);
 				$Item=wbCallFormFunc("BeforeItemShow",$Item,$table,$mode);
 		}
-
         if (isset($clear) AND $clear=="true") {$clear=true;} else {$clear=false;}
 		$this->DOM->wbSetData($Item,$clear);
     }
