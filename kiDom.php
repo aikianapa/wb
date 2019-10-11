@@ -1511,7 +1511,11 @@ abstract class kiNode
             $c->removeClass("wb-done");
             $c->removeClass("wb-plugin");
         }
-        
+        $this->wbControlClass();
+        $this->wbControlClass(); // два прохода!
+    }
+
+    public function wbControlClass() {
         
         $check = "empty-control";
         $remove = "empty-remove";
@@ -1533,9 +1537,9 @@ abstract class kiNode
                 }
             }
         }
-        
     }
-
+    
+    
     public function wbSetValues($Item=array(),$obj=TRUE) {
         if ( !( (array)$Item === $Item ) ) $Item=array($Item);
         $this->wbSetAttributes($Item);
