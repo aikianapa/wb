@@ -190,6 +190,7 @@ function wb_delegates() {
     wb_plugins();
     wb_tree();
     wb_ajax();
+    wb_class_control();
     $(document).trigger("wb-delegates");
 }
 
@@ -2535,6 +2536,31 @@ error: function(data) {
             });
         }
     });
+}
+
+
+function wb_class_control() {
+    $(document).undelegate("[class*='control-visible-']");
+    $(document).delegate("[class*='control-visible-']","change",function(){
+        var value = $(this).val();
+        var classes = trim($(this).attr("class")).split(" ");
+        var that = this;
+         $(classes).each(function(i,v) {
+             if (strpos(" "+v,"control-visible-")) {
+                v = v.split("-");
+                if (v[2] !== undefined) {
+                    $("[class*='control-show-"+v[2]+"-']").hide();
+                    $("[class*='control-hide-"+v[2]+"-']").show();
+                    $(".control-show-"+v[2]+"-"+value).show();
+                    $(".control-hide-"+v[2]+"-"+value).hide();
+                    $(".control-remove-"+v[2]+"-"+value).remove();
+                }
+            }
+         });
+        
+    });
+
+    $("[class*='control-visible-']").trigger("change");
 }
 
 function setcookie(name, value, exp_y, exp_m, exp_d, path, domain, secure) {

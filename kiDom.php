@@ -1511,6 +1511,29 @@ abstract class kiNode
             $c->removeClass("wb-done");
             $c->removeClass("wb-plugin");
         }
+        
+        
+        $check = "empty-control";
+        $remove = "empty-remove";
+
+        $ec = $this->find("[class*='{$check}']");
+        foreach($ec as $c) {
+            if (trim(strip_tags_smart($c->html())) == "") {
+                $ats = explode(" ",$c->attr("class"));
+                foreach ($ats as $at => $v) {
+                    if (strpos(" ".$v,$check)) {
+                        $v = explode("-",$v);
+                        if (!isset($v[2])) {
+                            $c->parents(".{$remove}")->remove();
+                        } else {
+                            $this->find(".{$remove}-{$v[2]}")->remove();
+                        }
+                        $c->remove();
+                    }
+                }
+            }
+        }
+        
     }
 
     public function wbSetValues($Item=array(),$obj=TRUE) {
