@@ -2540,13 +2540,13 @@ error: function(data) {
 
 
 function wb_class_control() {
-    $(document).undelegate("[class*='control-visible-']");
-    $(document).delegate("[class*='control-visible-']","change",function(){
+    $(document).undelegate("[class*='control-value-']","change");
+    $(document).delegate("[class*='control-value-']","change",function(){
         var value = $(this).val();
         var classes = trim($(this).attr("class")).split(" ");
         var that = this;
          $(classes).each(function(i,v) {
-             if (strpos(" "+v,"control-visible-")) {
+             if (strpos(" "+v,"control-value-")) {
                 v = v.split("-");
                 if (v[2] !== undefined) {
                     $("[class*='control-show-"+v[2]+"-']").hide();
@@ -2554,13 +2554,18 @@ function wb_class_control() {
                     $(".control-show-"+v[2]+"-"+value).show();
                     $(".control-hide-"+v[2]+"-"+value).hide();
                     $(".control-remove-"+v[2]+"-"+value).remove();
+                    $(".control-update-"+v[2]).each(function(){
+                       console.log("Обновление темплейта");
+                    });
+                    
+                    
                 }
             }
          });
         
     });
-
-    $("[class*='control-visible-']").trigger("change");
+    
+    $("[class*='control-value-']").trigger("change");
 }
 
 function setcookie(name, value, exp_y, exp_m, exp_d, path, domain, secure) {

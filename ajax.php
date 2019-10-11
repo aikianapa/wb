@@ -294,6 +294,7 @@ function ajax__setdata() {
 }
 
 function ajax__listfiles() {
+    if (!isset($_SESSION["user_id"])) return;
     $result=array();
     $_GET["path"]="/".implode("/",$_ENV["route"]["params"]);
     if ($_GET["path"]=="") {
