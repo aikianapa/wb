@@ -2558,10 +2558,11 @@ function wb_class_control() {
                         var updater = $(this).attr("data-wb-update");
                         var tpl = $("#"+$(this).attr("data-wb-tpl")).html();
                         var ret = wbapp.postWait(updater,{"value":value,"tpl":tpl});
+                        if (ret.error == true) return;
                         if ($(this).is("input")) {
-                            $(this).val(ret);
+                            $(this).val(ret.content);
                         } else {
-                            $(this).html(ret);
+                            $(this).html(ret.content);
                         }
                     });
                 }
