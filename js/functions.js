@@ -2555,10 +2555,15 @@ function wb_class_control() {
                     $(".control-hide-"+v[2]+"-"+value).hide();
                     $(".control-remove-"+v[2]+"-"+value).remove();
                     $(".control-update-"+v[2]).each(function(){
-                       console.log("Обновление темплейта");
+                        var updater = $(this).attr("data-wb-update");
+                        var tpl = $("#"+$(this).attr("data-wb-tpl")).html();
+                        var ret = wbapp.postWait(updater,{"value":value,"tpl":tpl});
+                        if ($(this).is("input")) {
+                            $(this).val(ret);
+                        } else {
+                            $(this).html(ret);
+                        }
                     });
-                    
-                    
                 }
             }
          });
