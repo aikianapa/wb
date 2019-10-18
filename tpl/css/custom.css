@@ -14,7 +14,7 @@ body.cursor-wait * {
 
 body {
   height: 100vh;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .modal-content {

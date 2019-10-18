@@ -2,6 +2,7 @@ wbapp.scriptWait("/engine/modules/summernote/dist/summernote-bs4.min.js",[],func
     wb_include("/engine/modules/summernote/dist/summernote-bs4.css");
     
     function start(that,lang) {
+        var that = that;
         if ($(that).attr("data-height") !== undefined) {
             var height = parseInt($(that).attr("data-height"));
         } else {
@@ -40,8 +41,11 @@ wbapp.scriptWait("/engine/modules/summernote/dist/summernote-bs4.min.js",[],func
                     var id = wbapp.newId();
                     $(that).attr("data-id",id);
                     if ($(that).parents(".modal").length) {
-                        $(that).parents(".modal").on("hide.bs.modal",function(){
-                            $(that).summernote('destroy');
+                        $(document).delegate(".modal","hide.bs.modal",function(ev){
+                            if ($(ev.target).find("[data-id="+id+"]").length) {
+                                $(that).summernote('destroy');    
+                            }
+                            
                         });
                     }
                     console.log('Summernote is launched');
