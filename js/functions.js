@@ -2563,6 +2563,7 @@ function wb_class_control() {
                             $(this).val(ret.content);
                         } else {
                             $(this).html(ret.content);
+                            $(this).find("option[value="+$(this).attr("value")+"]").prop("selected",true);
                         }
                     });
                 }
