@@ -82,7 +82,7 @@ class tagThumbnail extends kiNode  {
         $srcImg=$srcImg[count($srcImg)-1];
         $srcExt=explode(".",strtolower(trim($srcImg)));
         $srcExt=$srcExt[count($srcExt)-1];
-        $exts=array("jpg","jpeg","gif","png","svg","pdf","doc","xls","docx","xlsx");
+        $exts=array("pdf","doc","xls","docx","xlsx");
 
         if (in_array($srcExt,$exts)) {
             $ext = $srcExt;
