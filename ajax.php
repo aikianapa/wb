@@ -401,7 +401,7 @@ function ajax__mail() {
     if (!isset($_POST["_subject"])) $_POST["_subject"]=$_ENV['sysmsg']["mail_from_site"];
     if (!isset($_POST["subject"])) $_POST["subject"]=$_POST["_subject"];
     $_POST["subject"] = mb_encode_mimeheader($_POST["subject"],"UTF-8");
-    
+
     if (isset($_POST["_tpl"])) {
         $out=wbGetTpl($_POST["_tpl"]);
     }

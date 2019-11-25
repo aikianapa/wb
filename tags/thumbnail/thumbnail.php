@@ -82,12 +82,14 @@ class tagThumbnail extends kiNode  {
         $srcImg=$srcImg[count($srcImg)-1];
         $srcExt=explode(".",strtolower(trim($srcImg)));
         $srcExt=$srcExt[count($srcExt)-1];
-        $exts=array("jpg","jpeg","gif","png","svg","pdf");
+        $exts=array("jpg","jpeg","gif","png","svg","pdf","doc","xls","docx","xlsx");
 
-        if (!in_array($srcExt,$exts)) {
-            $src="/engine/uploads/__system/filetypes/{$srcExt}.png";
-            $img="{$srcExt}.png";
-            $ext="png";
+        if (in_array($srcExt,$exts)) {
+            $ext = $srcExt;
+            if ($ext == "docx") $ext = "doc";
+            if ($ext == "xlsx") $ext = "xls";
+            $src="/engine/js/uploader/icons/{$ext}.svg";
+            $ext = "svg";
         }
 
 
@@ -186,7 +188,7 @@ class tagThumbnail extends kiNode  {
             }
         }
         $info = pathinfo($src);
-		$ext=$info["extension"];
+		    $ext=$info["extension"];
         $this->DOM->src=urlencode($src);
 
         if ($src==array()) $src="";

@@ -108,7 +108,7 @@ success: function(data) {
         load.then(function(success){
             if (func !== undefined) {
                 return func(data);
-            }            
+            }
         });
     }
 
@@ -151,7 +151,7 @@ success: function(data) {
 	wbapp.getTpl = function(tpl,fn=undefined) {
 		return wb_func("wbGetTpl",[tpl],fn);
 	}
-    
+
 	wbapp.baloon = function(text,type='info',delay=3000) {
 		if (!wb_plugins_loaded()) {
 			console.log("Error: wb_plugins not loaded!");
@@ -607,7 +607,7 @@ function wb_tree() {
                     // При инициализации берём отсюда
                     // Фикс ошибки с кавычками
                 }
-                
+
                 var branch = {
 id:
                     $(this).attr("data-id"),
@@ -1364,7 +1364,7 @@ empty: 'fa fa-star-o'
 }
 
 $.fn.wbFixModal = function () {
-    
+
     $(this).find(".close[data-dismiss=modal]").off("click");
     $(this).find(".close[data-dismiss=modal]").on("click",function(event){
         var modal = $(this).parents(".modal")[0];
@@ -1372,9 +1372,9 @@ $.fn.wbFixModal = function () {
         event.preventDefault();
         return false;
     });
-    
+
     if ($(this).parents(".modal")) return;
-    
+
 	if ($(document).find(".kt-mainpanel").length) {
 		$(this).find(".modal-dialog").css( 'height' ,'').css("margin","");
 		$(this).find(".modal-content").css( 'height' ,'');
@@ -1868,6 +1868,19 @@ function wb_check_required(form) {
             console.log("trigger: wb_required_false ["+$(this).attr("name")+"]");
             $(document).trigger("wb_required_false", [this]);
         }
+				if ($(this).is("[type=radio]") && $(this).is(":not(:checked)")) {
+            res = false;
+						var fld = $(this).attr("name");
+						if (fld > "") {
+								$("[type=radio][name='"+fld+"']").each(function(){
+									if ($(this).is(":checked")) {res = true;}
+								});
+						}
+						if (!res) {
+            		console.log("trigger: wb_required_false ["+$(this).attr("name")+"]");
+            		$(document).trigger("wb_required_false", [this]);
+						}
+        }
         if ($(this).is("[type=password]")) {
             var pcheck = $(this).attr("name") + "_check";
             if ($("input[type=password][name='" + pcheck + "']").length) {
@@ -2074,9 +2087,9 @@ function wb_ajax() {
         })(file);
         reader.readAsDataURL(file);
     });
-    
-    
-    
+
+
+
     $(document).undelegate("[data-wb-ajax]:not(.select2)", "click");
     $(document).delegate("[data-wb-ajax]:not(.select2)", "click", function(e) {
 	    $(this).parents("ul").find(".active[data-wb-ajax]").removeClass("active");
@@ -2289,7 +2302,7 @@ function wb_pagination(pid) {
         if (id==undefined) return;
         var tplid = id.substr(5);
         var more = $("[data-wb-tpl='"+tplid+"'").attr("data-wb-more");
-        
+
         $(this).data("route", $(this).attr("data-wb-route")).removeAttr("data-wb-route");
         if ($(this).is(":not([data-wb-idx])")) {
             $(this).attr("data-wb-idx", idx);
@@ -2487,9 +2500,9 @@ success: function(data) {
                                     $(slr).remove();
                                 }
                             } else {
-                                $("[data-wb-tpl=" + tid + "]").html(data.data);    
+                                $("[data-wb-tpl=" + tid + "]").html(data.data);
                             }
-                            
+
                             if (data.pages > "1") {
                                 $(".pagination[id=ajax-" + pid + "]").show();
                                 var pid = $(data.pagr).attr("id");
@@ -2527,7 +2540,7 @@ error: function(data) {
             }
 
         });
-        
+
         if (more !== undefined && $(more).length)  {
             $(slr).hide();
             $(document).undelegate(more,"click");
@@ -2569,9 +2582,9 @@ function wb_class_control() {
                 }
             }
          });
-        
+
     });
-    
+
     $("[class*='control-value-']").trigger("change");
 }
 

@@ -23,3 +23,7 @@
 .wb-uploader.single .gallery {text-align:left;}
 .wb-uploader.single .thumbnail img  {padding: 1px; border-radius:0px;  background-size: contain; opacity:1; max-width: 100%; height: auto!important;}
 .wb-uploader.single .moxie-shim {max-width:100%; height:auto; width:auto; border:none;}
+.modal .wb-uploader.single .thumbnail:after {
+  content: attr(data-name);
+  font-size: 10px;
+}
