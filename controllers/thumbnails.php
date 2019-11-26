@@ -75,12 +75,19 @@ function thumbnail_view()
                 $image = new \Imagick(realpath($file));
                 if ($remote) unlink($file);
                 $scale = 1;
-                if ($height > $width) $scale = $height / $width;;
-                $image->thumbnailImage($_GET["w"], $_GET["h"]*$scale, true);
+                if ($_GET["h"] > $_GET["w"]) $scale = $_GET["h"] / $_GET["w"];
+                if ($_GET["h"] < $_GET["w"]) $scale = $_GET["w"] / $_GET["h"];
+
+                  if ($_GET["h"] * $scale >= $width) {
+                      $image->thumbnailImage($_GET["w"] * (1+$scale) , $_GET["h"], true);
+                  } else {
+
+                      $image->thumbnailImage($_GET["w"]* (1+$scale), $_GET["h"] * ($scale), true);
+                  }
 
                 if ($_GET["zc"]!==1) {
-                    $oy = $_GET["h"] / 100 * $_GET["oy"] / 2;
-                    $ox = $_GET["w"] / 100 * $_GET["ox"] / 2;
+                    $oy = ($_GET["h"] / 100 * $_GET["oy"]);
+                    $ox = $_GET["w"] / 100 * $_GET["ox"];
                     $image->cropImage($_GET["w"], $_GET["h"],$ox,$oy);
                 }
                 file_put_contents($cachedir."/".$cachefile, $image);
