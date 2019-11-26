@@ -241,8 +241,9 @@ class tagThumbnail extends kiNode  {
             } else {
                 $h=$height;
             }
-
-            $src="/{$thumb}/{$w}x{$h}/src{$src}";
+            $left=intval($left);
+            $top=intval($top);
+            $src="/{$thumb}/{$w}x{$h}/{$left}x{$top}/src{$src}";
         }
 
         if ($bkg==true) {
