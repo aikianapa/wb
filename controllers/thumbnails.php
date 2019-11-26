@@ -65,6 +65,8 @@ function thumbnail_view()
         $mime=$size["mime"];
         $cachefile=md5($file."_".$_GET["w"]."_".$_GET["h"]."_".$_GET["ox"]."_".$_GET["oy"]).".".$ext;
         $cachedir=$_ENV["path_app"]."/uploads/_cache/".substr($cachefile, 0, 2);
+        $tw = $_GET["w"];
+        $th = $_GET["h"];
         if (!is_dir($cachedir)) {
             $u=umask();
             mkdir($cachedir, 0766, true);
@@ -75,20 +77,42 @@ function thumbnail_view()
                 $image = new \Imagick(realpath($file));
                 if ($remote) unlink($file);
                 $scale = 1;
-                if ($_GET["h"] > $_GET["w"]) $scale = $_GET["h"] / $_GET["w"];
-                if ($_GET["h"] < $_GET["w"]) $scale = $_GET["w"] / $_GET["h"];
+//                if ($tw > $width OR $th > $height) {
+                    $scale_w = $tw / $width;
+                    $scale_h = $th / $height;
+                    if ($scale_h > $scale_w) {$scale = $scale_h;} else {$scale = $scale_w;}
 
-                  if ($_GET["h"] * $scale >= $width) {
-                      $image->thumbnailImage($_GET["w"] * (1+$scale) , $_GET["h"], true);
-                  } else {
+                    $width = $width * $scale;
+                    $height = $height * $scale;
+                    $image->resizeImage($width,$height,true,true,false);
+                    // resise source
+//                }
+//echo "width: $width<br>height: $height<br>$scale";die;
 
-                      $image->thumbnailImage($_GET["w"]* (1+$scale), $_GET["h"] * ($scale), true);
-                  }
+                  // $image->thumbnailImage($_GET["w"], $_GET["h"] * (1+$scale), true);
+
+
+
+
+//echo "swidth: $width<br>sheight: $height<br>width: $new_width<br>height: $new_height<br>$scale";die;
+
 
                 if ($_GET["zc"]!==1) {
-                    $oy = ($_GET["h"] / 100 * $_GET["oy"]);
-                    $ox = $_GET["w"] / 100 * $_GET["ox"];
-                    $image->cropImage($_GET["w"], $_GET["h"],$ox,$oy);
+                    $ox = ($tw / 100 * $_GET["ox"]) / 2;
+                    if ($th>=$height) {
+                      $oy=0;
+                    } else {
+                        $oy = (($height - $th) / 100 * $_GET["oy"]);
+                    }
+                    if ($tw>=$width) {$ox=0;} else {
+                        $oh = (($width - $tw) / 100 * $_GET["ox"]);
+                    }
+
+//echo "swidth: $width<br>sheight: $height<br>x: $ox<br>y: $oy<br>$scale";die;
+
+                    $image->cropImage($tw, $th, $ox, $oy);
+                } else {
+                    $image->resizeImage($tw,$th,true,true,false);
                 }
                 file_put_contents($cachedir."/".$cachefile, $image);
             } else {
