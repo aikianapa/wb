@@ -90,7 +90,7 @@ function thumbnail_view()
 
                 $width = $width * $scale;
                 $height = $height * $scale;
-                $image->resizeImage($width, $height, true, 1.5, false);
+                $image->resizeImage($width, $height, false, 1, false);
                 // resise source
 //                }
                 //echo "width: $width<br>height: $height<br>$scale";die;
@@ -120,7 +120,7 @@ function thumbnail_view()
 
                     $image->cropImage($tw, $th, $ox, $oy);
                 } else {
-                    $image->resizeImage($tw, $th, true, true, false);
+                    $image->resizeImage($tw, $th, false, 1, false);
                 }
                 file_put_contents($cachedir."/".$cachefile, $image);
             } else {
