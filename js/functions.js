@@ -2554,19 +2554,37 @@ error: function(data) {
 
 function wb_class_control() {
     $(document).undelegate("[class*='control-value-']","change");
-    $(document).delegate("[class*='control-value-']","change",function(){
-        var value = $(this).val();
+    $(document).delegate("[class*='control-value-']","change",function(e){
+				var value = $(this).val();
+				if ($(this).is("[type=checkbox]:checked")) {
+						var value = "on";
+				} else if ($(this).is("[type=checkbox]:not(:checked)")) {
+						var value = "";
+				} else if ($(this).is("[type=radio]:checked")) {
+						var value = $(this).val();
+				} else if ($(this).is("[type=radio]:not(:checked)")) {
+						var value = "";
+				}
+
+
+
         var classes = trim($(this).attr("class")).split(" ");
         var that = this;
+
          $(classes).each(function(i,v) {
              if (strpos(" "+v,"control-value-")) {
                 v = v.split("-");
                 if (v[2] !== undefined) {
                     $("[class*='control-show-"+v[2]+"-']").hide();
-                    $("[class*='control-hide-"+v[2]+"-']").show();
-                    $(".control-show-"+v[2]+"-"+value).show();
-                    $(".control-hide-"+v[2]+"-"+value).hide();
-                    $(".control-remove-"+v[2]+"-"+value).remove();
+//
+										console.log(".control-hide-"+v[2]+"-"+value);
+										if (value > "") {
+											$(".control-hide-"+v[2]+"-"+value).hide();
+	                    $(".control-show-"+v[2]+"-"+value).show();
+											$(".control-toggle-"+v[2]+"-"+value).toggle();
+	                    $(".control-remove-"+v[2]+"-"+value).remove();
+										}
+
                     $(".control-update-"+v[2]).each(function(){
                         var updater = $(this).attr("data-wb-update");
                         var tpl = $("#"+$(this).attr("data-wb-tpl")).html();
