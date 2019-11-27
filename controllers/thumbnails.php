@@ -75,44 +75,52 @@ function thumbnail_view()
         if (!is_file($cachedir."/---".$cachefile) and $cache) {
             if (class_exists("Imagick")) {
                 $image = new \Imagick(realpath($file));
-                if ($remote) unlink($file);
+                if ($remote) {
+                    unlink($file);
+                }
                 $scale = 1;
 //                if ($tw > $width OR $th > $height) {
-                    $scale_w = $tw / $width;
-                    $scale_h = $th / $height;
-                    if ($scale_h > $scale_w) {$scale = $scale_h;} else {$scale = $scale_w;}
+                $scale_w = $tw / $width;
+                $scale_h = $th / $height;
+                if ($scale_h > $scale_w) {
+                    $scale = $scale_h;
+                } else {
+                    $scale = $scale_w;
+                }
 
-                    $width = $width * $scale;
-                    $height = $height * $scale;
-                    $image->resizeImage($width,$height,true,true,false);
-                    // resise source
+                $width = $width * $scale;
+                $height = $height * $scale;
+                $image->resizeImage($width, $height, true, true, false);
+                // resise source
 //                }
-//echo "width: $width<br>height: $height<br>$scale";die;
+                //echo "width: $width<br>height: $height<br>$scale";die;
 
-                  // $image->thumbnailImage($_GET["w"], $_GET["h"] * (1+$scale), true);
-
-
+                // $image->thumbnailImage($_GET["w"], $_GET["h"] * (1+$scale), true);
 
 
-//echo "swidth: $width<br>sheight: $height<br>width: $new_width<br>height: $new_height<br>$scale";die;
+
+
+                //echo "swidth: $width<br>sheight: $height<br>width: $new_width<br>height: $new_height<br>$scale";die;
 
 
                 if ($_GET["zc"]!==1) {
                     $ox = ($tw / 100 * $_GET["ox"]) / 2;
                     if ($th>=$height) {
-                      $oy=0;
+                        $oy=0;
                     } else {
                         $oy = (($height - $th) / 100 * $_GET["oy"]);
                     }
-                    if ($tw>=$width) {$ox=0;} else {
-                        $oh = (($width - $tw) / 100 * $_GET["ox"]);
+                    if ($tw>=$width) {
+                        $ox=0;
+                    } else {
+                        $ox = (($width - $tw) / 100 * $_GET["ox"]);
                     }
 
-//echo "swidth: $width<br>sheight: $height<br>x: $ox<br>y: $oy<br>$scale";die;
+                    //echo "swidth: $width<br>sheight: $height<br>x: $ox<br>y: $oy<br>$scale";die;
 
                     $image->cropImage($tw, $th, $ox, $oy);
                 } else {
-                    $image->resizeImage($tw,$th,true,true,false);
+                    $image->resizeImage($tw, $th, true, true, false);
                 }
                 file_put_contents($cachedir."/".$cachefile, $image);
             } else {
