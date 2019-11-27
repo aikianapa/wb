@@ -90,7 +90,7 @@ function thumbnail_view()
 
                 $width = $width * $scale;
                 $height = $height * $scale;
-                $image->resizeImage($width, $height, true, true, false);
+                $image->resizeImage($width, $height, true, 1.5, false);
                 // resise source
 //                }
                 //echo "width: $width<br>height: $height<br>$scale";die;
