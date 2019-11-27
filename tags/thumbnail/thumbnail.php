@@ -151,9 +151,8 @@ class tagThumbnail extends kiNode  {
             $top=$offset[1];
             $left=$offset[0];
         } else {
-            $top="15%";
+            $top="50%";
             $left="50%";
-            if ($bkg==true AND $contain=="true") $top="50%";
         }
 
 		if (substr($src,0,7)=="http://" OR substr($src,0,8)=="https://") {
