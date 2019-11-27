@@ -260,6 +260,8 @@ class tagThumbnail extends kiNode  {
             if (is_numeric($height)) {
                 $height.="px";
             }
+            $left = intval($left);
+            $top = intval($top);
             //$style="width:{$width}; height: {$height}; background: url('{$src}') {$left} {$top} no-repeat; display:inline-block; background-size: {$bSize}; background-clip: content-box;".$style;
             $style="background: url('{$src}') {$left}% {$top}% no-repeat; display:inline-block;{$bSize} {$cBox} {$style}";
             $this->DOM->attr("src","/engine/uploads/__system/transparent.png");
