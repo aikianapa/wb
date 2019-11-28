@@ -430,6 +430,7 @@ function ajax__mail() {
     $receivers = [];
     $sendlist = explode(",",$mailto);
     foreach($sendlist as $tmp) {
+        $tmp = trim( $tmp );
         $receivers[] = "{$tmp};{$_ENV["settings"]["header"]}";
     }
 
