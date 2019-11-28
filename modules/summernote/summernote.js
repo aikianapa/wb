@@ -1,6 +1,6 @@
 wbapp.scriptWait("/engine/modules/summernote/dist/summernote-bs4.min.js",[],function(){
     wb_include("/engine/modules/summernote/dist/summernote-bs4.css");
-    
+
     function start(that,lang) {
         var that = that;
         if ($(that).attr("data-height") !== undefined) {
@@ -8,7 +8,7 @@ wbapp.scriptWait("/engine/modules/summernote/dist/summernote-bs4.min.js",[],func
         } else {
             var height = 200;
         }
-        
+
         if ($(that).attr("data-toolbar") == undefined) {
               var toolbar = [
                 // [groupName, [list of button]]
@@ -24,7 +24,7 @@ wbapp.scriptWait("/engine/modules/summernote/dist/summernote-bs4.min.js",[],func
                 var toolbar = $(that).attr("data-toolbar");
                 toolbar = eval("toolbar = "+toolbar);
             }
-        
+
         $(that).summernote({
             height: height,
             lang: lang,
@@ -43,9 +43,9 @@ wbapp.scriptWait("/engine/modules/summernote/dist/summernote-bs4.min.js",[],func
                     if ($(that).parents(".modal").length) {
                         $(document).delegate(".modal","hide.bs.modal",function(ev){
                             if ($(ev.target).find("[data-id="+id+"]").length) {
-                                $(that).summernote('destroy');    
+                                $(that).summernote('destroy');
                             }
-                            
+
                         });
                     }
                     console.log('Summernote is launched');
@@ -55,8 +55,8 @@ wbapp.scriptWait("/engine/modules/summernote/dist/summernote-bs4.min.js",[],func
         $(that).data("wb-loaded",true);
     }
 
-    
-    
+
+
     function init() {
         $('.summernote').each(function(){
             var that = this;
@@ -69,11 +69,11 @@ wbapp.scriptWait("/engine/modules/summernote/dist/summernote-bs4.min.js",[],func
                         start(that,lang);
                     });
                 }
-            }        
+            }
         });
     }
-    
+
     init();
-    
+
     $(document).on("multiinput_after_add",function(){init();});
 });

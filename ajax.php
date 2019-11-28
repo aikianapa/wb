@@ -427,10 +427,16 @@ function ajax__mail() {
     else {
         $mailto = $_ENV["settings"]["email"];
     }
+    $receivers = [];
+    $sendlist = explode(",",$mailto);
+    foreach($sendlist as $tmp) {
+        $receivers[] = "{$tmp};{$_ENV["settings"]["header"]}";
+    }
+
     $Item=$_POST;
     $out->wbSetData($Item);
     $out=$out->outerHtml();
-    $res=wbMail("{$_POST["email"]};{$_POST["name"]}","{$mailto};{$_ENV["settings"]["header"]}", $_POST["subject"], $out, $attachments);
+    $res=wbMail("{$_POST["email"]};{$_POST["name"]}",$receivers, $_POST["subject"], $out, $attachments);
     if (!$res) {
         $result=json_encode(array("error"=>true,"msg"=>$_ENV['sysmsg']["mail_sent_error"].": ".$_ENV["error"]['wbMail']));
     } else {
