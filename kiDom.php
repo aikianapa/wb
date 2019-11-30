@@ -1516,7 +1516,7 @@ abstract class kiNode
     }
 
     public function wbControlClass() {
-        
+
         $check = "empty-control";
         $remove = "empty-remove";
 
@@ -1538,8 +1538,8 @@ abstract class kiNode
             }
         }
     }
-    
-    
+
+
     public function wbSetValues($Item=array(),$obj=TRUE) {
         if ( !( (array)$Item === $Item ) ) $Item=array($Item);
         $this->wbSetAttributes($Item);
@@ -1575,7 +1575,7 @@ abstract class kiNode
                     } else {
                         $value=$def;
                     }
-                    if ($value!=="") {
+                    if (!$inp->hasAttr("value") AND $value!=="") {
                         $inp->attr("value",$value);
                     }
                     else {
@@ -1679,7 +1679,7 @@ abstract class kiNode
     }
 
 	public function wbAppends($Item=array()) {
-        
+
         if ($_ENV["route"]["controller"]=="engine") return;
 	    if ($this->find("head")->length) {
 		// Вставки в тэг HEAD
@@ -1972,7 +1972,7 @@ abstract class kiNode
             $this->addClass("wb-attrs");
         }
     }
-    
+
     /* do not fork with qoutes in tree text
     public function wbSetAttributes($Item=array()) {
         $attributes=$this->attributes();
