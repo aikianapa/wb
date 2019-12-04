@@ -67,12 +67,16 @@ function thumbnail_view()
         $cachedir=$_ENV["path_app"]."/uploads/_cache/".substr($cachefile, 0, 2);
         $tw = $_GET["w"];
         $th = $_GET["h"];
+        if (!isset($_GET["ox"])) $_GET["ox"] = 50;
+        if (!isset($_GET["oy"])) $_GET["oy"] = 50;
+        if (intval($_GET["ox"]) == 0) $_GET["ox"] = $_GET["ox"] + 0.000001;
+        if (intval($_GET["oy"]) == 0) $_GET["oy"] = $_GET["oy"] + 0.000001;
         if (!is_dir($cachedir)) {
             $u=umask();
             mkdir($cachedir, 0766, true);
             umask($u);
         }
-        if (!is_file($cachedir."/".$cachefile) and $cache) {
+        if (!is_file($cachedir."/".$cachefile1) and $cache) {
             if (class_exists("Imagick")) {
                 $image = new \Imagick(realpath($file));
                 if ($remote) {
@@ -102,25 +106,36 @@ function thumbnail_view()
 
                 //echo "swidth: $width<br>sheight: $height<br>width: $new_width<br>height: $new_height<br>$scale";die;
 
+                $ox = ($tw / 100 * $_GET["ox"]) / 2;
+                if ($th>=$height) {
+                    $oy=0;
+                } else {
+                    $oy = (($height - $th) / 100 * $_GET["oy"]);
+                }
+                if ($tw>=$width) {
+                    $ox=0;
+                } else {
+                    $ox = (($width - $tw) / 100 * $_GET["ox"]);
+                }
 
-                if ($_GET["zc"]!==1) {
-                    $ox = ($tw / 100 * $_GET["ox"]) / 2;
-                    if ($th>=$height) {
-                        $oy=0;
-                    } else {
-                        $oy = (($height - $th) / 100 * $_GET["oy"]);
-                    }
-                    if ($tw>=$width) {
-                        $ox=0;
-                    } else {
-                        $ox = (($width - $tw) / 100 * $_GET["ox"]);
-                    }
+
+                if (intval($_GET["zc"]) == 1) {
 
                     //echo "swidth: $width<br>sheight: $height<br>x: $ox<br>y: $oy<br>$scale";die;
 
                     $image->cropImage($tw, $th, $ox, $oy);
                 } else {
-                    $image->resizeImage($tw, $th, false, 1, false);
+                    $thumb = $image->clone();
+                    $thumb->thumbnailImage($tw, $th, true);
+
+                    $image->resizeImage($width, $height, false, 1, false);
+                    $image->cropImage($tw, $th, $ox, $oy);
+                    $image->blurImage(40,40);
+
+                    $deltaX = ($image->getImageWidth()  - $thumb->getImageWidth()) / (100 / $_GET["ox"]);
+                    $deltaY = ($image->getImageHeight() - $thumb->getImageHeight()) / (100 / $_GET["oy"]);
+
+                    $image->compositeImage($thumb, Imagick::COMPOSITE_OVER, $deltaX , $deltaY );
                 }
                 file_put_contents($cachedir."/".$cachefile, $image);
             } else {

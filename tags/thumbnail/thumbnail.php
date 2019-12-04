@@ -214,8 +214,8 @@ class tagThumbnail extends kiNode  {
             $ext=substr($img,-3);
         }
 
-        if ($ext!=="svg" AND $contain!=="true") {
-            if ($contain=="true") {
+        if ($ext!=="svg") {
+            if ($contain=="true" AND $bkg !== true) {
                 $thumb="thumbc";
             }
             else {
@@ -274,6 +274,7 @@ class tagThumbnail extends kiNode  {
             }
         }
         $this->DOM->removeAttr("data-wb-size");
+        $this->DOM->removeAttr("contain");
         $this->DOM->removeAttr("size");
         $this->DOM->attr("data-src",$srcSrc);
         $this->DOM->attr("data-ext",$srcExt);
