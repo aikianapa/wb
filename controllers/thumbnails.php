@@ -76,7 +76,7 @@ function thumbnail_view()
             mkdir($cachedir, 0766, true);
             umask($u);
         }
-        if (!is_file($cachedir."/".$cachefile1) and $cache) {
+        if (!is_file($cachedir."/".$cachefile) and $cache) {
             if (class_exists("Imagick")) {
                 $image = new \Imagick(realpath($file));
                 if ($remote) {
