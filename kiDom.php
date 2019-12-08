@@ -1575,7 +1575,7 @@ abstract class kiNode
                     } else {
                         $value=$def;
                     }
-                    if (!$inp->hasAttr("value") AND $value!=="") {
+                    if (!$inp->hasAttr("value") OR ($inp->hasAttr("value") AND $value!=="")) {
                         $inp->attr("value",$value);
                     }
                     else {
