@@ -32,6 +32,10 @@ function _pagesAfterItemRead($Item=null) {
 	return $Item;
 }
 
+function _pagesAfterItemSave($Item) {
+		exec("wget -q -b {$_ENV['hostp']}/{$Item['id']}?wbcache=update > null &");
+		return $Item;
+}
 
 
 
