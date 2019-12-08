@@ -27,6 +27,7 @@ function editarea__afterRead($out,$Item,$obj) {
         }
 
         $cr=$out->find(".mod_editarea",0);
+        if (!$cr) return;
         $sc=$out->find("script",0);
         $ta=$cr->find("textarea");
         $in=$cr->find("input",0);
