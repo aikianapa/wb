@@ -23,9 +23,12 @@ class tagModule extends kiNode  {
         //$exclude=array("role","data-wb-role","class","src");
         $this->DOM->removeClass("wb-done");
         $exclude=array("data-wb-role","src");
-	$call=$src."_init"; if (is_callable($call)) {$out=@$call($this->DOM,$Item);}
-	$call=$src."__init"; if (is_callable($call)) {$out=@$call($this->DOM,$Item);}
-	if (!is_object($out)) {
+	$aCall=$src."_init"; 
+	$eCall=$src."__init";
+	if (is_callable($aCall)) {$out=@$aCall($this->DOM,$Item);} else if (is_callable($eCall)) {$out=@$eCall($this->DOM,$Item);}
+	if (!is_object($out) AND $out>"") {
+		$out = wbFromString($out);
+	} else {
 		$out=wbFromFile($_ENV["route"]["hostp"]."/module/{$src}/");
 	}
         $func=$src."_afterRead";
