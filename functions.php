@@ -2600,7 +2600,7 @@ function wbAuthGetContents($url,$get=null,$username=null,$password=null) {
 	if (!is_array($get)) $get=(array)$get;
     $cred = sprintf('Authorization: Basic %s', base64_encode("$username:$password") );
     $opts = array(
-                'http'=>array(
+                "{$_ENV["route"]["scheme"]}"=>array(
                     'method'=>'GET',
                     'header'=>$cred,
                     'content'=>$get
@@ -2628,7 +2628,7 @@ function wbAuthPostContents($url, $post=null, $username=null,$password=null) {
     $cred = sprintf('Authorization: Basic %s', base64_encode("$username:$password") );
     $post=http_build_query($post);
     $opts = array(
-                'http'=>array(
+                "{$_ENV["route"]["scheme"]}"=>array(
                     'method'=>'POST',
                     'header'=>$cred,
                     'content'=>$post
