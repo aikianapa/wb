@@ -180,7 +180,9 @@ class tagInclude extends kiNode  {
                 $tplpath=implode("/",$tplpath)."/";
                 $src=wbSetValuesStr($src,$Item);
                 $file=$_ENV["path_app"].$src;
-                if (is_file($_SERVER["DOCUMENT_ROOT"].$file)) {
+                if (is_file($file)) {
+                    $src=$file;
+                } else if (is_file($_SERVER["DOCUMENT_ROOT"].$file)) {
                     $src=$_SERVER["DOCUMENT_ROOT"].$file;
                 } else {
 					$tmp = explode("://",$src);
