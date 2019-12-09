@@ -183,10 +183,12 @@ class tagInclude extends kiNode  {
                 if (is_file($_SERVER["DOCUMENT_ROOT"].$file)) {
                     $src=$_SERVER["DOCUMENT_ROOT"].$file;
                 } else {
-                    if (substr($src,0,7)!=="{$_ENV["route"]["scheme"]}://") {
-                        if (substr($src,0,1)!="/") {
+					$tmp = explode("://",$src);
+                    if ($tmp[0] !== $_ENV["route"]["scheme"] ) {
+                        if (substr($src,0,1) !== "/") {
                             $src="/".$src;
-                        } $src=$_ENV["route"]["hostp"].$src;
+                        } 
+                        $src=$_ENV["route"]["hostp"].$src;
                     }
                 }
                 $this_content=wbFromFile($src);
