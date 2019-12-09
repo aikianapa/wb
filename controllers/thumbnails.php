@@ -65,18 +65,22 @@ function thumbnail_view()
         $mime=$size["mime"];
         $cachefile=md5($file."_".$_GET["w"]."_".$_GET["h"]."_".$_GET["ox"]."_".$_GET["oy"]).".".$ext;
         $cachedir=$_ENV["path_app"]."/uploads/_cache/".substr($cachefile, 0, 2);
-        $tw = $_GET["w"];
-        $th = $_GET["h"];
-        if (!isset($_GET["ox"])) $_GET["ox"] = 50;
-        if (!isset($_GET["oy"])) $_GET["oy"] = 50;
-        if (intval($_GET["ox"]) == 0) $_GET["ox"] = $_GET["ox"] + 0.000001;
-        if (intval($_GET["oy"]) == 0) $_GET["oy"] = $_GET["oy"] + 0.000001;
-        if (!is_dir($cachedir)) {
-            $u=umask();
-            mkdir($cachedir, 0766, true);
-            umask($u);
-        }
         if (!is_file($cachedir."/".$cachefile) and $cache) {
+            if (!is_dir($cachedir)) {
+	        $u=umask();
+	        mkdir($cachedir, 0766, true);
+		umask($u);
+            }
+
+            $tw = $_GET["w"];
+	    $th = $_GET["h"];
+    	    if (!isset($_GET["ox"])) $_GET["ox"] = 50;
+            if (!isset($_GET["oy"])) $_GET["oy"] = 50;
+            if (intval($_GET["ox"]) == 0) $_GET["ox"] = $_GET["ox"] + 0.000001;
+            if (intval($_GET["oy"]) == 0) $_GET["oy"] = $_GET["oy"] + 0.000001;
+
+
+
             if (class_exists("Imagick")) {
                 $image = new \Imagick(realpath($file));
                 if ($remote) {
