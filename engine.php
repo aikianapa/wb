@@ -48,7 +48,7 @@ if (!$cache["check"]) {
         $html = $_ENV["DOM"]->outerHtml();
     }
 	if ($cache["save"]==true) {
-        
+
         wbPutContents($cache["path"],$html);
     }
 } else if ($cache["check"]===true) {

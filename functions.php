@@ -220,14 +220,14 @@ function wbMail(
         if (is_array($attach)) {
             foreach($attach as $a) {
                 if (is_string($a) AND substr($a,0,5) == "data:") {
-                    preg_match('/^data:(.*);base64,/', substr($a,0,50), $matches, PREG_OFFSET_CAPTURE); 
+                    preg_match('/^data:(.*);base64,/', substr($a,0,50), $matches, PREG_OFFSET_CAPTURE);
                     $mime = $matches[1][0];
                     $ext = explode("/",$mime);
                     $file = wbNewId().".".$ext[1];
                     $base64 = substr($a,strlen("data:{$mime};base64,"));
                     $mail->AddStringAttachment(base64_decode($base64), $file, 'base64', $mime);
                 } else {
-                    $mail->addAttachment($a);    
+                    $mail->addAttachment($a);
                 }
             }
         }
@@ -613,7 +613,7 @@ function wbFieldBuild($param, $data = array(),$locale=array())
         $_ENV["route"]["mode"]=$param["_mode"]=$_GET["mode"]=$mode;
         $tpl=wbGetForm($form,$mode);
         $tpl->wbSetAttributes($param);
-            
+
         $flddata = $data[$param["name"]];
         $flddata["_form"] = $data["_form"];
         $flddata["_item"] = $data["_item"];
@@ -624,7 +624,7 @@ function wbFieldBuild($param, $data = array(),$locale=array())
             $inp->attr("name","{$fld}[{$inp->attr("name")}]");
         }
         if ($param["prop"]["selector"]>"") {$tpl=$tpl->find($param["prop"]["selector"],0)->clone();}
-        
+
         $tpl->find(".nav-tabs .nav-item:first-child")->addClass("active");
         $_ENV=$env;
         $_GET=$get;
@@ -632,9 +632,9 @@ function wbFieldBuild($param, $data = array(),$locale=array())
         unset($env,$get,$par);
         break;
     case 'snippet':
-            
+
         break;
-            
+
     case 'select':
         if (!is_array($opt)) break;
         if (strpos($opt["from"],":")) {
@@ -657,7 +657,7 @@ function wbFieldBuild($param, $data = array(),$locale=array())
                     if (isset($from[1])) $tree=wbTreeFindBranch($tree,$from[1]);
 					break;
 				case "form":
-				
+
 					break;
 			}
 
@@ -719,7 +719,7 @@ function wbFieldBuild($param, $data = array(),$locale=array())
         $set->find('.form-group > label')->html($label);
         $set->find('.form-group > div')->html($tpl->outerHtml());
     }
-    
+
     $set->wbSetData($param);
     $set->wbSetValues($data);
     $out = $set->outerHtml();
@@ -1265,7 +1265,7 @@ function wbItemRead($table = null, $id = null)
 }
 
 function wbCacheCheck() {
-    exec("find {$_ENV["dbac"]} -type f -mmin +120 -exec rm -rf {} \; &"); // clean old chaches
+    exec("find {$_ENV["dbac"]} -type f -mmin +1440 -exec rm -rf {} \; &"); // clean old chaches
     $cache = array("check"=>false,"id"=>false,"path"=>false,"data"=>false,"save"=>false);
     if (in_array($_ENV["cache_state"],["update","false"])) {
         $save = true;
@@ -1280,6 +1280,7 @@ function wbCacheCheck() {
             $c=wbAttrToArray($line["controller"]);
             $f=wbAttrToArray($line["form"]);
             $m=wbAttrToArray($line["mode"]);
+
             if (
                 (in_array($_ENV["route"]["controller"],$c) OR $c==array("*") )
                 AND     (in_array($_ENV["route"]["form"],$f) OR $f==array("*") OR ($f==array() AND !in_array("form",$c)))
@@ -1287,9 +1288,10 @@ function wbCacheCheck() {
                 AND     $line["active"] == "on"
             )
             {
-            
+
                 $cacheId = wbGetCacheId();
                 $cacheFile = wbGetCacheId(true);
+
                 if (!is_file($cacheFile)) {
                     $cache = array("check"=>null,"id"=>$cacheId,"path"=>$cacheFile,"data"=>false,"save"=>true);
                 } else {
@@ -1316,10 +1318,10 @@ function wbCacheEnvState() {
             $_ENV["cache_state"]=$_ENV["route"]["params"]["wbcache"];
             if (strpos($_ENV["route"]["uri"],"?wbcache=".$_ENV["route"]["params"]["wbcache"]."&")) {
                 $_ENV["route"]["uri"]=str_replace("wbcache=".$_ENV["route"]["params"]["wbcache"]."&","",$_ENV["route"]["uri"]);
-            } else 
+            } else
             if (strpos($_ENV["route"]["uri"],"?wbcache=".$_ENV["route"]["params"]["wbcache"])) {
                 $_ENV["route"]["uri"]=str_replace("?wbcache=".$_ENV["route"]["params"]["wbcache"],"",$_ENV["route"]["uri"]);
-            } else 
+            } else
             if (strpos($_ENV["route"]["uri"],"&wbcache=".$_ENV["route"]["params"]["wbcache"])) {
                 $_ENV["route"]["uri"]=str_replace("&wbcache=".$_ENV["route"]["params"]["wbcache"],"",$_ENV["route"]["uri"]);
             }
@@ -1337,7 +1339,7 @@ function wbGetCacheId($file=false) {
         $cacheFile = "{$_ENV["dbac"]}/{$cacheDir}/{$cacheId}.htm";
         return $cacheFile;
     } else {
-        return $cacheId;    
+        return $cacheId;
     }
 }
 
@@ -3063,12 +3065,12 @@ function wbNormalizePath($path)
 
 function wbClearValues($out,$rep='')
 {
-    $out = preg_replace('/\{\{([^\}]+?)\}\}+|<script.*text\/template.*?>.*?<\/script>(*SKIP)(*F)/isumx', $rep, $out); return $out; 
-} 
-function wbListTpl() { 
-    $dir=$_ENV['path_tpl']; 
-    $list=array(); 
-    $result=array(); 
+    $out = preg_replace('/\{\{([^\}]+?)\}\}+|<script.*text\/template.*?>.*?<\/script>(*SKIP)(*F)/isumx', $rep, $out); return $out;
+}
+function wbListTpl() {
+    $dir=$_ENV['path_tpl'];
+    $list=array();
+    $result=array();
     if (is_dir($dir)) { $list=wbListFilesRecursive($dir, true); foreach ($list as $l=> $val) {
     if (('.php' == substr($val['file'], -4) or '.htm' == substr($val['file'], -4) or '.tpl' == substr($val['file'], -4)) and !strpos('.inc.', $val['file'])) {
     $path = str_replace($dir, '', $val['path']);
