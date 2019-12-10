@@ -17,8 +17,8 @@ function module__controller__init($module=null) {
 	$eModule=$_ENV["path_engine"]."/modules/{$module}/{$module}.php";
 	if (is_file($aModule)) {include_once($aModule);} elseif (is_file($eModule)) {include_once($eModule);}
 	$out=null;
-	$call=$module."_init"; if (is_callable($call)) {$out=@$call();}
-	$call=$module."__init"; if (is_callable($call)) {$out=@$call();}
+	$call=$module."_init"; if (is_callable($call)) {$out=@$call($_ENV["DOM"]);}
+	$call=$module."__init"; if (is_callable($call)) {$out=@$call($_ENV["DOM"]);}
 	if ($out!==null) {$_ENV["DOM"]=$out;} else {
 		$_ENV["DOM"]=wbFromString("{$_ENV['sysmsg']['err_mod_lost']}: [{$module}]");
 	}
