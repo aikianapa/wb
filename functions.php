@@ -202,8 +202,11 @@ function wbMail(
 		$mail->Password = $sett["password"];
 		$mail->SMTPSecure = $sett["secure"];
 		intval($sett["port"]) > 0 ? $mail->Port = intval($sett["port"]) : $mail->Port = 587;
-	}
-        $mail->setFrom($from[0], $from[1]);
+    $mail->setFrom($_ENV["settings"]["email"],$_ENV["settings"]["header"]);
+	} else {
+    $mail->setFrom($from[0], $from[1]);
+  }
+
         $mail->addReplyTo($from[0], $from[1]);
         $mail->isHTML(true);
         $mail->Subject = $subject;

@@ -36,6 +36,7 @@
         <label class="col-sm-4 control-label" title="Set system mail function">SMTP secure</label>
         <div class="col-sm-8">
 		<select class="col-sm-8 form-control" name="phmail[secure]" value="{{phmail[secure]}}">
+      <option value="">NO</option>
 			<option value="tls">TLS</option>
 			<option value="ssl">SSL</option>
 		</select>
