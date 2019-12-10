@@ -202,7 +202,8 @@ function wbMail(
 		$mail->Password = $sett["password"];
 		$mail->SMTPSecure = $sett["secure"];
 		intval($sett["port"]) > 0 ? $mail->Port = intval($sett["port"]) : $mail->Port = 587;
-    $mail->setFrom($_ENV["settings"]["email"],$_ENV["settings"]["header"]);
+    if (is_email($sett["username"])) {$tmpeml = $sett["username"]; } else {$tmpeml = $_ENV["settings"]["email"];}
+    $mail->setFrom($tmpeml,$_ENV["settings"]["header"]);
 	} else {
     $mail->setFrom($from[0], $from[1]);
   }
