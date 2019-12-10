@@ -195,19 +195,23 @@ function wbMail(
             $mail->Port = 587;                                    // TCP port to connect to
         */
         if ($sett["smtp"]=="on") {
+          if ($sett["secure"] == "") $sett["secure"] = false;
 		$mail->isSMTP();
 		$mail->Host = $sett["host"];
 		$sett["smtp"]=="on" ? $mail->SMTPAuth = true : $mail->SMTPAuth = false;
 		$mail->Username = $sett["username"];
 		$mail->Password = $sett["password"];
 		$mail->SMTPSecure = $sett["secure"];
-		intval($sett["port"]) > 0 ? $mail->Port = intval($sett["port"]) : $mail->Port = 587;
-    if (is_email($sett["username"])) {$tmpeml = $sett["username"]; } else {$tmpeml = $_ENV["settings"]["email"];}
-    $mail->setFrom($tmpeml,$_ENV["settings"]["header"]);
+		intval($sett["port"]) > 0 ? $mail->Port = intval($sett["port"]) : $mail->Port = 25;
+    if ($sett["masksender"] == "on") {
+        $mail->setFrom($from[0], $from[1]);
+    } else {
+        if (is_email($sett["username"])) {$tmpeml = $sett["username"]; } else {$tmpeml = $_ENV["settings"]["email"];}
+        $mail->setFrom($tmpeml,$_ENV["settings"]["header"]);
+    }
 	} else {
     $mail->setFrom($from[0], $from[1]);
   }
-
         $mail->addReplyTo($from[0], $from[1]);
         $mail->isHTML(true);
         $mail->Subject = $subject;

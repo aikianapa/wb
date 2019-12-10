@@ -35,12 +35,12 @@
     <div class="row form-group">
         <label class="col-sm-4 control-label" title="Set system mail function">SMTP secure</label>
         <div class="col-sm-8">
-		<select class="col-sm-8 form-control" name="phmail[secure]" value="{{phmail[secure]}}">
-      <option value="">NO</option>
-			<option value="tls">TLS</option>
-			<option value="ssl">SSL</option>
-		</select>
-	</div>
+      		<select class="col-sm-8 form-control" name="phmail[secure]" value="{{phmail[secure]}}">
+            <option value="">NO</option>
+      			<option value="tls">TLS</option>
+      			<option value="ssl">SSL</option>
+      		</select>
+	      </div>
     </div>
 
 <hr>
@@ -59,6 +59,11 @@
     <div class="row form-group">
         <label class="col-sm-4 control-label">SMTP password</label>
         <div class="col-sm-8"><input type="password" name="phmail[password]" class="form-control" placeholder="SMTP password"></div>
+    </div>
+
+    <div class="row form-group">
+        <label class="col-sm-4 control-label">Mask Sender</label>
+        <div class="col-sm-8"><label class="switch switch-success"><input type="checkbox" name="phmail[masksender]"><span></span></label></div>
     </div>
 
 </div>
