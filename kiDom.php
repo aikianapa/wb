@@ -389,7 +389,11 @@ class ki extends CLexer
                                                          'Cookie: ' . session_name()."=".session_id()."\r\n" .
                                                          'Connection: ' . " Close\r\n\r\n",
                                                          'content' => http_build_query($_POST)
-                                                 )
+                                                 ),
+    "ssl"=>array(
+        "verify_peer"=>false,
+        "verify_peer_name"=>false,
+    ),
                                              ));
             session_write_close();
             $url=parse_url($file);
