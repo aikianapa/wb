@@ -382,7 +382,7 @@ class ki extends CLexer
                 session_start();
             }
             $context = stream_context_create(array(
-                                                 'http'=>array(
+                                                 "{$ENV['route']['scheme']}"=>array(
                                                          'method'=>"POST",
                                                          'header'=>	'Accept-language:' . " en\r\n" .
                                                          'Content-Type:' . " application/x-www-form-urlencoded\r\n" .
