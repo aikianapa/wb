@@ -28,7 +28,7 @@ function module__controller__init($module=null)
     $aCall=$module."_init";
     $eCall=$module."__init";
     if (is_callable($aCall)) {
-        $out=@$call($_ENV["DOM"]);
+        $out=@$aCall($_ENV["DOM"]);
     } elseif (is_callable($eCall)) {
         $out=@$eCall($_ENV["DOM"]);
     }
