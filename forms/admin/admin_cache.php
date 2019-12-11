@@ -13,6 +13,15 @@
 	</div>
 </div>
 
+<div class="col-12">
+    <div class="form-group row">
+	<label class="col-sm-3">{{_LANG[cache_lifetime]}}</label>
+	<div class="col-sm-3">
+      <input class="form-control" name="cache_lifetime" placeholder="{{_LANG[cache_lifetime]}}">
+  </div>
+	</div>
+</div>
+
 
 <div class="col-12">
 	<div class="row" style="padding-left: 30px; padding-right:60px;">
@@ -56,8 +65,9 @@
 <script type="text/locale">
 [rus]
         controller	= Контроллер
-	form		= Форма
+	       form		= Форма
         mode		= Режим
+        cache_lifetime = "Периодичность очистки кэша (мин)"
         lifetime        = Время жизни сек.
         active          = Активто
         clear_img	= Очистка кэша изображений
@@ -65,8 +75,9 @@
         clear		= Очистить
 [eng]
         controller	= Controller
-	form		= Form name
+	      form		= Form name
         mode		= Mode
+        cache_lifetime = "Cache cleaner (min)"
         lifetime        = Lifetime sec.
         active          = Active
         clear_img	= Clear cache images

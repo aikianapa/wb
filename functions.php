@@ -61,6 +61,7 @@ function wbInitEnviroment()
     $_ENV['intext_height'] = 240;
     $_ENV['page_size'] = 12;
     $_ENV['data'] = new stdClass(); // for store some data
+    $_ENV["cache_lifetime"] = 120; // clean cache dir (min)
     wbCheckWorkspace();
     $variables = array();
     $settings = wbItemRead('admin', 'settings');
@@ -74,6 +75,8 @@ function wbInitEnviroment()
     $_ENV['variables'] = $variables;
     $settings = array_merge($settings, $variables);
     $_ENV['settings'] = $settings;
+
+    if (isset($_ENV['settings']["cache_lifetime"]) AND intval($_ENV['settings']["cache_lifetime"]) > 0) $_ENV["cache_lifetime"] = intval($_ENV['settings']["cache_lifetime"]);
 
     if ($_SERVER["REQUEST_URI"]=="/engine/") {
         unset($_SESSION["lang"]);
@@ -1273,7 +1276,6 @@ function wbItemRead($table = null, $id = null)
 }
 
 function wbCacheCheck() {
-    exec("find {$_ENV["dbac"]} -maxdepth 1 -mmin +360 -type f -exec rm -rf {} \; &"); // clean old chaches
     $cache = array("check"=>false,"id"=>false,"path"=>false,"data"=>false,"save"=>false);
     if (in_array($_ENV["cache_state"],["update","false"])) {
         $save = true;
@@ -1315,6 +1317,16 @@ function wbCacheCheck() {
                 }
             }
         }
+        // cache cleaner
+        $currtime = time();
+        if (!isset($_ENV["settings"]["cache_lastdrop"]) OR $_ENV["settings"]["cache_lastdrop"] == "") $_ENV["settings"]["cache_lastdrop"] = $currtime;
+        $lasttime = $_ENV["settings"]["cache_lastdrop"];
+        if ( ($currtime - $lasttime) > $_ENV["cache_lifetime"] * 60) {
+            exec("find {$_ENV["dbac"]} -maxdepth 1 -mmin +{$_ENV["cache_lifetime"]} -type f -exec rm -rf {} \; &"); // clean old caches
+            wbItemSave("admin",["id"=>"settings","cache_lastdrop"=>$currtime]);
+        }
+        // ============
+
     }
     return $cache;
 }
