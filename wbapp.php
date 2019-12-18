@@ -3,16 +3,16 @@ use Nahid\JsonQ\Jsonq;
 use Rct567\DomQuery\DomQuery;
 
 class wbDom extends DomQuery {
-    
-    /* ======================================================= 
+
+    /* =======================================================
                         WEB BASIC EXTENSIONS
     ======================================================= */
-    
+
     public function fetch($Item=null) {
         if ($Item == null AND isset($this->data)) {
             $Item = $this->data;
         } else if ($Item !== null) {
-            $this->data = $Item;    
+            $this->data = $Item;
         }
         if (!$this->isDocument) {
             $this->fetchParams();
@@ -37,8 +37,8 @@ class wbDom extends DomQuery {
                 }
             }
         }
-        
-        
+
+
 //        echo "<pre>".htmlspecialchars($this->outerHtml())."</pre>";
         if (!$this->wbdone) {
             if (!$this->isDocument) {
@@ -47,7 +47,7 @@ class wbDom extends DomQuery {
         }
         return $this;
     }
-    
+
 	public function outerHtml($clear = false) {
         if ($clear) {
             $this->find(".wb-done")->removeClass("wb-done");
@@ -71,7 +71,7 @@ class wbDom extends DomQuery {
                 $tmp=$attr->name;
                 if (strpos($tmp,"ata-wb-")) {
                     $tmp=str_replace("data-wb-","",$tmp);
-                    $params[$tmp]=$attr->value; 
+                    $params[$tmp]=$attr->value;
                 }
             }
         }
@@ -83,7 +83,7 @@ class wbDom extends DomQuery {
         }
         return $this;
     }
-    
+
     function excludeTags() {
         $list=$this->find("textarea,[type=text/template],.wb-done,.wb-value,pre,.nowb,[data-role=module],[data-wb-role=module],select.select2[data-wb-ajax] option");
         foreach ($list as $ta) {
@@ -93,7 +93,7 @@ class wbDom extends DomQuery {
         };
         return $this;
     }
-    
+
     function includeTags() {
         $list=$this->find("[wb-exclude-id]")->each(function($ta) {
             $ta->replaceWith(strtr($ta->outerHtml(),array("#~#~"=>"{{","~#~#"=>"}}")));
@@ -101,16 +101,16 @@ class wbDom extends DomQuery {
         });
         return $this;
     }
-    
+
     public function clear() {
         $this->html("");
         return $this;
     }
-    
+
     public function tag() {
         return $this->tagName;
     }
-    
+
     public function getLocale($ini=null) {
         $locale=null;
         if ($this->find("[type='text/locale']")->length OR $ini!==null) {
@@ -152,14 +152,14 @@ class wbDom extends DomQuery {
         $this->locale = $locale;
         return $locale;
     }
-    
+
     public function setLocale($ini=null) {
         $locale = null;
         if ($this->find("[text/locale]")) $locale=$this->getLocale($ini);
         $this->locale = $locale;
         return $locale;
     }
-    
+
     public function hasRole($role=null) {
         if ($role == null && isset($this->params->role)) {
             return $this->params->role;
@@ -169,7 +169,7 @@ class wbDom extends DomQuery {
             return false;
         }
     }
-    
+
     public function setValues($Item=null) {
         if ($Item == null) $Item = $this->data;
         if (!((array)$Item === $Item)) {$Item=[];}
@@ -177,7 +177,7 @@ class wbDom extends DomQuery {
         $this->html(wbSetValuesStr($this->html(),$Item));
         return $this;
     }
-    
+
     public function setAttributes($Item=null) {
         if ($Item == null) $Item = $this->data;
             $attributes=$this->attributes;
@@ -203,7 +203,7 @@ class wbDom extends DomQuery {
 
         return $this;
     }
-    
+
     public function wbWhere($Item=null) {
         $res = true;
         $where=$this->params->where;
@@ -213,10 +213,10 @@ class wbDom extends DomQuery {
         //if ($this->params->hide !== "false") $this->removeAttr("data-wb-where");
         return $res;
     }
-    
+
 }
-    
-    
+
+
 
 class wbApp {
     public $settings;
@@ -297,7 +297,7 @@ class wbApp {
             $dom->isDocument = $isDocument;
             return $dom;
         }
-    
+
         public function getForm($form = null, $mode = null, $engine = null) {
             $_ENV['error'][__FUNCTION__] = '';
             if (null == $form) $form = $_ENV['route']['form'];

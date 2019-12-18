@@ -1277,6 +1277,7 @@ function wbItemRead($table = null, $id = null)
 
 function wbCacheCheck() {
     $cache = array("check"=>false,"id"=>false,"path"=>false,"data"=>false,"save"=>false);
+    if ($_POST!==[]) return $cache;
     if (in_array($_ENV["cache_state"],["update","false"])) {
         $save = true;
         if ($_ENV["cache_state"]=="false") $save = false;
