@@ -231,7 +231,7 @@ function wbMail(
         if (is_array($attach)) {
             foreach($attach as $a) {
                 if (is_string($a) AND substr($a,0,5) == "data:") {
-                    preg_match('/^data:(.*);base64,/', substr($a,0,50), $matches, PREG_OFFSET_CAPTURE);
+                    preg_match('/^data:(.*);base64,/', substr($a,0,200), $matches, PREG_OFFSET_CAPTURE);
                     $mime = $matches[1][0];
                     $ext = wbMimeExt($mime);
                     $file = wbNewId().".".$ext;
