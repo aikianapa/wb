@@ -288,7 +288,7 @@ function wbMimeExt($mime){
     "webm":["video\/webm"],"aac":["audio\/x-acc"],"m4u":["application\/vnd.mpegurl"],
     "pdf":["application\/pdf","application\/octet-stream"],
     "pptx":["application\/vnd.openxmlformats-officedocument.presentationml.presentation"],
-    "ppt":["application\/powerpoint","application\/vnd.ms-powerpoint","application\/vnd.ms-office",
+    "ppt":["application\/powerpoint","application\/vnd.ms-powerpoint"],"doc":["application\/vnd.ms-office",
     "application\/msword"],"docx":["application\/vnd.openxmlformats-officedocument.wordprocessingml.document"],
     "xlsx":["application\/vnd.openxmlformats-officedocument.spreadsheetml.sheet","application\/vnd.ms-excel"],
     "xl":["application\/excel"],"xls":["application\/msexcel","application\/x-msexcel","application\/x-ms-excel",
