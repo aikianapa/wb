@@ -2485,8 +2485,10 @@ function wbWherePhp($str = '', $item = array())
 		}
 	}
 	if ($flag==4) {$str.=")";}
+    $str=preg_replace('~\("(.*)" \)\s\s"(.*)"~',' ("$1 $2") ',$str);
     //$str=preg_replace("~\{\{([^(}})]*)\}\}~","",$str);
     $_ENV["cache"][__FUNCTION__][$cache]=$str;
+    if ($flag == 1 && substr($str,-2)!==") ") $str="";
     return $str;
 }
 
