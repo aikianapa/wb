@@ -285,11 +285,8 @@ class tagThumbnail extends kiNode  {
         if ($this->DOM->attr("lazy") == "true" OR ($_ENV["settings"]["cache_lazy_img"] == "on" AND  $this->DOM->attr("lazy") !== "false")) {
             $this->DOM->attr("data-lazy",$src);
             $this->DOM->removeAttr("src");
-        }
-
-        if (!isset($_ENV["module_loadjs"][__FUNCTION__])) {
-          $this->DOM->append('<script data-wb-append="body" src="/engine/tags/thumbnail/thumbnail.js"></script>');
-          $_ENV["module_loadjs"][__FUNCTION__]=true;
+            $loadjs = "/engine/tags/thumbnail/thumbnail.js";
+            wbLoadJs($this->DOM,$loadjs);
         }
 // =================
         $this->DOM->removeAttr('json');

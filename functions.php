@@ -128,15 +128,21 @@ function wbInitEnviroment()
         $_ENV['page_size'] = $_ENV['settings']['page_size'];
     }
     if (!isset($_ENV["settings"]["cache_lazy_img"])) $_ENV["settings"]["cache_lazy_img"]="";
-
     $_ENV['sysmsg'] = wbGetSysMsg();
-
     // Load tags
     $_ENV['tags'] = wbListTags();
     foreach(array_keys($_ENV['tags']) as $name) {
         require_once $_ENV['tags'][$name];
     }
 }
+
+function wbLoadJs(&$dom,$loadjs) {
+    if (!isset($_ENV["loadedjs"][$loadjs])) {
+      $dom->append('<script data-wb-append="body" src="'.$loadjs.'"></script>');
+      $_ENV["loadedjs"][$loadjs]=true;
+    }
+}
+
 
 function wbGetSysMsg() {
     $locale=array();
