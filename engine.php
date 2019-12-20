@@ -32,7 +32,6 @@ if (!$cache["check"]) {
 		$hide=$_ENV["DOM"]->find("[data-wb-hide]");
 		foreach($hide as $h) {$h->tagHideAttrs();}
 	}
-
 	$_ENV["DOM"]->wbTargeter();
 	$_ENV["DOM"]->wbClearClass();
 	if ( isset($_ENV["settings"]["beautifyHtml"]) AND $_ENV["settings"]["beautifyHtml"]=="on" ) {
