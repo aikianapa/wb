@@ -24,6 +24,18 @@
 
 
 <div class="col-12">
+  <div class="form-group row">
+<label class="col-sm-3">{{_LANG[cache_lazy_img]}}</label>
+<div class="col-sm-3">
+  <label class="switch switch-sm switch-success">
+    <input type="checkbox" name="cache_lazy_img" value="">
+    <span></span>
+  </label>
+</div>
+</div>
+</div>
+
+<div class="col-12">
 	<div class="row" style="padding-left: 30px; padding-right:60px;">
 		<div class="col-sm-3">
 			<label>{{_LANG[controller]}}</label>
@@ -73,6 +85,7 @@
         clear_img	= Очистка кэша изображений
         clear_txt	= Очистка кэша страниц
         clear		= Очистить
+        cache_lazy_img = Ленивые картинки по-умолчанию
 [eng]
         controller	= Controller
 	      form		= Form name
@@ -83,4 +96,5 @@
         clear_img	= Clear cache images
         clear_txt	= Clear cache texts
         clear		= Clear
+        cache_lazy_img = Lazy images by default
 </script>

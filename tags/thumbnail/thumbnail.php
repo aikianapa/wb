@@ -281,7 +281,19 @@ class tagThumbnail extends kiNode  {
         $this->DOM->attr("class",$class);
         $this->DOM->attr("noimg",$noimg);
         $this->DOM->attr("style",$style);
+// === lazy Load ===
+        if ($this->DOM->attr("lazy") == "true" OR ($_ENV["settings"]["cache_lazy_img"] == "on" AND  $this->DOM->attr("lazy") !== "false")) {
+            $this->DOM->attr("data-lazy",$src);
+            $this->DOM->removeAttr("src");
+        }
+
+        if (!isset($_ENV["module_loadjs"][__FUNCTION__])) {
+          $this->DOM->append('<script data-wb-append="body" src="/engine/tags/thumbnail/thumbnail.js"></script>');
+          $_ENV["module_loadjs"][__FUNCTION__]=true;
+        }
+// =================
         $this->DOM->removeAttr('json');
+        $this->DOM->removeAttr('lazy');
     }
 
 

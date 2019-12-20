@@ -62,6 +62,7 @@ function wbInitEnviroment()
     $_ENV['page_size'] = 12;
     $_ENV['data'] = new stdClass(); // for store some data
     $_ENV["cache_lifetime"] = 120; // clean cache dir (min)
+    $_ENV["module_loadjs"] = [];
     wbCheckWorkspace();
     $variables = array();
     $settings = wbItemRead('admin', 'settings');
@@ -126,6 +127,8 @@ function wbInitEnviroment()
     if (isset($_ENV['settings']['page_size']) and is_numeric($_ENV['settings']['page_size'])) {
         $_ENV['page_size'] = $_ENV['settings']['page_size'];
     }
+    if (!isset($_ENV["settings"]["cache_lazy_img"])) $_ENV["settings"]["cache_lazy_img"]="";
+
     $_ENV['sysmsg'] = wbGetSysMsg();
 
     // Load tags
