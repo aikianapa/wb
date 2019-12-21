@@ -1482,6 +1482,17 @@ abstract class kiNode
                 }
             }
         };
+        // clear double js loading
+        $srcjs = $this->find("script[src$=.js]");
+        $loaded = [];
+        foreach ($srcjs as $inc) {
+            if (in_array($inc->attr("src"),$loaded)) {
+                $inc->remove();
+            } else {
+                $loaded[] = $inc->attr("src");
+            }
+        }
+
 
         $this->find("[data-wb-remove]")->remove();
         $this->find("[data-wb-clear]")->html("");

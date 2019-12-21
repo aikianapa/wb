@@ -62,7 +62,6 @@ function wbInitEnviroment()
     $_ENV['page_size'] = 12;
     $_ENV['data'] = new stdClass(); // for store some data
     $_ENV["cache_lifetime"] = 120; // clean cache dir (min)
-    $_ENV["module_loadjs"] = [];
     wbCheckWorkspace();
     $variables = array();
     $settings = wbItemRead('admin', 'settings');
@@ -137,9 +136,8 @@ function wbInitEnviroment()
 }
 
 function wbLoadJs(&$dom,$loadjs) {
-    if (!isset($_ENV["loadedjs"][$loadjs])) {
+    if (!$dom->find("[src='{$loadjs}']")->length) {
       $dom->append('<script data-wb-append="body" src="'.$loadjs.'"></script>');
-      $_ENV["loadedjs"][$loadjs]=true;
     }
 }
 
