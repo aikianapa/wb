@@ -276,7 +276,8 @@ class tagThumbnail extends kiNode  {
         $this->DOM->removeAttr("data-wb-size");
         $this->DOM->removeAttr("contain");
         $this->DOM->removeAttr("size");
-        $this->DOM->attr("data-src",$srcSrc);
+        $this->DOM->removeAttr("data-src");
+        $this->DOM->removeAttr("data-wb-noimg");
         $this->DOM->attr("data-ext",$srcExt);
         $this->DOM->attr("class",$class);
 //        $this->DOM->attr("noimg",$noimg);
