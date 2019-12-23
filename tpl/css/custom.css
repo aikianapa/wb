@@ -2,7 +2,8 @@
 
 .wblogo {font-family:wblogo; top:-1.3rem; font-weight:normal;}
 
-.kt-logo .wblogo {font-size:2.4rem; }
+.kt-logo .wblogo {font-size: 2.1rem;
+    word-break: break-all; }
 
 .cursor-wait {
   cursor: wait;
@@ -492,7 +493,7 @@ select.form-control+.select2-container {
   position: relative;
   left:0;
   margin-bottom: 10px;
-  overflow:hidden; 
+  overflow:hidden;
 }
 
 .content-left li.nav-item {

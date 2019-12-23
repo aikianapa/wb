@@ -6,10 +6,10 @@ $(function() {
 	} else {
 		// загрузка из wbengine
 	    var loading = setInterval(function() {
-		if ($(document).data("wb_include").length >= 4) {
-		    wb_init();
-		    clearInterval(loading);
-		}
+					if ($(document).data("wb_include").length >= 3) {
+					    wb_init();
+					    clearInterval(loading);
+					}
 	    },1);
 	}
 });
@@ -2393,6 +2393,7 @@ function wb_pagination(pid) {
 
         $(document).undelegate(".pagination[id=" + id + "] li a", "click");
         $(document).delegate(".pagination[id=" + id + "] li a", "click", function(event) {
+
             if (!$(this).is("a") || !$(this).parent().hasClass("active")) { // отсекает дубль вызова ajax, но не работает trigger в поиске
                 console.log("active_pagination(): Click");
                 var that = $(this);

@@ -40,7 +40,7 @@ function wb_include(url,defer,async) {
     }
     return;
 }
-wb_include("/engine/js/vue.min.js");
+//wb_include("/engine/js/vue.min.js");
 wb_include("/engine/js/php.js");
 wb_include("/engine/js/jquery.redirect.js");
 wb_include("/engine/js/functions.js");

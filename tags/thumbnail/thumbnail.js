@@ -4,13 +4,9 @@ $(document).ready(function(){
   $(document).on('wbThumbLazy',function(){
         $('[data-lazy]').Lazy({
          // your configuration goes here
-         effect: 'fadeIn',
+         effect: 'show',
          threshold: 200,
-         attribute: 'data-lazy',
-         afterLoad: function(e) {
-            var src = $(e).attr("src");
-            $("[data-lazy='"+src+"']").attr("src",src).removeAttr("data-lazy");
-         }
+         attribute: 'data-lazy'
         });
 
   });
