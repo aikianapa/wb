@@ -18,6 +18,10 @@ body {
   overflow: hidden;
 }
 
+img[width] {
+  height:auto;
+}
+
 .modal-content {
   box-shadow: 3px 3px 3px #00000022;
 }
