@@ -167,6 +167,12 @@ function wbMailer(
 function wbMail(
     $from = null, $sent = null, $subject = null, $message = null, $attach = null
 ) {
+    if (isset($_POST["_fakesend"]) && $_POST["_fakesend"]=="true") {
+        $_POST["_fakesend"] = true;
+    } else if (isset($_POST["_fakesend"]) && $_POST["_fakesend"]=="false") {
+      $_POST["_fakesend"] = false;
+    }
+
     if ($from == null) {
         $from=$_ENV["settings"]["email"].";".$_ENV["settings"]["header"];
     } else if (!is_array($from)) {
@@ -250,8 +256,12 @@ function wbMail(
             }
         }
         //send the message, check for errors
-        $mail->send();
-        $error=$_ENV["error"][__FUNCTION__]=$mail->ErrorInfo;
+        if (isset($_POST["_fakesend"])) {
+            $error=$_ENV["error"][__FUNCTION__]=$_POST["_fakesend"];
+        } else {
+          $mail->send();
+          $error=$_ENV["error"][__FUNCTION__]=$mail->ErrorInfo;
+        }
     } else {
 
 // Set content-type header for sending HTML email
@@ -260,11 +270,17 @@ function wbMail(
 
 // Additional headers
         $headers .= "From: {$from[0]}\r\n"."X-Mailer: php";
-        foreach($sent as $s) {
-            $error=mail($s[0],$subject,$message,$headers);
-            if ($error==true) {$error=false;} else {$error=true;}
-            $_ENV["error"][__FUNCTION__]=$error;
 
+        if (isset($_POST["_fakesend"])) {
+            $error=$_ENV["error"][__FUNCTION__]=$_POST["_fakesend"];
+            return $error;
+        } else {
+              foreach($sent as $s) {
+                  $error=mail($s[0],$subject,$message,$headers);
+                  if ($error==true) {$error=false;} else {$error=true;}
+                  $_ENV["error"][__FUNCTION__]=$error;
+
+              }
         }
     }
         if ($error>"") {

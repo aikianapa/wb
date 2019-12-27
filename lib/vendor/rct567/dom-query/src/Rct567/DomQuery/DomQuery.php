@@ -61,7 +61,7 @@ class DomQuery extends DomQueryNodes
         // get html for first node
         return $this->getInnerHtml();
     }
-    
+
     public function innerHtml($html_string=null) {
         return $this->html($html_string);
     }

@@ -1985,6 +1985,9 @@ function wb_ajax() {
                     var form = $(that).parents("form");
                     flag = wb_check_required(form);
                     ajax = $(form).serializeArray();
+										if ($(that).attr("data-fakesend") > "") {
+												ajax.push({name:"_fakesend",value:$(that).attr("data-fakesend")});
+										}
 					if ($(that).attr("data-automail") !== "false" && $(that).attr("data-wb-ajax")=="/ajax/mail/") {
 						is_mail = true;
 						ajax.push({name:"_message",value:$(form).wbMailForm()});
@@ -2151,7 +2154,7 @@ $.fn.wbMailForm = function() {
     // создание автописьма из формы
     var tpl = "";
     $(this).find(":input:not([type=radio]):not([type=checkbox]),:input[type=checkbox]:checked,:input[type=radio]:checked").each(function() {
-        if (!$(this).is("[type=button]") && !$(this).is("[data-mail=false]") && !in_array($(this).attr("name"),["_subject","_mailto","_callback"])) {
+        if (!$(this).is("[type=button]") && !$(this).is("[data-mail=false]") && !in_array($(this).attr("name"),["_subject","_mailto","_callback","_fakesend"])) {
             var label = $(this).attr("data-label");
             if (label == undefined) label = $(this).wbGetInputLabel();
             var value = "";
