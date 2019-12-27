@@ -2151,7 +2151,7 @@ $.fn.wbMailForm = function() {
     // создание автописьма из формы
     var tpl = "";
     $(this).find(":input:not([type=radio]):not([type=checkbox]),:input[type=checkbox]:checked,:input[type=radio]:checked").each(function() {
-        if (!$(this).is("[type=button]") && !$(this).is("[data-mail=false]") && !in_array($(this).attr("name"),["_subject","_mailto"])) {
+        if (!$(this).is("[type=button]") && !$(this).is("[data-mail=false]") && !in_array($(this).attr("name"),["_subject","_mailto","_callback"])) {
             var label = $(this).attr("data-label");
             if (label == undefined) label = $(this).wbGetInputLabel();
             var value = "";
