@@ -1,7 +1,4 @@
 /.project
 /database/_cache
 /uploads/_cache
-
-_functions\.php
-
-_kiDom\.php
+/uploads/_sess

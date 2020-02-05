@@ -198,6 +198,7 @@ function ajax__save($form=null) {
             $_POST["id"]=$_GET["item"];
         }
         $res=wbItemSave($form,$_POST);
+        //wbTableFlush($form);
         $ret=array();
         if (isset($_GET["copy"])) {
             $old=str_replace("//","/",$_ENV["path_app"]."/uploads/{$form}/{$_GET["copy"]}/");
