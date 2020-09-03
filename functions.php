@@ -1606,6 +1606,7 @@ function wbGetCache()
 {
     if (count($_POST)) return null;
     if ($_GET['mode'] !== 'show') return null;
+    if (isset($_GET['params']) AND isset($_GET['params']['update'])) return null;
     $cid = wbGetCacheId();
     $sub = substr($cid, 0, 4);
     $dir = $_ENV['dbac'] . '/' . $sub;
