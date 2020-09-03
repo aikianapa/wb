@@ -34,7 +34,7 @@
 </div>
 </div>
 </div>
-
+<!--
 <div class="col-12">
 	<div class="row" style="padding-left: 30px; padding-right:60px;">
 		<div class="col-sm-3">
@@ -73,13 +73,16 @@
 			</label>
 		</div>
 	</div>
+
+
+-->
 </div>
 <script type="text/locale">
 [rus]
         controller	= Контроллер
 	       form		= Форма
         mode		= Режим
-        cache_lifetime = "Периодичность очистки кэша (мин)"
+        cache_lifetime = "Время жизни кэша (сек)"
         lifetime        = Время жизни сек.
         active          = Активто
         clear_img	= Очистка кэша изображений
@@ -90,7 +93,7 @@
         controller	= Controller
 	      form		= Form name
         mode		= Mode
-        cache_lifetime = "Cache cleaner (min)"
+        cache_lifetime = "Cache lifetime (sec)"
         lifetime        = Lifetime sec.
         active          = Active
         clear_img	= Clear cache images

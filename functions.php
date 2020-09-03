@@ -1586,7 +1586,6 @@ function wbGetCacheId()
 function wbSetCache($out = '')
 {
     if (count($_POST)) return null;
-    if (array_keys($_GET) !== ['uri','controller','mode','form','item']) return null;
     if ($_GET['mode'] !== 'show') return null;
 
     $cid = wbGetCacheId();
@@ -1606,7 +1605,6 @@ function wbSetCache($out = '')
 function wbGetCache()
 {
     if (count($_POST)) return null;
-    if (array_keys($_GET) !== ['uri','controller','mode','form','item']) return null;
     if ($_GET['mode'] !== 'show') return null;
     $cid = wbGetCacheId();
     $sub = substr($cid, 0, 4);
