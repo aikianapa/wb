@@ -11,8 +11,8 @@ ini_set('display_errors', 1);
 session_start();
 require_once __DIR__."/functions.php";
 wbInit();
-$cache=wbCacheCheck();
-if (!$cache["check"]) {
+$cache = wbGetCache();
+if (!$cache) {
     $_ENV["ITEM"]=array();
     $exclude=in_array($_ENV["route"]["controller"],array("module","ajax","thumbnails"));
 	if (!isset($_ENV["route"]["form"]) OR $_ENV["route"]["form"]!=="default_form") {
@@ -46,13 +46,15 @@ if (!$cache["check"]) {
         if (is_object($html)) $html = $html->outerHtml();
     } else {
         $html = $_ENV["DOM"]->outerHtml();
-    }
+	}
+	wbSetCache($html);
+	/*
 	if ($cache["save"]==true) {
 
         wbPutContents($cache["path"],$html);
-    }
-} else if ($cache["check"]===true) {
-	$html=$cache["data"];
+    }*/
+} else {
+	$html=&$cache;
 }
 session_write_close();
 echo $html;
