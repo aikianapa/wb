@@ -1580,6 +1580,7 @@ function wbGetCacheId()
 {
     $uri = $_ENV['route']['uri'];
     $lang = $_ENV["lang"];
+    if ($lang == '') $lang = 'rus';
     return md5($uri . '_' . $lang);
 }
 
@@ -1597,7 +1598,7 @@ function wbSetCache($out = '')
     }
 
     if (!is_dir($dir)) {
-        mkdir($dir, 0777, true);
+        mkdir($dir, 0755, true);
     }
     file_put_contents($name, $out, LOCK_EX);
 }
@@ -1615,13 +1616,15 @@ function wbGetCache()
     if (is_file($name)) {
         if ((time() - filectime($name)) > $lifetime) {
             // Делаем асинхронный запрос с обновлением кэша
-            $fp = stream_socket_client("tcp://{$_ENV['route']['host']}:{$_ENV['route']['port']}", $errno, $errstr, 30);
-            if (!$fp) {
-                echo "$errstr ($errno)<br />\n";
-            } else {
-                fwrite($fp, "GET {$_ENV['route']['uri']}?update HTTP/1.0\r\nHost: {$_ENV['route']['host']} \r\nAccept: */*\r\n\r\n");
-                fclose($fp);
-            }
+            //$fp = stream_socket_client("tcp://{$_ENV['route']['host']}:{$_ENV['route']['port']}", $errno, $errstr, 30);
+            //if (!$fp) {
+              //  echo "$errstr ($errno)<br />\n";
+            //} else {
+                //fwrite($fp, "GET {$_ENV['route']['uri']}?update HTTP/1.0\r\nHost: {$_ENV['route']['host']}\r\nAccept: */*\r\n\r\n");
+                //fclose($fp);
+            //}
+            //wget -O filename.tar ftp://some.host.com/filename-1.3.0-release-branch.tar
+            exec("wget -O -b {$name} {$_ENV['route']['hostp']}{$_ENV['route']['uri']}?update &");
         }
         return file_get_contents($name);
     }

@@ -169,6 +169,8 @@ final class wbRouter {
             $_ENV["route"]=array("scheme"=>$scheme,"host"=>$_SERVER["HTTP_HOST"],"controller"=>$controller,$controller=>$_GET["form"], $action=>$_GET["mode"], "params"=>$_GET);
         }
         $_ENV["server"]=$_ENV["route"]["hostp"];
+        $_ENV["route"]["uri"] = explode('?',$_ENV["route"]["uri"]);
+        $_ENV["route"]["uri"] = $_ENV["route"]["uri"][0];
         return $_ENV["route"];
     }
 
