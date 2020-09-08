@@ -1624,7 +1624,7 @@ function wbGetCache()
                 //fclose($fp);
             //}
             //wget -O filename.tar ftp://some.host.com/filename-1.3.0-release-branch.tar
-            exec("wget -O -b {$name} {$_ENV['route']['hostp']}{$_ENV['route']['uri']}?update &");
+            exec("wget -b -F -O {$name} {$_ENV['route']['hostp']}{$_ENV['route']['uri']}?update &");
         }
         return file_get_contents($name);
     }

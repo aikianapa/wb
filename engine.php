@@ -10,7 +10,9 @@ ini_set('session.cookie_lifetime', 100);
 ini_set('display_errors', 1);
 session_start();
 require_once __DIR__."/functions.php";
+$_ENV['debug'] = false;
 wbInit();
+if ($_ENV["route"]["form"] == 'pages' && $_ENV["route"]["item"] == 'news1') $_ENV['debug'] = true;
 $cache = wbGetCache();
 if (!$cache) {
     $_ENV["ITEM"]=array();
