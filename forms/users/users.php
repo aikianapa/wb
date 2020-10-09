@@ -22,9 +22,11 @@ function _usersAfterItemRead($Item) {
 			$Item["role"]="admin";
 		} else {
 			// read admin menu/dashboard config as default
-			$prop=wbItemRead("users",$_SESSION["user_role"]);
-			$Item["roleprop"]=$prop["roleprop"];
-			$Item["_roleprop__dict_"]=$prop["_roleprop__dict_"];
+			if ($Item['id'] == $_SESSION["user_role"]) {
+				$prop=wbItemRead("users",$_SESSION["user_role"]);
+				$Item["roleprop"]=$prop["roleprop"];
+				$Item["_roleprop__dict_"]=$prop["_roleprop__dict_"];
+			}
 		}
 	    }
 	}

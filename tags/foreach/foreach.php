@@ -1,6 +1,5 @@
 <?php
 class tagForeach extends kiNode  {
-
     function __construct($that) {
 	if ($that->hasClass("wb-done")) return;
         $this->DOM = $that;
@@ -104,6 +103,7 @@ class tagForeach extends kiNode  {
         if ($table > "") {
             $table=wbTable($table);
             $itemform=wbTableName($table);
+
             if (isset($item) AND $item>"") {
                 $Item[0]=wbItemRead($table,$item);
                 if ($field>"") {
@@ -116,7 +116,7 @@ class tagForeach extends kiNode  {
                     }
                 }
             }  else {
-                $Item=wbItemList($table,$where);
+                $Item = wbItemList($table,$where);
             }
         }
         if (isset($call) AND is_callable($call)) {
